@@ -144,11 +144,10 @@ class Cardapio(dbus.service.Object):
 
 		if self.shown_section is None:
 			self.clear_search_entry()
+			widget.set_sensitive(False)
+
 		else:
 			self.show_all_nonempty_sections()
-
-		self.auto_toggled_sidebar_button = True
-		widget.set_active(False)
 
 
 	def on_sidebar_button_clicked(self, widget, section_slab):
@@ -205,7 +204,7 @@ class Cardapio(dbus.service.Object):
 		pass
 
 
-	def on_mainwindow_destroy(self, widget, event):
+	def on_mainwindow_destroy(self, widget):
 
 		gtk.main_quit()
 
@@ -248,7 +247,11 @@ class Cardapio(dbus.service.Object):
 
 	def on_searchentry_icon_press(self, widget, iconpos, event):
 
-		self.clear_search_entry()
+		if self.is_searchfield_empty():
+			self.show_all_nonempty_sections()
+
+		else:
+			self.clear_search_entry()
 
 
 	def on_searchentry_changed(self, widget):
@@ -261,6 +264,8 @@ class Cardapio(dbus.service.Object):
 			self.disappear_with_section(self.system_section_slab)
 			self.disappear_with_section(self.session_section_slab)
 			self.disappear_with_section(self.search_section_slab)
+		else:
+			self.all_sections_sidebar_button.set_sensitive(True)
 
 		if self.tracker_object is not None:
 			if len(text) >= Cardapio.min_search_string_length:
@@ -424,6 +429,9 @@ class Cardapio(dbus.service.Object):
 		else: return False
 		return True
 
+		# TODO: send all alphanumeric keys to entry field
+		# (or all non-tab, non-shift-tab, non-enter, non-esc, non-modifier keys)
+
 
 	# make Tab go from first result element to text entry widget
 	def on_first_button_key_press_event(self, widget, event):
@@ -557,6 +565,8 @@ class Cardapio(dbus.service.Object):
 		button = self.add_sidebar_button(_('All'), None, self.category_pane, comment = _('Show all categories'))
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_sections_sidebar_button = button 
+		self.set_sidebar_button_active(button, True)
+		self.all_sections_sidebar_button.set_sensitive(False)
 
 		for node in self.app_tree.root.contents:
 
@@ -880,10 +890,16 @@ class Cardapio(dbus.service.Object):
 				sec.hide()
 
 		if self.shown_section is not None:
-			self.auto_toggled_sidebar_button = True
-			self.section_list[self.shown_section]['category'].set_active(False)
+			widget = self.section_list[self.shown_section]['category']
+			self.set_sidebar_button_active(widget, False)
 
 		self.shown_section = None
+
+		widget = self.all_sections_sidebar_button
+		self.set_sidebar_button_active(widget, True) 
+
+		if self.is_searchfield_empty():
+			widget.set_sensitive(False)
 
 
 	def show_lone_section(self, section_slab):
@@ -892,8 +908,12 @@ class Cardapio(dbus.service.Object):
 			sec.hide()
 
 		if self.shown_section is not None:
-			self.auto_toggled_sidebar_button = True
-			self.section_list[self.shown_section]['category'].set_active(False)
+			widget = self.section_list[self.shown_section]['category']
+			self.set_sidebar_button_active(widget, False)
+
+		elif self.all_sections_sidebar_button.get_active():
+			widget = self.all_sections_sidebar_button
+			self.set_sidebar_button_active(widget, False)
 
 		self.all_sections_sidebar_button.set_sensitive(True)
 		self.shown_section = section_slab
@@ -917,6 +937,13 @@ class Cardapio(dbus.service.Object):
 
 		self.section_list[section_slab]['has-entries'] = False
 		self.section_list[section_slab]['category'].hide()
+
+
+	def set_sidebar_button_active(self, button, state):
+
+		if button.get_active() != state:
+			self.auto_toggled_sidebar_button = True
+			button.set_active(state)
 
 
 	def scroll_to_section(self, widget, session_slab):
