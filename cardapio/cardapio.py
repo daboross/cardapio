@@ -43,6 +43,7 @@ _ = gettext.gettext
 # TODO: make cardapio applet a menuitem, so we can use the top-left pixel
 # TODO: add "places" to cardapio
 # TODO: add icons for System, Session, and All categories
+# TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
 
 class Cardapio(dbus.service.Object):
 
@@ -86,7 +87,7 @@ class Cardapio(dbus.service.Object):
 		self.set_up_dbus()
 		self.set_up_tracker_search()
 		self.build_ui()
-		self.first_app_widget = self.app_list[0][1]
+		self.first_app_widget = self.app_list[0]['button']
 
 		self.app_tree.add_monitor(self.on_menu_data_changed)
 		self.sys_tree.add_monitor(self.on_menu_data_changed)
@@ -267,18 +268,17 @@ class Cardapio(dbus.service.Object):
 		self.first_app_widget = None
 
 		for sec in self.section_list:
-			self.section_is_empty(sec)
-			#DEL self.section_list[sec]['has_entries'] = False
+			self.set_section_is_empty(sec)
 		
 		for app in self.app_list:
-			if app[0].find(text) == -1:
-				app[1].hide()
+			if app['title'].find(text) == -1:
+				app['button'].hide()
 			else:
-				app[1].show()
-				self.section_has_entries(app[2])
-				#DEL self.section_list[app[2]]['has_entries'] = True
+				app['button'].show()
+				self.set_section_has_entries(app['section'])
+
 				if self.first_app_widget is None:
-					self.first_app_widget = app[1]
+					self.first_app_widget = app['button']
 
 		if self.shown_section is None:
 			self.show_all_nonempty_sections()
@@ -369,12 +369,24 @@ class Cardapio(dbus.service.Object):
 		# make Tab go to first result element
 		if event.keyval == gtk.gdk.keyval_from_name('Tab'):
 
-			if self.first_app_widget is not None:
-				self.first_app_widget.connect('key-press-event', self.on_first_button_key_press_event)
+			if self.shown_section is not None:
+
+				contents = self.section_list[self.shown_section]['contents']
+				visible_children = [c for c in contents.get_children() if c.get_property('visible')]
+
+				if visible_children:
+
+					#self.first_child.connect('key-press-event', self.on_first_button_key_press_event)
+					self.window.set_focus(visible_children[0])
+				
+			elif self.first_app_widget is not None:
+
+				#self.first_app_widget.connect('key-press-event', self.on_first_button_key_press_event)
 				self.window.set_focus(self.first_app_widget)
 
 			elif self.first_result_widget is not None:
-				self.first_result_widget.connect('key-press-event', self.on_first_button_key_press_event)
+
+				#self.first_result_widget.connect('key-press-event', self.on_first_button_key_press_event)
 				self.window.set_focus(self.first_result_widget)
 
 		elif event.keyval == gtk.gdk.keyval_from_name('Escape'):
@@ -560,7 +572,7 @@ class Cardapio(dbus.service.Object):
 		self.add_tree_to_app_list(node, section_contents)
 
 		sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section_slab)
-		self.section_list[section_slab] = {'has_entries': True, 'category': sidebar_button}
+		self.section_list[section_slab] = {'has-entries': True, 'category': sidebar_button, 'contents': section_contents}
 
 
 	def add_hidden_slab(self, title_str, icon_name = None, comment = ''):
@@ -575,7 +587,7 @@ class Cardapio(dbus.service.Object):
 
 		sidebar_button.hide()
 		section_slab.hide()
-		self.section_list[section_slab] = {'has_entries': False, 'category': sidebar_button}
+		self.section_list[section_slab] = {'has-entries': False, 'category': sidebar_button, 'contents': section_contents}
 
 		return section_slab, section_contents
 
@@ -645,7 +657,7 @@ class Cardapio(dbus.service.Object):
 		button = self.add_button(button_str, icon_name, parent_widget, comment, icon_size = self.icon_size_large)
 
 		if app_list is not None:
-			app_list.append([button_str.lower(), button, parent_widget.parent.parent])
+			app_list.append({'title': button_str.lower(), 'button': button, 'section': parent_widget.parent.parent})
 			# save the app name, its button, and the section slab it came from
 			# NOTE: IF THERE ARE CHANGES IN THE UI FILE, THIS MAY PRODUCE
 			# HARD-TO-FIND BUGS!!
@@ -791,16 +803,14 @@ class Cardapio(dbus.service.Object):
 					self.first_result_widget = button
 
 			self.search_section_contents.show()
-			self.section_has_entries(self.search_section_slab)
-			#DEL self.section_list[self.search_section_slab]['has_entries'] = True
+			self.set_section_has_entries(self.search_section_slab)
 
 			if self.shown_section is None or self.shown_section == self.search_section_slab:
 				self.search_section_slab.show()
 
 		else:
 
-			self.section_is_empty(self.search_section_slab)
-			#DEL self.section_list[self.search_section_slab]['has_entries'] = False
+			self.set_section_is_empty(self.search_section_slab)
 
 			if self.shown_section is None or self.shown_section == self.search_section_slab:
 				self.search_section_slab.hide()
@@ -852,7 +862,7 @@ class Cardapio(dbus.service.Object):
 	def show_all_nonempty_sections(self):
 
 		for sec in self.section_list:
-			if self.section_list[sec]['has_entries']:
+			if self.section_list[sec]['has-entries']:
 				sec.show()
 			else:
 				sec.hide()
@@ -880,20 +890,20 @@ class Cardapio(dbus.service.Object):
 
 	def disappear_with_section(self, section_slab):
 
-		self.section_list[section_slab]['has_entries'] = False
+		self.section_list[section_slab]['has-entries'] = False
 		self.section_list[section_slab]['category'].hide()
 		section_slab.hide()
 
 
-	def section_has_entries(self, section_slab):
+	def set_section_has_entries(self, section_slab):
 
-		self.section_list[section_slab]['has_entries'] = True
+		self.section_list[section_slab]['has-entries'] = True
 		self.section_list[section_slab]['category'].show()
 
 
-	def section_is_empty(self, section_slab):
+	def set_section_is_empty(self, section_slab):
 
-		self.section_list[section_slab]['has_entries'] = False
+		self.section_list[section_slab]['has-entries'] = False
 		self.section_list[section_slab]['category'].hide()
 
 
