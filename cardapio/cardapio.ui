@@ -14,6 +14,7 @@
     <signal name="destroy" handler="on_mainwindow_destroy"/>
     <signal name="key_press_event" handler="on_mainwindow_key_press_event"/>
     <signal name="configure_event" handler="on_mainwindow_configure_event"/>
+    <signal name="delete_event" handler="on_mainwindow_delete_event"/>
     <child>
       <object class="GtkViewport" id="MainWindowBorder">
         <property name="visible">True</property>

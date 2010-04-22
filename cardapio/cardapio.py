@@ -173,9 +173,15 @@ class Cardapio(dbus.service.Object):
 
 	def on_mainwindow_destroy(self, widget, *etc, **kwetc):
 
-		# TODO: figure out how to make applet stop accepting Alt-F4!
-
 		gtk.main_quit()
+
+
+	def on_mainwindow_delete_event(self, widget, *etc, **kwetc):
+
+		if self.toggle_button:
+			# keep window alive is in panel mode
+			#widget.emit_stop_by_name('destroy')
+			return True
 
 
 	def on_mainwindow_focus_out(self, widget, *etc, **kwetc):
