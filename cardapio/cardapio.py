@@ -37,9 +37,12 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
+# TODO: add "No results to show" text
+# TODO: fix tabbing of first_app_widget / first_result_widget  
 # TODO: make cardapio window open near panel applet
 # TODO: make cardapio applet a menuitem, so we can use the top-left pixel
 # TODO: add "places" to cardapio
+# TODO: add icons for System, Session, and All categories
 
 class Cardapio(dbus.service.Object):
 
@@ -57,15 +60,17 @@ class Cardapio(dbus.service.Object):
 
 	def __init__(self, hidden = False, toggle_button = None):
 
-		self.toggle_button = toggle_button
-		self.auto_toggled = False
+		self.panel_button = toggle_button
+		self.auto_toggled_panel_button = False
+		self.auto_toggled_sidebar_button = False
 
 		# TODO: remember position and dimensions between sessions. Use gconf? What?
 		self.window_position = (0, 0)
 		self.window_size = None
 
 		self.app_list = []
-		self.section_list = []
+		self.section_list = {}
+		self.shown_section = None
 
 		self.first_app_widget = None
 		self.first_result_widget = None
@@ -130,6 +135,35 @@ class Cardapio(dbus.service.Object):
 				pass
 
 
+	def on_all_sections_sidebar_button_clicked(self, widget):
+
+		if self.auto_toggled_sidebar_button:
+			self.auto_toggled_sidebar_button = False
+			return True
+
+		if self.shown_section is None:
+			self.clear_search_entry()
+		else:
+			self.show_all_nonempty_sections()
+
+		self.auto_toggled_sidebar_button = True
+		widget.set_active(False)
+
+
+	def on_sidebar_button_clicked(self, widget, section_slab):
+
+		if self.auto_toggled_sidebar_button:
+			self.auto_toggled_sidebar_button = False
+			return True
+
+		if self.shown_section == section_slab:
+			self.shown_section = None # necessary!
+			self.show_all_nonempty_sections()
+			return True
+
+		self.show_lone_section(section_slab)
+
+
 	def build_ui(self):
 
 		cardapio_path = os.path.dirname(__file__)
@@ -178,7 +212,7 @@ class Cardapio(dbus.service.Object):
 
 	def on_mainwindow_delete_event(self, widget, *etc, **kwetc):
 
-		if self.toggle_button:
+		if self.panel_button:
 			# keep window alive is in panel mode
 			#widget.emit_stop_by_name('destroy')
 			return True
@@ -186,7 +220,7 @@ class Cardapio(dbus.service.Object):
 
 	def on_mainwindow_focus_out(self, widget, *etc, **kwetc):
 
-		if self.toggle_button is not None:
+		if self.panel_button is not None:
 			self.hide()
 
 
@@ -217,9 +251,9 @@ class Cardapio(dbus.service.Object):
 		self.search_menus(text)
 
 		if len(text) == 0:
-			self.system_section_slab.hide()
-			self.session_section_slab.hide()
-			self.search_section_slab.hide()
+			self.disappear_with_section(self.system_section_slab)
+			self.disappear_with_section(self.session_section_slab)
+			self.disappear_with_section(self.search_section_slab)
 
 		if self.tracker_object is not None:
 			if len(text) >= Cardapio.min_search_string_length:
@@ -231,25 +265,23 @@ class Cardapio(dbus.service.Object):
 	def search_menus(self, text):
 
 		self.first_app_widget = None
-		sections_visible = {}
 
 		for sec in self.section_list:
-			sections_visible[sec] = False
+			self.section_is_empty(sec)
+			#DEL self.section_list[sec]['has_entries'] = False
 		
 		for app in self.app_list:
 			if app[0].find(text) == -1:
 				app[1].hide()
 			else:
 				app[1].show()
-				sections_visible[app[2]] = True
+				self.section_has_entries(app[2])
+				#DEL self.section_list[app[2]]['has_entries'] = True
 				if self.first_app_widget is None:
 					self.first_app_widget = app[1]
 
-		for sec in sections_visible:
-			if sections_visible[sec]:
-				sec.show()
-			else:
-				sec.hide()
+		if self.shown_section is None:
+			self.show_all_nonempty_sections()
 
 
 	def schedule_search_with_tracker(self, text):
@@ -309,14 +341,15 @@ class Cardapio(dbus.service.Object):
 		#
 		# - regex works, but it's too slow for normal use...
 
-	def is_search_field_empty(self):
+
+	def is_searchfield_empty(self):
 
 		return (len(self.search_entry.get_text().strip()) == 0)
 
 
 	def on_searchentry_activate(self, widget, *etc, **kwetc):
 
-		if self.is_search_field_empty():
+		if self.is_searchfield_empty():
 			self.system_section_slab.hide()
 			self.session_section_slab.hide()
 			self.search_section_slab.hide()
@@ -346,7 +379,7 @@ class Cardapio(dbus.service.Object):
 
 		elif event.keyval == gtk.gdk.keyval_from_name('Escape'):
 
-			if self.is_search_field_empty():
+			if self.is_searchfield_empty():
 				self.hide()
 
 			self.clear_search_entry()
@@ -403,7 +436,6 @@ class Cardapio(dbus.service.Object):
 		else:
 			self.restore_dimensions()
 
-		self.scroll_to_top()
 		self.window.set_focus(self.search_entry)
 		self.set_focus_handler()
 
@@ -415,14 +447,14 @@ class Cardapio(dbus.service.Object):
 
 	def hide(self, do_auto_toggle = True):
 
-		self.visible = False
-		self.clear_search_entry()
-
 		if do_auto_toggle:
 			self.auto_toggle_button(False)
 
 		self.window.hide()
 
+		self.visible = False
+		self.clear_search_entry()
+		self.show_all_nonempty_sections()
 
 
 	@dbus.service.method(dbus_interface=bus_name_str, in_signature=None, out_signature=None)
@@ -432,10 +464,10 @@ class Cardapio(dbus.service.Object):
 		else: self.show()
 
 
-	def on_toggle_button_clicked(self, widget):
+	def on_panel_button_clicked(self, widget):
 
-		if self.auto_toggled:
-			self.auto_toggled = False
+		if self.auto_toggled_panel_button:
+			self.auto_toggled_panel_button = False
 			return True
 
 		if self.visible: self.hide(do_auto_toggle = False)
@@ -444,9 +476,9 @@ class Cardapio(dbus.service.Object):
 
 	def auto_toggle_button(self, state):
 
-		if self.toggle_button is not None:
-			self.auto_toggled = True
-			self.toggle_button.set_active(state)
+		if self.panel_button is not None:
+			self.auto_toggled_panel_button = True
+			self.panel_button.set_active(state)
 
 
 	def rebuild_all(self):
@@ -479,24 +511,28 @@ class Cardapio(dbus.service.Object):
 
 			# TODO: not working! this is freezing the app!
 
-			#button = self.add_large_button(_('Lock Screen'), 'system-lock-screen', self.session_section_contents, comment = _('Protect your computer from unauthorized use'), app_list = self.app_list)
+			#button = self.add_launcher_entry(_('Lock Screen'), 'system-lock-screen', self.session_section_contents, comment = _('Protect your computer from unauthorized use'), app_list = self.app_list)
 			#button.connect('clicked', self.on_lock_screen_activated)
 
 			pass
 
 		if can_manage_session:
 
-			button = self.add_large_button(_('Log Out...'), 'system-log-out', self.session_section_contents, comment = _('Log out of this session to log in as a different user'), app_list = self.app_list)
+			button = self.add_launcher_entry(_('Log Out...'), 'system-log-out', self.session_section_contents, comment = _('Log out of this session to log in as a different user'), app_list = self.app_list)
 			button.connect('clicked', self.on_session_action, False)
 
-			button = self.add_large_button(_('Shut Down...'), 'system-shutdown', self.session_section_contents, comment = _('Shut down the system'), app_list = self.app_list)
+			button = self.add_launcher_entry(_('Shut Down...'), 'system-shutdown', self.session_section_contents, comment = _('Shut down the system'), app_list = self.app_list)
 			button.connect('clicked', self.on_session_action, True)
 
 
 	def build_application_list(self):
 
-		self.section_list = []
+		self.section_list = {}
 		self.app_list = []
+
+		button = self.add_sidebar_button(_('All'), None, self.category_pane, comment = _('Show all categories'))
+		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
+		self.all_sections_sidebar_button = button 
 
 		for node in self.app_tree.root.contents:
 
@@ -508,14 +544,14 @@ class Cardapio(dbus.service.Object):
 			elif isinstance(node, gmenu.Entry):
 
 				# add to system pane
-				button = self.add_small_button(node.name, node.icon, self.system_pane, comment = node.get_comment())
+				button = self.add_sidebar_button(node.name, node.icon, self.system_pane, comment = node.get_comment(), use_toggle_button = False)
 				button.connect('clicked', self.launch_app, node.desktop_file_path)
 
 
 	def add_section_slab(self, node):
 
 		# add category to category pane
-		category_button = self.add_small_button(node.name, node.icon, self.category_pane, comment = node.get_comment())
+		sidebar_button = self.add_sidebar_button(node.name, node.icon, self.category_pane, comment = node.get_comment())
 
 		# add category to application pane
 		section_slab, section_contents = self.add_application_section(node.name)
@@ -523,18 +559,23 @@ class Cardapio(dbus.service.Object):
 		# add all apps in this category to application pane
 		self.add_tree_to_app_list(node, section_contents)
 
-		category_button.connect('clicked', self.scroll_to_section, section_slab)
-		self.section_list.append(section_slab)
+		sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section_slab)
+		self.section_list[section_slab] = {'has_entries': True, 'category': sidebar_button}
 
 
-	def add_hidden_slab(self, title_str):
+	def add_hidden_slab(self, title_str, icon_name = None, comment = ''):
 
-		# add system category to application pane
+		# add category to category pane
+		sidebar_button = self.add_sidebar_button(title_str, icon_name, self.category_pane, comment = comment)
+
+		# add category to application pane
 		section_slab, section_contents = self.add_application_section(title_str)
 
-		# hide this slab (unless user is searching)
+		sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section_slab)
+
+		sidebar_button.hide()
 		section_slab.hide()
-		self.section_list.append(section_slab)
+		self.section_list[section_slab] = {'has_entries': False, 'category': sidebar_button}
 
 		return section_slab, section_contents
 
@@ -560,9 +601,7 @@ class Cardapio(dbus.service.Object):
 	def add_hidden_search_results_slab(self):
 
 		# add system category to application pane
-		system_label = self.get_object('SystemLabel')
-		section_slab, section_contents = self.add_application_section(_('Other Results'))
-		section_slab.hide()
+		section_slab, section_contents = self.add_hidden_slab(_('Other Results'))
 		self.search_section_slab = section_slab
 		self.search_section_contents = section_contents
 
@@ -596,12 +635,12 @@ class Cardapio(dbus.service.Object):
 		self.search_section_slab.hide()
 
 
-	def add_small_button(self, button_str, icon_name, parent_widget, comment = ''):
+	def add_sidebar_button(self, button_str, icon_name, parent_widget, comment = '', use_toggle_button = True):
 
-		return self.add_button(button_str, icon_name, parent_widget, comment, icon_size = self.icon_size_small)
+		return self.add_button(button_str, icon_name, parent_widget, comment, icon_size = self.icon_size_small, use_toggle_button = use_toggle_button)
 
 
-	def add_large_button(self, button_str, icon_name, parent_widget, comment = '', app_list = None):
+	def add_launcher_entry(self, button_str, icon_name, parent_widget, comment = '', app_list = None):
 
 		button = self.add_button(button_str, icon_name, parent_widget, comment, icon_size = self.icon_size_large)
 
@@ -614,9 +653,12 @@ class Cardapio(dbus.service.Object):
 		return button
 
 
-	def add_button(self, button_str, icon_name, parent_widget, comment = '', icon_size = 32):
+	def add_button(self, button_str, icon_name, parent_widget, comment = '', icon_size = 32, use_toggle_button = False):
 
-		button = gtk.Button(button_str)
+		if use_toggle_button:
+			button = gtk.ToggleButton(button_str)
+		else:
+			button = gtk.Button(button_str)
 
 		icon_pixbuf = self.get_pixbuf_icon(icon_name, icon_size)
 		button.set_image(gtk.image_new_from_pixbuf(icon_pixbuf))
@@ -710,7 +752,7 @@ class Cardapio(dbus.service.Object):
 
 			if isinstance(node, gmenu.Entry):
 
-				button = self.add_large_button(node.name, node.icon, parent_widget, comment = node.get_comment(), app_list = self.app_list)
+				button = self.add_launcher_entry(node.name, node.icon, parent_widget, comment = node.get_comment(), app_list = self.app_list)
 				button.connect('clicked', self.launch_app, node.desktop_file_path)
 
 			elif isinstance(node, gmenu.Directory) and recursive:
@@ -742,18 +784,26 @@ class Cardapio(dbus.service.Object):
 				if not self.icon_theme.has_icon(icon_name):
 					icon_name = 'text-x-generic'
 
-				button = self.add_large_button(result[0], icon_name, self.search_section_contents, comment = comment)
-				button.connect('clicked', lambda x,y: self.launch_xdg(y), result[1])
+				button = self.add_launcher_entry(result[0], icon_name, self.search_section_contents, comment = comment)
+				button.connect('clicked', lambda x, y: self.launch_xdg(y), result[1])
 
 				if self.first_result_widget is None:
 					self.first_result_widget = button
 
 			self.search_section_contents.show()
-			self.search_section_slab.show()
+			self.section_has_entries(self.search_section_slab)
+			#DEL self.section_list[self.search_section_slab]['has_entries'] = True
+
+			if self.shown_section is None or self.shown_section == self.search_section_slab:
+				self.search_section_slab.show()
 
 		else:
 
-			self.search_section_slab.hide()
+			self.section_is_empty(self.search_section_slab)
+			#DEL self.section_list[self.search_section_slab]['has_entries'] = False
+
+			if self.shown_section is None or self.shown_section == self.search_section_slab:
+				self.search_section_slab.hide()
 
 
 	def prepare_viewport(self):
@@ -797,6 +847,54 @@ class Cardapio(dbus.service.Object):
 			pass
 
 		self.hide()
+
+
+	def show_all_nonempty_sections(self):
+
+		for sec in self.section_list:
+			if self.section_list[sec]['has_entries']:
+				sec.show()
+			else:
+				sec.hide()
+
+		if self.shown_section is not None:
+			self.auto_toggled_sidebar_button = True
+			self.section_list[self.shown_section]['category'].set_active(False)
+
+		self.shown_section = None
+
+
+	def show_lone_section(self, section_slab):
+
+		for sec in self.section_list:
+			sec.hide()
+
+		if self.shown_section is not None:
+			self.auto_toggled_sidebar_button = True
+			self.section_list[self.shown_section]['category'].set_active(False)
+
+		self.all_sections_sidebar_button.set_sensitive(True)
+		self.shown_section = section_slab
+		section_slab.show()
+
+
+	def disappear_with_section(self, section_slab):
+
+		self.section_list[section_slab]['has_entries'] = False
+		self.section_list[section_slab]['category'].hide()
+		section_slab.hide()
+
+
+	def section_has_entries(self, section_slab):
+
+		self.section_list[section_slab]['has_entries'] = True
+		self.section_list[section_slab]['category'].show()
+
+
+	def section_is_empty(self, section_slab):
+
+		self.section_list[section_slab]['has_entries'] = False
+		self.section_list[section_slab]['category'].hide()
 
 
 	def scroll_to_section(self, widget, session_slab):

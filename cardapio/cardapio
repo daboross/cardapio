@@ -32,7 +32,7 @@ def cardapio_factory(applet, iid):
 
 	button.set_image(button_icon)
 	button.set_relief(gtk.RELIEF_NONE)
-	button.connect_after('toggled', cardapio.on_toggle_button_clicked)
+	button.connect_after('toggled', cardapio.on_panel_button_clicked)
 	button.connect('button_press_event', on_button_press, applet)
 
 	#menuitem = gtk.ImageMenuItem()
