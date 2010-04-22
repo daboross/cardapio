@@ -43,7 +43,6 @@ _ = gettext.gettext
 # TODO: make cardapio applet a menuitem, so we can use the top-left pixel
 # TODO: make apps draggable to make shortcuts elsewhere
 # TODO: add "places" to cardapio
-# TODO: add icons for System, Session, and All categories
 # TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
 
 class Cardapio(dbus.service.Object):
@@ -398,10 +397,16 @@ class Cardapio(dbus.service.Object):
 
 		elif event.keyval == gtk.gdk.keyval_from_name('Escape'):
 
-			if self.is_searchfield_empty():
-				self.hide()
+			if not self.is_searchfield_empty():
 
-			self.clear_search_entry()
+				self.clear_search_entry()
+
+			elif self.shown_section is not None:
+
+				self.show_all_nonempty_sections()
+
+			else:
+				self.hide()
 
 		else: return False
 		return True

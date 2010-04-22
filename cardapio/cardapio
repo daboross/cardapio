@@ -35,6 +35,7 @@ def cardapio_factory(applet, iid):
 	button.connect_after('toggled', cardapio.on_panel_button_clicked)
 	button.connect('button_press_event', on_button_press, applet)
 
+	# TODO: substitute button for menuitem
 	#menuitem = gtk.ImageMenuItem()
 	#menuitem.set_image(button_icon)
 	#menuitem.connect('select', cardapio.show)
@@ -56,6 +57,7 @@ def on_button_press(widget, event, applet):
 	if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 		widget.emit_stop_by_name('button_press_event')
 		applet.setup_menu('', [], None)
+		# TODO: add "About" and "Edit menu" to this context menu
 
 
 def on_change_background(applet, type, color, pixmap):
