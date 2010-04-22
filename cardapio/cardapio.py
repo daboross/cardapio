@@ -41,6 +41,7 @@ _ = gettext.gettext
 # TODO: fix tabbing of first_app_widget / first_result_widget  
 # TODO: make cardapio window open near panel applet
 # TODO: make cardapio applet a menuitem, so we can use the top-left pixel
+# TODO: make apps draggable to make shortcuts elsewhere
 # TODO: add "places" to cardapio
 # TODO: add icons for System, Session, and All categories
 # TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
@@ -201,17 +202,29 @@ class Cardapio(dbus.service.Object):
 
 	def set_focus_handler(self):
 
-		# TODO: why does autohive misbehave when not running in panel mode?
-		#self.window.connect_after('focus_out_event', self.on_mainwindow_focus_out)
+		#self.window.connect_after('focus-out-event', self.on_mainwindow_focus_out)
 		pass
 
 
-	def on_mainwindow_destroy(self, widget, *etc, **kwetc):
+	def on_mainwindow_destroy(self, widget, event):
 
 		gtk.main_quit()
 
 
-	def on_mainwindow_delete_event(self, widget, *etc, **kwetc):
+	def on_mainwindow_focus_out(self, widget, event):
+
+		# TODO: why does autohive misbehave when not running in panel mode?
+		if self.panel_button is not None:
+			self.hide()
+
+
+	# TODO: cancel focus out when moving the window!
+	#def on_mainwindow_button_press_event(self, widget, event):
+	#
+	#	self.window.emit_stop_by_name('focus-out-event')
+
+
+	def on_mainwindow_delete_event(self, widget, event):
 
 		if self.panel_button:
 			# keep window alive is in panel mode
@@ -219,13 +232,7 @@ class Cardapio(dbus.service.Object):
 			return True
 
 
-	def on_mainwindow_focus_out(self, widget, *etc, **kwetc):
-
-		if self.panel_button is not None:
-			self.hide()
-
-
-	def on_mainwindow_configure_event(self, widget, *etc, **kwetc):
+	def on_mainwindow_configure_event(self, widget, event):
 
 		self.save_dimensions()
 
@@ -235,17 +242,17 @@ class Cardapio(dbus.service.Object):
 		glib.timeout_add_seconds(Cardapio.menu_rebuild_delay, self.rebuild_all)
 
 
-	def on_menu_data_changed(self, *etc):
+	def on_menu_data_changed(self, widget, event):
 
 		glib.timeout_add_seconds(Cardapio.menu_rebuild_delay, self.rebuild_all)
 
 
-	def on_searchentry_icon_press(self, widget, *etc, **kwetc):
+	def on_searchentry_icon_press(self, widget, iconpos, event):
 
 		self.clear_search_entry()
 
 
-	def on_searchentry_changed(self, widget, *etc, **kwetc):
+	def on_searchentry_changed(self, widget):
 
 		text = self.search_entry.get_text().strip()
 
@@ -347,7 +354,7 @@ class Cardapio(dbus.service.Object):
 		return (len(self.search_entry.get_text().strip()) == 0)
 
 
-	def on_searchentry_activate(self, widget, *etc, **kwetc):
+	def on_searchentry_activate(self, widget):
 
 		if self.is_searchfield_empty():
 			self.system_section_slab.hide()
@@ -364,7 +371,7 @@ class Cardapio(dbus.service.Object):
 		self.clear_search_entry()
 
 
-	def on_searchentry_key_press_event(self, widget, event, *etc, **kwetc):
+	def on_searchentry_key_press_event(self, widget, event):
 
 		# make Tab go to first result element
 		if event.keyval == gtk.gdk.keyval_from_name('Tab'):
@@ -400,7 +407,7 @@ class Cardapio(dbus.service.Object):
 		return True
 
 
-	def on_mainwindow_key_press_event(self, widget, event, *etc, **kwetc):
+	def on_mainwindow_key_press_event(self, widget, event):
 
 		if self.search_entry.is_focus(): return False
 
@@ -414,7 +421,7 @@ class Cardapio(dbus.service.Object):
 
 
 	# make Tab go from first result element to text entry widget
-	def on_first_button_key_press_event(self, widget, event, *etc, **kwetc):
+	def on_first_button_key_press_event(self, widget, event):
 
 		if event.keyval == gtk.gdk.keyval_from_name('ISO_Left_Tab'):
 
@@ -594,7 +601,7 @@ class Cardapio(dbus.service.Object):
 
 	def add_hidden_system_slab(self):
 
-		section_slab, section_contents = self.add_hidden_slab(_('System Tasks'))
+		section_slab, section_contents = self.add_hidden_slab(_('System Tasks'), 'applications-system')
 
 		self.add_tree_to_app_list(self.app_tree.root, section_contents, recursive = False)
 		self.add_tree_to_app_list(self.sys_tree.root, section_contents)
@@ -604,7 +611,7 @@ class Cardapio(dbus.service.Object):
 
 	def add_hidden_session_slab(self):
 
-		section_slab, section_contents = self.add_hidden_slab(_('Session Tasks'))
+		section_slab, section_contents = self.add_hidden_slab(_('Session Tasks'), 'session-properties')
 		self.session_section_slab = section_slab
 		self.session_section_contents = section_contents
 		self.build_session_list()
@@ -613,7 +620,7 @@ class Cardapio(dbus.service.Object):
 	def add_hidden_search_results_slab(self):
 
 		# add system category to application pane
-		section_slab, section_contents = self.add_hidden_slab(_('Other Results'))
+		section_slab, section_contents = self.add_hidden_slab(_('Other Results'), 'system-search')
 		self.search_section_slab = section_slab
 		self.search_section_contents = section_contents
 
