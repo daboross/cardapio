@@ -4,6 +4,7 @@
   <!-- interface-naming-policy project-wide -->
   <object class="GtkWindow" id="MainWindow">
     <property name="title" translatable="yes">Cardapio</property>
+    <property name="window_position">center-on-parent</property>
     <property name="default_width">450</property>
     <property name="default_height">450</property>
     <property name="type_hint">menu</property>

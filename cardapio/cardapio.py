@@ -173,6 +173,8 @@ class Cardapio(dbus.service.Object):
 
 	def on_mainwindow_destroy(self, widget, *etc, **kwetc):
 
+		# TODO: figure out how to make applet stop accepting Alt-F4!
+
 		gtk.main_quit()
 
 
@@ -207,6 +209,11 @@ class Cardapio(dbus.service.Object):
 		text = self.search_entry.get_text().strip()
 
 		self.search_menus(text)
+
+		if len(text) == 0:
+			self.system_section_slab.hide()
+			self.session_section_slab.hide()
+			self.search_section_slab.hide()
 
 		if self.tracker_object is not None:
 			if len(text) >= Cardapio.min_search_string_length:
@@ -303,7 +310,11 @@ class Cardapio(dbus.service.Object):
 
 	def on_searchentry_activate(self, widget, *etc, **kwetc):
 
-		if self.is_search_field_empty(): return 
+		if self.is_search_field_empty():
+			self.system_section_slab.hide()
+			self.session_section_slab.hide()
+			self.search_section_slab.hide()
+			return 
 
 		if self.first_app_widget is not None:
 			self.first_app_widget.emit('clicked')
