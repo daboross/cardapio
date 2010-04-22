@@ -575,6 +575,7 @@ class Cardapio(dbus.service.Object):
 
 		self.search_entry.set_text('')
 		self.system_section_slab.hide()
+		self.session_section_slab.hide()
 		self.search_section_slab.hide()
 
 
