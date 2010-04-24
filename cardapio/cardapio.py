@@ -540,7 +540,7 @@ class Cardapio(dbus.service.Object):
 	def on_panel_button_press(self, widget, event):
 
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
-			self.panel_applet.emit_stop_by_name('button-press-event')
+			widget.emit_stop_by_name('button-press-event')
 			self.panel_applet.setup_menu('', [], None)
 			# TODO: add "About" and "Edit menu" to this context menu
 			#return True
