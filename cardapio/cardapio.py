@@ -23,6 +23,7 @@ import gobject
 import urllib2
 import gettext
 import commands
+import keybinder
 import subprocess
 import gnomeapplet
 import dbus, dbus.service
@@ -61,6 +62,8 @@ class Cardapio(dbus.service.Object):
 	search_results_limit     = 15   # results
 	search_update_delay      = 100  # msec
 
+	default_keybinding = '<Super><Space>'
+
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
 		self.panel_applet = panel_applet
@@ -92,6 +95,9 @@ class Cardapio(dbus.service.Object):
 
 		self.app_tree.add_monitor(self.on_menu_data_changed)
 		self.sys_tree.add_monitor(self.on_menu_data_changed)
+
+		self.keybinding = Cardapio.default_keybinding
+		keybinder.bind(self.keybinding, self.show_hide)
 
 		if not hidden: self.show()
 
@@ -197,7 +203,7 @@ class Cardapio(dbus.service.Object):
 		self.prepare_viewport()
 		self.rebuild_all()
 
-
+	
 	def on_mainwindow_destroy(self, widget):
 
 		gtk.main_quit()
@@ -205,7 +211,11 @@ class Cardapio(dbus.service.Object):
 
 	def on_mainwindow_focus_out(self, widget, event):
 
-		if gtk.gdk.window_at_pointer() == None:
+		if self.panel_applet is None:
+			self.hide()
+
+		elif gtk.gdk.window_at_pointer() == None:
+
 			self.hide()
 
 
@@ -520,8 +530,11 @@ class Cardapio(dbus.service.Object):
 	@dbus.service.method(dbus_interface=bus_name_str, in_signature=None, out_signature=None)
 	def show_hide(self):
 
-		if self.visible: self.hide()
-		else: self.show()
+		if self.visible: 
+			self.hide()
+
+		else: 
+			self.show()
 
 
 	def on_panel_button_press(self, widget, event):
@@ -534,7 +547,7 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_panel_button_toggled(self, widget):
-		
+
 		if self.auto_toggled_panel_button:
 			self.auto_toggled_panel_button = False
 			return True
@@ -937,7 +950,7 @@ class Cardapio(dbus.service.Object):
 		except OSError:
 			pass
 
-		self.hide(do_auto_toggle = False)
+		self.hide()
 
 
 	def show_all_nonempty_sections(self):
@@ -1027,10 +1040,6 @@ class Cardapio(dbus.service.Object):
 		str = re.sub('"', '\\"', str)
 		return str
 
-# TODO: make menu not deselect when mouse goes to window
-def return_false(*args):
-	print 123
-	return False
 
 def applet_factory(applet, iid):
 	
@@ -1043,18 +1052,7 @@ def applet_factory(applet, iid):
 	button.connect('toggled', cardapio.on_panel_button_toggled)
 	button.connect('button-press-event', cardapio.on_panel_button_press)
 
-#	menuitem = gtk.ImageMenuItem(_('Applications'))
-#	menuitem.set_image(button_icon)
-#	cardapio = Cardapio(hidden = True, panel_button = menuitem, panel_applet = applet)
-#	menuitem.connect('button-press-event', cardapio.on_panel_button_press)
-#	menuitem.connect('select', return_false)
-#	menuitem.connect('deselect', return_false)
-#
-#	menubar = gtk.MenuBar()
-#	menubar.add(menuitem)
-
 	applet.connect('change-background', cardapio.on_panel_change_background)
-	#applet.add(menubar)
 	applet.add(button)
 	applet.show_all()
 
