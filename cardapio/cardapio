@@ -12,7 +12,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from cardapio import Cardapio
+from cardapio import Cardapio, applet_factory
 
 import gtk
 import sys
@@ -24,60 +24,6 @@ DBusGMainLoop(set_as_default=True)
 bus = dbus.SessionBus()
 bus_request_name = bus.request_name(Cardapio.bus_name_str)
 
-def cardapio_factory(applet, iid):
-	
-	button = gtk.ToggleButton()
-	cardapio = Cardapio(hidden = True, toggle_button = button)
-	button_icon = gtk.image_new_from_icon_name('distributor-logo', gtk.ICON_SIZE_SMALL_TOOLBAR)
-
-	button.set_image(button_icon)
-	button.set_relief(gtk.RELIEF_NONE)
-	button.connect_after('toggled', cardapio.on_panel_button_clicked)
-	button.connect('button_press_event', on_button_press, applet)
-
-	# TODO: substitute button for menuitem
-	#menuitem = gtk.ImageMenuItem()
-	#menuitem.set_image(button_icon)
-	#menuitem.connect('select', cardapio.show)
-	#menuitem.connect('deselect', cardapio.hide)
-	#menuitem.connect('button_press_event', on_button_press, applet)
-	#menubar = gtk.MenuBar()
-	#menubar.add(menuitem)
-
-	applet.connect('change-background', on_change_background)
-	applet.add(button)
-	#applet.add(menubar)
-	applet.show_all()
-
-	return True
-
-
-def on_button_press(widget, event, applet):
-
-	if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
-		widget.emit_stop_by_name('button_press_event')
-		applet.setup_menu('', [], None)
-		# TODO: add "About" and "Edit menu" to this context menu
-
-
-def on_change_background(applet, type, color, pixmap):
-
-	applet.set_style(None)
-	rc_style = gtk.RcStyle()
-	applet.modify_style(rc_style)
-
-	if (type == gnomeapplet.NO_BACKGROUND):
-		pass
-
-	elif (type == gnomeapplet.COLOR_BACKGROUND):
-		applet.modify_bg(gtk.STATE_NORMAL, color)
-
-	elif (type == gnomeapplet.PIXMAP_BACKGROUND):
-		style = applet.style
-		style.bg_pixmap[gtk.STATE_NORMAL] = pixmap
-		applet.set_style(style)  
-
-
 if len(sys.argv) == 2:
 
 	if sys.argv[1] == 'run-in-window':   
@@ -86,7 +32,7 @@ if len(sys.argv) == 2:
 		main_window.set_title('Python Applet')
 		main_window.connect('destroy', gtk.main_quit) 
 		app = gnomeapplet.Applet()
-		cardapio_factory(app, None)
+		applet_factory(app, None)
 		app.reparent(main_window)
 		main_window.show_all()
 		gtk.main()
@@ -107,6 +53,6 @@ if len(sys.argv) == 2:
 else:
 
 	gnomeapplet.bonobo_factory('OAFIID:GNOME_Cardapio_Factory', 
-			gnomeapplet.Applet.__gtype__, 'Cardapio', '0', cardapio_factory)
+			gnomeapplet.Applet.__gtype__, 'Cardapio', '0', applet_factory)
 
 

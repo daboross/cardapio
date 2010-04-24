@@ -39,7 +39,6 @@ _ = gettext.gettext
 
 # TODO: add "No results to show" text
 # TODO: fix tabbing of first_app_widget / first_result_widget  
-# TODO: make cardapio window open near panel applet
 # TODO: make cardapio applet a menuitem, so we can use the top-left pixel
 # TODO: make apps draggable to make shortcuts elsewhere
 # TODO: add "places" to cardapio
@@ -59,14 +58,14 @@ class Cardapio(dbus.service.Object):
 	search_results_limit     = 15
 	search_update_msec       = 100
 
-	def __init__(self, hidden = False, toggle_button = None):
+	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
-		self.panel_button = toggle_button
+		self.panel_applet = panel_applet
+		self.panel_button = panel_button
 		self.auto_toggled_panel_button = False
 		self.auto_toggled_sidebar_button = False
 
 		# TODO: remember position and dimensions between sessions. Use gconf? What?
-		self.window_position = (0, 0)
 		self.window_size = None
 
 		self.app_list = []
@@ -212,7 +211,7 @@ class Cardapio(dbus.service.Object):
 	def on_mainwindow_focus_out(self, widget, event):
 
 		# TODO: why does autohive misbehave when not running in panel mode?
-		if self.panel_button is not None:
+		if self.panel_applet is not None:
 			self.hide()
 
 
@@ -224,7 +223,7 @@ class Cardapio(dbus.service.Object):
 
 	def on_mainwindow_delete_event(self, widget, event):
 
-		if self.panel_button:
+		if self.panel_applet:
 			# keep window alive is in panel mode
 			#widget.emit_stop_by_name('destroy')
 			return True
@@ -444,10 +443,56 @@ class Cardapio(dbus.service.Object):
 		return True
 
 
-	def restore_dimensions(self):
+	def restore_location(self):
 
-		if self.window_position is not None: 
-			self.window.move(*self.window_position)
+		menu_width, menu_height = self.window.get_size()
+		screen_height = gtk.gdk.screen_height()
+		screen_width  = gtk.gdk.screen_width()
+
+		if self.panel_applet is None:
+			menu_x = (screen_width - menu_width)/2
+			menu_y = (screen_height - menu_height)/2
+			self.window.move(menu_x, menu_y)
+			return
+
+		panel = self.panel_button.get_parent_window()
+		panel_x, panel_y = panel.get_origin()
+		panel_width, panel_height = panel.get_size()
+
+		applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
+
+		# update coordinates according to panel orientation
+		orientation = self.panel_applet.get_orient()
+
+		if orientation == gnomeapplet.ORIENT_UP or orientation == gnomeapplet.ORIENT_DOWN:
+			applet_height = panel_height
+		
+		if orientation == gnomeapplet.ORIENT_LEFT or orientation == gnomeapplet.ORIENT_RIGHT:
+			applet_width = panel_width
+
+		menu_x = panel_x + applet_x
+		menu_y = panel_y + applet_y + applet_height
+
+		# move window to one edge always matches some edge of the panel button 
+
+		if menu_x + menu_width > screen_width:
+			menu_x = panel_x + applet_x + applet_width - menu_width
+
+		if menu_y + menu_height > screen_height:
+			menu_y = panel_y + applet_y - menu_height
+
+		# if it is impossible, do out best to have the top-left corner of our
+		# window visible at least
+
+		if menu_x < 0: menu_x = 0
+		if menu_y < 0: menu_y = 0
+
+		# TODO: figure out why there's a 4px margin between the menu and the panel 
+		self.window.move(menu_x, menu_y)
+
+
+
+	def restore_dimensions(self):
 
 		if self.window_size is not None: 
 			self.window.resize(*self.window_size)
@@ -455,24 +500,20 @@ class Cardapio(dbus.service.Object):
 
 	def save_dimensions(self):
 
-		self.window_position = self.window.get_position()
 		self.window_size = self.window.get_size()
 
 
 	def show(self, do_auto_toggle = True):
 
 		self.visible = True
-
-		if self.window_position is None:
-			self.save_dimensions()
-		else:
-			self.restore_dimensions()
+		self.restore_dimensions()
+		self.restore_location()
 
 		self.window.set_focus(self.search_entry)
 		self.set_focus_handler()
 
 		if do_auto_toggle:
-			self.auto_toggle_button(True)
+			self.auto_toggle_panel_button(True)
 
 		self.window.show()
 
@@ -480,7 +521,7 @@ class Cardapio(dbus.service.Object):
 	def hide(self, do_auto_toggle = True):
 
 		if do_auto_toggle:
-			self.auto_toggle_button(False)
+			self.auto_toggle_panel_button(False)
 
 		self.window.hide()
 
@@ -496,7 +537,16 @@ class Cardapio(dbus.service.Object):
 		else: self.show()
 
 
-	def on_panel_button_clicked(self, widget):
+	def on_panel_button_press(self, widget, event):
+
+		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
+			self.panel_applet.emit_stop_by_name('button-press-event')
+			self.panel_applet.setup_menu('', [], None)
+			# TODO: add "About" and "Edit menu" to this context menu
+			#return True
+
+
+	def on_panel_button_toggled(self, widget):
 
 		if self.auto_toggled_panel_button:
 			self.auto_toggled_panel_button = False
@@ -506,11 +556,33 @@ class Cardapio(dbus.service.Object):
 		else: self.show(do_auto_toggle = False)
 
 
-	def auto_toggle_button(self, state):
+	def on_panel_change_background(self, widget, type, color, pixmap):
 
-		if self.panel_button is not None:
+		widget.set_style(None)
+		rc_style = gtk.RcStyle()
+		self.panel_applet.modify_style(rc_style)
+
+		if (type == gnomeapplet.NO_BACKGROUND):
+			pass
+
+		elif (type == gnomeapplet.COLOR_BACKGROUND):
+			self.panel_applet.modify_bg(gtk.STATE_NORMAL, color)
+			self.panel_button.parent.modify_bg(gtk.STATE_NORMAL, color)
+
+		elif (type == gnomeapplet.PIXMAP_BACKGROUND):
+			style = self.panel_applet.style
+			style.bg_pixmap[gtk.STATE_NORMAL] = pixmap
+			self.panel_applet.set_style(style)  
+			self.panel_button.parent.set_style(style)  
+
+
+	def auto_toggle_panel_button(self, state):
+
+		if self.panel_applet is not None:
 			self.auto_toggled_panel_button = True
 			self.panel_button.set_active(state)
+			#if state: self.panel_button.activate()
+			#else: self.panel_button.deselect()
 
 
 	def rebuild_all(self):
@@ -967,5 +1039,38 @@ class Cardapio(dbus.service.Object):
 		str = re.sub("'", "\\'", str)
 		str = re.sub('"', '\\"', str)
 		return str
+
+# TODO: make menu not deselect when mouse goes to window
+def return_false(*args):
+	print 123
+	return False
+
+def applet_factory(applet, iid):
+	
+	button_icon = gtk.image_new_from_icon_name('distributor-logo', gtk.ICON_SIZE_SMALL_TOOLBAR)
+
+	button = gtk.ToggleButton(_('Applications'))
+	cardapio = Cardapio(hidden = True, panel_button = button, panel_applet = applet)
+	button.set_image(button_icon)
+	button.set_relief(gtk.RELIEF_NONE)
+	button.connect('toggled', cardapio.on_panel_button_toggled)
+	button.connect('button-press-event', cardapio.on_panel_button_press)
+
+#	menuitem = gtk.ImageMenuItem(_('Applications'))
+#	menuitem.set_image(button_icon)
+#	cardapio = Cardapio(hidden = True, panel_button = menuitem, panel_applet = applet)
+#	menuitem.connect('button-press-event', cardapio.on_panel_button_press)
+#	menuitem.connect('select', return_false)
+#	menuitem.connect('deselect', return_false)
+#
+#	menubar = gtk.MenuBar()
+#	menubar.add(menuitem)
+
+	applet.connect('change-background', cardapio.on_panel_change_background)
+	#applet.add(menubar)
+	applet.add(button)
+	applet.show_all()
+
+	return True
 
 
