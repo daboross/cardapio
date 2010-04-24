@@ -37,11 +37,14 @@ gettext.bindtextdomain(APP, DIR)
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-# TODO: add "No results to show" text
-# TODO: fix tabbing of first_app_widget / first_result_widget  
-# TODO: make cardapio applet a menuitem, so we can use the top-left pixel
+# Before version 1.0:
 # TODO: make apps draggable to make shortcuts elsewhere
 # TODO: add "places" to cardapio
+# TODO: add "No results to show" text
+
+# After version 1.0:
+# TODO: fix tabbing of first_app_widget / first_result_widget  
+# TODO: make cardapio applet a menuitem, so we can use the top-left pixel
 # TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
 
 class Cardapio(dbus.service.Object):
@@ -53,10 +56,10 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	menu_rebuild_delay       = 2
-	min_search_string_length = 3
-	search_results_limit     = 15
-	search_update_msec       = 100
+	menu_rebuild_delay       = 5    # seconds
+	min_search_string_length = 3    # characters
+	search_results_limit     = 15   # results
+	search_update_delay      = 100  # msec
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
@@ -65,16 +68,15 @@ class Cardapio(dbus.service.Object):
 		self.auto_toggled_panel_button = False
 		self.auto_toggled_sidebar_button = False
 
-		# TODO: remember position and dimensions between sessions. Use gconf? What?
-		self.window_size = None
-
 		self.app_list = []
 		self.section_list = {}
 		self.shown_section = None
 
 		self.first_app_widget = None
 		self.first_result_widget = None
+
 		self.visible = False
+		self.window_size = None
 
 		self.app_tree = gmenu.lookup_tree('applications.menu')
 		self.sys_tree = gmenu.lookup_tree('settings.menu')
@@ -186,21 +188,14 @@ class Cardapio(dbus.service.Object):
 		self.icon_size_large = gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
 		self.icon_size_small = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
 
-		self.prepare_viewport()
-
-		self.rebuild_all()
-
 		# make sure buttons have icons!
 		settings = gtk.settings_get_default()
 		settings.set_property('gtk-button-images', True)
 
 		self.window.set_keep_above(True)
 
-
-	def set_focus_handler(self):
-
-		#self.window.connect_after('focus-out-event', self.on_mainwindow_focus_out)
-		pass
+		self.prepare_viewport()
+		self.rebuild_all()
 
 
 	def on_mainwindow_destroy(self, widget):
@@ -210,22 +205,14 @@ class Cardapio(dbus.service.Object):
 
 	def on_mainwindow_focus_out(self, widget, event):
 
-		# TODO: why does autohive misbehave when not running in panel mode?
-		if self.panel_applet is not None:
+		if gtk.gdk.window_at_pointer() == None:
 			self.hide()
-
-
-	# TODO: cancel focus out when moving the window!
-	#def on_mainwindow_button_press_event(self, widget, event):
-	#
-	#	self.window.emit_stop_by_name('focus-out-event')
 
 
 	def on_mainwindow_delete_event(self, widget, event):
 
 		if self.panel_applet:
-			# keep window alive is in panel mode
-			#widget.emit_stop_by_name('destroy')
+			# keep window alive if in panel mode
 			return True
 
 
@@ -279,8 +266,9 @@ class Cardapio(dbus.service.Object):
 
 		for sec in self.section_list:
 			self.set_section_is_empty(sec)
-		
+
 		for app in self.app_list:
+
 			if app['title'].find(text) == -1:
 				app['button'].hide()
 			else:
@@ -299,7 +287,7 @@ class Cardapio(dbus.service.Object):
 		if self.search_timer is not None:
 			gobject.source_remove(self.search_timer)
 
-		self.search_timer = gobject.timeout_add(Cardapio.search_update_msec, self.search_with_tracker, text)
+		self.search_timer = gobject.timeout_add(Cardapio.search_update_delay, self.search_with_tracker, text)
 
 
 	def search_with_tracker(self, text):
@@ -510,7 +498,6 @@ class Cardapio(dbus.service.Object):
 		self.restore_location()
 
 		self.window.set_focus(self.search_entry)
-		self.set_focus_handler()
 
 		if do_auto_toggle:
 			self.auto_toggle_panel_button(True)
@@ -547,7 +534,7 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_panel_button_toggled(self, widget):
-
+		
 		if self.auto_toggled_panel_button:
 			self.auto_toggled_panel_button = False
 			return True
@@ -688,7 +675,7 @@ class Cardapio(dbus.service.Object):
 
 	def add_hidden_system_slab(self):
 
-		section_slab, section_contents = self.add_hidden_slab(_('System Tasks'), 'applications-system')
+		section_slab, section_contents = self.add_hidden_slab(_('System'), 'applications-system')
 
 		self.add_tree_to_app_list(self.app_tree.root, section_contents, recursive = False)
 		self.add_tree_to_app_list(self.sys_tree.root, section_contents)
@@ -698,7 +685,7 @@ class Cardapio(dbus.service.Object):
 
 	def add_hidden_session_slab(self):
 
-		section_slab, section_contents = self.add_hidden_slab(_('Session Tasks'), 'session-properties')
+		section_slab, section_contents = self.add_hidden_slab(_('Session'), 'session-properties')
 		self.session_section_slab = section_slab
 		self.session_section_contents = section_contents
 		self.build_session_list()
@@ -950,7 +937,7 @@ class Cardapio(dbus.service.Object):
 		except OSError:
 			pass
 
-		self.hide()
+		self.hide(do_auto_toggle = False)
 
 
 	def show_all_nonempty_sections(self):
