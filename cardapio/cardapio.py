@@ -62,7 +62,8 @@ class Cardapio(dbus.service.Object):
 	search_results_limit     = 15   # results
 	search_update_delay      = 100  # msec
 
-	default_keybinding = '<Super><Space>'
+	default_keybinding = '<Super>space'
+	# try gtk.accelerator_parse('<Super>space') to see if the string is correct!
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
@@ -215,7 +216,7 @@ class Cardapio(dbus.service.Object):
 			self.hide()
 
 		elif gtk.gdk.window_at_pointer() == None:
-
+			# TODO: fix the double-show problem when typing hot key to hide
 			self.hide()
 
 
@@ -521,8 +522,8 @@ class Cardapio(dbus.service.Object):
 			self.auto_toggle_panel_button(False)
 
 		self.window.hide()
-
 		self.visible = False
+
 		self.clear_search_entry()
 		self.show_all_nonempty_sections()
 
@@ -530,11 +531,8 @@ class Cardapio(dbus.service.Object):
 	@dbus.service.method(dbus_interface=bus_name_str, in_signature=None, out_signature=None)
 	def show_hide(self):
 
-		if self.visible: 
-			self.hide()
-
-		else: 
-			self.show()
+		if self.visible: self.hide()
+		else: self.show()
 
 
 	def on_panel_button_press(self, widget, event):
@@ -548,9 +546,9 @@ class Cardapio(dbus.service.Object):
 
 	def on_panel_button_toggled(self, widget):
 
-		if self.auto_toggled_panel_button:
-			self.auto_toggled_panel_button = False
-			return True
+		#if self.auto_toggled_panel_button:
+		#	self.auto_toggled_panel_button = False
+		#	return True
 
 		if self.visible: self.hide(do_auto_toggle = False)
 		else: self.show(do_auto_toggle = False)
