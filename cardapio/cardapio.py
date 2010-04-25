@@ -67,6 +67,8 @@ class Cardapio(dbus.service.Object):
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
+		self.user_home_folder = os.path.expanduser('~')
+
 		self.panel_applet = panel_applet
 		self.panel_button = panel_button
 		self.auto_toggled_panel_button = False
@@ -943,7 +945,7 @@ class Cardapio(dbus.service.Object):
 	def launch_raw(self, path):
 
 		try:
-			subprocess.Popen(path, shell=True)
+			subprocess.Popen(path, shell = True, cwd = self.user_home_folder)
 
 		except OSError:
 			pass
