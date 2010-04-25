@@ -186,7 +186,7 @@ class Cardapio(dbus.service.Object):
 		self.window            = self.get_object('MainWindow')
 		self.application_pane  = self.get_object('ApplicationPane')
 		self.category_pane     = self.get_object('CategoryPane')
-		self.otherapps_pane    = self.get_object('OtherAppsPane')
+		self.system_pane       = self.get_object('SystemPane')
 		self.search_entry      = self.get_object('SearchEntry')
 		self.scrolled_window   = self.get_object('ScrolledWindow')
 		self.scroll_adjustment = self.scrolled_window.get_vadjustment()
@@ -588,7 +588,7 @@ class Cardapio(dbus.service.Object):
 
 		self.clear_application_pane()
 		self.clear_category_pane()
-		self.clear_otherapps_pane()
+		self.clear_system_pane()
 		self.build_places_list()
 		self.build_application_list()
 
@@ -652,7 +652,7 @@ class Cardapio(dbus.service.Object):
 			elif isinstance(node, gmenu.Entry):
 
 				# add to system pane
-				button = self.add_sidebar_button(node.name, node.icon, self.otherapps_pane, comment = node.get_comment(), use_toggle_button = False)
+				button = self.add_sidebar_button(node.name, node.icon, self.system_pane, comment = node.get_comment(), use_toggle_button = False)
 				button.connect('clicked', self.launch_app, node.desktop_file_path)
 
 
@@ -728,9 +728,9 @@ class Cardapio(dbus.service.Object):
 			container.remove(child)
 
 
-	def clear_otherapps_pane(self):
+	def clear_system_pane(self):
 
-		container = self.get_object('OtherAppsPane')
+		container = self.get_object('SystemPane')
 		for	child in container.get_children():
 			container.remove(child)
 
