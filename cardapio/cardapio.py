@@ -19,7 +19,6 @@ import gtk
 import glib
 import gmenu
 import locale
-import gobject
 import urllib2
 import gettext
 import commands
@@ -57,7 +56,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	menu_rebuild_delay       = 5    # seconds
+	menu_rebuild_delay       = 3    # seconds
 	min_search_string_length = 3    # characters
 	search_results_limit     = 15   # results
 	search_update_delay      = 100  # msec
@@ -187,7 +186,7 @@ class Cardapio(dbus.service.Object):
 		self.window            = self.get_object('MainWindow')
 		self.application_pane  = self.get_object('ApplicationPane')
 		self.category_pane     = self.get_object('CategoryPane')
-		self.system_pane       = self.get_object('SystemPane')
+		self.otherapps_pane    = self.get_object('OtherAppsPane')
 		self.search_entry      = self.get_object('SearchEntry')
 		self.scrolled_window   = self.get_object('ScrolledWindow')
 		self.scroll_adjustment = self.scrolled_window.get_vadjustment()
@@ -239,7 +238,7 @@ class Cardapio(dbus.service.Object):
 		glib.timeout_add_seconds(Cardapio.menu_rebuild_delay, self.rebuild_all)
 
 
-	def on_menu_data_changed(self, widget, event):
+	def on_menu_data_changed(self, tree):
 
 		glib.timeout_add_seconds(Cardapio.menu_rebuild_delay, self.rebuild_all)
 
@@ -298,14 +297,14 @@ class Cardapio(dbus.service.Object):
 	def schedule_search_with_tracker(self, text):
 
 		if self.search_timer is not None:
-			gobject.source_remove(self.search_timer)
+			glib.source_remove(self.search_timer)
 
-		self.search_timer = gobject.timeout_add(Cardapio.search_update_delay, self.search_with_tracker, text)
+		self.search_timer = glib.timeout_add(Cardapio.search_update_delay, self.search_with_tracker, text)
 
 
 	def search_with_tracker(self, text):
 
-		gobject.source_remove(self.search_timer)
+		glib.source_remove(self.search_timer)
 
 		# no .lower(), since there's no fn:lower-case in tracker
 		#text = self.escape_quotes(text).lower()
@@ -589,13 +588,16 @@ class Cardapio(dbus.service.Object):
 
 		self.clear_application_pane()
 		self.clear_category_pane()
-		self.clear_system_pane()
+		self.clear_otherapps_pane()
 		self.build_places_list()
 		self.build_application_list()
 
 		self.add_hidden_session_slab()
 		self.add_hidden_system_slab()
 		self.add_hidden_search_results_slab()
+
+		return False 
+		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
 	def build_places_list(self):
@@ -650,7 +652,7 @@ class Cardapio(dbus.service.Object):
 			elif isinstance(node, gmenu.Entry):
 
 				# add to system pane
-				button = self.add_sidebar_button(node.name, node.icon, self.system_pane, comment = node.get_comment(), use_toggle_button = False)
+				button = self.add_sidebar_button(node.name, node.icon, self.otherapps_pane, comment = node.get_comment(), use_toggle_button = False)
 				button.connect('clicked', self.launch_app, node.desktop_file_path)
 
 
@@ -726,9 +728,9 @@ class Cardapio(dbus.service.Object):
 			container.remove(child)
 
 
-	def clear_system_pane(self):
+	def clear_otherapps_pane(self):
 
-		container = self.get_object('SystemPane')
+		container = self.get_object('OtherAppsPane')
 		for	child in container.get_children():
 			container.remove(child)
 

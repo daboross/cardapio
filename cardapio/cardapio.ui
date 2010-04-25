@@ -123,7 +123,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="SystemSlab">
+                          <object class="GtkFrame" id="OtherAppsSlab">
                             <property name="visible">True</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
@@ -132,7 +132,7 @@
                                 <property name="visible">True</property>
                                 <property name="top_padding">4</property>
                                 <child>
-                                  <object class="GtkVBox" id="SystemPane">
+                                  <object class="GtkVBox" id="OtherAppsPane">
                                     <property name="visible">True</property>
                                     <property name="orientation">vertical</property>
                                     <child>
@@ -143,10 +143,10 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="SystemLabel">
+                              <object class="GtkLabel" id="OtherAppsLabel">
                                 <property name="visible">True</property>
                                 <property name="xalign">0</property>
-                                <property name="label" translatable="yes">System Tasks</property>
+                                <property name="label" translatable="yes">Other tasks</property>
                                 <property name="use_markup">True</property>
                                 <attributes>
                                   <attribute name="weight" value="bold"/>
