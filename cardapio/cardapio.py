@@ -254,6 +254,9 @@ class Cardapio(dbus.service.Object):
 
 	def on_searchentry_changed(self, widget):
 
+		self.first_app_widget = None
+		self.first_result_widget = None
+
 		text = self.search_entry.get_text().strip()
 
 		self.search_menus(text)
@@ -274,6 +277,7 @@ class Cardapio(dbus.service.Object):
 
 	def search_menus(self, text):
 
+		text = text.lower()
 		self.first_app_widget = None
 
 		for sec in self.section_list:
@@ -881,9 +885,9 @@ class Cardapio(dbus.service.Object):
 		self.search_section_contents = gtk.VBox()
 		container.add(self.search_section_contents)
 
-		if len(results):
+		self.first_result_widget = None
 
-			self.first_result_widget = None
+		if len(results):
 
 			for result in results:
 				comment = urllib2.unquote(result[2])
