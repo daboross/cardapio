@@ -61,6 +61,7 @@ class Cardapio(dbus.service.Object):
 	search_results_limit     = 15   # results
 	search_update_delay      = 100  # msec
 
+	default_panel_label = _('Applications')
 	default_keybinding = '<Super>space'
 	# try gtk.accelerator_parse('<Super>space') to see if the string is correct!
 
@@ -661,25 +662,43 @@ class Cardapio(dbus.service.Object):
 
 		for line in config_file.readlines():
 
-			if self.insert_xdg_folder(line, '\s*XDG_DESKTOP_DIR\s*=\s*"(.+)"', _('Desktop'), 'user-desktop'): continue
-			if self.insert_xdg_folder(line, '\s*XDG_DOWNLOAD_DIR\s*=\s*"(.+)"', _('Download'), 'folder-download'): continue
-			if self.insert_xdg_folder(line, '\s*XDG_TEMPLATES_DIR\s*=\s*"(.+)"', _('Templates'), 'folder-templates'): continue
-			if self.insert_xdg_folder(line, '\s*XDG_PUBLICSHARE_DIR\s*=\s*"(.+)"', _('Public'), 'folder-publicshare'): continue
-			if self.insert_xdg_folder(line, '\s*XDG_DOCUMENTS_DIR\s*=\s*"(.+)"', _('Documents'), 'folder-documents'): continue
-			if self.insert_xdg_folder(line, '\s*XDG_MUSIC_DIR\s*=\s*"(.+)"', _('Music'), 'folder-music'): continue
-			if self.insert_xdg_folder(line, '\s*XDG_PICTURES_DIR\s*=\s*"(.+)"', _('Pictures'), 'folder-pictures'): continue
-			if self.insert_xdg_folder(line, '\s*XDG_VIDEOS_DIR\s*=\s*"(.+)"', _('Videos'), 'folder-videos'): continue
-
-
-	def insert_xdg_folder(self, line, match_pattern, folder_name, folder_icon):
-
-			res = re.match(match_pattern, line)
+			res = re.match('\s*XDG_DESKTOP_DIR\s*=\s*"(.+)"', line)
 			if res is not None:
-				res = os.path.expanduser(res.groups()[0].replace('$HOME', '~'))
-				button = self.add_launcher_entry(folder_name, folder_icon, self.places_section_contents, comment = _('Open folder %s') % folder_name, app_list = self.app_list)
-				button.connect('clicked', self.on_xdg_button_clicked, res)
-				return True
-			return False
+				path = res.groups()[0]
+				self.add_place(_('Desktop'), path, 'user-desktop')
+
+		config_file.close()
+
+		config_filepath = os.path.join(self.user_home_folder, '.gtk-bookmarks')
+		config_file = file(config_filepath, 'r')
+
+		for line in config_file.readlines():
+			if line.strip(' \n\r\t'):
+				self.add_place(self.get_place_name(line), line, 'folder')
+
+		config_file.close()
+		# TODO handle bookmarks changing
+
+
+	def get_folder_name(self, folder_path):
+
+		res = folder_path.split(os.path.sep)
+		if res: return res[-1].strip(' \n\r\t').replace('%20', ' ')
+		return None
+
+
+	def get_place_name(self, folder_path):
+
+		res = folder_path.split(' ')
+		if len(res) > 1: return ' '.join(res[1:]).strip(' \n\r\t')
+		return self.get_folder_name(folder_path)
+
+
+	def add_place(self, folder_name, folder_path, folder_icon):
+
+		folder_path = os.path.expanduser(folder_path.replace('$HOME', '~')).strip(' \n\r\t')
+		button = self.add_launcher_entry(folder_name, folder_icon, self.places_section_contents, comment = _('Open folder %s') % folder_name, app_list = self.app_list)
+		button.connect('clicked', self.on_xdg_button_clicked, folder_path)
 
 
 	def build_session_list(self):
@@ -1138,7 +1157,7 @@ def applet_factory(applet, iid):
 	
 	button_icon = gtk.image_new_from_icon_name('distributor-logo', gtk.ICON_SIZE_SMALL_TOOLBAR)
 
-	button = gtk.ToggleButton(_('Applications'))
+	button = gtk.ToggleButton(Cardapio.default_panel_label)
 	cardapio = Cardapio(hidden = True, panel_button = button, panel_applet = applet)
 	button.set_image(button_icon)
 	button.set_relief(gtk.RELIEF_NONE)
