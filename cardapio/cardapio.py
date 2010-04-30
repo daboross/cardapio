@@ -48,6 +48,7 @@ _ = gettext.gettext
 # TODO: fix tabbing of first_app_widget / first_result_widget  
 # TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
 # TODO: any letter or number typed anywhere (without modifiers) is redirected to search entry
+# TODO: multiple columns when window is wide enough (like gnome-control-center)
 
 class Cardapio(dbus.service.Object):
 
@@ -222,7 +223,7 @@ class Cardapio(dbus.service.Object):
 				]
 
 		self.prepare_viewport()
-		self.rebuild_all()
+		self.rebuild()
 
 	
 	def open_about_dialog(self, widget, verb):
@@ -245,8 +246,8 @@ class Cardapio(dbus.service.Object):
 		if self.panel_applet is None:
 			self.hide()
 
-		elif gtk.gdk.window_at_pointer() == None:
-			# TODO: fix the double-show problem when typing hot key to hide
+		elif gtk.gdk.window_at_pointer() is None:
+			# make sure clicking the applet button does cause a focus-out event
 			self.hide()
 
 
@@ -264,12 +265,12 @@ class Cardapio(dbus.service.Object):
 
 	def on_icon_theme_changed(self, icon_theme):
 
-		glib.timeout_add_seconds(Cardapio.menu_rebuild_delay, self.rebuild_all)
+		glib.timeout_add_seconds(Cardapio.menu_rebuild_delay, self.rebuild)
 
 
 	def on_menu_data_changed(self, tree):
 
-		glib.timeout_add_seconds(Cardapio.menu_rebuild_delay, self.rebuild_all)
+		glib.timeout_add_seconds(Cardapio.menu_rebuild_delay, self.rebuild)
 
 
 	def on_searchentry_icon_press(self, widget, iconpos, event):
@@ -291,8 +292,8 @@ class Cardapio(dbus.service.Object):
 		self.search_menus(text)
 
 		if len(text) == 0:
-			self.disappear_with_section(self.system_section_slab)
 			self.disappear_with_section(self.session_section_slab)
+			self.disappear_with_section(self.system_section_slab)
 			self.disappear_with_section(self.search_section_slab)
 		else:
 			self.all_sections_sidebar_button.set_sensitive(True)
@@ -539,7 +540,6 @@ class Cardapio(dbus.service.Object):
 
 	def show(self, do_auto_toggle = True):
 
-		self.visible = True
 		self.restore_dimensions()
 		self.restore_location()
 
@@ -549,6 +549,7 @@ class Cardapio(dbus.service.Object):
 			self.auto_toggle_panel_button(True)
 
 		self.window.show()
+		self.visible = True
 
 
 	def hide(self, do_auto_toggle = True):
@@ -625,14 +626,23 @@ class Cardapio(dbus.service.Object):
 			#else: self.panel_button.deselect()
 
 
-	def rebuild_all(self):
+	def rebuild(self):
 
 		self.clear_application_pane()
 		self.clear_category_pane()
 		self.clear_system_pane()
-		self.build_places_list()
-		self.build_application_list()
 
+		self.section_list = {}
+		self.app_list = []
+
+		button = self.add_sidebar_button(_('All'), None, self.category_pane, comment = _('Show all categories'))
+		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
+		self.all_sections_sidebar_button = button 
+		self.set_sidebar_button_active(button, True)
+		self.all_sections_sidebar_button.set_sensitive(False)
+
+		self.add_places_slab()
+		self.add_applications_slab()
 		self.add_hidden_session_slab()
 		self.add_hidden_system_slab()
 		self.add_hidden_search_results_slab()
@@ -643,9 +653,33 @@ class Cardapio(dbus.service.Object):
 
 	def build_places_list(self):
 
-		# TODO: make a category called "places", and treat it like any other
-		# app category...
-		pass
+		button = self.add_launcher_entry(_('Home'), 'user-home', self.places_section_contents, comment = _('Open your personal folder'), app_list = self.app_list)
+		button.connect('clicked', self.on_xdg_button_clicked, self.user_home_folder)
+
+		config_filepath = os.path.join(DesktopEntry.xdg_config_home, 'user-dirs.dirs')
+		config_file = file(config_filepath, 'r')
+
+		for line in config_file.readlines():
+
+			if self.insert_xdg_folder(line, '\s*XDG_DESKTOP_DIR\s*=\s*"(.+)"', _('Desktop'), 'user-desktop'): continue
+			if self.insert_xdg_folder(line, '\s*XDG_DOWNLOAD_DIR\s*=\s*"(.+)"', _('Download'), 'folder-download'): continue
+			if self.insert_xdg_folder(line, '\s*XDG_TEMPLATES_DIR\s*=\s*"(.+)"', _('Templates'), 'folder-templates'): continue
+			if self.insert_xdg_folder(line, '\s*XDG_PUBLICSHARE_DIR\s*=\s*"(.+)"', _('Public'), 'folder-publicshare'): continue
+			if self.insert_xdg_folder(line, '\s*XDG_DOCUMENTS_DIR\s*=\s*"(.+)"', _('Documents'), 'folder-documents'): continue
+			if self.insert_xdg_folder(line, '\s*XDG_MUSIC_DIR\s*=\s*"(.+)"', _('Music'), 'folder-music'): continue
+			if self.insert_xdg_folder(line, '\s*XDG_PICTURES_DIR\s*=\s*"(.+)"', _('Pictures'), 'folder-pictures'): continue
+			if self.insert_xdg_folder(line, '\s*XDG_VIDEOS_DIR\s*=\s*"(.+)"', _('Videos'), 'folder-videos'): continue
+
+
+	def insert_xdg_folder(self, line, match_pattern, folder_name, folder_icon):
+
+			res = re.match(match_pattern, line)
+			if res is not None:
+				res = os.path.expanduser(res.groups()[0].replace('$HOME', '~'))
+				button = self.add_launcher_entry(folder_name, folder_icon, self.places_section_contents, comment = _('Open folder %s') % folder_name, app_list = self.app_list)
+				button.connect('clicked', self.on_xdg_button_clicked, res)
+				return True
+			return False
 
 
 	def build_session_list(self):
@@ -672,16 +706,7 @@ class Cardapio(dbus.service.Object):
 			button.connect('clicked', self.on_session_action, True)
 
 
-	def build_application_list(self):
-
-		self.section_list = {}
-		self.app_list = []
-
-		button = self.add_sidebar_button(_('All'), None, self.category_pane, comment = _('Show all categories'))
-		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
-		self.all_sections_sidebar_button = button 
-		self.set_sidebar_button_active(button, True)
-		self.all_sections_sidebar_button.set_sensitive(False)
+	def add_applications_slab(self):
 
 		for node in self.app_tree.root.contents:
 
@@ -694,7 +719,7 @@ class Cardapio(dbus.service.Object):
 
 				# add to system pane
 				button = self.add_sidebar_button(node.name, node.icon, self.system_pane, comment = node.get_comment(), use_toggle_button = False)
-				button.connect('clicked', self.launch_app, node.desktop_file_path)
+				button.connect('clicked', self.on_app_button_clicked, node.desktop_file_path)
 
 
 	def add_section_slab(self, node):
@@ -712,7 +737,7 @@ class Cardapio(dbus.service.Object):
 		self.section_list[section_slab] = {'has-entries': True, 'category': sidebar_button, 'contents': section_contents}
 
 
-	def add_hidden_slab(self, title_str, icon_name = None, comment = ''):
+	def add_slab(self, title_str, icon_name = None, comment = '', hide = True):
 
 		# add category to category pane
 		sidebar_button = self.add_sidebar_button(title_str, icon_name, self.category_pane, comment = comment)
@@ -722,16 +747,35 @@ class Cardapio(dbus.service.Object):
 
 		sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section_slab)
 
-		sidebar_button.hide()
-		section_slab.hide()
-		self.section_list[section_slab] = {'has-entries': False, 'category': sidebar_button, 'contents': section_contents}
+		if hide:
+			sidebar_button.hide()
+			section_slab.hide()
+			self.section_list[section_slab] = {'has-entries': False, 'category': sidebar_button, 'contents': section_contents}
+		else:
+			self.section_list[section_slab] = {'has-entries': True, 'category': sidebar_button, 'contents': section_contents}
 
 		return section_slab, section_contents
 
 
+	def add_places_slab(self):
+
+		section_slab, section_contents = self.add_slab(_('Places'), 'folder', hide = False)
+		self.places_section_slab = section_slab
+		self.places_section_contents = section_contents
+		self.build_places_list()
+
+
+	def add_hidden_session_slab(self):
+
+		section_slab, section_contents = self.add_slab(_('Session'), 'session-properties')
+		self.session_section_slab = section_slab
+		self.session_section_contents = section_contents
+		self.build_session_list()
+
+
 	def add_hidden_system_slab(self):
 
-		section_slab, section_contents = self.add_hidden_slab(_('System'), 'applications-system')
+		section_slab, section_contents = self.add_slab(_('System'), 'applications-system')
 
 		self.add_tree_to_app_list(self.app_tree.root, section_contents, recursive = False)
 		self.add_tree_to_app_list(self.sys_tree.root, section_contents)
@@ -739,18 +783,10 @@ class Cardapio(dbus.service.Object):
 		self.system_section_slab = section_slab
 
 
-	def add_hidden_session_slab(self):
-
-		section_slab, section_contents = self.add_hidden_slab(_('Session'), 'session-properties')
-		self.session_section_slab = section_slab
-		self.session_section_contents = section_contents
-		self.build_session_list()
-
-
 	def add_hidden_search_results_slab(self):
 
 		# add system category to application pane
-		section_slab, section_contents = self.add_hidden_slab(_('Other Results'), 'system-search')
+		section_slab, section_contents = self.add_slab(_('Other Results'), 'system-search')
 		self.search_section_slab = section_slab
 		self.search_section_contents = section_contents
 
@@ -902,7 +938,7 @@ class Cardapio(dbus.service.Object):
 			if isinstance(node, gmenu.Entry):
 
 				button = self.add_launcher_entry(node.name, node.icon, parent_widget, comment = node.get_comment(), app_list = self.app_list)
-				button.connect('clicked', self.launch_app, node.desktop_file_path)
+				button.connect('clicked', self.on_app_button_clicked, node.desktop_file_path)
 
 			elif isinstance(node, gmenu.Directory) and recursive:
 
@@ -934,7 +970,7 @@ class Cardapio(dbus.service.Object):
 					icon_name = 'text-x-generic'
 
 				button = self.add_launcher_entry(result[0], icon_name, self.search_section_contents, comment = comment)
-				button.connect('clicked', lambda x, y: self.launch_xdg(y), result[1])
+				button.connect('clicked', self.on_xdg_button_clicked, result[1])
 
 				if self.first_result_widget is None:
 					self.first_result_widget = button
@@ -972,7 +1008,7 @@ class Cardapio(dbus.service.Object):
 		print(_('No menu editing apps found! Tried these: %s') % ', '.join(Cardapio.menu_editing_apps))
 
 
-	def launch_app(self, widget, desktop_path):
+	def on_app_button_clicked(self, widget, desktop_path):
 
 		if os.path.exists(desktop_path):
 
@@ -985,6 +1021,11 @@ class Cardapio(dbus.service.Object):
 				path = match.group(1)
 
 			return self.launch_raw(path)
+
+
+	def on_xdg_button_clicked(self, widget, path):
+
+		self.launch_xdg(path)
 
 
 	def launch_xdg(self, path):
