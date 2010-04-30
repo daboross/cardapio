@@ -38,23 +38,22 @@ gettext.textdomain(APP)
 _ = gettext.gettext
 
 # Before version 1.0:
-# TODO: make apps draggable to make shortcuts elsewhere
+# TODO: fix Win+Space untoggle
+# TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
 # TODO: add "places" to cardapio
 # TODO: add "No results to show" text
+# TODO: make sure colors work with all themes
 
 # After version 1.0:
 # TODO: fix tabbing of first_app_widget / first_result_widget  
-# TODO: make cardapio applet a menuitem, so we can use the top-left pixel
 # TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
+# TODO: any letter or number typed anywhere (without modifiers) is redirected to search entry
 
 class Cardapio(dbus.service.Object):
 
 	FOLDERS = 1
 	ITEMS   = 2
 	BOTH    = 3
-
-	bus_name_str = 'org.varal.Cardapio'
-	bus_obj_str  = '/org/varal/Cardapio'
 
 	menu_rebuild_delay       = 3    # seconds
 	min_search_string_length = 3    # characters
@@ -63,6 +62,13 @@ class Cardapio(dbus.service.Object):
 
 	default_keybinding = '<Super>space'
 	# try gtk.accelerator_parse('<Super>space') to see if the string is correct!
+
+	file_management_apps = ('nautilus', 'thunar')
+	menu_editing_apps = ('alacarte', 'gmenu-simple-editor')
+
+	bus_name_str = 'org.varal.Cardapio'
+	bus_obj_str  = '/org/varal/Cardapio'
+
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
@@ -184,6 +190,7 @@ class Cardapio(dbus.service.Object):
 
 		self.get_object = self.builder.get_object
 		self.window            = self.get_object('MainWindow')
+		self.about_dialog      = self.get_object('AboutDialog')
 		self.application_pane  = self.get_object('ApplicationPane')
 		self.category_pane     = self.get_object('CategoryPane')
 		self.system_pane       = self.get_object('SystemPane')
@@ -202,10 +209,32 @@ class Cardapio(dbus.service.Object):
 
 		self.window.set_keep_above(True)
 
+		self.context_menu_xml = '''
+			<popup name="button3">
+				<menuitem name="Item 1" verb="Edit" label="%s" pixtype="stock" pixname="gtk-edit"/>
+				<menuitem name="Item 2" verb="About" label="%s" pixtype="stock" pixname="gtk-about"/>
+			</popup>
+			''' % (_('_Edit Menus'), _('_About'))
+
+		self.context_menu_verbs = [
+				('Edit', self.launch_edit_app),
+				('About', self.open_about_dialog)
+				]
+
 		self.prepare_viewport()
 		self.rebuild_all()
 
 	
+	def open_about_dialog(self, widget, verb):
+
+		self.about_dialog.show()
+
+
+	def on_about_dialog_close(self, widget, response = None):
+
+		self.about_dialog.hide()
+
+
 	def on_mainwindow_destroy(self, widget):
 
 		gtk.main_quit()
@@ -491,7 +520,8 @@ class Cardapio(dbus.service.Object):
 		if menu_x < 0: menu_x = 0
 		if menu_y < 0: menu_y = 0
 
-		# TODO: figure out why there's a 4px margin between the menu and the panel 
+		# TODO: fix 4px margin between the menu and the panel (it's because the
+		# button is larger than the panel... how do i fix this?)
 		self.window.move(menu_x, menu_y)
 
 
@@ -541,22 +571,25 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_panel_button_press(self, widget, event):
+		# used for the menu only
 
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 			widget.emit_stop_by_name('button-press-event')
-			self.panel_applet.setup_menu('', [], None)
+			self.panel_applet.setup_menu(self.context_menu_xml, self.context_menu_verbs, None)
 			# TODO: add "About" and "Edit menu" to this context menu
 			#return True
 
 
 	def on_panel_button_toggled(self, widget):
 
-		#if self.auto_toggled_panel_button:
-		#	self.auto_toggled_panel_button = False
-		#	return True
+		if self.auto_toggled_panel_button:
+			self.auto_toggled_panel_button = False
+			return True
 
-		if self.visible: self.hide(do_auto_toggle = False)
-		else: self.show(do_auto_toggle = False)
+		if self.visible: 
+			self.hide(do_auto_toggle = False)
+		else: 
+			self.show(do_auto_toggle = False)
 
 
 	def on_panel_change_background(self, widget, type, color, pixmap):
@@ -580,6 +613,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def auto_toggle_panel_button(self, state):
+
+		if self.auto_toggled_panel_button:
+			self.auto_toggled_panel_button = False
+			return
 
 		if self.panel_applet is not None:
 			self.auto_toggled_panel_button = True
@@ -927,6 +964,14 @@ class Cardapio(dbus.service.Object):
 		# TODO: make sure the viewport color changes on the fly when user changes theme too!
 
 
+	def launch_edit_app(self, widget, verb):
+
+		for app in  Cardapio.menu_editing_apps:
+			if self.launch_raw(app): return
+
+		print(_('No menu editing apps found! Tried these: %s') % ', '.join(Cardapio.menu_editing_apps))
+
+
 	def launch_app(self, widget, desktop_path):
 
 		if os.path.exists(desktop_path):
@@ -939,13 +984,13 @@ class Cardapio(dbus.service.Object):
 			if match is not None:
 				path = match.group(1)
 
-			self.launch_raw(path)
+			return self.launch_raw(path)
 
 
 	def launch_xdg(self, path):
 
 		path = self.escape_quotes(path)
-		self.launch_raw("xdg-open '%s'" % path)
+		return self.launch_raw("xdg-open '%s'" % path)
 
 
 	def launch_raw(self, path):
@@ -954,9 +999,10 @@ class Cardapio(dbus.service.Object):
 			subprocess.Popen(path, shell = True, cwd = self.user_home_folder)
 
 		except OSError:
-			pass
+			return False
 
 		self.hide()
+		return True
 
 
 	def show_all_nonempty_sections(self):
