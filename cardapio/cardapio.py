@@ -38,13 +38,13 @@ gettext.textdomain(APP)
 _ = gettext.gettext
 
 # Before version 1.0:
-# TODO: fix Win+Space untoggle
 # TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
 # TODO: make "places" use custom icons
 # TODO: add "No results to show" text
 # TODO: make sure colors work with all themes
 
 # After version 1.0:
+# TODO: fix Win+Space untoggle
 # TODO: fix tabbing of first_app_widget / first_result_widget  
 # TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
 # TODO: any letter or number typed anywhere (without modifiers) is redirected to search entry
@@ -518,8 +518,6 @@ class Cardapio(dbus.service.Object):
 		if menu_x < 0: menu_x = 0
 		if menu_y < 0: menu_y = 0
 
-		# TODO: fix 4px margin between the menu and the panel (it's because the
-		# button is larger than the panel... how do i fix this?)
 		self.window.move(menu_x, menu_y)
 
 
