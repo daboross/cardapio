@@ -1061,7 +1061,7 @@ class Cardapio(dbus.service.Object):
 		except OSError:
 			return False
 
-		self.hide()
+		self.hide(do_auto_toggle = False)
 		return True
 
 
