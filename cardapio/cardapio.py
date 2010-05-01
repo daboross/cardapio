@@ -40,7 +40,7 @@ _ = gettext.gettext
 # Before version 1.0:
 # TODO: fix Win+Space untoggle
 # TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
-# TODO: add "places" to cardapio
+# TODO: make "places" use custom icons
 # TODO: add "No results to show" text
 # TODO: make sure colors work with all themes
 
@@ -52,9 +52,6 @@ _ = gettext.gettext
 
 class Cardapio(dbus.service.Object):
 
-	FOLDERS = 1
-	ITEMS   = 2
-	BOTH    = 3
 
 	menu_rebuild_delay       = 3    # seconds
 	min_search_string_length = 3    # characters
@@ -78,7 +75,6 @@ class Cardapio(dbus.service.Object):
 
 		self.panel_applet = panel_applet
 		self.panel_button = panel_button
-		self.auto_toggled_panel_button = False
 		self.auto_toggled_sidebar_button = False
 
 		self.app_list = []
@@ -244,10 +240,10 @@ class Cardapio(dbus.service.Object):
 
 	def on_mainwindow_focus_out(self, widget, event):
 
-		if self.panel_applet is None:
-			self.hide()
-
-		elif gtk.gdk.window_at_pointer() is None:
+		#if self.panel_applet is None:
+		#	self.hide()
+		
+		if gtk.gdk.window_at_pointer() is None:
 			# make sure clicking the applet button does cause a focus-out event
 			self.hide()
 
@@ -539,24 +535,22 @@ class Cardapio(dbus.service.Object):
 		self.window_size = self.window.get_size()
 
 
-	def show(self, do_auto_toggle = True):
+	def show(self):
 
 		self.restore_dimensions()
 		self.restore_location()
 
+		self.auto_toggle_panel_button(True)
+
 		self.window.set_focus(self.search_entry)
-
-		if do_auto_toggle:
-			self.auto_toggle_panel_button(True)
-
 		self.window.show()
+
 		self.visible = True
 
 
-	def hide(self, do_auto_toggle = True):
+	def hide(self):
 
-		if do_auto_toggle:
-			self.auto_toggle_panel_button(False)
+		self.auto_toggle_panel_button(False)
 
 		self.window.hide()
 		self.visible = False
@@ -578,20 +572,16 @@ class Cardapio(dbus.service.Object):
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 			widget.emit_stop_by_name('button-press-event')
 			self.panel_applet.setup_menu(self.context_menu_xml, self.context_menu_verbs, None)
-			# TODO: add "About" and "Edit menu" to this context menu
-			#return True
 
 
-	def on_panel_button_toggled(self, widget):
+	def on_panel_button_toggled(self, widget, event):
 
-		if self.auto_toggled_panel_button:
-			self.auto_toggled_panel_button = False
-			return True
+		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 1:
 
-		if self.visible: 
-			self.hide(do_auto_toggle = False)
-		else: 
-			self.show(do_auto_toggle = False)
+			if self.visible: self.hide()
+			else: self.show()
+
+			return True # required! or we get strange focus problems
 
 
 	def on_panel_change_background(self, widget, type, color, pixmap):
@@ -616,15 +606,10 @@ class Cardapio(dbus.service.Object):
 
 	def auto_toggle_panel_button(self, state):
 
-		if self.auto_toggled_panel_button:
-			self.auto_toggled_panel_button = False
-			return
-
 		if self.panel_applet is not None:
-			self.auto_toggled_panel_button = True
-			self.panel_button.set_active(state)
-			#if state: self.panel_button.activate()
-			#else: self.panel_button.deselect()
+			#self.panel_button.set_active(state)
+			if state: self.panel_button.select()
+			else: self.panel_button.deselect()
 
 
 	def rebuild(self):
@@ -1061,7 +1046,7 @@ class Cardapio(dbus.service.Object):
 		except OSError:
 			return False
 
-		self.hide(do_auto_toggle = False)
+		self.hide()
 		return True
 
 
@@ -1153,19 +1138,31 @@ class Cardapio(dbus.service.Object):
 		return str
 
 
+def return_true(*args):
+	return True
+
+
 def applet_factory(applet, iid):
 	
-	button_icon = gtk.image_new_from_icon_name('distributor-logo', gtk.ICON_SIZE_SMALL_TOOLBAR)
+	button = gtk.ImageMenuItem(Cardapio.default_panel_label)
 
-	button = gtk.ToggleButton(Cardapio.default_panel_label)
 	cardapio = Cardapio(hidden = True, panel_button = button, panel_applet = applet)
+
+	button_icon = gtk.image_new_from_icon_name('distributor-logo', gtk.ICON_SIZE_SMALL_TOOLBAR)
 	button.set_image(button_icon)
-	button.set_relief(gtk.RELIEF_NONE)
-	button.connect('toggled', cardapio.on_panel_button_toggled)
-	button.connect('button-press-event', cardapio.on_panel_button_press)
+
+	menu = gtk.MenuBar()
+	menu.add(button)
+
+	button.connect('button-press-event', cardapio.on_panel_button_toggled)
+	menu.connect('button-press-event', cardapio.on_panel_button_press)
+
+	# make sure menuitem doesn't change focus on mouseout/mousein
+	button.connect('enter-notify-event', return_true)
+	button.connect('leave-notify-event', return_true)
 
 	applet.connect('change-background', cardapio.on_panel_change_background)
-	applet.add(button)
+	applet.add(menu)
 	applet.show_all()
 
 	return True
