@@ -16,6 +16,7 @@ import os
 import re
 import sys
 import gtk
+import gio
 import glib
 import gmenu
 import locale
@@ -640,34 +641,52 @@ class Cardapio(dbus.service.Object):
 		button = self.add_launcher_entry(_('Home'), 'user-home', self.places_section_contents, comment = _('Open your personal folder'), app_list = self.app_list)
 		button.connect('clicked', self.on_xdg_button_clicked, self.user_home_folder)
 
-		config_filepath = os.path.join(DesktopEntry.xdg_config_home, 'user-dirs.dirs')
-		config_file = file(config_filepath, 'r')
+		xdg_folders_filepath = os.path.join(DesktopEntry.xdg_config_home, 'user-dirs.dirs')
+		xdg_folders_file = file(xdg_folders_filepath, 'r')
 
-		for line in config_file.readlines():
+		for line in xdg_folders_file.readlines():
 
 			res = re.match('\s*XDG_DESKTOP_DIR\s*=\s*"(.+)"', line)
 			if res is not None:
 				path = res.groups()[0]
 				self.add_place(_('Desktop'), path, 'user-desktop')
 
-		config_file.close()
+		xdg_folders_file.close()
 
-		config_filepath = os.path.join(self.user_home_folder, '.gtk-bookmarks')
-		config_file = file(config_filepath, 'r')
+		bookmark_filepath = os.path.join(self.user_home_folder, '.gtk-bookmarks')
+		bookmark_file = file(bookmark_filepath, 'r')
 
-		for line in config_file.readlines():
+		for line in bookmark_file.readlines():
 			if line.strip(' \n\r\t'):
 				self.add_place(self.get_place_name(line), line, 'folder')
 
-		config_file.close()
-		# TODO handle bookmarks changing
+		bookmark_file.close()
+
+		self.bookmark_monitor = gio.File(bookmark_filepath).monitor_file()  # keep a reference to avoid getting it garbage collected
+		self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed)
+
+
+	def on_bookmark_monitor_changed(self, monitor, file, other_file, event):
+
+		if event == gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
+
+			# TODO: make sure this doesn't fire 5 times per change!
+
+			for item in self.places_section_contents.get_children():
+				self.places_section_contents.remove(item)
+
+			self.build_places_list()
 
 
 	def get_folder_name(self, folder_path):
 
 		res = folder_path.split(os.path.sep)
-		if res: return res[-1].strip(' \n\r\t').replace('%20', ' ')
-		return None
+		if res: 
+			res = res[-1].strip(' \n\r\t').replace('%20', ' ')
+			if res: return res
+
+		# TODO: handle remote folders like nautilus does (i.e. '/home on ftp.myserver.net')
+		return folder_path.strip(' \n\r\t').replace('%20', ' ')
 
 
 	def get_place_name(self, folder_path):
