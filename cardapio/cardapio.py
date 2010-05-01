@@ -61,7 +61,7 @@ class Cardapio(dbus.service.Object):
 	search_results_limit     = 15   # results
 	search_update_delay      = 100  # msec
 
-	default_panel_label = _('Applications')
+	default_panel_label = commands.getoutput('lsb_release -is')
 	default_keybinding = '<Super>space'
 	# try gtk.accelerator_parse('<Super>space') to see if the string is correct!
 
