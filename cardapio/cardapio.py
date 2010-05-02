@@ -41,15 +41,21 @@ _ = gettext.gettext
 # Before version 1.0:
 # TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
 # TODO: make "places" use custom icons
+# TODO: add computer, mount points, trash to "places"
 # TODO: add "No results to show" text
 # TODO: make sure colors work with all themes
+# TODO: make applet 1px larger in every direction, so fitts law works
+# TODO: fix metacity's focus problems...
 
 # After version 1.0:
 # TODO: fix Win+Space untoggle
 # TODO: fix tabbing of first_app_widget / first_result_widget  
 # TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
 # TODO: any letter or number typed anywhere (without modifiers) is redirected to search entry
+# TODO: show context-menu for mountpoints to eject
 # TODO: multiple columns when window is wide enough (like gnome-control-center)
+# TODO: slash "/" navigates inside folders, Esc pops out
+# plus other TODO's elsewhere in the code
 
 class Cardapio(dbus.service.Object):
 
@@ -362,6 +368,9 @@ class Cardapio(dbus.service.Object):
 			error_handler=self.handle_search_error
 			)
 
+		# TODO: why does new tracker not support nie:mimeType or nfo:belongsToContainer?
+		# CHECK NEW ONTOLOGY!
+
 		# Things I've tried:
 		#
 		#			FILTER (fn:contains(?title, '%s'))
@@ -376,7 +385,7 @@ class Cardapio(dbus.service.Object):
 		#
 		# - no support for fn:lower-case, so i can't do:
 		#
-		#       FILTER (fn:contains(fn:lower-case(?title, '%s')))
+		#       FILTER (fn:contains(fn:lower-case(?title), '%s'))
 		#
 		# - fts:match does not match source code! so not good for searching
 		# files in general, only documents.
@@ -658,7 +667,10 @@ class Cardapio(dbus.service.Object):
 
 		for line in bookmark_file.readlines():
 			if line.strip(' \n\r\t'):
-				self.add_place(self.get_place_name(line), line, 'folder')
+				name, path = self.get_place_name_and_path(line)
+				# TODO: make sure path exists
+				# TODO: if path doesn't exist, add gio monitor (could be a removable disk)
+				self.add_place(name, path, 'folder')
 
 		bookmark_file.close()
 
@@ -678,28 +690,35 @@ class Cardapio(dbus.service.Object):
 			self.build_places_list()
 
 
-	def get_folder_name(self, folder_path):
+	def get_folder_name_and_path(self, folder_path):
+
+		path = folder_path.strip(' \n\r\t')
 
 		res = folder_path.split(os.path.sep)
 		if res: 
-			res = res[-1].strip(' \n\r\t').replace('%20', ' ')
-			if res: return res
+			name = res[-1].strip(' \n\r\t').replace('%20', ' ')
+			if name: return name, path
 
 		# TODO: handle remote folders like nautilus does (i.e. '/home on ftp.myserver.net')
-		return folder_path.strip(' \n\r\t').replace('%20', ' ')
+		name = path.replace('%20', ' ')	
+		return name, path
 
 
-	def get_place_name(self, folder_path):
+	def get_place_name_and_path(self, folder_path):
 
 		res = folder_path.split(' ')
-		if len(res) > 1: return ' '.join(res[1:]).strip(' \n\r\t')
-		return self.get_folder_name(folder_path)
+		if len(res) > 1: 
+			name = ' '.join(res[1:]).strip(' \n\r\t')
+			path = res[0]
+			return name, path
+
+		return self.get_folder_name_and_path(folder_path)
 
 
 	def add_place(self, folder_name, folder_path, folder_icon):
 
 		folder_path = os.path.expanduser(folder_path.replace('$HOME', '~')).strip(' \n\r\t')
-		button = self.add_launcher_entry(folder_name, folder_icon, self.places_section_contents, comment = _('Open folder %s') % folder_name, app_list = self.app_list)
+		button = self.add_launcher_entry(folder_name, folder_icon, self.places_section_contents, comment = folder_path, app_list = self.app_list)
 		button.connect('clicked', self.on_xdg_button_clicked, folder_path)
 
 
@@ -895,8 +914,8 @@ class Cardapio(dbus.service.Object):
 		s = str(len(section_slab));
 		c = str(len(section_contents));
 
-		section_slab.set_name(section_slab.name + s)
-		section_contents.set_name(section_contents.name + s + c)
+		section_slab.set_name('SectionSlab' + s)
+		section_contents.set_name('SectionContents' + s + c)
 
 		self.application_pane.pack_start(section_slab, expand = False, fill = False)
 
