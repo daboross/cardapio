@@ -29,7 +29,7 @@ if len(sys.argv) == 2:
 	if sys.argv[1] == 'run-in-window':   
 
 		main_window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		main_window.set_title('Python Applet')
+		main_window.set_title('Cardapio Applet')
 		main_window.connect('destroy', gtk.main_quit) 
 		app = gnomeapplet.Applet()
 		applet_factory(app, None)

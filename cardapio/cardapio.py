@@ -12,23 +12,29 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import os
-import re
-import sys
-import gtk
-import gio
-import glib
-import gmenu
-import locale
-import urllib2
-import gettext
-import commands
-import keybinder
-import subprocess
-import gnomeapplet
-import dbus, dbus.service
-from xdg import BaseDirectory, DesktopEntry
-from dbus.mainloop.glib import DBusGMainLoop
+try:
+	import os
+	import re
+	import sys
+	import gtk
+	import gio
+	import glib
+	import gmenu
+	import locale
+	import urllib2
+	import gettext
+	import commands
+	import keybinder
+	import subprocess
+	import gnomeapplet
+	import dbus, dbus.service
+	from xdg import BaseDirectory, DesktopEntry
+	from dbus.mainloop.glib import DBusGMainLoop
+
+except Exception, exception:
+	print exception
+	sys.exit(1)
+
 
 APP = 'Cardapio'
 DIR = 'locale'
@@ -40,14 +46,15 @@ _ = gettext.gettext
 
 # Before version 1.0:
 # TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
-# TODO: make "places" use custom icons
 # TODO: add computer, mount points, trash to "places"
-# TODO: add "No results to show" text
 # TODO: make sure colors work with all themes
 # TODO: make applet 1px larger in every direction, so fitts law works
 # TODO: fix metacity's focus problems...
+# TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
 
 # After version 1.0:
+# TODO: make a configuration window to change the shortcut, size, etc. Save with gconf or use ini file
+# TODO: make "places" use custom icons
 # TODO: fix Win+Space untoggle
 # TODO: fix tabbing of first_app_widget / first_result_widget  
 # TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
@@ -74,6 +81,8 @@ class Cardapio(dbus.service.Object):
 
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
+
+	no_results_text = _('No results to show')
 
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
@@ -299,6 +308,8 @@ class Cardapio(dbus.service.Object):
 			self.disappear_with_section(self.session_section_slab)
 			self.disappear_with_section(self.system_section_slab)
 			self.disappear_with_section(self.search_section_slab)
+			self.no_results_slab.hide()
+
 		else:
 			self.all_sections_sidebar_button.set_sensitive(True)
 
@@ -330,6 +341,8 @@ class Cardapio(dbus.service.Object):
 
 		if self.shown_section is None:
 			self.show_all_nonempty_sections()
+		else:
+			self.consider_showing_no_results_text()
 
 
 	def schedule_search_with_tracker(self, text):
@@ -635,6 +648,9 @@ class Cardapio(dbus.service.Object):
 		self.set_sidebar_button_active(button, True)
 		self.all_sections_sidebar_button.set_sensitive(False)
 
+		self.no_results_slab, dummy, self.no_results_label = self.add_application_section(Cardapio.no_results_text)
+		self.no_results_slab.hide()
+
 		self.add_places_slab()
 		self.add_applications_slab()
 		self.add_hidden_session_slab()
@@ -768,13 +784,13 @@ class Cardapio(dbus.service.Object):
 		sidebar_button = self.add_sidebar_button(node.name, node.icon, self.category_pane, comment = node.get_comment())
 
 		# add category to application pane
-		section_slab, section_contents = self.add_application_section(node.name)
+		section_slab, section_contents, dummy = self.add_application_section(node.name)
 
 		# add all apps in this category to application pane
 		self.add_tree_to_app_list(node, section_contents)
 
 		sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section_slab)
-		self.section_list[section_slab] = {'has-entries': True, 'category': sidebar_button, 'contents': section_contents}
+		self.section_list[section_slab] = {'has-entries': True, 'category': sidebar_button, 'contents': section_contents, 'title': node.name}
 
 
 	def add_slab(self, title_str, icon_name = None, comment = '', hide = True):
@@ -783,16 +799,16 @@ class Cardapio(dbus.service.Object):
 		sidebar_button = self.add_sidebar_button(title_str, icon_name, self.category_pane, comment = comment)
 
 		# add category to application pane
-		section_slab, section_contents = self.add_application_section(title_str)
+		section_slab, section_contents, dummy = self.add_application_section(title_str)
 
 		sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section_slab)
 
 		if hide:
 			sidebar_button.hide()
 			section_slab.hide()
-			self.section_list[section_slab] = {'has-entries': False, 'category': sidebar_button, 'contents': section_contents}
+			self.section_list[section_slab] = {'has-entries': False, 'category': sidebar_button, 'contents': section_contents, 'title': title_str}
 		else:
-			self.section_list[section_slab] = {'has-entries': True, 'category': sidebar_button, 'contents': section_contents}
+			self.section_list[section_slab] = {'has-entries': True, 'category': sidebar_button, 'contents': section_contents, 'title': title_str}
 
 		return section_slab, section_contents
 
@@ -919,7 +935,7 @@ class Cardapio(dbus.service.Object):
 
 		self.application_pane.pack_start(section_slab, expand = False, fill = False)
 
-		return section_slab, section_contents
+		return section_slab, section_contents, label
 
 
 	def add_section(self):
@@ -1088,11 +1104,20 @@ class Cardapio(dbus.service.Object):
 
 	def show_all_nonempty_sections(self):
 
+		no_results_to_show = True
+
 		for sec in self.section_list:
 			if self.section_list[sec]['has-entries']:
 				sec.show()
+				no_results_to_show = False
 			else:
 				sec.hide()
+
+		if no_results_to_show:
+			self.no_results_slab.show()
+			self.no_results_label.set_text(Cardapio.no_results_text)
+		else:
+			self.no_results_slab.hide()
 
 		if self.shown_section is not None:
 			widget = self.section_list[self.shown_section]['category']
@@ -1122,7 +1147,21 @@ class Cardapio(dbus.service.Object):
 
 		self.all_sections_sidebar_button.set_sensitive(True)
 		self.shown_section = section_slab
-		section_slab.show()
+
+		self.consider_showing_no_results_text()
+
+
+	def consider_showing_no_results_text(self):
+
+		if self.section_list[self.shown_section]['has-entries']:
+			self.shown_section.show()
+			self.no_results_slab.hide()
+		else:
+			self.shown_section.hide()
+			self.no_results_slab.show()
+			self.no_results_label.set_text(_('No %s to show') % self.section_list[self.shown_section]['title'])
+
+		return True
 
 
 	def disappear_with_section(self, section_slab):
