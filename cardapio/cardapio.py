@@ -647,7 +647,7 @@ class Cardapio(dbus.service.Object):
 		self.set_sidebar_button_active(button, True)
 		self.all_sections_sidebar_button.set_sensitive(False)
 
-		self.no_results_slab, dummy, self.no_results_label = self.add_application_section(Cardapio.no_results_text)
+		self.no_results_slab, dummy, self.no_results_label = self.add_application_section('Dummy text')
 		self.hide_no_results_text()
 
 		self.add_places_slab()
