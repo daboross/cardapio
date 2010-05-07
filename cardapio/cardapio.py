@@ -46,7 +46,6 @@ _ = gettext.gettext
 
 # Before version 1.0:
 # TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
-# TODO: make sure colors work with all themes
 # TODO: make applet 1px larger in every direction, so fitts law works
 # TODO: fix metacity's focus problems...
 # TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
@@ -65,10 +64,10 @@ _ = gettext.gettext
 # TODO: slash "/" should navigate inside folders, Esc pops out
 # TODO: search results have context menu with "Open with...", "Show parent folder", and so on.
 # TODO: figure out if tracker can sort the results by relevancy
-# plus other TODO's elsewhere in the code
+# plus other TODO's elsewhere in the code...
+
 
 class Cardapio(dbus.service.Object):
-
 
 	menu_rebuild_delay       = 3    # seconds
 	min_search_string_length = 3    # characters
@@ -79,7 +78,6 @@ class Cardapio(dbus.service.Object):
 	default_keybinding = '<Super>space'
 	# try gtk.accelerator_parse('<Super>space') to see if the string is correct!
 
-	file_management_apps = ('nautilus', 'thunar')
 	menu_editing_apps = ('alacarte', 'gmenu-simple-editor')
 
 	bus_name_str = 'org.varal.Cardapio'
