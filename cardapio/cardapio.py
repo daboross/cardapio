@@ -133,11 +133,12 @@ class Cardapio(dbus.service.Object):
 
 	def set_up_tracker_search(self):
 
-		self.tracker_object = None
+		self.tracker = None
 		self.search_timer = None
 
 		if self.bus.request_name('org.freedesktop.Tracker1') == dbus.bus.REQUEST_NAME_REPLY_IN_QUEUE:
-			self.tracker_object = self.bus.get_object('org.freedesktop.Tracker1', '/org/freedesktop/Tracker1/Resources')
+			tracker_object = self.bus.get_object('org.freedesktop.Tracker1', '/org/freedesktop/Tracker1/Resources')
+			self.tracker = dbus.Interface(tracker_object, 'org.freedesktop.Tracker1.Resources') 
 
 
 	def on_session_action(self, widget, shutdown):
@@ -313,7 +314,7 @@ class Cardapio(dbus.service.Object):
 		else:
 			self.all_sections_sidebar_button.set_sensitive(True)
 
-		if self.tracker_object is not None:
+		if self.tracker is not None:
 			if len(text) >= Cardapio.min_search_string_length:
 				self.schedule_search_with_tracker(text)
 			else:
@@ -361,7 +362,7 @@ class Cardapio(dbus.service.Object):
 		#text = self.escape_quotes(text).lower()
 		text = self.escape_quotes(text)
 
-		self.tracker_object.SparqlQuery(
+		self.tracker.SparqlQuery(
 			"""
 				SELECT ?title ?uri ?tooltip ?mime
 				WHERE { 
@@ -380,9 +381,6 @@ class Cardapio(dbus.service.Object):
 			reply_handler=self.handle_search_result,
 			error_handler=self.handle_search_error
 			)
-
-		# TODO: why does new tracker not support nie:mimeType or nfo:belongsToContainer?
-		# CHECK NEW ONTOLOGY!
 
 		# Things I've tried:
 		#
@@ -1037,6 +1035,8 @@ class Cardapio(dbus.service.Object):
 			if self.shown_section is None or self.shown_section == self.search_section_slab:
 				self.search_section_slab.show()
 
+			self.no_results_slab.hide()
+
 		else:
 
 			self.set_section_is_empty(self.search_section_slab)
@@ -1159,7 +1159,7 @@ class Cardapio(dbus.service.Object):
 		else:
 			self.shown_section.hide()
 			self.no_results_slab.show()
-			self.no_results_label.set_text(_('No %s to show') % self.section_list[self.shown_section]['title'])
+			self.no_results_label.set_text(_('No results to show in %s"') % self.section_list[self.shown_section]['title'])
 
 		return True
 
