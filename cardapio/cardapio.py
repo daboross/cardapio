@@ -51,9 +51,11 @@ _ = gettext.gettext
 # TODO: make applet 1px larger in every direction, so fitts law works
 # TODO: fix metacity's focus problems...
 # TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
+# TODO: fix bugs with "no results to show"
 
 # After version 1.0:
-# TODO: make a configuration window to change the shortcut, size, etc. Save with gconf or use ini file
+# TODO: make a configuration window to change the shortcut, etc. Save with gconf or use ini file
+# TODO: remember last window size (using gconf or whatever)
 # TODO: make "places" use custom icons
 # TODO: fix Win+Space untoggle
 # TODO: fix tabbing of first_app_widget / first_result_widget  
@@ -61,7 +63,8 @@ _ = gettext.gettext
 # TODO: any letter or number typed anywhere (without modifiers) is redirected to search entry
 # TODO: show context-menu for mountpoints to eject
 # TODO: multiple columns when window is wide enough (like gnome-control-center)
-# TODO: slash "/" navigates inside folders, Esc pops out
+# TODO: slash "/" should navigate inside folders, Esc pops out
+# TODO: search results have context menu with "Open with...", "Show parent folder", and so on.
 # plus other TODO's elsewhere in the code
 
 class Cardapio(dbus.service.Object):
@@ -309,7 +312,7 @@ class Cardapio(dbus.service.Object):
 			self.disappear_with_section(self.session_section_slab)
 			self.disappear_with_section(self.system_section_slab)
 			self.disappear_with_section(self.search_section_slab)
-			self.no_results_slab.hide()
+			self.hide_no_results_text()
 
 		else:
 			self.all_sections_sidebar_button.set_sensitive(True)
@@ -647,7 +650,7 @@ class Cardapio(dbus.service.Object):
 		self.all_sections_sidebar_button.set_sensitive(False)
 
 		self.no_results_slab, dummy, self.no_results_label = self.add_application_section(Cardapio.no_results_text)
-		self.no_results_slab.hide()
+		self.hide_no_results_text()
 
 		self.add_places_slab()
 		self.add_applications_slab()
@@ -1034,8 +1037,10 @@ class Cardapio(dbus.service.Object):
 
 			if self.shown_section is None or self.shown_section == self.search_section_slab:
 				self.search_section_slab.show()
+				self.hide_no_results_text()
 
-			self.no_results_slab.hide()
+			else:
+				self.consider_showing_no_results_text()
 
 		else:
 
@@ -1043,6 +1048,8 @@ class Cardapio(dbus.service.Object):
 
 			if self.shown_section is None or self.shown_section == self.search_section_slab:
 				self.search_section_slab.hide()
+
+			self.consider_showing_no_results_text()
 
 
 	def prepare_viewport(self):
@@ -1114,10 +1121,9 @@ class Cardapio(dbus.service.Object):
 				sec.hide()
 
 		if no_results_to_show:
-			self.no_results_slab.show()
-			self.no_results_label.set_text(Cardapio.no_results_text)
+			self.show_no_results_text()
 		else:
-			self.no_results_slab.hide()
+			self.hide_no_results_text()
 
 		if self.shown_section is not None:
 			widget = self.section_list[self.shown_section]['category']
@@ -1151,17 +1157,32 @@ class Cardapio(dbus.service.Object):
 		self.consider_showing_no_results_text()
 
 
+	def show_no_results_text(self, text = None):
+
+		if text is None: text = _('No results to show')
+
+		self.no_results_label.set_text(text)
+		self.no_results_slab.show()
+
+
+	def hide_no_results_text(self):
+
+		self.no_results_slab.hide()
+
+
 	def consider_showing_no_results_text(self):
 
+		if self.shown_section is None:
+			self.show_no_results_text()
+			return 
+			
 		if self.section_list[self.shown_section]['has-entries']:
 			self.shown_section.show()
-			self.no_results_slab.hide()
+			self.hide_no_results_text()
+
 		else:
 			self.shown_section.hide()
-			self.no_results_slab.show()
-			self.no_results_label.set_text(_('No results to show in %s"') % self.section_list[self.shown_section]['title'])
-
-		return True
+			self.show_no_results_text(_('No results to show in "%s"') % self.section_list[self.shown_section]['title'])
 
 
 	def disappear_with_section(self, section_slab):
