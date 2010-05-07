@@ -46,25 +46,25 @@ _ = gettext.gettext
 
 # Before version 1.0:
 # TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
-# TODO: add computer, mount points, trash to "places"
 # TODO: make sure colors work with all themes
 # TODO: make applet 1px larger in every direction, so fitts law works
 # TODO: fix metacity's focus problems...
 # TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
-# TODO: fix bugs with "no results to show"
 
 # After version 1.0:
-# TODO: make a configuration window to change the shortcut, etc. Save with gconf or use ini file
+# TODO: make a preferences window. Save items with gconf or use ini file.
+# TODO: optionally (user preference) show log out, shutdown buttons along bottom of the window
 # TODO: remember last window size (using gconf or whatever)
 # TODO: make "places" use custom icons
 # TODO: fix Win+Space untoggle
 # TODO: fix tabbing of first_app_widget / first_result_widget  
 # TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
 # TODO: any letter or number typed anywhere (without modifiers) is redirected to search entry
-# TODO: show context-menu for mountpoints to eject
+# TODO: add mount points to "places", allow ejecting from context menu
 # TODO: multiple columns when window is wide enough (like gnome-control-center)
 # TODO: slash "/" should navigate inside folders, Esc pops out
 # TODO: search results have context menu with "Open with...", "Show parent folder", and so on.
+# TODO: figure out if tracker can sort the results by relevancy
 # plus other TODO's elsewhere in the code
 
 class Cardapio(dbus.service.Object):
@@ -666,6 +666,9 @@ class Cardapio(dbus.service.Object):
 		button = self.add_launcher_entry(_('Home'), 'user-home', self.places_section_contents, comment = _('Open your personal folder'), app_list = self.app_list)
 		button.connect('clicked', self.on_xdg_button_clicked, self.user_home_folder)
 
+		button = self.add_launcher_entry(_('Computer'), 'computer', self.places_section_contents, comment = _('Browse all local and remote disks and folders accessible from this computer'), app_list = self.app_list)
+		button.connect('clicked', self.on_xdg_button_clicked, 'computer:///')
+
 		xdg_folders_filepath = os.path.join(DesktopEntry.xdg_config_home, 'user-dirs.dirs')
 		xdg_folders_file = file(xdg_folders_filepath, 'r')
 
@@ -675,6 +678,8 @@ class Cardapio(dbus.service.Object):
 			if res is not None:
 				path = res.groups()[0]
 				self.add_place(_('Desktop'), path, 'user-desktop')
+
+			# TODO: use this loop to find which folders need special icons 
 
 		xdg_folders_file.close()
 
@@ -692,6 +697,9 @@ class Cardapio(dbus.service.Object):
 
 		self.bookmark_monitor = gio.File(bookmark_filepath).monitor_file()  # keep a reference to avoid getting it garbage collected
 		self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed)
+
+		button = self.add_launcher_entry(_('Trash'), 'user-trash', self.places_section_contents, comment = _('Open the trash'), app_list = self.app_list)
+		button.connect('clicked', self.on_xdg_button_clicked, 'trash:///')
 
 
 	def on_bookmark_monitor_changed(self, monitor, file, other_file, event):
