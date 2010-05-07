@@ -85,8 +85,6 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	no_results_text = _('No results to show')
-
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
@@ -1005,7 +1003,6 @@ class Cardapio(dbus.service.Object):
 	def handle_search_error(self, error):
 
 		print error
-		pass
 
 
 	def handle_search_result(self, results):
