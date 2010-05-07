@@ -96,10 +96,11 @@ class Cardapio(dbus.service.Object):
 
 		self.app_list = []
 		self.section_list = {}
-		self.shown_section = None
+		self.selected_section = None
 
 		self.first_app_widget = None
 		self.first_result_widget = None
+		self.no_results_to_show = False
 
 		self.visible = False
 		self.window_size = None
@@ -173,7 +174,7 @@ class Cardapio(dbus.service.Object):
 			self.auto_toggled_sidebar_button = False
 			return True
 
-		if self.shown_section is None:
+		if self.selected_section is None:
 			self.clear_search_entry()
 			widget.set_sensitive(False)
 
@@ -187,8 +188,8 @@ class Cardapio(dbus.service.Object):
 			self.auto_toggled_sidebar_button = False
 			return True
 
-		if self.shown_section == section_slab:
-			self.shown_section = None # necessary!
+		if self.selected_section == section_slab:
+			self.selected_section = None # necessary!
 			self.show_all_nonempty_sections()
 			return True
 
@@ -341,7 +342,7 @@ class Cardapio(dbus.service.Object):
 				if self.first_app_widget is None:
 					self.first_app_widget = app['button']
 
-		if self.shown_section is None:
+		if self.selected_section is None:
 			self.show_all_nonempty_sections()
 		else:
 			self.consider_showing_no_results_text()
@@ -432,9 +433,9 @@ class Cardapio(dbus.service.Object):
 		# make Tab go to first result element
 		if event.keyval == gtk.gdk.keyval_from_name('Tab'):
 
-			if self.shown_section is not None:
+			if self.selected_section is not None:
 
-				contents = self.section_list[self.shown_section]['contents']
+				contents = self.section_list[self.selected_section]['contents']
 				visible_children = [c for c in contents.get_children() if c.get_property('visible')]
 
 				if visible_children:
@@ -458,7 +459,7 @@ class Cardapio(dbus.service.Object):
 
 				self.clear_search_entry()
 
-			elif self.shown_section is not None:
+			elif self.selected_section is not None:
 
 				self.show_all_nonempty_sections()
 
@@ -1032,7 +1033,7 @@ class Cardapio(dbus.service.Object):
 			self.search_section_contents.show()
 			self.set_section_has_entries(self.search_section_slab)
 
-			if self.shown_section is None or self.shown_section == self.search_section_slab:
+			if self.selected_section is None or self.selected_section == self.search_section_slab:
 				self.search_section_slab.show()
 				self.hide_no_results_text()
 
@@ -1043,10 +1044,11 @@ class Cardapio(dbus.service.Object):
 
 			self.set_section_is_empty(self.search_section_slab)
 
-			if self.shown_section is None or self.shown_section == self.search_section_slab:
+			if self.selected_section is None or self.selected_section == self.search_section_slab:
 				self.search_section_slab.hide()
 
-			self.consider_showing_no_results_text()
+			if self.no_results_to_show:
+				self.consider_showing_no_results_text()
 
 
 	def prepare_viewport(self):
@@ -1108,25 +1110,25 @@ class Cardapio(dbus.service.Object):
 
 	def show_all_nonempty_sections(self):
 
-		no_results_to_show = True
+		self.no_results_to_show = True
 
 		for sec in self.section_list:
 			if self.section_list[sec]['has-entries']:
 				sec.show()
-				no_results_to_show = False
+				self.no_results_to_show = False
 			else:
 				sec.hide()
 
-		if no_results_to_show:
+		if self.no_results_to_show:
 			self.show_no_results_text()
 		else:
 			self.hide_no_results_text()
 
-		if self.shown_section is not None:
-			widget = self.section_list[self.shown_section]['category']
+		if self.selected_section is not None:
+			widget = self.section_list[self.selected_section]['category']
 			self.set_sidebar_button_active(widget, False)
 
-		self.shown_section = None
+		self.selected_section = None
 
 		widget = self.all_sections_sidebar_button
 		self.set_sidebar_button_active(widget, True) 
@@ -1140,8 +1142,8 @@ class Cardapio(dbus.service.Object):
 		for sec in self.section_list:
 			sec.hide()
 
-		if self.shown_section is not None:
-			widget = self.section_list[self.shown_section]['category']
+		if self.selected_section is not None:
+			widget = self.section_list[self.selected_section]['category']
 			self.set_sidebar_button_active(widget, False)
 
 		elif self.all_sections_sidebar_button.get_active():
@@ -1149,7 +1151,7 @@ class Cardapio(dbus.service.Object):
 			self.set_sidebar_button_active(widget, False)
 
 		self.all_sections_sidebar_button.set_sensitive(True)
-		self.shown_section = section_slab
+		self.selected_section = section_slab
 
 		self.consider_showing_no_results_text()
 
@@ -1169,17 +1171,17 @@ class Cardapio(dbus.service.Object):
 
 	def consider_showing_no_results_text(self):
 
-		if self.shown_section is None:
+		if self.selected_section is None:
 			self.show_no_results_text()
 			return 
 			
-		if self.section_list[self.shown_section]['has-entries']:
-			self.shown_section.show()
+		if self.section_list[self.selected_section]['has-entries']:
+			self.selected_section.show()
 			self.hide_no_results_text()
 
 		else:
-			self.shown_section.hide()
-			self.show_no_results_text(_('No results to show in "%s"') % self.section_list[self.shown_section]['title'])
+			self.selected_section.hide()
+			self.show_no_results_text(_('No results to show in "%s"') % self.section_list[self.selected_section]['title'])
 
 
 	def disappear_with_section(self, section_slab):
