@@ -886,12 +886,12 @@ class Cardapio(dbus.service.Object):
 
 	def add_sidebar_button(self, button_str, icon_name, parent_widget, comment = '', use_toggle_button = True):
 
-		return self.add_button(button_str, icon_name, parent_widget, comment, icon_size = self.icon_size_small, use_toggle_button = use_toggle_button)
+		return self.add_button(button_str, icon_name, parent_widget, comment, is_launcher_button = False)
 
 
 	def add_launcher_entry(self, button_str, icon_name, parent_widget, comment = '', app_list = None):
 
-		button = self.add_button(button_str, icon_name, parent_widget, comment, icon_size = self.icon_size_large)
+		button = self.add_button(button_str, icon_name, parent_widget, comment, is_launcher_button = True)
 
 		if app_list is not None:
 			app_list.append({'title': button_str.lower(), 'button': button, 'section': parent_widget.parent.parent})
@@ -902,23 +902,36 @@ class Cardapio(dbus.service.Object):
 		return button
 
 
-	def add_button(self, button_str, icon_name, parent_widget, comment = '', icon_size = 32, use_toggle_button = False):
+	def add_button(self, button_str, icon_name, parent_widget, comment = '', is_launcher_button = True):
 
-		if use_toggle_button:
-			button = gtk.ToggleButton(button_str)
+		if is_launcher_button:
+			button = gtk.Button()
+			icon_size = self.icon_size_large
 		else:
-			button = gtk.Button(button_str)
+			button = gtk.ToggleButton()
+			icon_size = self.icon_size_small
 
 		icon_pixbuf = self.get_pixbuf_icon(icon_name, icon_size)
-		button.set_image(gtk.image_new_from_pixbuf(icon_pixbuf))
+
+		label = gtk.Label(button_str)
+		if is_launcher_button: label.set_style(self.app_style)
+
+		hbox = gtk.HBox()
+		hbox.add(gtk.image_new_from_pixbuf(icon_pixbuf))
+		hbox.add(label)
+		hbox.set_spacing(5)
+		hbox.set_homogeneous(False)
+
+		align = gtk.Alignment(0, 0.5)
+		align.add(hbox)
 
 		if comment: button.set_tooltip_text(comment)
 
-		button.set_alignment(0, 0.5)
+		button.add(align)
 		button.set_relief(gtk.RELIEF_NONE)
 		button.set_use_underline(False)
 
-		button.show()
+		button.show_all()
 		parent_widget.pack_start(button, expand = False, fill = False)
 
 		return button
@@ -926,14 +939,12 @@ class Cardapio(dbus.service.Object):
 
 	def add_application_section(self, section_title = None):
 
-		# TODO: make sure the section titles use a text color that works against
-		# all base colors
-
 		section_slab, section_contents = self.add_section()
 
 		if section_title is not None:
 			label = section_slab.get_label_widget()
 			label.set_text(section_title)
+			label.set_style(self.app_style)
 
 		s = str(len(section_slab));
 		c = str(len(section_contents));
@@ -995,9 +1006,6 @@ class Cardapio(dbus.service.Object):
 	def add_tree_to_app_list(self, tree, parent_widget, recursive = True):
 
 		for node in tree.contents:
-
-			# TODO: make sure these buttons use a text color that works against
-			# all base colors
 
 			if isinstance(node, gmenu.Entry):
 
@@ -1061,13 +1069,14 @@ class Cardapio(dbus.service.Object):
 
 	def prepare_viewport(self):
 
+		# TODO: make sure the this method is called when user changes his/her theme
+
 		dummy_window = gtk.Window()
 		dummy_window.realize()
-		scrolledwin_style = dummy_window.get_style().copy()
-		scrolledwin_style.bg[gtk.STATE_NORMAL] = scrolledwin_style.base[gtk.STATE_NORMAL]
-		self.get_object('ScrolledViewport').set_style(scrolledwin_style)
-
-		# TODO: make sure the viewport color changes on the fly when user changes theme too!
+		self.app_style = dummy_window.get_style().copy()
+		self.app_style.bg[gtk.STATE_NORMAL] = self.app_style.base[gtk.STATE_NORMAL]
+		self.app_style.fg[gtk.STATE_NORMAL] = self.app_style.text[gtk.STATE_NORMAL]
+		self.get_object('ScrolledViewport').set_style(self.app_style)
 
 
 	def launch_edit_app(self, widget, verb):
