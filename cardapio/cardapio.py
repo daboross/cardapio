@@ -70,7 +70,7 @@ _ = gettext.gettext
 
 class Cardapio(dbus.service.Object):
 
-	menu_rebuild_delay       = 3    # seconds
+	menu_rebuild_delay       = 60   # seconds
 	min_search_string_length = 3    # characters
 	search_results_limit     = 15   # results
 	search_update_delay      = 100  # msec
@@ -197,6 +197,8 @@ class Cardapio(dbus.service.Object):
 
 	def build_ui(self):
 
+		self.rebuild_timer = None
+
 		cardapio_path = os.path.dirname(__file__)
 		self.uifile = os.path.join(cardapio_path, 'cardapio.ui')
 
@@ -281,7 +283,15 @@ class Cardapio(dbus.service.Object):
 
 	def on_icon_theme_changed(self, icon_theme):
 
-		glib.timeout_add_seconds(Cardapio.menu_rebuild_delay, self.rebuild)
+		self.schedule_rebuild()
+
+
+	def schedule_rebuild(self):
+
+		if self.rebuild_timer is not None:
+			glib.source_remove(self.rebuild_timer)
+
+		self.rebuild_timer = glib.timeout_add_seconds(Cardapio.menu_rebuild_delay, self.rebuild)
 
 
 	def on_gtk_settings_changed(self, gobj, property_changed):
@@ -289,12 +299,12 @@ class Cardapio(dbus.service.Object):
 		if property_changed.name == 'gtk-color-scheme'\
 				or property_changed.name == 'gtk-theme-name':
 			self.prepare_viewport()
-			glib.timeout_add_seconds(Cardapio.menu_rebuild_delay, self.rebuild)
+			self.schedule_rebuild()
 
 
 	def on_menu_data_changed(self, tree):
 
-		glib.timeout_add_seconds(Cardapio.menu_rebuild_delay, self.rebuild)
+		self.schedule_rebuild()
 
 
 	def on_searchentry_icon_press(self, widget, iconpos, event):
@@ -412,6 +422,9 @@ class Cardapio(dbus.service.Object):
 		# files in general, only documents.
 		#
 		# - regex works, but it's too slow for normal use...
+
+		return False
+		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
 	def is_searchfield_empty(self):
@@ -566,6 +579,9 @@ class Cardapio(dbus.service.Object):
 
 	def show(self):
 
+		if self.rebuild_timer is not None:
+			self.rebuild()
+
 		self.restore_dimensions()
 		self.restore_location()
 
@@ -642,6 +658,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def rebuild(self):
+
+		if self.rebuild_timer is not None:
+			glib.source_remove(self.rebuild_timer)
+			self.rebuild_timer = None
 
 		self.clear_application_pane()
 		self.clear_category_pane()
