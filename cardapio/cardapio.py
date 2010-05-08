@@ -51,6 +51,7 @@ _ = gettext.gettext
 # TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
 
 # After version 1.0:
+# TODO: make on_icon_theme_changed / on_gtk_settings_changed more lightweight by keeping all themeable widgets in an array
 # TODO: make a preferences window. Save items with gconf or use ini file.
 # TODO: optionally (user preference) show log out, shutdown buttons along bottom of the window
 # TODO: remember last window size (using gconf or whatever)
@@ -219,8 +220,9 @@ class Cardapio(dbus.service.Object):
 		self.icon_size_small = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
 
 		# make sure buttons have icons!
-		settings = gtk.settings_get_default()
-		settings.set_property('gtk-button-images', True)
+		self.gtk_settings = gtk.settings_get_default()
+		self.gtk_settings.set_property('gtk-button-images', True)
+		self.gtk_settings.connect('notify', self.on_gtk_settings_changed)
 
 		self.window.set_keep_above(True)
 
@@ -280,6 +282,14 @@ class Cardapio(dbus.service.Object):
 	def on_icon_theme_changed(self, icon_theme):
 
 		glib.timeout_add_seconds(Cardapio.menu_rebuild_delay, self.rebuild)
+
+
+	def on_gtk_settings_changed(self, gobj, property_changed):
+
+		if property_changed.name == 'gtk-color-scheme'\
+				or property_changed.name == 'gtk-theme-name':
+			self.prepare_viewport()
+			glib.timeout_add_seconds(Cardapio.menu_rebuild_delay, self.rebuild)
 
 
 	def on_menu_data_changed(self, tree):
