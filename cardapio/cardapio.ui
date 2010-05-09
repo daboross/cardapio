@@ -135,7 +135,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkFrame" id="SystemSlab">
+                          <object class="GtkFrame" id="PinnedSlab">
                             <property name="visible">True</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
@@ -144,20 +144,35 @@
                                 <property name="visible">True</property>
                                 <property name="top_padding">4</property>
                                 <child>
-                                  <object class="GtkVBox" id="SystemPane">
+                                  <object class="GtkScrolledWindow" id="scrolledwindow2">
                                     <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="hscrollbar_policy">never</property>
+                                    <property name="vscrollbar_policy">automatic</property>
                                     <child>
-                                      <placeholder/>
+                                      <object class="GtkViewport" id="viewport2">
+                                        <property name="visible">True</property>
+                                        <property name="resize_mode">queue</property>
+                                        <property name="shadow_type">none</property>
+                                        <child>
+                                          <object class="GtkVBox" id="PinnedPane">
+                                            <property name="visible">True</property>
+                                            <child>
+                                              <placeholder/>
+                                            </child>
+                                          </object>
+                                        </child>
+                                      </object>
                                     </child>
                                   </object>
                                 </child>
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="SystemLabel">
+                              <object class="GtkLabel" id="PinnedLabel">
                                 <property name="visible">True</property>
                                 <property name="xalign">0</property>
-                                <property name="label" translatable="yes">System tasks</property>
+                                <property name="label" translatable="yes">Pinned</property>
                                 <property name="use_markup">True</property>
                                 <attributes>
                                   <attribute name="weight" value="bold"/>

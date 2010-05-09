@@ -32,7 +32,7 @@ try:
 	from dbus.mainloop.glib import DBusGMainLoop
 
 except Exception, exception:
-	print exception
+	print(exception)
 	sys.exit(1)
 
 
@@ -213,7 +213,7 @@ class Cardapio(dbus.service.Object):
 		self.about_dialog      = self.get_object('AboutDialog')
 		self.application_pane  = self.get_object('ApplicationPane')
 		self.category_pane     = self.get_object('CategoryPane')
-		self.system_pane       = self.get_object('SystemPane')
+		self.pinned_pane       = self.get_object('PinnedPane')
 		self.search_entry      = self.get_object('SearchEntry')
 		self.scrolled_window   = self.get_object('ScrolledWindow')
 		self.scroll_adjustment = self.scrolled_window.get_vadjustment()
@@ -380,7 +380,7 @@ class Cardapio(dbus.service.Object):
 
 		glib.source_remove(self.search_timer)
 
-		# no .lower(), since there's no fn:lower-case in tracker
+		# no .lower(), since there's no fn:lower-case in tracker (yet!)
 		#text = self.escape_quotes(text).lower()
 		text = self.escape_quotes(text)
 
@@ -667,7 +667,7 @@ class Cardapio(dbus.service.Object):
 
 		self.clear_application_pane()
 		self.clear_category_pane()
-		self.clear_system_pane()
+		self.clear_pinned_pane()
 
 		self.section_list = {}
 		self.app_list = []
@@ -802,6 +802,8 @@ class Cardapio(dbus.service.Object):
 
 	def add_applications_slab(self):
 
+		pinned_pane_empty = True
+
 		for node in self.app_tree.root.contents:
 
 			if isinstance(node, gmenu.Directory):
@@ -812,8 +814,14 @@ class Cardapio(dbus.service.Object):
 			elif isinstance(node, gmenu.Entry):
 
 				# add to system pane
-				button = self.add_sidebar_button(node.name, node.icon, self.system_pane, comment = node.get_comment(), use_toggle_button = False)
+				button = self.add_sidebar_button(node.name, node.icon, self.pinned_pane, comment = node.get_comment(), use_toggle_button = False)
 				button.connect('clicked', self.on_app_button_clicked, node.desktop_file_path)
+				pinned_pane_empty = False
+
+		if pinned_pane_empty:
+			self.get_object('PinnedSlab').hide()
+		else:
+			self.get_object('PinnedSlab').show()
 
 
 	def add_section_slab(self, node):
@@ -887,21 +895,21 @@ class Cardapio(dbus.service.Object):
 
 	def clear_application_pane(self):
 
-		container = self.get_object('ApplicationPane')
+		container = self.application_pane
 		for	child in container.get_children():
 			container.remove(child)
 
 
 	def clear_category_pane(self):
 
-		container = self.get_object('CategoryPane')
+		container = self.category_pane
 		for	child in container.get_children():
 			container.remove(child)
 
 
-	def clear_system_pane(self):
+	def clear_pinned_pane(self):
 
-		container = self.get_object('SystemPane')
+		container = self.pinned_pane
 		for	child in container.get_children():
 			container.remove(child)
 
@@ -1051,7 +1059,7 @@ class Cardapio(dbus.service.Object):
 
 	def handle_search_error(self, error):
 
-		print error
+		print(error)
 
 
 	def handle_search_result(self, results):
