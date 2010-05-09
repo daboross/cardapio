@@ -49,8 +49,10 @@ _ = gettext.gettext
 # TODO: make applet 1px larger in every direction, so fitts law works
 # TODO: fix metacity's focus problems...
 # TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
+# TODO: make "system tasks" disappear when empty
 
 # After version 1.0:
+# TODO: add debug console window to cardapio, to facilitate debugging
 # TODO: make on_icon_theme_changed / on_gtk_settings_changed more lightweight by keeping all themeable widgets in an array
 # TODO: make a preferences window. Save items with gconf or use ini file.
 # TODO: optionally (user preference) show log out, shutdown buttons along bottom of the window
@@ -240,7 +242,7 @@ class Cardapio(dbus.service.Object):
 				('About', self.open_about_dialog)
 				]
 
-		self.prepare_viewport()
+		self.prepare_colors()
 		self.rebuild()
 
 	
@@ -298,7 +300,7 @@ class Cardapio(dbus.service.Object):
 
 		if property_changed.name == 'gtk-color-scheme'\
 				or property_changed.name == 'gtk-theme-name':
-			self.prepare_viewport()
+			self.prepare_colors()
 			self.schedule_rebuild()
 
 
@@ -942,7 +944,9 @@ class Cardapio(dbus.service.Object):
 		icon_pixbuf = self.get_pixbuf_icon(icon_name, icon_size)
 
 		label = gtk.Label(button_str)
-		if is_launcher_button: label.set_style(self.app_style)
+
+		if is_launcher_button: 
+			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
 
 		hbox = gtk.HBox()
 		hbox.add(gtk.image_new_from_pixbuf(icon_pixbuf))
@@ -972,7 +976,7 @@ class Cardapio(dbus.service.Object):
 		if section_title is not None:
 			label = section_slab.get_label_widget()
 			label.set_text(section_title)
-			label.set_style(self.app_style)
+			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
 
 		s = str(len(section_slab));
 		c = str(len(section_contents));
@@ -1095,16 +1099,14 @@ class Cardapio(dbus.service.Object):
 				self.consider_showing_no_results_text()
 
 
-	def prepare_viewport(self):
-
-		# TODO: make sure the this method is called when user changes his/her theme
+	def prepare_colors(self):
 
 		dummy_window = gtk.Window()
 		dummy_window.realize()
-		self.app_style = dummy_window.get_style().copy()
-		self.app_style.bg[gtk.STATE_NORMAL] = self.app_style.base[gtk.STATE_NORMAL]
-		self.app_style.fg[gtk.STATE_NORMAL] = self.app_style.text[gtk.STATE_NORMAL]
-		self.get_object('ScrolledViewport').set_style(self.app_style)
+		app_style = dummy_window.get_style()
+		self.style_app_button_bg = app_style.base[gtk.STATE_NORMAL]
+		self.style_app_button_fg = app_style.text[gtk.STATE_NORMAL]
+		self.get_object('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
 
 
 	def launch_edit_app(self, widget, verb):
