@@ -53,11 +53,7 @@ _ = gettext.gettext
 # TODO: add help/about somewhere on the menu
 
 # After version 1.0:
-# TODO: add debug console window to cardapio, to facilitate debugging
-# TODO: make on_icon_theme_changed / on_gtk_settings_changed more lightweight by keeping all themeable widgets in an array
 # TODO: make a preferences window. 
-# TODO: optionally (user preference) show log out, shutdown buttons along bottom of the window
-# TODO: remember last window size (using gconf or whatever)
 # TODO: make "places" use custom icons
 # TODO: fix Win+Space untoggle
 # TODO: fix tabbing of first_app_widget / first_result_widget  
@@ -68,6 +64,8 @@ _ = gettext.gettext
 # TODO: slash "/" should navigate inside folders, Esc pops out
 # TODO: search results have context menu with "Open with...", "Show parent folder", and so on.
 # TODO: figure out if tracker can sort the results by relevancy
+# TODO: make on_icon_theme_changed / on_gtk_settings_changed more lightweight by keeping all themeable widgets in an array
+# TODO: add debug console window to cardapio, to facilitate debugging the applet
 # plus other TODO's elsewhere in the code...
 
 

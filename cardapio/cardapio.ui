@@ -38,7 +38,6 @@
                       <object class="GtkAlignment" id="alignment4">
                         <property name="visible">True</property>
                         <property name="top_padding">4</property>
-                        <property name="bottom_padding">4</property>
                         <child>
                           <object class="GtkVBox" id="SidePane">
                             <property name="visible">True</property>
