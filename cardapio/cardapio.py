@@ -19,6 +19,7 @@ try:
 	import gtk
 	import gio
 	import glib
+	import json
 	import gmenu
 	import locale
 	import urllib2
@@ -50,12 +51,11 @@ _ = gettext.gettext
 # TODO: fix metacity's focus problems...
 # TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
 # TODO: add help/about somewhere on the menu
-# TODO: show log out, shutdown buttons along bottom of the window
 
 # After version 1.0:
 # TODO: add debug console window to cardapio, to facilitate debugging
 # TODO: make on_icon_theme_changed / on_gtk_settings_changed more lightweight by keeping all themeable widgets in an array
-# TODO: make a preferences window. Save items with gconf or use ini file.
+# TODO: make a preferences window. 
 # TODO: optionally (user preference) show log out, shutdown buttons along bottom of the window
 # TODO: remember last window size (using gconf or whatever)
 # TODO: make "places" use custom icons
@@ -105,7 +105,8 @@ class Cardapio(dbus.service.Object):
 		self.no_results_to_show = False
 
 		self.visible = False
-		self.window_size = None
+
+		self.read_config_file()
 
 		self.app_tree = gmenu.lookup_tree('applications.menu')
 		self.sys_tree = gmenu.lookup_tree('settings.menu')
@@ -126,6 +127,12 @@ class Cardapio(dbus.service.Object):
 		keybinder.bind(self.keybinding, self.show_hide)
 
 		if not hidden: self.show()
+
+
+	def quit(self, *dummy):
+
+		self.save_config_file()
+		gtk.main_quit()
 
 
 	def set_up_dbus(self):
@@ -198,6 +205,50 @@ class Cardapio(dbus.service.Object):
 		self.show_lone_section(section_slab)
 
 
+	def get_config_file(self, mode):
+
+		config_folder_path = os.path.join(DesktopEntry.xdg_config_home, 'Cardapio')
+
+		if not os.path.exists(config_folder_path): 
+			os.mkdir(config_folder_path)
+
+		elif not os.path.isdir(config_folder_path):
+			print(_('Error! Path "%s" already exists!') % config_folder_path)
+			sys.exit(1)
+
+		config_file_path = os.path.join(DesktopEntry.xdg_config_home, 'Cardapio', 'config.ini')
+
+		if not os.path.exists(config_file_path):
+			open(config_file_path, 'w+')
+
+		elif not os.path.isfile(config_file_path):
+			print(_('Error! Path "%s" already exists!') % config_file_path)
+			sys.exit(1)
+
+		return open(config_file_path, mode)
+
+
+	def read_config_file(self):
+
+		config_file = self.get_config_file('r')
+
+		self.settings = {}
+
+		try     : self.settings = json.load(config_file)
+		except  : pass
+		finally : config_file.close()
+
+		if self.settings: return
+
+		self.settings['window_size'] = None
+
+
+	def save_config_file(self):
+
+		config_file = self.get_config_file('w')
+		json.dump(self.settings, config_file, sort_keys = True, indent = 4)
+
+
 	def build_ui(self):
 
 		self.rebuild_timer = None
@@ -246,6 +297,10 @@ class Cardapio(dbus.service.Object):
 		self.prepare_colors()
 		self.rebuild()
 
+		if self.panel_applet is not None:
+			self.panel_applet.connect('destroy', self.quit)
+
+
 	
 	def open_about_dialog(self, widget, verb):
 
@@ -259,7 +314,7 @@ class Cardapio(dbus.service.Object):
 
 	def on_mainwindow_destroy(self, widget):
 
-		gtk.main_quit()
+		self.quit()
 
 
 	def on_mainwindow_focus_out(self, widget, event):
@@ -572,13 +627,13 @@ class Cardapio(dbus.service.Object):
 
 	def restore_dimensions(self):
 
-		if self.window_size is not None: 
-			self.window.resize(*self.window_size)
+		if self.settings['window_size'] is not None: 
+			self.window.resize(*self.settings['window_size'])
 
 
 	def save_dimensions(self):
 
-		self.window_size = self.window.get_size()
+		self.settings['window_size'] = self.window.get_size()
 
 
 	def show(self):
@@ -718,8 +773,8 @@ class Cardapio(dbus.service.Object):
 		button = self.add_launcher_entry(_('Computer'), 'computer', self.places_section_contents, comment = _('Browse all local and remote disks and folders accessible from this computer'), app_list = self.app_list)
 		button.connect('clicked', self.on_xdg_button_clicked, 'computer:///')
 
-		xdg_folders_filepath = os.path.join(DesktopEntry.xdg_config_home, 'user-dirs.dirs')
-		xdg_folders_file = file(xdg_folders_filepath, 'r')
+		xdg_folders_file_path = os.path.join(DesktopEntry.xdg_config_home, 'user-dirs.dirs')
+		xdg_folders_file = file(xdg_folders_file_path, 'r')
 
 		for line in xdg_folders_file.readlines():
 
@@ -732,8 +787,8 @@ class Cardapio(dbus.service.Object):
 
 		xdg_folders_file.close()
 
-		bookmark_filepath = os.path.join(self.user_home_folder, '.gtk-bookmarks')
-		bookmark_file = file(bookmark_filepath, 'r')
+		bookmark_file_path = os.path.join(self.user_home_folder, '.gtk-bookmarks')
+		bookmark_file = file(bookmark_file_path, 'r')
 
 		for line in bookmark_file.readlines():
 			if line.strip(' \n\r\t'):
@@ -744,7 +799,7 @@ class Cardapio(dbus.service.Object):
 
 		bookmark_file.close()
 
-		self.bookmark_monitor = gio.File(bookmark_filepath).monitor_file()  # keep a reference to avoid getting it garbage collected
+		self.bookmark_monitor = gio.File(bookmark_file_path).monitor_file()  # keep a reference to avoid getting it garbage collected
 		self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed)
 
 		button = self.add_launcher_entry(_('Trash'), 'user-trash', self.places_section_contents, comment = _('Open the trash'), app_list = self.app_list)
@@ -1320,7 +1375,7 @@ class Cardapio(dbus.service.Object):
 		return str
 
 
-def return_true(*args):
+def return_true(*dummy):
 	return True
 
 
