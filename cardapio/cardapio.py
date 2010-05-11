@@ -50,7 +50,7 @@ _ = gettext.gettext
 # TODO: make applet 1px larger in every direction, so fitts law works
 # TODO: fix metacity's focus problems...
 # TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
-# TODO: add help/about somewhere on the menu
+# TODO: add help/about somewhere on the menu -- remove pinned items
 
 # After version 1.0:
 # TODO: make a preferences window. 
@@ -70,11 +70,6 @@ _ = gettext.gettext
 
 
 class Cardapio(dbus.service.Object):
-
-	menu_rebuild_delay       = 60   # seconds
-	min_search_string_length = 3    # characters
-	search_results_limit     = 10   # results
-	search_update_delay      = 100  # msec
 
 	default_panel_label = commands.getoutput('lsb_release -is')
 	default_keybinding = '<Super>space'
@@ -247,10 +242,22 @@ class Cardapio(dbus.service.Object):
 		finally : config_file.close()
 
 		if 'window_size' not in self.settings:
-			self.settings['window_size'] = None
+			self.settings['window_size'] = None # (px, px)
 
 		if 'show_session_buttons' not in self.settings:
-			self.settings['show_session_buttons'] = False
+			self.settings['show_session_buttons'] = False # bool
+
+		if 'min_search_string_length' not in self.settings:
+			self.settings['min_search_string_length'] = 3 # characters
+
+		if 'menu_rebuild_delay' not in self.settings:
+			self.settings['menu_rebuild_delay'] = 60 # seconds
+
+		if 'search_results_limit' not in self.settings:
+			self.settings['search_results_limit'] = 10 # results
+
+		if 'search_update_delay' not in self.settings:
+			self.settings['search_update_delay'] = 100 # msec
 
 
 	def save_config_file(self):
@@ -358,7 +365,7 @@ class Cardapio(dbus.service.Object):
 		if self.rebuild_timer is not None:
 			glib.source_remove(self.rebuild_timer)
 
-		self.rebuild_timer = glib.timeout_add_seconds(Cardapio.menu_rebuild_delay, self.rebuild)
+		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu_rebuild_delay'], self.rebuild)
 
 
 	def on_gtk_settings_changed(self, gobj, property_changed):
@@ -402,7 +409,7 @@ class Cardapio(dbus.service.Object):
 			self.all_sections_sidebar_button.set_sensitive(True)
 
 		if self.tracker is not None:
-			if len(text) >= Cardapio.min_search_string_length:
+			if len(text) >= self.settings['min_search_string_length']:
 				self.schedule_search_with_tracker(text)
 			else:
 				self.set_section_is_empty(self.search_section_slab)
@@ -439,7 +446,7 @@ class Cardapio(dbus.service.Object):
 		if self.search_timer is not None:
 			glib.source_remove(self.search_timer)
 
-		self.search_timer = glib.timeout_add(Cardapio.search_update_delay, self.search_with_tracker, text)
+		self.search_timer = glib.timeout_add(self.settings['search_update_delay'], self.search_with_tracker, text)
 
 
 	def search_with_tracker(self, text):
@@ -465,7 +472,7 @@ class Cardapio(dbus.service.Object):
 					}
 				LIMIT %d
 			""" 
-			% (text, Cardapio.search_results_limit),
+			% (text, self.settings['search_results_limit']),
 			dbus_interface='org.freedesktop.Tracker1.Resources',
 			reply_handler=self.handle_search_result,
 			error_handler=self.handle_search_error
@@ -1170,7 +1177,7 @@ class Cardapio(dbus.service.Object):
 
 	def handle_search_result(self, results):
 
-		if len(self.search_entry.get_text()) < Cardapio.min_search_string_length:
+		if len(self.search_entry.get_text()) < self.settings['min_search_string_length']:
 
 			# Handle the case where user presses backspace *very* quickly, and the
 			# search starts when len(text) > min_search_string_length, but after
