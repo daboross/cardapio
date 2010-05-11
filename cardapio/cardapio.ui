@@ -35,7 +35,7 @@
                     <property name="visible">True</property>
                     <property name="spacing">8</property>
                     <child>
-                      <object class="GtkAlignment" id="alignment4">
+                      <object class="GtkAlignment" id="SidePaneMargin">
                         <property name="visible">True</property>
                         <property name="top_padding">4</property>
                         <child>
@@ -48,7 +48,7 @@
                                 <property name="label_xalign">0</property>
                                 <property name="shadow_type">none</property>
                                 <child>
-                                  <object class="GtkAlignment" id="alignment5">
+                                  <object class="GtkAlignment" id="SearchEntryMargin">
                                     <property name="visible">True</property>
                                     <property name="top_padding">4</property>
                                     <child>
@@ -69,7 +69,7 @@
                                   </object>
                                 </child>
                                 <child type="label">
-                                  <object class="GtkLabel" id="label1">
+                                  <object class="GtkLabel" id="SearchLabel">
                                     <property name="visible">True</property>
                                     <property name="xalign">0</property>
                                     <property name="label" translatable="yes">Search</property>
@@ -92,7 +92,7 @@
                                 <property name="label_xalign">0</property>
                                 <property name="shadow_type">none</property>
                                 <child>
-                                  <object class="GtkAlignment" id="alignment6">
+                                  <object class="GtkAlignment" id="CategoryMargin">
                                     <property name="visible">True</property>
                                     <property name="top_padding">4</property>
                                     <child>
@@ -121,7 +121,7 @@
                                   </object>
                                 </child>
                                 <child type="label">
-                                  <object class="GtkLabel" id="label2">
+                                  <object class="GtkLabel" id="ViewLabel">
                                     <property name="visible">True</property>
                                     <property name="xalign">0</property>
                                     <property name="label" translatable="yes">View</property>
@@ -143,7 +143,7 @@
                                 <property name="label_xalign">0</property>
                                 <property name="shadow_type">none</property>
                                 <child>
-                                  <object class="GtkAlignment" id="alignment9">
+                                  <object class="GtkAlignment" id="PinnedMargin">
                                     <property name="visible">True</property>
                                     <property name="top_padding">4</property>
                                     <child>
@@ -197,7 +197,7 @@
                             <property name="resize_mode">queue</property>
                             <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkAlignment" id="ApplicationPaneAlignment">
+                              <object class="GtkAlignment" id="ApplicationPaneMargin">
                                 <property name="visible">True</property>
                                 <property name="bottom_padding">8</property>
                                 <property name="left_padding">4</property>
@@ -212,7 +212,7 @@
                                         <property name="label_xalign">0</property>
                                         <property name="shadow_type">none</property>
                                         <child>
-                                          <object class="GtkAlignment" id="alignment8">
+                                          <object class="GtkAlignment" id="SectionMargin">
                                             <property name="visible">True</property>
                                             <property name="left_padding">8</property>
                                             <child>

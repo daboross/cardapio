@@ -53,7 +53,7 @@ _ = gettext.gettext
 # TODO: add help/about somewhere on the menu -- remove pinned items
 
 # After version 1.0:
-# TODO: make a preferences window. 
+# TODO: make a preferences window that exposes the options from .config/Cardapio/config.ini
 # TODO: make "places" use custom icons
 # TODO: fix Win+Space untoggle
 # TODO: fix tabbing of first_app_widget / first_result_widget  
@@ -1336,6 +1336,7 @@ class Cardapio(dbus.service.Object):
 		self.selected_section = section_slab
 
 		self.consider_showing_no_results_text()
+ 		self.scroll_to_top()
 
 
 	def show_no_results_text(self, text = None):
