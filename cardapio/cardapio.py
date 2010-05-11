@@ -49,7 +49,8 @@ _ = gettext.gettext
 # TODO: make applet 1px larger in every direction, so fitts law works
 # TODO: fix metacity's focus problems...
 # TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
-# TODO: make "system tasks" disappear when empty
+# TODO: add help/about somewhere on the menu
+# TODO: show log out, shutdown buttons along bottom of the window
 
 # After version 1.0:
 # TODO: add debug console window to cardapio, to facilitate debugging
@@ -74,7 +75,7 @@ class Cardapio(dbus.service.Object):
 
 	menu_rebuild_delay       = 60   # seconds
 	min_search_string_length = 3    # characters
-	search_results_limit     = 15   # results
+	search_results_limit     = 10   # results
 	search_update_delay      = 100  # msec
 
 	default_panel_label = commands.getoutput('lsb_release -is')
@@ -160,8 +161,8 @@ class Cardapio(dbus.service.Object):
 		self.hide()
 
 		try:
-			ss_proxy = self.bus.get_object('org.gnome.ScreenSaver', '/')
-			dbus.Interface(ss_proxy, 'org.gnome.ScreenSaver').Lock()
+			screensaver_object = self.bus.get_object('org.gnome.ScreenSaver', '/org/gnome/ScreenSaver')
+			dbus.Interface(screensaver_object, 'org.gnome.ScreenSaver').Lock()
 
 		except dbus.DBusException, e:
 			# NoReply exception may occur even while the screensaver did lock the screen
@@ -340,6 +341,7 @@ class Cardapio(dbus.service.Object):
 			if len(text) >= Cardapio.min_search_string_length:
 				self.schedule_search_with_tracker(text)
 			else:
+				self.set_section_is_empty(self.search_section_slab)
 				self.search_section_slab.hide()
 
 
@@ -379,6 +381,7 @@ class Cardapio(dbus.service.Object):
 	def search_with_tracker(self, text):
 
 		glib.source_remove(self.search_timer)
+		self.search_timer = None
 
 		# no .lower(), since there's no fn:lower-case in tracker (yet!)
 		#text = self.escape_quotes(text).lower()
@@ -532,7 +535,7 @@ class Cardapio(dbus.service.Object):
 			self.window.move(menu_x, menu_y)
 			return
 
-		panel = self.panel_button.get_parent_window()
+		panel = self.panel_button.get_toplevel().get_property('window')
 		panel_x, panel_y = panel.get_origin()
 		panel_width, panel_height = panel.get_size()
 
@@ -543,7 +546,7 @@ class Cardapio(dbus.service.Object):
 
 		if orientation == gnomeapplet.ORIENT_UP or orientation == gnomeapplet.ORIENT_DOWN:
 			applet_height = panel_height
-		
+
 		if orientation == gnomeapplet.ORIENT_LEFT or orientation == gnomeapplet.ORIENT_RIGHT:
 			applet_width = panel_width
 
@@ -565,7 +568,6 @@ class Cardapio(dbus.service.Object):
 		if menu_y < 0: menu_y = 0
 
 		self.window.move(menu_x, menu_y)
-
 
 
 	def restore_dimensions(self):
@@ -648,7 +650,24 @@ class Cardapio(dbus.service.Object):
 			style = self.panel_applet.style
 			style.bg_pixmap[gtk.STATE_NORMAL] = pixmap
 			self.panel_applet.set_style(style)  
-			self.panel_button.parent.set_style(style)  
+			self.panel_button.parent.set_style(style) # TODO: make this transparent?
+
+
+	def on_applet_realize(self, widget):
+
+		pass
+
+	#	panel = self.panel_button.get_toplevel().get_property('window')
+	#	panel_width, panel_height = panel.get_size()
+	#	applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
+	#
+	#	orientation = self.panel_applet.get_orient()
+	#
+	#	if orientation == gnomeapplet.ORIENT_UP or orientation == gnomeapplet.ORIENT_DOWN:
+	#		self.panel_button.parent.set_property('height-request', panel_height)
+	#
+	#	if orientation == gnomeapplet.ORIENT_LEFT or orientation == gnomeapplet.ORIENT_RIGHT:
+	#		self.panel_button.parent.set_property('width-request', panel_width)
 
 
 	def auto_toggle_panel_button(self, state):
@@ -784,12 +803,11 @@ class Cardapio(dbus.service.Object):
 
 		if can_lock_screen:
 
+			pass
 			# TODO: not working! this is freezing the app!
 
 			#button = self.add_launcher_entry(_('Lock Screen'), 'system-lock-screen', self.session_section_contents, comment = _('Protect your computer from unauthorized use'), app_list = self.app_list)
 			#button.connect('clicked', self.on_lock_screen_activated)
-
-			pass
 
 		if can_manage_session:
 
@@ -1064,6 +1082,20 @@ class Cardapio(dbus.service.Object):
 
 	def handle_search_result(self, results):
 
+		if len(self.search_entry.get_text()) < Cardapio.min_search_string_length:
+
+			# Handle the case where user presses backspace *very* quickly, and the
+			# search starts when len(text) > min_search_string_length, but after
+			# search_update_delay milliseconds this method is called while the
+			# search entry now has len(text) < min_search_string_length
+
+			# Anyways, it's hard to explain, but suffice to say it's a race
+			# condition and we handle it here.
+
+			self.set_section_is_empty(self.search_section_slab)
+			self.search_section_slab.hide()
+			return
+
 		container = self.search_section_contents.parent
 		container.remove(self.search_section_contents)
 		self.search_section_contents = gtk.VBox()
@@ -1312,7 +1344,9 @@ def applet_factory(applet, iid):
 	button.connect('leave-notify-event', return_true)
 
 	applet.connect('change-background', cardapio.on_panel_change_background)
+	applet.connect('realize', cardapio.on_applet_realize)
 	applet.add(menu)
+
 	applet.show_all()
 
 	return True
