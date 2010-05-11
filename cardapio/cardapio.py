@@ -90,6 +90,8 @@ class Cardapio(dbus.service.Object):
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
+		self.read_config_file()
+
 		self.user_home_folder = os.path.expanduser('~')
 
 		self.panel_applet = panel_applet
@@ -105,8 +107,6 @@ class Cardapio(dbus.service.Object):
 		self.no_results_to_show = False
 
 		self.visible = False
-
-		self.read_config_file()
 
 		self.app_tree = gmenu.lookup_tree('applications.menu')
 		self.sys_tree = gmenu.lookup_tree('settings.menu')
@@ -152,7 +152,17 @@ class Cardapio(dbus.service.Object):
 			self.tracker = dbus.Interface(tracker_object, 'org.freedesktop.Tracker1.Resources') 
 
 
-	def on_session_action(self, widget, shutdown):
+	def on_logout_button_clicked(self, widget):
+
+		self.do_session_action(False)
+
+
+	def on_shutdown_button_clicked(self, widget):
+
+		self.do_session_action(True)
+
+
+	def do_session_action(self, shutdown):
 
 		sm_proxy = self.bus.get_object('org.gnome.SessionManager', '/org/gnome/SessionManager')
 		sm_if = dbus.Interface(sm_proxy, 'org.gnome.SessionManager')
@@ -163,7 +173,7 @@ class Cardapio(dbus.service.Object):
 		self.hide()
 
 
-	def on_lock_screen_activated(self, widget):
+	def on_lockscreen_button_clicked(self, widget):
 
 		self.hide()
 
@@ -238,9 +248,11 @@ class Cardapio(dbus.service.Object):
 		except  : pass
 		finally : config_file.close()
 
-		if self.settings: return
+		if 'window_size' not in self.settings:
+			self.settings['window_size'] = None
 
-		self.settings['window_size'] = None
+		if 'show_session_buttons' not in self.settings:
+			self.settings['show_session_buttons'] = False
 
 
 	def save_config_file(self):
@@ -299,7 +311,6 @@ class Cardapio(dbus.service.Object):
 
 		if self.panel_applet is not None:
 			self.panel_applet.connect('destroy', self.quit)
-
 
 	
 	def open_about_dialog(self, widget, verb):
@@ -858,19 +869,43 @@ class Cardapio(dbus.service.Object):
 
 		if can_lock_screen:
 
-			pass
 			# TODO: not working! this is freezing the app!
 
-			#button = self.add_launcher_entry(_('Lock Screen'), 'system-lock-screen', self.session_section_contents, comment = _('Protect your computer from unauthorized use'), app_list = self.app_list)
-			#button.connect('clicked', self.on_lock_screen_activated)
+			button_label = _('Lock Screen')
+			button_tooltip = _('Protect your computer from unauthorized use')
+			button = self.add_launcher_entry(button_label, 'system-lock-screen', self.session_section_contents, comment = button_tooltip, app_list = self.app_list)
+			button.connect('clicked', self.on_lockscreen_button_clicked)
+
+			if self.settings['show_session_buttons']:
+				button = self.add_button(button_label, 'system-lock-screen', self.get_object('LeftSessionPane'), comment = button_tooltip, is_launcher_button = True)
+				button.connect('clicked', self.on_lockscreen_button_clicked)
+
 
 		if can_manage_session:
 
-			button = self.add_launcher_entry(_('Log Out...'), 'system-log-out', self.session_section_contents, comment = _('Log out of this session to log in as a different user'), app_list = self.app_list)
-			button.connect('clicked', self.on_session_action, False)
+			button_label = _('Log Out...')
+			button_tooltip = _('Log out of this session to log in as a different user')
+			button = self.add_launcher_entry(button_label, 'system-log-out', self.session_section_contents, comment = button_tooltip, app_list = self.app_list)
+			button.connect('clicked', self.on_logout_button_clicked)
 
-			button = self.add_launcher_entry(_('Shut Down...'), 'system-shutdown', self.session_section_contents, comment = _('Shut down the system'), app_list = self.app_list)
-			button.connect('clicked', self.on_session_action, True)
+			if self.settings['show_session_buttons']:
+				button = self.add_button(button_label, 'system-log-out', self.get_object('RightSessionPane'), comment = button_tooltip, is_launcher_button = True)
+				button.connect('clicked', self.on_logout_button_clicked)
+
+			button_label = _('Shut Down...')
+			button_tooltip = _('Shut down the system')
+			button = self.add_launcher_entry(button_label, 'system-shutdown', self.session_section_contents, comment = button_tooltip, app_list = self.app_list)
+			button.connect('clicked', self.on_shutdown_button_clicked)
+
+			if self.settings['show_session_buttons']:
+				button = self.add_button(button_label, 'system-shutdown', self.get_object('RightSessionPane'), comment = button_tooltip, is_launcher_button = True)
+				button.connect('clicked', self.on_shutdown_button_clicked)
+
+
+		if self.settings['show_session_buttons'] and (can_lock_screen or can_manage_session):
+			self.get_object('SessionPane').show()
+		else:
+			self.get_object('SessionPane').hide()
 
 
 	def add_applications_slab(self):
