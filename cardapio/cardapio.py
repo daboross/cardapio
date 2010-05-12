@@ -748,8 +748,9 @@ class Cardapio(dbus.service.Object):
 			glib.source_remove(self.rebuild_timer)
 			self.rebuild_timer = None
 
-		self.clear_application_pane()
-		self.clear_category_pane()
+		self.clear_pane(self.application_pane)
+		self.clear_pane(self.category_pane)
+		self.clear_pane(self.sideapp_pane)
 
 		self.section_list = {}
 		self.app_list = []
@@ -1025,25 +1026,11 @@ class Cardapio(dbus.service.Object):
 		self.search_section_contents = section_contents
 
 
-	def clear_application_pane(self):
+	def clear_pane(self, container):
 
-		container = self.application_pane
 		for	child in container.get_children():
 			container.remove(child)
 
-
-	def clear_category_pane(self):
-
-		container = self.category_pane
-		for	child in container.get_children():
-			container.remove(child)
-
-
-	def clear_sideapp_pane(self):
-
-		container = self.sideapp_pane
-		for	child in container.get_children():
-			container.remove(child)
 
 	def clear_search_entry(self):
 
