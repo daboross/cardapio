@@ -1,3 +1,6 @@
+Usage
+=====
+
 To use as a panel applet, simply add it as usual: Right-click the panel, select
 "Add to panel", then choose "Cardapio".
 
@@ -22,3 +25,4 @@ and other bugs will be fixed before 1.0.
 
 If you would like to contribute, take a look at the lines marked with "TODO" in
 cardapio.py
+

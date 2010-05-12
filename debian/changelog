@@ -1,5 +1,5 @@
-cardapio (0.9.0) unstable; urgency=low
+cardapio (0.9-1) unstable; urgency=low
 
-  * Initial release. (Closes: #XXXXXX)
+  * Initial (preview) release 
 
- -- tvst <tvst@hotmail.com>  Wed, 12 May 2010 16:54:29 -0400
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 12 May 2010 17:47:03 -0400
