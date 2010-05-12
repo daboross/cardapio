@@ -1,20 +1,13 @@
-Installation
-============
-
-Simple:
-$ ./install.sh
-
-
-
-Usage
-=====
-
-To use as a panel applet, simply add it as usual: Right-click the panel, select "Add to panel", then choose "Cardapio".
+To use as a panel applet, simply add it as usual: Right-click the panel, select
+"Add to panel", then choose "Cardapio".
 
 To use as a launcher, run cardapio with the argument 'show'. That is:
 $ cardapio show
 
-Once cardapio is running, you can access it using Super+Space. To change this key binding and to access many more options, simply change the file at ~/.config/Cardapio/config.ini which is created automatically when Cardapio *exits*.
+Once cardapio is running, you can access it using Super+Space. To change this
+key binding and to access many more options, simply change the file at
+~/.config/Cardapio/config.ini which is created automatically when Cardapio
+*exits*.
 
 Have fun!
 
@@ -22,6 +15,10 @@ Have fun!
 Note
 ====
 
-This is version 0.9, which means there are some bugs. For instance, window managers tend to stop Cardapio from gaining focus when the key binding is used. As a quick fix, just add Cardapio to your window manager's exception list. This and other bugs will be fixed before 1.0.
+This is version 0.9, which means there are some bugs. For instance, window
+managers tend to stop Cardapio from gaining focus when the key binding is used.
+As a quick fix, just add Cardapio to your window manager's exception list. This
+and other bugs will be fixed before 1.0.
 
-If you would like to contribute, take a look at the lines marked with "TODO" in cardapio.py
+If you would like to contribute, take a look at the lines marked with "TODO" in
+cardapio.py
