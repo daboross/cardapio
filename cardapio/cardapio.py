@@ -234,33 +234,28 @@ class Cardapio(dbus.service.Object):
 		config_file = self.get_config_file('r')
 
 		self.settings = {}
+		s = {}
 
-		try     : self.settings = json.load(config_file)
+		try     : settings_in = json.load(config_file)
 		except  : pass
 		finally : config_file.close()
 
-		if 'window_size' not in self.settings:
-			self.settings['window_size'] = None # (px, px)
+		self.set_config_option(s, 'window size'             , None           ) # format: [px, px]
+		self.set_config_option(s, 'show session buttons'    , False          ) # bool
+		self.set_config_option(s, 'min search string length', 3              ) # characters
+		self.set_config_option(s, 'menu rebuild delay'      , 60             ) # seconds
+		self.set_config_option(s, 'search results limit'    , 10             ) # results
+		self.set_config_option(s, 'search update delay'     , 100            ) # msec
+		self.set_config_option(s, 'keybinding'              , '<Super>space' ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
 
-		if 'show_session_buttons' not in self.settings:
-			self.settings['show_session_buttons'] = False # bool
 
-		if 'min_search_string_length' not in self.settings:
-			self.settings['min_search_string_length'] = 3 # characters
+	def set_config_option(self, s, key, val):
 
-		if 'menu_rebuild_delay' not in self.settings:
-			self.settings['menu_rebuild_delay'] = 60 # seconds
+		if key in self.settings:
+			self.settings[key] = s[key]
+		else: 
+			self.settings[key] = val
 
-		if 'search_results_limit' not in self.settings:
-			self.settings['search_results_limit'] = 10 # results
-
-		if 'search_update_delay' not in self.settings:
-			self.settings['search_update_delay'] = 100 # msec
-
-		if 'keybinding' not in self.settings:
-			self.settings['keybinding'] = '<Super>space'
-
-		# the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
 
 
 	def save_config_file(self):
@@ -368,7 +363,7 @@ class Cardapio(dbus.service.Object):
 		if self.rebuild_timer is not None:
 			glib.source_remove(self.rebuild_timer)
 
-		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu_rebuild_delay'], self.rebuild)
+		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.rebuild)
 
 
 	def on_gtk_settings_changed(self, gobj, property_changed):
@@ -412,7 +407,7 @@ class Cardapio(dbus.service.Object):
 			self.all_sections_sidebar_button.set_sensitive(True)
 
 		if self.tracker is not None:
-			if len(text) >= self.settings['min_search_string_length']:
+			if len(text) >= self.settings['min search string length']:
 				self.schedule_search_with_tracker(text)
 			else:
 				self.set_section_is_empty(self.search_section_slab)
@@ -449,7 +444,7 @@ class Cardapio(dbus.service.Object):
 		if self.search_timer is not None:
 			glib.source_remove(self.search_timer)
 
-		self.search_timer = glib.timeout_add(self.settings['search_update_delay'], self.search_with_tracker, text)
+		self.search_timer = glib.timeout_add(self.settings['search update delay'], self.search_with_tracker, text)
 
 
 	def search_with_tracker(self, text):
@@ -475,7 +470,7 @@ class Cardapio(dbus.service.Object):
 					}
 				LIMIT %d
 			""" 
-			% (text, self.settings['search_results_limit']),
+			% (text, self.settings['search results limit']),
 			dbus_interface='org.freedesktop.Tracker1.Resources',
 			reply_handler=self.handle_search_result,
 			error_handler=self.handle_search_error
@@ -646,13 +641,13 @@ class Cardapio(dbus.service.Object):
 
 	def restore_dimensions(self):
 
-		if self.settings['window_size'] is not None: 
-			self.window.resize(*self.settings['window_size'])
+		if self.settings['window size'] is not None: 
+			self.window.resize(*self.settings['window size'])
 
 
 	def save_dimensions(self):
 
-		self.settings['window_size'] = self.window.get_size()
+		self.settings['window size'] = self.window.get_size()
 
 
 	def show(self):
@@ -884,7 +879,7 @@ class Cardapio(dbus.service.Object):
 			button = self.add_launcher_entry(button_label, 'system-lock-screen', self.session_section_contents, comment = button_tooltip, app_list = self.app_list)
 			button.connect('clicked', self.on_lockscreen_button_clicked)
 
-			if self.settings['show_session_buttons']:
+			if self.settings['show session buttons']:
 				button = self.add_button(button_label, 'system-lock-screen', self.get_object('LeftSessionPane'), comment = button_tooltip, is_launcher_button = True)
 				button.connect('clicked', self.on_lockscreen_button_clicked)
 
@@ -896,7 +891,7 @@ class Cardapio(dbus.service.Object):
 			button = self.add_launcher_entry(button_label, 'system-log-out', self.session_section_contents, comment = button_tooltip, app_list = self.app_list)
 			button.connect('clicked', self.on_logout_button_clicked)
 
-			if self.settings['show_session_buttons']:
+			if self.settings['show session buttons']:
 				button = self.add_button(button_label, 'system-log-out', self.get_object('RightSessionPane'), comment = button_tooltip, is_launcher_button = True)
 				button.connect('clicked', self.on_logout_button_clicked)
 
@@ -905,12 +900,12 @@ class Cardapio(dbus.service.Object):
 			button = self.add_launcher_entry(button_label, 'system-shutdown', self.session_section_contents, comment = button_tooltip, app_list = self.app_list)
 			button.connect('clicked', self.on_shutdown_button_clicked)
 
-			if self.settings['show_session_buttons']:
+			if self.settings['show session buttons']:
 				button = self.add_button(button_label, 'system-shutdown', self.get_object('RightSessionPane'), comment = button_tooltip, is_launcher_button = True)
 				button.connect('clicked', self.on_shutdown_button_clicked)
 
 
-		if self.settings['show_session_buttons'] and (can_lock_screen or can_manage_session):
+		if self.settings['show session buttons'] and (can_lock_screen or can_manage_session):
 			self.get_object('SessionPane').show()
 		else:
 			self.get_object('SessionPane').hide()
@@ -1180,7 +1175,7 @@ class Cardapio(dbus.service.Object):
 
 	def handle_search_result(self, results):
 
-		if len(self.search_entry.get_text()) < self.settings['min_search_string_length']:
+		if len(self.search_entry.get_text()) < self.settings['min search string length']:
 
 			# Handle the case where user presses backspace *very* quickly, and the
 			# search starts when len(text) > min_search_string_length, but after
