@@ -275,14 +275,17 @@ class Cardapio(dbus.service.Object):
 		self.builder.connect_signals(self)
 
 		self.get_object = self.builder.get_object
-		self.window            = self.get_object('MainWindow')
-		self.about_dialog      = self.get_object('AboutDialog')
-		self.application_pane  = self.get_object('ApplicationPane')
-		self.category_pane     = self.get_object('CategoryPane')
-		self.sideapp_pane      = self.get_object('SideappPane')
-		self.search_entry      = self.get_object('SearchEntry')
-		self.scrolled_window   = self.get_object('ScrolledWindow')
-		self.scroll_adjustment = self.scrolled_window.get_vadjustment()
+		self.window             = self.get_object('MainWindow')
+		self.about_dialog       = self.get_object('AboutDialog')
+		self.application_pane   = self.get_object('ApplicationPane')
+		self.category_pane      = self.get_object('CategoryPane')
+		self.sideapp_pane       = self.get_object('SideappPane')
+		self.search_entry       = self.get_object('SearchEntry')
+		self.scrolled_window    = self.get_object('ScrolledWindow')
+		self.scroll_adjustment  = self.scrolled_window.get_vadjustment()
+		self.session_pane       = self.get_object('SessionPane')
+		self.left_session_pane  = self.get_object('LeftSessionPane')
+		self.right_session_pane = self.get_object('RightSessionPane')
 
 		self.icon_theme = gtk.icon_theme_get_default()
 		self.icon_theme.connect('changed', self.on_icon_theme_changed)
@@ -751,6 +754,8 @@ class Cardapio(dbus.service.Object):
 		self.clear_pane(self.application_pane)
 		self.clear_pane(self.category_pane)
 		self.clear_pane(self.sideapp_pane)
+		self.clear_pane(self.left_session_pane)
+		self.clear_pane(self.right_session_pane)
 
 		self.section_list = {}
 		self.app_list = []
@@ -906,7 +911,7 @@ class Cardapio(dbus.service.Object):
 			button.connect('clicked', self.on_lockscreen_button_clicked)
 
 			if self.settings['show session buttons']:
-				button = self.add_button(button_label, 'system-lock-screen', self.get_object('LeftSessionPane'), tooltip = button_tooltip, is_launcher_button = True)
+				button = self.add_button(button_label, 'system-lock-screen', self.left_session_pane, tooltip = button_tooltip, is_launcher_button = True)
 				button.connect('clicked', self.on_lockscreen_button_clicked)
 
 
@@ -918,7 +923,7 @@ class Cardapio(dbus.service.Object):
 			button.connect('clicked', self.on_logout_button_clicked)
 
 			if self.settings['show session buttons']:
-				button = self.add_button(button_label, 'system-log-out', self.get_object('RightSessionPane'), tooltip = button_tooltip, is_launcher_button = True)
+				button = self.add_button(button_label, 'system-log-out', self.right_session_pane, tooltip = button_tooltip, is_launcher_button = True)
 				button.connect('clicked', self.on_logout_button_clicked)
 
 			button_label = _('Shut Down...')
@@ -927,14 +932,14 @@ class Cardapio(dbus.service.Object):
 			button.connect('clicked', self.on_shutdown_button_clicked)
 
 			if self.settings['show session buttons']:
-				button = self.add_button(button_label, 'system-shutdown', self.get_object('RightSessionPane'), tooltip = button_tooltip, is_launcher_button = True)
+				button = self.add_button(button_label, 'system-shutdown', self.right_session_pane, tooltip = button_tooltip, is_launcher_button = True)
 				button.connect('clicked', self.on_shutdown_button_clicked)
 
 
 		if self.settings['show session buttons'] and (can_lock_screen or can_manage_session):
-			self.get_object('SessionPane').show()
+			self.session_pane.show()
 		else:
-			self.get_object('SessionPane').hide()
+			self.session_pane.hide()
 
 
 	def build_system_list(self):
