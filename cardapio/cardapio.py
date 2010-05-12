@@ -72,8 +72,6 @@ _ = gettext.gettext
 class Cardapio(dbus.service.Object):
 
 	default_panel_label = commands.getoutput('lsb_release -is')
-	default_keybinding = '<Super>space'
-	# try gtk.accelerator_parse('<Super>space') to see if the string is correct!
 
 	menu_editing_apps = ('alacarte', 'gmenu-simple-editor')
 
@@ -116,7 +114,7 @@ class Cardapio(dbus.service.Object):
 		self.app_tree.add_monitor(self.on_menu_data_changed)
 		self.sys_tree.add_monitor(self.on_menu_data_changed)
 
-		self.keybinding = Cardapio.default_keybinding
+		self.keybinding = self.settings['keybinding']
 		keybinder.bind(self.keybinding, self.show_hide)
 
 		if not hidden: self.show()
@@ -258,6 +256,11 @@ class Cardapio(dbus.service.Object):
 
 		if 'search_update_delay' not in self.settings:
 			self.settings['search_update_delay'] = 100 # msec
+
+		if 'keybinding' not in self.settings:
+			self.settings['keybinding'] = '<Super>space'
+
+		# the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
 
 
 	def save_config_file(self):
