@@ -50,7 +50,6 @@ _ = gettext.gettext
 # TODO: make applet 1px larger in every direction, so fitts law works
 # TODO: fix metacity's focus problems...
 # TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
-# TODO: add help/about somewhere on the menu -- remove pinned items
 
 # After version 1.0:
 # TODO: make a preferences window that exposes the options from .config/Cardapio/config.ini
@@ -71,8 +70,7 @@ _ = gettext.gettext
 
 class Cardapio(dbus.service.Object):
 
-	default_panel_label = commands.getoutput('lsb_release -is')
-
+	distro_name = commands.getoutput('lsb_release -is')
 	menu_editing_apps = ('alacarte', 'gmenu-simple-editor')
 
 	bus_name_str = 'org.varal.Cardapio'
@@ -236,7 +234,7 @@ class Cardapio(dbus.service.Object):
 		self.settings = {}
 		s = {}
 
-		try     : settings_in = json.load(config_file)
+		try     : s = json.load(config_file)
 		except  : pass
 		finally : config_file.close()
 
@@ -247,11 +245,12 @@ class Cardapio(dbus.service.Object):
 		self.set_config_option(s, 'search results limit'    , 10             ) # results
 		self.set_config_option(s, 'search update delay'     , 100            ) # msec
 		self.set_config_option(s, 'keybinding'              , '<Super>space' ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
+		self.set_config_option(s, 'applet label'            , Cardapio.distro_name) # string
 
 
 	def set_config_option(self, s, key, val):
 
-		if key in self.settings:
+		if key in s:
 			self.settings[key] = s[key]
 		else: 
 			self.settings[key] = val
@@ -280,7 +279,7 @@ class Cardapio(dbus.service.Object):
 		self.about_dialog      = self.get_object('AboutDialog')
 		self.application_pane  = self.get_object('ApplicationPane')
 		self.category_pane     = self.get_object('CategoryPane')
-		self.pinned_pane       = self.get_object('PinnedPane')
+		self.sideapp_pane      = self.get_object('SideappPane')
 		self.search_entry      = self.get_object('SearchEntry')
 		self.scrolled_window   = self.get_object('ScrolledWindow')
 		self.scroll_adjustment = self.scrolled_window.get_vadjustment()
@@ -302,7 +301,7 @@ class Cardapio(dbus.service.Object):
 				<menuitem name="Item 1" verb="Edit" label="%s" pixtype="stock" pixname="gtk-edit"/>
 				<menuitem name="Item 2" verb="About" label="%s" pixtype="stock" pixname="gtk-about"/>
 			</popup>
-			''' % (_('_Edit Menus'), _('_About'))
+			''' % (_('_Edit Menus'), _('_About Cardapio'))
 
 		self.context_menu_verbs = [
 				('Edit', self.launch_edit_app),
@@ -398,9 +397,7 @@ class Cardapio(dbus.service.Object):
 		self.search_menus(text)
 
 		if len(text) == 0:
-			self.disappear_with_section(self.session_section_slab)
-			self.disappear_with_section(self.system_section_slab)
-			self.disappear_with_section(self.search_section_slab)
+			self.hide_all_transitory_sections(fully_hide = True)
 			self.hide_no_results_text()
 
 		else:
@@ -509,9 +506,7 @@ class Cardapio(dbus.service.Object):
 	def on_searchentry_activate(self, widget):
 
 		if self.is_searchfield_empty():
-			self.system_section_slab.hide()
-			self.session_section_slab.hide()
-			self.search_section_slab.hide()
+			self.hide_all_transitory_sections()
 			return 
 
 		if self.first_app_widget is not None:
@@ -755,12 +750,11 @@ class Cardapio(dbus.service.Object):
 
 		self.clear_application_pane()
 		self.clear_category_pane()
-		self.clear_pinned_pane()
 
 		self.section_list = {}
 		self.app_list = []
 
-		button = self.add_sidebar_button(_('All'), None, self.category_pane, comment = _('Show all categories'))
+		button = self.add_sidebar_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'))
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_sections_sidebar_button = button 
 		self.set_sidebar_button_active(button, True)
@@ -769,22 +763,46 @@ class Cardapio(dbus.service.Object):
 		self.no_results_slab, dummy, self.no_results_label = self.add_application_section('Dummy text')
 		self.hide_no_results_text()
 
+		# slabs that should go *before* regular application slabs
+		self.add_favorites_slab()
 		self.add_places_slab()
-		self.add_applications_slab()
+		self.add_help_slab()
+
+		self.build_applications_list()
+
+		# slabs that should go *after* regular application slabs
 		self.add_hidden_session_slab()
 		self.add_hidden_system_slab()
 		self.add_hidden_search_results_slab()
+
+		self.build_favorites_list()
+		self.build_places_list()
+		self.build_session_list()
+		self.build_system_list()
+		self.build_help_list()
 
 		return False 
 		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
+	def build_help_list(self):
+
+		button_label = _('Help and Support')
+		button_tooltip = _('Get help with %s') % Cardapio.distro_name
+
+		button = self.add_sidebar_button(button_label, 'help-contents', self.sideapp_pane, tooltip = button_tooltip, use_toggle_button = False)
+		button.connect('clicked', self.on_raw_button_clicked, 'gnome-help')
+
+		button = self.add_launcher_entry(button_label, 'help-contents', self.help_section_contents, tooltip = button_tooltip, app_list = self.app_list)
+		button.connect('clicked', self.on_raw_button_clicked, 'gnome-help')
+
+
 	def build_places_list(self):
 
-		button = self.add_launcher_entry(_('Home'), 'user-home', self.places_section_contents, comment = _('Open your personal folder'), app_list = self.app_list)
+		button = self.add_launcher_entry(_('Home'), 'user-home', self.places_section_contents, tooltip = _('Open your personal folder'), app_list = self.app_list)
 		button.connect('clicked', self.on_xdg_button_clicked, self.user_home_folder)
 
-		button = self.add_launcher_entry(_('Computer'), 'computer', self.places_section_contents, comment = _('Browse all local and remote disks and folders accessible from this computer'), app_list = self.app_list)
+		button = self.add_launcher_entry(_('Computer'), 'computer', self.places_section_contents, tooltip = _('Browse all local and remote disks and folders accessible from this computer'), app_list = self.app_list)
 		button.connect('clicked', self.on_xdg_button_clicked, 'computer:///')
 
 		xdg_folders_file_path = os.path.join(DesktopEntry.xdg_config_home, 'user-dirs.dirs')
@@ -816,7 +834,7 @@ class Cardapio(dbus.service.Object):
 		self.bookmark_monitor = gio.File(bookmark_file_path).monitor_file()  # keep a reference to avoid getting it garbage collected
 		self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed)
 
-		button = self.add_launcher_entry(_('Trash'), 'user-trash', self.places_section_contents, comment = _('Open the trash'), app_list = self.app_list)
+		button = self.add_launcher_entry(_('Trash'), 'user-trash', self.places_section_contents, tooltip = _('Open the trash'), app_list = self.app_list)
 		button.connect('clicked', self.on_xdg_button_clicked, 'trash:///')
 
 
@@ -860,8 +878,15 @@ class Cardapio(dbus.service.Object):
 	def add_place(self, folder_name, folder_path, folder_icon):
 
 		folder_path = os.path.expanduser(folder_path.replace('$HOME', '~')).strip(' \n\r\t')
-		button = self.add_launcher_entry(folder_name, folder_icon, self.places_section_contents, comment = folder_path, app_list = self.app_list)
+		button = self.add_launcher_entry(folder_name, folder_icon, self.places_section_contents, tooltip = folder_path, app_list = self.app_list)
 		button.connect('clicked', self.on_xdg_button_clicked, folder_path)
+
+
+	def build_favorites_list(self):
+
+		have_no_favorites = self.add_tree_to_app_list(self.app_tree.root, self.favorites_section_contents, recursive = False)
+		if have_no_favorites:
+			self.hide_section(self.favorites_section_slab, fully_hide = True)
 
 
 	def build_session_list(self):
@@ -876,11 +901,11 @@ class Cardapio(dbus.service.Object):
 
 			button_label = _('Lock Screen')
 			button_tooltip = _('Protect your computer from unauthorized use')
-			button = self.add_launcher_entry(button_label, 'system-lock-screen', self.session_section_contents, comment = button_tooltip, app_list = self.app_list)
+			button = self.add_launcher_entry(button_label, 'system-lock-screen', self.session_section_contents, tooltip = button_tooltip, app_list = self.app_list)
 			button.connect('clicked', self.on_lockscreen_button_clicked)
 
 			if self.settings['show session buttons']:
-				button = self.add_button(button_label, 'system-lock-screen', self.get_object('LeftSessionPane'), comment = button_tooltip, is_launcher_button = True)
+				button = self.add_button(button_label, 'system-lock-screen', self.get_object('LeftSessionPane'), tooltip = button_tooltip, is_launcher_button = True)
 				button.connect('clicked', self.on_lockscreen_button_clicked)
 
 
@@ -888,20 +913,20 @@ class Cardapio(dbus.service.Object):
 
 			button_label = _('Log Out...')
 			button_tooltip = _('Log out of this session to log in as a different user')
-			button = self.add_launcher_entry(button_label, 'system-log-out', self.session_section_contents, comment = button_tooltip, app_list = self.app_list)
+			button = self.add_launcher_entry(button_label, 'system-log-out', self.session_section_contents, tooltip = button_tooltip, app_list = self.app_list)
 			button.connect('clicked', self.on_logout_button_clicked)
 
 			if self.settings['show session buttons']:
-				button = self.add_button(button_label, 'system-log-out', self.get_object('RightSessionPane'), comment = button_tooltip, is_launcher_button = True)
+				button = self.add_button(button_label, 'system-log-out', self.get_object('RightSessionPane'), tooltip = button_tooltip, is_launcher_button = True)
 				button.connect('clicked', self.on_logout_button_clicked)
 
 			button_label = _('Shut Down...')
 			button_tooltip = _('Shut down the system')
-			button = self.add_launcher_entry(button_label, 'system-shutdown', self.session_section_contents, comment = button_tooltip, app_list = self.app_list)
+			button = self.add_launcher_entry(button_label, 'system-shutdown', self.session_section_contents, tooltip = button_tooltip, app_list = self.app_list)
 			button.connect('clicked', self.on_shutdown_button_clicked)
 
 			if self.settings['show session buttons']:
-				button = self.add_button(button_label, 'system-shutdown', self.get_object('RightSessionPane'), comment = button_tooltip, is_launcher_button = True)
+				button = self.add_button(button_label, 'system-shutdown', self.get_object('RightSessionPane'), tooltip = button_tooltip, is_launcher_button = True)
 				button.connect('clicked', self.on_shutdown_button_clicked)
 
 
@@ -911,52 +936,39 @@ class Cardapio(dbus.service.Object):
 			self.get_object('SessionPane').hide()
 
 
-	def add_applications_slab(self):
+	def build_system_list(self):
 
-		pinned_pane_empty = True
+		for node in self.sys_tree.root.contents:
+
+			if isinstance(node, gmenu.Entry):
+
+				button = self.add_sidebar_button(node.name, node.icon, self.sideapp_pane, tooltip = node.get_comment(), use_toggle_button = False)
+				button.connect('clicked', self.on_app_button_clicked, node.desktop_file_path)
+
+		self.add_tree_to_app_list(self.sys_tree.root, self.system_section_contents)
+
+
+	def build_applications_list(self):
 
 		for node in self.app_tree.root.contents:
 
 			if isinstance(node, gmenu.Directory):
 
 				# add to main pane
-				self.add_section_slab(node)
-
-			elif isinstance(node, gmenu.Entry):
-
-				# add to system pane
-				button = self.add_sidebar_button(node.name, node.icon, self.pinned_pane, comment = node.get_comment(), use_toggle_button = False)
-				button.connect('clicked', self.on_app_button_clicked, node.desktop_file_path)
-				pinned_pane_empty = False
-
-		if pinned_pane_empty:
-			self.get_object('PinnedSlab').hide()
-		else:
-			self.get_object('PinnedSlab').show()
+				self.add_slab(node.name, node.icon, node.get_comment(), node = node, hide = False)
 
 
-	def add_section_slab(self, node):
+	def add_slab(self, title_str, icon_name = None, tooltip = '', hide = True, node = None):
 
 		# add category to category pane
-		sidebar_button = self.add_sidebar_button(node.name, node.icon, self.category_pane, comment = node.get_comment())
-
-		# add category to application pane
-		section_slab, section_contents, dummy = self.add_application_section(node.name)
-
-		# add all apps in this category to application pane
-		self.add_tree_to_app_list(node, section_contents)
-
-		sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section_slab)
-		self.section_list[section_slab] = {'has-entries': True, 'category': sidebar_button, 'contents': section_contents, 'title': node.name}
-
-
-	def add_slab(self, title_str, icon_name = None, comment = '', hide = True):
-
-		# add category to category pane
-		sidebar_button = self.add_sidebar_button(title_str, icon_name, self.category_pane, comment = comment)
+		sidebar_button = self.add_sidebar_button(title_str, icon_name, self.category_pane, tooltip = tooltip)
 
 		# add category to application pane
 		section_slab, section_contents, dummy = self.add_application_section(title_str)
+
+		if node is not None:
+			# add all apps in this category to application pane
+			self.add_tree_to_app_list(node, section_contents)
 
 		sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section_slab)
 
@@ -964,18 +976,31 @@ class Cardapio(dbus.service.Object):
 			sidebar_button.hide()
 			section_slab.hide()
 			self.section_list[section_slab] = {'has-entries': False, 'category': sidebar_button, 'contents': section_contents, 'title': title_str}
+
 		else:
 			self.section_list[section_slab] = {'has-entries': True, 'category': sidebar_button, 'contents': section_contents, 'title': title_str}
 
 		return section_slab, section_contents
 
 
+	def add_help_slab(self):
+
+		section_slab, section_contents = self.add_slab(_('Help'), 'system-help')
+		self.help_section_slab = section_slab
+		self.help_section_contents = section_contents
+
+
 	def add_places_slab(self):
 
-		section_slab, section_contents = self.add_slab(_('Places'), 'folder', hide = False)
-		self.places_section_slab = section_slab
+		section_slab, section_contents = self.add_slab(_('Places'), 'folder', tooltip = _('Access documents and folders'), hide = False)
 		self.places_section_contents = section_contents
-		self.build_places_list()
+
+
+	def add_favorites_slab(self):
+
+		section_slab, section_contents = self.add_slab(_('Pinned items'), 'emblem-favorite', tooltip = _('Your favorite applications'), hide = False)
+		self.favorites_section_slab = section_slab
+		self.favorites_section_contents = section_contents
 
 
 	def add_hidden_session_slab(self):
@@ -983,17 +1008,13 @@ class Cardapio(dbus.service.Object):
 		section_slab, section_contents = self.add_slab(_('Session'), 'session-properties')
 		self.session_section_slab = section_slab
 		self.session_section_contents = section_contents
-		self.build_session_list()
 
 
 	def add_hidden_system_slab(self):
 
 		section_slab, section_contents = self.add_slab(_('System'), 'applications-system')
-
-		self.add_tree_to_app_list(self.app_tree.root, section_contents, recursive = False)
-		self.add_tree_to_app_list(self.sys_tree.root, section_contents)
-
 		self.system_section_slab = section_slab
+		self.system_section_contents = section_contents
 
 
 	def add_hidden_search_results_slab(self):
@@ -1018,29 +1039,26 @@ class Cardapio(dbus.service.Object):
 			container.remove(child)
 
 
-	def clear_pinned_pane(self):
+	def clear_sideapp_pane(self):
 
-		container = self.pinned_pane
+		container = self.sideapp_pane
 		for	child in container.get_children():
 			container.remove(child)
-
 
 	def clear_search_entry(self):
 
 		self.search_entry.set_text('')
-		self.system_section_slab.hide()
-		self.session_section_slab.hide()
-		self.search_section_slab.hide()
+		self.hide_all_transitory_sections()
 
 
-	def add_sidebar_button(self, button_str, icon_name, parent_widget, comment = '', use_toggle_button = True):
+	def add_sidebar_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = True):
 
-		return self.add_button(button_str, icon_name, parent_widget, comment, is_launcher_button = False)
+		return self.add_button(button_str, icon_name, parent_widget, tooltip, use_toggle_button = use_toggle_button, is_launcher_button = False)
 
 
-	def add_launcher_entry(self, button_str, icon_name, parent_widget, comment = '', app_list = None):
+	def add_launcher_entry(self, button_str, icon_name, parent_widget, tooltip = '', app_list = None):
 
-		button = self.add_button(button_str, icon_name, parent_widget, comment, is_launcher_button = True)
+		button = self.add_button(button_str, icon_name, parent_widget, tooltip, is_launcher_button = True)
 
 		if app_list is not None:
 			app_list.append({'title': button_str.lower(), 'button': button, 'section': parent_widget.parent.parent})
@@ -1051,21 +1069,22 @@ class Cardapio(dbus.service.Object):
 		return button
 
 
-	def add_button(self, button_str, icon_name, parent_widget, comment = '', is_launcher_button = True):
+	def add_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = None, is_launcher_button = True):
 
-		if is_launcher_button:
+		if is_launcher_button or use_toggle_button == False:
 			button = gtk.Button()
-			icon_size = self.icon_size_large
 		else:
 			button = gtk.ToggleButton()
-			icon_size = self.icon_size_small
-
-		icon_pixbuf = self.get_pixbuf_icon(icon_name, icon_size)
 
 		label = gtk.Label(button_str)
 
-		if is_launcher_button: 
+		if is_launcher_button:
+			icon_size = self.icon_size_large
 			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
+		else:
+			icon_size = self.icon_size_small
+
+		icon_pixbuf = self.get_pixbuf_icon(icon_name, icon_size)
 
 		hbox = gtk.HBox()
 		hbox.add(gtk.image_new_from_pixbuf(icon_pixbuf))
@@ -1076,7 +1095,7 @@ class Cardapio(dbus.service.Object):
 		align = gtk.Alignment(0, 0.5)
 		align.add(hbox)
 
-		if comment: button.set_tooltip_text(comment)
+		if tooltip: button.set_tooltip_text(tooltip)
 
 		button.add(align)
 		button.set_relief(gtk.RELIEF_NONE)
@@ -1156,16 +1175,21 @@ class Cardapio(dbus.service.Object):
 
 	def add_tree_to_app_list(self, tree, parent_widget, recursive = True):
 
+		has_no_leaves = True
+
 		for node in tree.contents:
 
 			if isinstance(node, gmenu.Entry):
 
-				button = self.add_launcher_entry(node.name, node.icon, parent_widget, comment = node.get_comment(), app_list = self.app_list)
+				button = self.add_launcher_entry(node.name, node.icon, parent_widget, tooltip = node.get_comment(), app_list = self.app_list)
 				button.connect('clicked', self.on_app_button_clicked, node.desktop_file_path)
+				has_no_leaves = False
 
 			elif isinstance(node, gmenu.Directory) and recursive:
 
 				self.add_tree_to_app_list(node, parent_widget)
+
+		return has_no_leaves
 
 
 	def handle_search_error(self, error):
@@ -1199,13 +1223,13 @@ class Cardapio(dbus.service.Object):
 		if len(results):
 
 			for result in results:
-				comment = urllib2.unquote(result[2])
+				tooltip = urllib2.unquote(result[2])
 
 				icon_name = result[3].replace('/', '-')
 				if not self.icon_theme.has_icon(icon_name):
 					icon_name = 'text-x-generic'
 
-				button = self.add_launcher_entry(result[0], icon_name, self.search_section_contents, comment = comment)
+				button = self.add_launcher_entry(result[0], icon_name, self.search_section_contents, tooltip = tooltip)
 				button.connect('clicked', self.on_xdg_button_clicked, result[1])
 
 				if self.first_result_widget is None:
@@ -1274,6 +1298,11 @@ class Cardapio(dbus.service.Object):
 
 		path = self.escape_quotes(path)
 		return self.launch_raw("xdg-open '%s'" % path)
+
+
+	def on_raw_button_clicked(self, widget, path):
+
+		self.launch_raw(path)
 
 
 	def launch_raw(self, path):
@@ -1365,10 +1394,20 @@ class Cardapio(dbus.service.Object):
 			self.show_no_results_text(_('No results to show in "%s"') % self.section_list[self.selected_section]['title'])
 
 
-	def disappear_with_section(self, section_slab):
+	def hide_all_transitory_sections(self, fully_hide = False):
 
-		self.section_list[section_slab]['has-entries'] = False
-		self.section_list[section_slab]['category'].hide()
+		self.hide_section(self.help_section_slab   , fully_hide)
+		self.hide_section(self.session_section_slab, fully_hide)
+		self.hide_section(self.system_section_slab , fully_hide)
+		self.hide_section(self.search_section_slab , fully_hide)
+
+
+	def hide_section(self, section_slab, fully_hide = False):
+
+		if fully_hide:
+			self.section_list[section_slab]['has-entries'] = False
+			self.section_list[section_slab]['category'].hide()
+
 		section_slab.hide()
 
 
@@ -1420,10 +1459,12 @@ def return_true(*dummy):
 
 def applet_factory(applet, iid):
 	
-	button = gtk.ImageMenuItem(Cardapio.default_panel_label)
+	button = gtk.ImageMenuItem()
 
 	cardapio = Cardapio(hidden = True, panel_button = button, panel_applet = applet)
 
+	button.set_label(cardapio.settings['applet label'])
+	button.set_tooltip_text(_('Access applications, folders, system settings, etc.'))
 	button_icon = gtk.image_new_from_icon_name('distributor-logo', gtk.ICON_SIZE_SMALL_TOOLBAR)
 	button.set_image(button_icon)
 
