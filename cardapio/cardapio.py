@@ -762,19 +762,17 @@ class Cardapio(dbus.service.Object):
 
 	def on_applet_realize(self, widget):
 
-		pass
-
-	#	panel = self.panel_button.get_toplevel().get_property('window')
-	#	panel_width, panel_height = panel.get_size()
-	#	applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
-	#
-	#	orientation = self.panel_applet.get_orient()
-	#
-	#	if orientation == gnomeapplet.ORIENT_UP or orientation == gnomeapplet.ORIENT_DOWN:
-	#		self.panel_button.parent.set_property('height-request', panel_height)
-	#
-	#	if orientation == gnomeapplet.ORIENT_LEFT or orientation == gnomeapplet.ORIENT_RIGHT:
-	#		self.panel_button.parent.set_property('width-request', panel_width)
+		panel = self.panel_button.get_toplevel().window
+		panel_width, panel_height = panel.get_size()
+		applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
+	
+		#orientation = self.panel_applet.get_orient()
+	
+		#if orientation == gnomeapplet.ORIENT_UP or orientation == gnomeapplet.ORIENT_DOWN:
+		#	self.panel_button.parent.set_property('height-request', panel_height)
+	
+		#if orientation == gnomeapplet.ORIENT_LEFT or orientation == gnomeapplet.ORIENT_RIGHT:
+		#	self.panel_button.parent.set_property('width-request', panel_width)
 
 
 	def auto_toggle_panel_button(self, state):
@@ -1485,7 +1483,7 @@ def return_true(*dummy):
 
 
 def applet_factory(applet, iid):
-	
+
 	button = gtk.ImageMenuItem()
 
 	cardapio = Cardapio(hidden = True, panel_button = button, panel_applet = applet)
@@ -1496,6 +1494,7 @@ def applet_factory(applet, iid):
 	button.set_image(button_icon)
 
 	menu = gtk.MenuBar()
+	menu.set_name('CardapioAppletMenu')
 	menu.add(button)
 
 	button.connect('button-press-event', cardapio.on_panel_button_toggled)
@@ -1504,6 +1503,28 @@ def applet_factory(applet, iid):
 	# make sure menuitem doesn't change focus on mouseout/mousein
 	button.connect('enter-notify-event', return_true)
 	button.connect('leave-notify-event', return_true)
+
+	gtk.rc_parse_string('''
+		style "cardapio-applet-menu-style"
+		{
+			xthickness = 0
+			ythickness = 0
+			GtkMenuBar::shadow-type = none
+			GtkMenuBar::internal-padding = 0
+			#bg[NORMAL] = "#ff0000"
+		}
+
+		style "cardapio-applet-style"
+		{
+			xthickness = 0
+			ythickness = 0
+			GtkWidget::focus-line-width = 0
+			GtkWidget::focus-padding = 0
+		}
+
+		widget "*CardapioAppletMenu" style:highest "cardapio-applet-menu-style"
+		widget "*PanelApplet" style "cardapio-applet-style"
+		''')
 
 	applet.connect('change-background', cardapio.on_panel_change_background)
 	applet.connect('realize', cardapio.on_applet_realize)
