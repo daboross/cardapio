@@ -4,7 +4,7 @@ from distutils.sysconfig import get_python_lib
 
 setup(
 	name         = 'Cardapio',
-	version      = '0.9.0',
+	version      = '0.9.2',
 	description  = 'A menu with search capabilities.',
 	author       = 'Thiago Teixeira',
 	author_email = 'tvst@hotmail.com',
