@@ -265,34 +265,53 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkHBox" id="SessionPane">
+                  <object class="GtkVBox" id="SessionPane">
                     <property name="visible">True</property>
+                    <property name="spacing">4</property>
                     <child>
-                      <object class="GtkHButtonBox" id="LeftSessionPane">
+                      <object class="GtkHSeparator" id="SessionSeparator">
                         <property name="visible">True</property>
-                        <property name="spacing">8</property>
-                        <property name="layout_style">start</property>
-                        <child>
-                          <placeholder/>
-                        </child>
                       </object>
                       <packing>
+                        <property name="expand">False</property>
                         <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkHButtonBox" id="RightSessionPane">
+                      <object class="GtkHBox" id="SessionPaneReal">
                         <property name="visible">True</property>
-                        <property name="spacing">8</property>
-                        <property name="layout_style">end</property>
                         <child>
-                          <placeholder/>
+                          <object class="GtkHButtonBox" id="LeftSessionPane">
+                            <property name="visible">True</property>
+                            <property name="spacing">8</property>
+                            <property name="layout_style">start</property>
+                            <child>
+                              <placeholder/>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="position">0</property>
+                          </packing>
                         </child>
                         <child>
-                          <placeholder/>
+                          <object class="GtkHButtonBox" id="RightSessionPane">
+                            <property name="visible">True</property>
+                            <property name="spacing">8</property>
+                            <property name="layout_style">end</property>
+                            <child>
+                              <placeholder/>
+                            </child>
+                            <child>
+                              <placeholder/>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="position">1</property>
+                          </packing>
                         </child>
                       </object>
                       <packing>
+                        <property name="expand">False</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
