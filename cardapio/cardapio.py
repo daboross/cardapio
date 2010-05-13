@@ -25,6 +25,7 @@ try:
 	import gio
 	import glib
 	import json
+	import time
 	import gmenu
 	import locale
 	import urllib2
@@ -53,7 +54,6 @@ _ = gettext.gettext
 # Before version 1.0:
 # TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
 # TODO: make applet 1px larger in every direction, so fitts law works
-# TODO: fix metacity's focus problems...
 # TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
 
 # After version 1.0:
@@ -62,7 +62,6 @@ _ = gettext.gettext
 # TODO: fix Win+Space untoggle
 # TODO: fix tabbing of first_app_widget / first_result_widget  
 # TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
-# TODO: any letter or number typed anywhere (without modifiers) is redirected to search entry
 # TODO: add mount points to "places", allow ejecting from context menu
 # TODO: multiple columns when window is wide enough (like gnome-control-center)
 # TODO: slash "/" should navigate inside folders, Esc pops out
@@ -78,6 +77,8 @@ class Cardapio(dbus.service.Object):
 	distro_name = commands.getoutput('lsb_release -is')
 	menu_editing_apps = ('alacarte', 'gmenu-simple-editor')
 
+	min_visibility_toggle_interval = 0.010 # seconds (this is a bit of a hack to fix some focus problems)
+
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
@@ -91,13 +92,12 @@ class Cardapio(dbus.service.Object):
 		self.panel_applet = panel_applet
 		self.panel_button = panel_button
 		self.auto_toggled_sidebar_button = False
+		self.last_visibility_toggle = 0
 
 		self.app_list = []
 		self.section_list = {}
 		self.selected_section = None
 
-		self.first_app_widget = None
-		self.first_result_widget = None
 		self.no_results_to_show = False
 
 		self.visible = False
@@ -112,7 +112,6 @@ class Cardapio(dbus.service.Object):
 		self.set_up_dbus()
 		self.set_up_tracker_search()
 		self.build_ui()
-		self.first_app_widget = self.app_list[0]['button']
 
 		self.app_tree.add_monitor(self.on_menu_data_changed)
 		self.sys_tree.add_monitor(self.on_menu_data_changed)
@@ -338,12 +337,35 @@ class Cardapio(dbus.service.Object):
 		self.quit()
 
 
+	def on_mainwindow_key_press(self, widget, event):
+
+		if self.window.get_focus() != self.search_entry:
+			self.previously_focused_widget = self.window.get_focus()
+
+
+	def on_mainwindow_after_key_press(self, widget, event):
+
+		w = self.window.get_focus()
+
+		if w != self.search_entry and w == self.previously_focused_widget:
+
+			if event.is_modifier: return
+
+			self.previously_focused_widget = None
+			self.window.set_focus(self.search_entry)
+			self.search_entry.emit('key-press-event', event)
+
+
 	def on_mainwindow_focus_out(self, widget, event):
 
-		#if self.panel_applet is None:
-		#	self.hide()
-		
-		if gtk.gdk.window_at_pointer() is None:
+		if self.panel_applet is None:
+			self.hide()
+
+		x, y, dummy = self.panel_applet.window.get_pointer()
+		dummy, dummy, w, h = self.panel_applet.get_allocation()
+
+		if not (0 <= x <= w and 0 <= y <= h):
+
 			# make sure clicking the applet button does cause a focus-out event
 			self.hide()
 
@@ -397,9 +419,6 @@ class Cardapio(dbus.service.Object):
 
 	def on_searchentry_changed(self, widget):
 
-		self.first_app_widget = None
-		self.first_result_widget = None
-
 		text = self.search_entry.get_text().strip()
 
 		self.search_menus(text)
@@ -422,7 +441,6 @@ class Cardapio(dbus.service.Object):
 	def search_menus(self, text):
 
 		text = text.lower()
-		self.first_app_widget = None
 
 		for sec in self.section_list:
 			self.set_section_is_empty(sec)
@@ -434,9 +452,6 @@ class Cardapio(dbus.service.Object):
 			else:
 				app['button'].show()
 				self.set_section_has_entries(app['section'])
-
-				if self.first_app_widget is None:
-					self.first_app_widget = app['button']
 
 		if self.selected_section is None:
 			self.show_all_nonempty_sections()
@@ -517,12 +532,6 @@ class Cardapio(dbus.service.Object):
 			self.hide_all_transitory_sections()
 			return 
 
-		if self.first_app_widget is not None:
-			self.first_app_widget.emit('clicked')
-
-		elif self.first_result_widget is not None:
-			self.first_result_widget.emit('clicked')
-
 		self.clear_search_entry()
 
 
@@ -538,18 +547,14 @@ class Cardapio(dbus.service.Object):
 
 				if visible_children:
 
-					#self.first_child.connect('key-press-event', self.on_first_button_key_press_event)
 					self.window.set_focus(visible_children[0])
+
+			else:
+
+				child = self.get_first_visible_app()
+				if child is not None: 
+					self.window.set_focus(child)
 				
-			elif self.first_app_widget is not None:
-
-				#self.first_app_widget.connect('key-press-event', self.on_first_button_key_press_event)
-				self.window.set_focus(self.first_app_widget)
-
-			elif self.first_result_widget is not None:
-
-				#self.first_result_widget.connect('key-press-event', self.on_first_button_key_press_event)
-				self.window.set_focus(self.first_result_widget)
 
 		elif event.keyval == gtk.gdk.keyval_from_name('Escape'):
 
@@ -566,6 +571,19 @@ class Cardapio(dbus.service.Object):
 
 		else: return False
 		return True
+
+
+	def get_first_visible_app(self):
+
+		for slab in self.application_pane.get_children():
+			if not slab.get_visible(): continue
+
+			for app in slab.get_children()[0].get_children()[0].get_children():
+				if not app.get_visible(): continue
+
+				return app
+
+		return None
 
 
 	def on_mainwindow_key_press_event(self, widget, event):
@@ -663,25 +681,38 @@ class Cardapio(dbus.service.Object):
 
 		self.auto_toggle_panel_button(True)
 
+		# for compiz, this must take place twice!!
+		self.window.present_with_time(int(time.time()))
+		self.window.present_with_time(int(time.time()))
+
+		# for metacity, this is required!!
+		self.window.window.focus()
+
 		self.window.set_focus(self.search_entry)
-		self.window.show()
 
 		self.visible = True
+		self.last_visibility_toggle = time.time()
 
 
 	def hide(self):
 
 		self.auto_toggle_panel_button(False)
 
-		self.window.hide()
 		self.visible = False
+		self.last_visibility_toggle = time.time()
+
+		self.window.hide()
 
 		self.clear_search_entry()
 		self.show_all_nonempty_sections()
 
 
+
 	@dbus.service.method(dbus_interface=bus_name_str, in_signature=None, out_signature=None)
 	def show_hide(self):
+
+		if time.time() - self.last_visibility_toggle < Cardapio.min_visibility_toggle_interval:
+			return
 
 		if self.visible: self.hide()
 		else: self.show()
@@ -745,7 +776,7 @@ class Cardapio(dbus.service.Object):
 	def auto_toggle_panel_button(self, state):
 
 		if self.panel_applet is not None:
-			#self.panel_button.set_active(state)
+
 			if state: self.panel_button.select()
 			else: self.panel_button.deselect()
 
@@ -1215,8 +1246,6 @@ class Cardapio(dbus.service.Object):
 		self.search_section_contents = gtk.VBox()
 		container.add(self.search_section_contents)
 
-		self.first_result_widget = None
-
 		if len(results):
 
 			for result in results:
@@ -1228,9 +1257,6 @@ class Cardapio(dbus.service.Object):
 
 				button = self.add_launcher_entry(result[0], icon_name, self.search_section_contents, tooltip = tooltip)
 				button.connect('clicked', self.on_xdg_button_clicked, result[1])
-
-				if self.first_result_widget is None:
-					self.first_result_widget = button
 
 			self.search_section_contents.show()
 			self.set_section_has_entries(self.search_section_slab)

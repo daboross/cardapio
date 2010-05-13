@@ -1,3 +1,9 @@
+cardapio (0.9-ubuntu3) lucid; urgency=low
+
+  * Argh! Still trying to fix the PPA's build system...
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 12 May 2010 19:40:04 -0400
+
 cardapio (0.9-ubuntu2) lucid; urgency=low
 
   * Trying to fix the PPA's build system...

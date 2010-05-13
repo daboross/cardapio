@@ -4,16 +4,18 @@ PYTHON=`which python`
 DESTDIR=/
 
 all:
-		@echo "make install - Install on local system"
-		@echo "make buildsrc - Generate a deb source package"
-		@echo "make clean - Get rid of scratch and byte files"
+	@echo "make install - Install on local system"
+	@echo "make buildsrc - Generate a deb source package"
+	@echo "make clean - Get rid of scratch and byte files"
 
 install:
-		$(PYTHON) setup.py install --root $(DESTDIR) $(COMPILE)
+	$(PYTHON) setup.py install --root $(DESTDIR) $(COMPILE)
 
 buildsrc:
-		debuild -S
+	debuild -S
 
 clean:
-		$(PYTHON) setup.py clean
-		$(MAKE) -f $(CURDIR)/debian/rules clean
+	$(PYTHON) setup.py clean
+	$(MAKE) -f $(CURDIR)/debian/rules clean
+	rm -rf build/ MANIFEST
+	find . -name '*.pyc' -delete
