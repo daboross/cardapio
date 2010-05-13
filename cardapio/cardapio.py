@@ -532,6 +532,10 @@ class Cardapio(dbus.service.Object):
 			self.hide_all_transitory_sections()
 			return 
 
+		first_app_widget = self.get_first_visible_app()
+		if first_app_widget is not None:
+			first_app_widget.emit('clicked')
+
 		self.clear_search_entry()
 
 
@@ -551,9 +555,9 @@ class Cardapio(dbus.service.Object):
 
 			else:
 
-				child = self.get_first_visible_app()
-				if child is not None: 
-					self.window.set_focus(child)
+				first_app_widget = self.get_first_visible_app()
+				if first_app_widget is not None: 
+					self.window.set_focus(first_app_widget)
 				
 
 		elif event.keyval == gtk.gdk.keyval_from_name('Escape'):
