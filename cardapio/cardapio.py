@@ -693,6 +693,7 @@ class Cardapio(dbus.service.Object):
 		self.window.window.focus()
 
 		self.window.set_focus(self.search_entry)
+ 		self.scroll_to_top()
 
 		self.visible = True
 		self.last_visibility_toggle = time.time()
@@ -762,17 +763,17 @@ class Cardapio(dbus.service.Object):
 
 	def on_applet_realize(self, widget):
 
-		panel = self.panel_button.get_toplevel().window
+		panel = self.panel_applet.get_toplevel().window
 		panel_width, panel_height = panel.get_size()
 		applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
 	
 		#orientation = self.panel_applet.get_orient()
 	
 		#if orientation == gnomeapplet.ORIENT_UP or orientation == gnomeapplet.ORIENT_DOWN:
-		#	self.panel_button.parent.set_property('height-request', panel_height)
+		#	self.panel_button.set_size_request(-1, panel_height)
 	
 		#if orientation == gnomeapplet.ORIENT_LEFT or orientation == gnomeapplet.ORIENT_RIGHT:
-		#	self.panel_button.parent.set_property('width-request', panel_width)
+		#	self.panel_button.set_size_request(panel_width, -1)
 
 
 	def auto_toggle_panel_button(self, state):
@@ -1511,6 +1512,8 @@ def applet_factory(applet, iid):
 			ythickness = 0
 			GtkMenuBar::shadow-type = none
 			GtkMenuBar::internal-padding = 0
+			GtkWidget::focus-padding = 0
+			GtkMenuBar::focus-padding = 0
 			#bg[NORMAL] = "#ff0000"
 		}
 
@@ -1523,7 +1526,8 @@ def applet_factory(applet, iid):
 		}
 
 		widget "*CardapioAppletMenu" style:highest "cardapio-applet-menu-style"
-		widget "*PanelApplet" style "cardapio-applet-style"
+		widget "*PanelApplet" style:highest "cardapio-applet-style"
+		#widget "*Cardapio.*" style:highest "cardapio-applet-style"
 		''')
 
 	applet.connect('change-background', cardapio.on_panel_change_background)
