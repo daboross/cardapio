@@ -36,10 +36,9 @@ if len(sys.argv) == 2:
 		app.reparent(main_window)
 		main_window.show_all()
 		gtk.main()
-		sys.exit()
 
 
-	else: # if sys.argv[1] == 'view'
+	elif sys.argv[1] == 'show':
 
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
 			del bus
@@ -49,6 +48,15 @@ if len(sys.argv) == 2:
 		else:
 			show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide')
 			show_hide()
+
+
+	elif sys.argv[1] == 'hidden':
+
+		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
+			del bus
+			Cardapio(hidden = True)
+			gtk.main()
+
 
 else:
 

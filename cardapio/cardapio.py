@@ -111,7 +111,7 @@ class Cardapio(dbus.service.Object):
 
 		self.set_up_dbus()
 		self.set_up_tracker_search()
-		self.build_ui()
+		self.setup_ui()
 
 		self.app_tree.add_monitor(self.on_menu_data_changed)
 		self.sys_tree.add_monitor(self.on_menu_data_changed)
@@ -245,11 +245,15 @@ class Cardapio(dbus.service.Object):
 		self.set_config_option(s, 'window size'             , None           ) # format: [px, px]
 		self.set_config_option(s, 'show session buttons'    , False          ) # bool
 		self.set_config_option(s, 'min search string length', 3              ) # characters
-		self.set_config_option(s, 'menu rebuild delay'      , 60             ) # seconds
+		self.set_config_option(s, 'menu rebuild delay'      , 300            ) # seconds
 		self.set_config_option(s, 'search results limit'    , 10             ) # results
 		self.set_config_option(s, 'search update delay'     , 100            ) # msec
 		self.set_config_option(s, 'keybinding'              , '<Super>space' ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
 		self.set_config_option(s, 'applet label'            , Cardapio.distro_name) # string
+
+		# this is useful so that the user can edit the config file on first-run 
+		# without need to quit cardapio first:
+		self.save_config_file()
 
 
 	def set_config_option(self, s, key, val):
@@ -267,7 +271,7 @@ class Cardapio(dbus.service.Object):
 		json.dump(self.settings, config_file, sort_keys = True, indent = 4)
 
 
-	def build_ui(self):
+	def setup_ui(self):
 
 		self.rebuild_timer = None
 
@@ -280,6 +284,7 @@ class Cardapio(dbus.service.Object):
 
 		self.get_object = self.builder.get_object
 		self.window             = self.get_object('MainWindow')
+		self.message_window     = self.get_object('MessageWindow')
 		self.about_dialog       = self.get_object('AboutDialog')
 		self.application_pane   = self.get_object('ApplicationPane')
 		self.category_pane      = self.get_object('CategoryPane')
@@ -293,8 +298,8 @@ class Cardapio(dbus.service.Object):
 
 		self.icon_theme = gtk.icon_theme_get_default()
 		self.icon_theme.connect('changed', self.on_icon_theme_changed)
-		self.icon_size_large = gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
-		self.icon_size_small = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
+		self.icon_size_app = gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
+		self.icon_size_category = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
 
 		# make sure buttons have icons!
 		self.gtk_settings = gtk.settings_get_default()
@@ -315,11 +320,65 @@ class Cardapio(dbus.service.Object):
 				('About', self.open_about_dialog)
 				]
 
-		self.prepare_colors()
-		self.rebuild()
-
 		if self.panel_applet is not None:
 			self.panel_applet.connect('destroy', self.quit)
+
+		self.build_ui()
+
+
+	def build_ui(self):
+
+		self.prepare_colors()
+
+		self.clear_pane(self.application_pane)
+		self.clear_pane(self.category_pane)
+		self.clear_pane(self.sideapp_pane)
+		self.clear_pane(self.left_session_pane)
+		self.clear_pane(self.right_session_pane)
+
+		self.section_list = {}
+		self.app_list = []
+
+		button = self.add_sidebar_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'))
+		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
+		self.all_sections_sidebar_button = button 
+		self.set_sidebar_button_active(button, True)
+		self.all_sections_sidebar_button.set_sensitive(False)
+
+		self.no_results_slab, dummy, self.no_results_label = self.add_application_section('Dummy text')
+		self.hide_no_results_text()
+
+		# slabs that should go *before* regular application slabs
+		self.add_favorites_slab()
+		self.add_places_slab()
+		self.add_help_slab()
+
+		self.build_applications_list()
+
+		# slabs that should go *after* regular application slabs
+		self.add_hidden_session_slab()
+		self.add_hidden_system_slab()
+		self.add_hidden_search_results_slab()
+
+		self.build_favorites_list()
+		self.build_places_list()
+		self.build_session_list()
+		self.build_system_list()
+		self.build_help_list()
+
+		self.show_message(False)
+
+
+	def rebuild_ui(self, show_message = False):
+
+		if self.rebuild_timer is not None:
+			glib.source_remove(self.rebuild_timer)
+			self.rebuild_timer = None
+
+		if show_message:
+			self.show_message(True)
+
+		glib.idle_add(self.build_ui)
 
 	
 	def open_about_dialog(self, widget, verb):
@@ -360,14 +419,16 @@ class Cardapio(dbus.service.Object):
 
 		if self.panel_applet is None:
 			self.hide()
+			return
 
 		x, y, dummy = self.panel_applet.window.get_pointer()
 		dummy, dummy, w, h = self.panel_applet.get_allocation()
 
-		if not (0 <= x <= w and 0 <= y <= h):
+		# make sure clicking the applet button doesn't cause a focus-out event
+		if (0 <= x <= w and 0 <= y <= h): 
+			return
 
-			# make sure clicking the applet button does cause a focus-out event
-			self.hide()
+		self.hide()
 
 
 	def on_mainwindow_delete_event(self, widget, event):
@@ -392,7 +453,7 @@ class Cardapio(dbus.service.Object):
 		if self.rebuild_timer is not None:
 			glib.source_remove(self.rebuild_timer)
 
-		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.rebuild)
+		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.rebuild_ui)
 
 
 	def on_gtk_settings_changed(self, gobj, property_changed):
@@ -617,19 +678,28 @@ class Cardapio(dbus.service.Object):
 		return True
 
 
-	def restore_location(self):
+	def reposition_window(self, is_message_window = False):
 
-		menu_width, menu_height = self.window.get_size()
+		window_width, window_height = self.window.get_size()
 		screen_height = gtk.gdk.screen_height()
 		screen_width  = gtk.gdk.screen_width()
 
+		if is_message_window:
+			window = self.message_window
+			message_width, message_height = self.message_window.get_size()
+			offset_x = (window_width - message_width) / 2
+			offset_y = (window_height - message_height) / 2
+		else:
+			window = self.window
+			offset_x = offset_y = 0
+
 		if self.panel_applet is None:
-			menu_x = (screen_width - menu_width)/2
-			menu_y = (screen_height - menu_height)/2
-			self.window.move(menu_x, menu_y)
+			window_x = (screen_width - window_width)/2
+			window_y = (screen_height - window_height)/2
+			window.move(window_x + offset_x, window_y + offset_y)
 			return
 
-		panel = self.panel_button.get_toplevel().get_property('window')
+		panel = self.panel_button.get_toplevel().window
 		panel_x, panel_y = panel.get_origin()
 		panel_width, panel_height = panel.get_size()
 
@@ -644,24 +714,24 @@ class Cardapio(dbus.service.Object):
 		if orientation == gnomeapplet.ORIENT_LEFT or orientation == gnomeapplet.ORIENT_RIGHT:
 			applet_width = panel_width
 
-		menu_x = panel_x + applet_x
-		menu_y = panel_y + applet_y + applet_height
+		window_x = panel_x + applet_x
+		window_y = panel_y + applet_y + applet_height
 
 		# move window to one edge always matches some edge of the panel button 
 
-		if menu_x + menu_width > screen_width:
-			menu_x = panel_x + applet_x + applet_width - menu_width
+		if window_x + window_width > screen_width:
+			window_x = panel_x + applet_x + applet_width - window_width
 
-		if menu_y + menu_height > screen_height:
-			menu_y = panel_y + applet_y - menu_height
+		if window_y + window_height > screen_height:
+			window_y = panel_y + applet_y - window_height
 
 		# if it is impossible, do out best to have the top-left corner of our
 		# window visible at least
 
-		if menu_x < 0: menu_x = 0
-		if menu_y < 0: menu_y = 0
+		if window_x < 0: window_x = 0
+		if window_y < 0: window_y = 0
 
-		self.window.move(menu_x, menu_y)
+		window.move(window_x + offset_x, window_y + offset_y)
 
 
 	def restore_dimensions(self):
@@ -675,28 +745,41 @@ class Cardapio(dbus.service.Object):
 		self.settings['window size'] = self.window.get_size()
 
 
+	def show_message(self, state = True):
+
+		if state == False:
+			self.message_window.hide()
+			#self.message_window.set_keep_above(False)
+			return
+
+		self.reposition_window(is_message_window = True)
+		#self.message_window.set_keep_above(True)
+		self.show_window_on_top(self.message_window)
+
+		# ensure window is rendered immediately
+		gtk.gdk.flush()
+		while gtk.events_pending():
+			gtk.main_iteration()
+
+
 	def show(self):
-
-		if self.rebuild_timer is not None:
-			self.rebuild()
-
-		self.restore_dimensions()
-		self.restore_location()
 
 		self.auto_toggle_panel_button(True)
 
-		# for compiz, this must take place twice!!
-		self.window.present_with_time(int(time.time()))
-		self.window.present_with_time(int(time.time()))
-
-		# for metacity, this is required!!
-		self.window.window.focus()
+		self.restore_dimensions()
+		self.reposition_window()
+		self.show_window_on_top(self.window)
 
 		self.window.set_focus(self.search_entry)
  		self.scroll_to_top()
 
 		self.visible = True
 		self.last_visibility_toggle = time.time()
+
+		if self.rebuild_timer is not None:
+			# build the UI *after* showing the window, so the user gets the
+			# satisfaction of seeing the window pop up, even if it's incomplete...
+			self.rebuild_ui(show_message = True)
 
 
 	def hide(self):
@@ -712,7 +795,6 @@ class Cardapio(dbus.service.Object):
 		self.show_all_nonempty_sections()
 
 
-
 	@dbus.service.method(dbus_interface=bus_name_str, in_signature=None, out_signature=None)
 	def show_hide(self):
 
@@ -721,6 +803,18 @@ class Cardapio(dbus.service.Object):
 
 		if self.visible: self.hide()
 		else: self.show()
+
+
+	def show_window_on_top(self, window):
+
+		window.show_now()
+
+		# for compiz, this must take place twice!!
+		window.present_with_time(int(time.time()))
+		window.present_with_time(int(time.time()))
+
+		# for metacity, this is required!!
+		window.window.focus() 
 
 
 	def on_panel_button_press(self, widget, event):
@@ -782,52 +876,6 @@ class Cardapio(dbus.service.Object):
 
 			if state: self.panel_button.select()
 			else: self.panel_button.deselect()
-
-
-	def rebuild(self):
-
-		if self.rebuild_timer is not None:
-			glib.source_remove(self.rebuild_timer)
-			self.rebuild_timer = None
-
-		self.clear_pane(self.application_pane)
-		self.clear_pane(self.category_pane)
-		self.clear_pane(self.sideapp_pane)
-		self.clear_pane(self.left_session_pane)
-		self.clear_pane(self.right_session_pane)
-
-		self.section_list = {}
-		self.app_list = []
-
-		button = self.add_sidebar_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'))
-		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
-		self.all_sections_sidebar_button = button 
-		self.set_sidebar_button_active(button, True)
-		self.all_sections_sidebar_button.set_sensitive(False)
-
-		self.no_results_slab, dummy, self.no_results_label = self.add_application_section('Dummy text')
-		self.hide_no_results_text()
-
-		# slabs that should go *before* regular application slabs
-		self.add_favorites_slab()
-		self.add_places_slab()
-		self.add_help_slab()
-
-		self.build_applications_list()
-
-		# slabs that should go *after* regular application slabs
-		self.add_hidden_session_slab()
-		self.add_hidden_system_slab()
-		self.add_hidden_search_results_slab()
-
-		self.build_favorites_list()
-		self.build_places_list()
-		self.build_session_list()
-		self.build_system_list()
-		self.build_help_list()
-
-		return False 
-		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
 	def build_help_list(self):
@@ -1110,10 +1158,10 @@ class Cardapio(dbus.service.Object):
 		label = gtk.Label(button_str)
 
 		if is_launcher_button:
-			icon_size = self.icon_size_large
+			icon_size = self.icon_size_app
 			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
 		else:
-			icon_size = self.icon_size_small
+			icon_size = self.icon_size_category
 
 		icon_pixbuf = self.get_pixbuf_icon(icon_name, icon_size)
 
