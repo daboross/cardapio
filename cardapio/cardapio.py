@@ -245,7 +245,7 @@ class Cardapio(dbus.service.Object):
 		self.set_config_option(s, 'window size'             , None           ) # format: [px, px]
 		self.set_config_option(s, 'show session buttons'    , False          ) # bool
 		self.set_config_option(s, 'min search string length', 3              ) # characters
-		self.set_config_option(s, 'menu rebuild delay'      , 300            ) # seconds
+		self.set_config_option(s, 'menu rebuild delay'      , 30             ) # seconds
 		self.set_config_option(s, 'search results limit'    , 10             ) # results
 		self.set_config_option(s, 'search update delay'     , 100            ) # msec
 		self.set_config_option(s, 'keybinding'              , '<Super>space' ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
