@@ -53,7 +53,7 @@ _ = gettext.gettext
 
 # Before version 1.0:
 # TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
-# TODO: make applet 1px larger in every direction, so fitts law works
+# TODO: make applet extend in every direction
 # TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
 
 # After version 1.0:
