@@ -1,3 +1,9 @@
+cardapio (0.9.4-ubuntu1) lucid; urgency=low
+
+  * Made tracker search more useful. Yes, this warrants another release :)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 16 May 2010 13:17:41 -0400
+
 cardapio (0.9.3-ubuntu1) lucid; urgency=low
 
   * Added the "Rebuilding..." window, and a few other cosmetic changes.
