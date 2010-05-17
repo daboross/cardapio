@@ -246,7 +246,7 @@ class Cardapio(dbus.service.Object):
 		self.set_config_option(s, 'show session buttons'    , False          ) # bool
 		self.set_config_option(s, 'min search string length', 3              ) # characters
 		self.set_config_option(s, 'menu rebuild delay'      , 30             ) # seconds
-		self.set_config_option(s, 'search results limit'    , 10             ) # results
+		self.set_config_option(s, 'search results limit'    , 15             ) # results
 		self.set_config_option(s, 'search update delay'     , 100            ) # msec
 		self.set_config_option(s, 'keybinding'              , '<Super>space' ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
 		self.set_config_option(s, 'applet label'            , Cardapio.distro_name) # string
@@ -539,16 +539,14 @@ class Cardapio(dbus.service.Object):
 
 		self.tracker.SparqlQuery(
 			"""
-				SELECT ?title ?uri ?tooltip ?mime
+				SELECT ?uri ?mime
 				WHERE { 
-					?item a nfo:FileDataObject;
-						nfo:fileName ?title;
+					?item a nie:InformationElement;
 						nie:url ?uri;
-						nie:mimeType ?mime;
-						nfo:belongsToContainer ?parent.
-					?parent nie:url ?tooltip.
-					FILTER (fn:contains(?title, '%s'))
+						nie:mimeType ?mime.
+					FILTER (fn:contains(?uri, '%s'))
 					}
+				ORDER BY ASC(?uri)
 				LIMIT %d
 			""" 
 			% (text, self.settings['search results limit']),
@@ -1300,14 +1298,19 @@ class Cardapio(dbus.service.Object):
 		if len(results):
 
 			for result in results:
-				tooltip = urllib2.unquote(result[2])
 
-				icon_name = result[3].replace('/', '-')
+				dummy, canonical_path = urllib2.splittype(result[0])
+				if not os.path.exists(canonical_path): continue
+
+				parent_name, child_name = os.path.split(result[0])
+				tooltip = urllib2.unquote(parent_name)
+
+				icon_name = result[1].replace('/', '-')
 				if not self.icon_theme.has_icon(icon_name):
 					icon_name = 'text-x-generic'
 
-				button = self.add_launcher_entry(result[0], icon_name, self.search_section_contents, tooltip = tooltip)
-				button.connect('clicked', self.on_xdg_button_clicked, result[1])
+				button = self.add_launcher_entry(child_name, icon_name, self.search_section_contents, tooltip = tooltip)
+				button.connect('clicked', self.on_xdg_button_clicked, result[0])
 
 			self.search_section_contents.show()
 			self.set_section_has_entries(self.search_section_slab)
