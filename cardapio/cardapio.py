@@ -428,6 +428,22 @@ class Cardapio(dbus.service.Object):
 		if (0 <= x <= w and 0 <= y <= h): 
 			return
 
+		# make sure resizing doesn't cause a focus-out event
+		window_x, window_y, window_w, window_h = self.window.get_allocation()
+
+		if window_x <= x <= window_x + window_w and window_y <= y <= window_y + window_h:
+
+			mask = widget.window.get_pointer()[2]
+
+			if (
+				gtk.gdk.BUTTON1_MASK & mask == gtk.gdk.BUTTON1_MASK or
+				gtk.gdk.BUTTON2_MASK & mask == gtk.gdk.BUTTON2_MASK or
+				gtk.gdk.BUTTON3_MASK & mask == gtk.gdk.BUTTON3_MASK or
+				gtk.gdk.BUTTON4_MASK & mask == gtk.gdk.BUTTON4_MASK or
+				gtk.gdk.BUTTON5_MASK & mask == gtk.gdk.BUTTON5_MASK 
+				):
+				return
+
 		self.hide()
 
 
