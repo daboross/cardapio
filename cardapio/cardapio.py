@@ -356,9 +356,9 @@ class Cardapio(dbus.service.Object):
 		self.build_applications_list()
 
 		# slabs that should go *after* regular application slabs
-		self.add_hidden_session_slab()
-		self.add_hidden_system_slab()
-		self.add_hidden_search_results_slab()
+		self.add_system_slab()
+		self.add_session_slab()
+		self.add_search_results_slab()
 
 		self.build_favorites_list()
 		self.build_places_list()
@@ -894,14 +894,28 @@ class Cardapio(dbus.service.Object):
 
 	def build_help_list(self):
 
-		button_label = _('Help and Support')
-		button_tooltip = _('Get help with %s') % Cardapio.distro_name
+		items = [
+			[
+				'gnome-control-center', 
+				_('Control Center'), 
+				_('The Gnome configuration tool'), 
+				'gnome-control-center'
+			],
+			[
+				'gnome-help', 
+				_('Help and Support'), 
+				_('Get help with %s') % Cardapio.distro_name, 
+				'help-contents'
+			],
+		]
 
-		button = self.add_sidebar_button(button_label, 'help-contents', self.sideapp_pane, tooltip = button_tooltip, use_toggle_button = False)
-		button.connect('clicked', self.on_raw_button_clicked, 'gnome-help')
+		for item in items:
 
-		button = self.add_launcher_entry(button_label, 'help-contents', self.help_section_contents, tooltip = button_tooltip, app_list = self.app_list)
-		button.connect('clicked', self.on_raw_button_clicked, 'gnome-help')
+			button = self.add_sidebar_button(item[1], item[3], self.sideapp_pane, tooltip = item[2], use_toggle_button = False)
+			button.connect('clicked', self.on_raw_button_clicked, item[0])
+
+			button = self.add_launcher_entry(item[1], item[3], self.help_section_contents, tooltip = item[2], app_list = self.app_list)
+			button.connect('clicked', self.on_raw_button_clicked, item[0])
 
 
 	def build_places_list(self):
@@ -1036,7 +1050,6 @@ class Cardapio(dbus.service.Object):
 				button = self.add_button(button_label, 'system-shutdown', self.right_session_pane, tooltip = button_tooltip, is_launcher_button = True)
 				button.connect('clicked', self.on_shutdown_button_clicked)
 
-
 		if self.settings['show session buttons'] and (can_lock_screen or can_manage_session):
 			self.session_pane.show()
 		else:
@@ -1065,7 +1078,7 @@ class Cardapio(dbus.service.Object):
 				self.add_slab(node.name, node.icon, node.get_comment(), node = node, hide = False)
 
 
-	def add_slab(self, title_str, icon_name = None, tooltip = '', hide = True, node = None):
+	def add_slab(self, title_str, icon_name = None, tooltip = '', hide = False, node = None):
 
 		# add category to category pane
 		sidebar_button = self.add_sidebar_button(title_str, icon_name, self.category_pane, tooltip = tooltip)
@@ -1092,7 +1105,7 @@ class Cardapio(dbus.service.Object):
 
 	def add_help_slab(self):
 
-		section_slab, section_contents = self.add_slab(_('Help'), 'system-help')
+		section_slab, section_contents = self.add_slab(_('Help'), 'system-help', hide = True)
 		self.help_section_slab = section_slab
 		self.help_section_contents = section_contents
 
@@ -1110,24 +1123,24 @@ class Cardapio(dbus.service.Object):
 		self.favorites_section_contents = section_contents
 
 
-	def add_hidden_session_slab(self):
+	def add_session_slab(self):
 
-		section_slab, section_contents = self.add_slab(_('Session'), 'session-properties')
+		section_slab, section_contents = self.add_slab(_('Session'), 'session-properties', hide = True)
 		self.session_section_slab = section_slab
 		self.session_section_contents = section_contents
 
 
-	def add_hidden_system_slab(self):
+	def add_system_slab(self):
 
-		section_slab, section_contents = self.add_slab(_('System'), 'applications-system')
+		section_slab, section_contents = self.add_slab(_('System'), 'applications-system', hide = True)
 		self.system_section_slab = section_slab
 		self.system_section_contents = section_contents
 
 
-	def add_hidden_search_results_slab(self):
+	def add_search_results_slab(self):
 
 		# add system category to application pane
-		section_slab, section_contents = self.add_slab(_('Other Results'), 'system-search')
+		section_slab, section_contents = self.add_slab(_('Other Results'), 'system-search', hide = True)
 		self.search_section_slab = section_slab
 		self.search_section_contents = section_contents
 
