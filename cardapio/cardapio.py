@@ -311,14 +311,31 @@ class Cardapio(dbus.service.Object):
 		self.context_menu_xml = '''
 			<popup name="button3">
 				<menuitem name="Item 1" verb="Edit" label="%s" pixtype="stock" pixname="gtk-edit"/>
-				<menuitem name="Item 2" verb="About" label="%s" pixtype="stock" pixname="gtk-about"/>
+				<menuitem name="Item 2" verb="AboutCardapio" label="%s" pixtype="stock" pixname="gtk-about"/>
+				<separator />
+				<menuitem name="Item 3" verb="AboutGnome" label="%s" pixtype="stock" pixname="gtk-about"/>
+				<menuitem name="Item 4" verb="AboutDistro" label="%s" pixtype="stock" pixname="gtk-about"/>
 			</popup>
-			''' % (_('_Edit Menus'), _('_About Cardapio'))
+			''' % (
+				_('_Edit Menus'), 
+				_('_About Cardapio'), 
+				_('_About Gnome'), 
+				_('_About %s') % Cardapio.distro_name
+			)
+
+		# NOTE: pixtype="filename" should be used for both
+		# "gnome-logo-icon-transparent" and "distributor-logo", but it requires
+		# full paths :-/
+		#
+		# TODO:
+		# Maybe we can use pixtype="pixbuf" with get_pixbuf_icon() somehow...
 
 		self.context_menu_verbs = [
-				('Edit', self.launch_edit_app),
-				('About', self.open_about_dialog)
-				]
+			('Edit', self.launch_edit_app),
+			('AboutCardapio', self.open_about_dialog),
+			('AboutGnome', self.open_about_dialog),
+			('AboutDistro', self.open_about_dialog)
+		]
 
 		if self.panel_applet is not None:
 			self.panel_applet.connect('destroy', self.quit)
@@ -383,7 +400,15 @@ class Cardapio(dbus.service.Object):
 	
 	def open_about_dialog(self, widget, verb):
 
-		self.about_dialog.show()
+		if verb == 'AboutCardapio':
+			self.about_dialog.show()
+
+		elif verb == 'AboutGnome':
+			self.launch_raw('gnome-about')
+
+		elif verb == 'AboutDistro':
+			self.launch_raw('yelp ghelp:about-%s' % Cardapio.distro_name.lower())
+			# i'm assuming this is the pattern for all distros...
 
 
 	def on_about_dialog_close(self, widget, response = None):
@@ -899,13 +924,15 @@ class Cardapio(dbus.service.Object):
 				'gnome-control-center', 
 				_('Control Center'), 
 				_('The Gnome configuration tool'), 
-				'gnome-control-center'
+				'gnome-control-center',
+				self.system_section_contents
 			],
 			[
 				'gnome-help', 
 				_('Help and Support'), 
 				_('Get help with %s') % Cardapio.distro_name, 
-				'help-contents'
+				'help-contents',
+				self.help_section_contents
 			],
 		]
 
@@ -914,7 +941,7 @@ class Cardapio(dbus.service.Object):
 			button = self.add_sidebar_button(item[1], item[3], self.sideapp_pane, tooltip = item[2], use_toggle_button = False)
 			button.connect('clicked', self.on_raw_button_clicked, item[0])
 
-			button = self.add_launcher_entry(item[1], item[3], self.help_section_contents, tooltip = item[2], app_list = self.app_list)
+			button = self.add_launcher_entry(item[1], item[3], item[4], tooltip = item[2], app_list = self.app_list)
 			button.connect('clicked', self.on_raw_button_clicked, item[0])
 
 
@@ -1247,9 +1274,9 @@ class Cardapio(dbus.service.Object):
 		return section_slab, section_contents
 
 
-	def get_pixbuf_icon(self, icon_value, icon_size, default_icon = 'application-x-executable'):
+	def get_pixbuf_icon(self, icon_value, icon_size, fallback_icon = 'application-x-executable'):
 
-		if not icon_value: icon_value = default_icon
+		if not icon_value: icon_value = fallback_icon
 
 		if os.path.isabs(icon_value):
 			if os.path.isfile(icon_value):
@@ -1276,7 +1303,7 @@ class Cardapio(dbus.service.Object):
 		finally:
 			self.icon_theme.handler_unblock_by_func(self.on_icon_theme_changed)
 
-		return self.get_pixbuf_icon(default_icon, icon_size)
+		return self.get_pixbuf_icon(fallback_icon, icon_size)
 
 
 	def add_tree_to_app_list(self, tree, parent_widget, recursive = True):
