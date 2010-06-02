@@ -1351,22 +1351,26 @@ class Cardapio(dbus.service.Object):
 		self.search_section_contents = gtk.VBox()
 		container.add(self.search_section_contents)
 
-		if len(results):
+		has_valid_results = False
 
-			for result in results:
+		for result in results:
 
-				dummy, canonical_path = urllib2.splittype(result[0])
-				if not os.path.exists(canonical_path): continue
+			dummy, canonical_path = urllib2.splittype(result[0])
+			if not os.path.exists(canonical_path): continue
 
-				parent_name, child_name = os.path.split(result[0])
-				tooltip = urllib2.unquote(parent_name)
+			has_valid_results = True
 
-				icon_name = result[1].replace('/', '-')
-				if not self.icon_theme.has_icon(icon_name):
-					icon_name = 'text-x-generic'
+			parent_name, child_name = os.path.split(result[0])
+			tooltip = urllib2.unquote(parent_name)
 
-				button = self.add_launcher_entry(child_name, icon_name, self.search_section_contents, tooltip = tooltip)
-				button.connect('clicked', self.on_xdg_button_clicked, result[0])
+			icon_name = result[1].replace('/', '-')
+			if not self.icon_theme.has_icon(icon_name):
+				icon_name = 'text-x-generic'
+
+			button = self.add_launcher_entry(child_name, icon_name, self.search_section_contents, tooltip = tooltip)
+			button.connect('clicked', self.on_xdg_button_clicked, result[0])
+
+		if has_valid_results:
 
 			self.search_section_contents.show()
 			self.set_section_has_entries(self.search_section_slab)
@@ -1513,6 +1517,11 @@ class Cardapio(dbus.service.Object):
 
 
 	def consider_showing_no_results_text(self):
+
+		"""
+		Show the "No Results" text if there's no selected section, or if the
+		selected section is "Other results"
+		"""
 
 		if self.selected_section is None:
 			self.show_no_results_text()
