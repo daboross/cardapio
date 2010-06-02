@@ -4,8 +4,8 @@
   <!-- interface-naming-policy project-wide -->
   <object class="GtkWindow" id="MainWindow">
     <property name="title" translatable="yes">Cardapio</property>
-    <property name="default_width">450</property>
-    <property name="default_height">500</property>
+    <property name="default_width">520</property>
+    <property name="default_height">570</property>
     <property name="type_hint">menu</property>
     <property name="skip_taskbar_hint">True</property>
     <property name="skip_pager_hint">True</property>

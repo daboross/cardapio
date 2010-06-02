@@ -373,8 +373,8 @@ class Cardapio(dbus.service.Object):
 		self.build_applications_list()
 
 		# slabs that should go *after* regular application slabs
-		self.add_system_slab()
 		self.add_session_slab()
+		self.add_system_slab()
 		self.add_search_results_slab()
 
 		self.build_favorites_list()
