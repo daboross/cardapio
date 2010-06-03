@@ -1,8 +1,14 @@
-cardapio (0.9.41) lucid; urgency=low
+cardapio (0.9.41-ubuntu2) lucid; urgency=low
+
+  * Adding a missing dependency to the package
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 3 Jun 2010 14:00:00 -0400
+
+cardapio (0.9.41-ubuntu1) lucid; urgency=low
 
   * A few updates, but mostly trying to satisfy dependencies (still!)
 
- -- Thiago Teixeira <tvst@hotmail.com>  Mon, 17 May 2010 13:51:00 -0400
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 2 May 2010 15:15:00 -0400
 
 cardapio (0.9.4-ubuntu2) lucid; urgency=low
 
