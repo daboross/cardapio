@@ -559,6 +559,9 @@ class Cardapio(dbus.service.Object):
 		else:
 			self.consider_showing_no_results_text()
 
+		first_app_widget = self.get_first_visible_app()
+		first_app_widget.grab_default()
+
 
 	def schedule_search_with_tracker(self, text):
 
@@ -1026,6 +1029,12 @@ class Cardapio(dbus.service.Object):
 	def add_place(self, folder_name, folder_path, folder_icon):
 
 		folder_path = os.path.expanduser(folder_path.replace('$HOME', '~')).strip(' \n\r\t')
+
+		dummy, canonical_path = urllib2.splittype(folder_path)
+		canonical_path = self.unescape(canonical_path)
+
+		if not urllib2.posixpath.exists(canonical_path): return
+
 		button = self.add_launcher_entry(folder_name, folder_icon, self.places_section_contents, tooltip = folder_path, app_list = self.app_list)
 		button.connect('clicked', self.on_xdg_button_clicked, folder_path)
 
