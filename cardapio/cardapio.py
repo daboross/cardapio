@@ -559,9 +559,6 @@ class Cardapio(dbus.service.Object):
 		else:
 			self.consider_showing_no_results_text()
 
-		first_app_widget = self.get_first_visible_app()
-		first_app_widget.grab_default()
-
 
 	def schedule_search_with_tracker(self, text):
 
