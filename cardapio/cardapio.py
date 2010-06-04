@@ -60,7 +60,7 @@ _ = gettext.gettext
 # TODO: make a preferences window that exposes the options from .config/Cardapio/config.ini
 # TODO: make "places" use custom icons
 # TODO: fix Win+Space untoggle
-# TODO: fix tabbing of first_app_widget / first_result_widget  
+# TODO: fix tabbing of first_app_widget
 # TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
 # TODO: add mount points to "places", allow ejecting from context menu
 # TODO: multiple columns when window is wide enough (like gnome-control-center)
@@ -147,12 +147,12 @@ class Cardapio(dbus.service.Object):
 
 	def on_logout_button_clicked(self, widget):
 
-		self.do_session_action(False)
+		self.do_session_action(shutdown = False)
 
 
 	def on_shutdown_button_clicked(self, widget):
 
-		self.do_session_action(True)
+		self.do_session_action(shutdown = True)
 
 
 	def do_session_action(self, shutdown):
@@ -262,7 +262,6 @@ class Cardapio(dbus.service.Object):
 			self.settings[key] = s[key]
 		else: 
 			self.settings[key] = val
-
 
 
 	def save_config_file(self):
@@ -489,20 +488,20 @@ class Cardapio(dbus.service.Object):
 		self.schedule_rebuild()
 
 
-	def schedule_rebuild(self):
-
-		if self.rebuild_timer is not None:
-			glib.source_remove(self.rebuild_timer)
-
-		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.rebuild_ui)
-
-
 	def on_gtk_settings_changed(self, gobj, property_changed):
 
 		if property_changed.name == 'gtk-color-scheme'\
 				or property_changed.name == 'gtk-theme-name':
 			self.prepare_colors()
 			self.schedule_rebuild()
+
+
+	def schedule_rebuild(self):
+
+		if self.rebuild_timer is not None:
+			glib.source_remove(self.rebuild_timer)
+
+		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.rebuild_ui)
 
 
 	def on_menu_data_changed(self, tree):
@@ -575,8 +574,8 @@ class Cardapio(dbus.service.Object):
 		self.search_timer = None
 
 		# no .lower(), since there's no fn:lower-case in tracker (yet!)
-		#text = self.escape_quotes(text).lower()
-		text = self.escape_quotes(text)
+		#text = urllib2.quote(text).lower()
+		text = urllib2.quote(text)
 
 		self.tracker.SparqlQuery(
 			"""
@@ -584,8 +583,9 @@ class Cardapio(dbus.service.Object):
 				WHERE { 
 					?item a nie:InformationElement;
 						nie:url ?uri;
-						nie:mimeType ?mime.
-					FILTER (fn:contains(?uri, '%s'))
+						nie:mimeType ?mime;
+						tracker:available true.
+					FILTER (fn:contains(?uri, "%s"))
 					}
 				ORDER BY ASC(?uri)
 				LIMIT %d
@@ -1356,19 +1356,19 @@ class Cardapio(dbus.service.Object):
 		for result in results:
 
 			dummy, canonical_path = urllib2.splittype(result[0])
+			canonical_path = urllib2.unquote(canonical_path)
 			if not os.path.exists(canonical_path): continue
 
 			has_valid_results = True
 
-			parent_name, child_name = os.path.split(result[0])
-			tooltip = urllib2.unquote(parent_name)
+			parent_name, child_name = os.path.split(canonical_path)
 
 			icon_name = result[1].replace('/', '-')
 			if not self.icon_theme.has_icon(icon_name):
 				icon_name = 'text-x-generic'
 
-			button = self.add_launcher_entry(child_name, icon_name, self.search_section_contents, tooltip = tooltip)
-			button.connect('clicked', self.on_xdg_button_clicked, result[0])
+			button = self.add_launcher_entry(child_name, icon_name, self.search_section_contents, tooltip = canonical_path)
+			button.connect('clicked', self.on_xdg_button_clicked, canonical_path)
 
 		if has_valid_results:
 
