@@ -1,3 +1,9 @@
+cardapio (0.9.42-ubuntu1) lucid; urgency=low
+
+  * Fixed problems with unicode filenames (i.e. displaying, launching, and searching with tracker)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 4 Jun 2010 19:13:00 -0400
+
 cardapio (0.9.41-ubuntu2) lucid; urgency=low
 
   * Adding a missing dependency to the package
