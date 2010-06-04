@@ -1209,6 +1209,9 @@ class Cardapio(dbus.service.Object):
 		else:
 			button = gtk.ToggleButton()
 
+		button_str = self.unescape(button_str)
+		tooltip = self.unescape(tooltip)
+
 		label = gtk.Label(button_str)
 
 		if is_launcher_button:
@@ -1351,16 +1354,9 @@ class Cardapio(dbus.service.Object):
 		self.search_section_contents = gtk.VBox()
 		container.add(self.search_section_contents)
 
-		has_valid_results = False
-
 		for result in results:
 
 			dummy, canonical_path = urllib2.splittype(result[0])
-			canonical_path = urllib2.unquote(canonical_path)
-			if not os.path.exists(canonical_path): continue
-
-			has_valid_results = True
-
 			parent_name, child_name = os.path.split(canonical_path)
 
 			icon_name = result[1].replace('/', '-')
@@ -1370,7 +1366,7 @@ class Cardapio(dbus.service.Object):
 			button = self.add_launcher_entry(child_name, icon_name, self.search_section_contents, tooltip = canonical_path)
 			button.connect('clicked', self.on_xdg_button_clicked, canonical_path)
 
-		if has_valid_results:
+		if results:
 
 			self.search_section_contents.show()
 			self.set_section_has_entries(self.search_section_slab)
@@ -1433,7 +1429,7 @@ class Cardapio(dbus.service.Object):
 
 	def launch_xdg(self, path):
 
-		path = self.escape_quotes(path)
+		path = self.escape_quotes(self.unescape(path))
 		return self.launch_raw("xdg-open '%s'" % path)
 
 
@@ -1588,11 +1584,16 @@ class Cardapio(dbus.service.Object):
 		self.scroll_adjustment.set_value(0)
 
 
-	def escape_quotes(self, str):
+	def unescape(self, mystr):
 
-		str = re.sub("'", "\\'", str)
-		str = re.sub('"', '\\"', str)
-		return str
+		return urllib2.unquote(str(mystr)) # NOTE: it is possible that with python3 we will have to change this line
+
+
+	def escape_quotes(self, mystr):
+
+		mystr = re.sub("'", "\\'", mystr)
+		mystr = re.sub('"', '\\"', mystr)
+		return mystr
 
 
 def return_true(*dummy):
