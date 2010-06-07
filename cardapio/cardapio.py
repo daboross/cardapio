@@ -48,8 +48,11 @@ DIR = 'locale'
 
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
+if hasattr(gettext, 'bind_textdomain_codeset'):
+    gettext.bind_textdomain_codeset(APP,'UTF-8')
 gettext.textdomain(APP)
 _ = gettext.gettext
+
 
 # Before version 1.0:
 # TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
@@ -319,7 +322,7 @@ class Cardapio(dbus.service.Object):
 				_('_Edit Menus'), 
 				_('_About Cardapio'), 
 				_('_About Gnome'), 
-				_('_About %s') % Cardapio.distro_name
+				_('_About %(distro_name)s') % {'distro_name' : Cardapio.distro_name}
 			)
 
 		# NOTE: pixtype="filename" should be used for both
@@ -930,7 +933,7 @@ class Cardapio(dbus.service.Object):
 			[
 				'gnome-help', 
 				_('Help and Support'), 
-				_('Get help with %s') % Cardapio.distro_name, 
+				_('Get help with %(distro_name)s') % {'distro_name':Cardapio.distro_name}, 
 				'help-contents',
 				self.help_section_contents
 			],
@@ -1535,7 +1538,7 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			self.selected_section.hide()
-			self.show_no_results_text(_('No results to show in "%s"') % self.section_list[self.selected_section]['title'])
+			self.show_no_results_text(_('No results to show in "%(category_name)s"') % {'category_name': self.section_list[self.selected_section]['title']})
 
 
 	def hide_all_transitory_sections(self, fully_hide = False):
