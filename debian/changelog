@@ -1,4 +1,4 @@
-cardapio (0.9.5-ubuntu1) lucid; urgency=low
+cardapio (0.9.50-ubuntu1) lucid; urgency=low
 
   * Added the ability to do translations
   * Added the first translation: pt_BR
