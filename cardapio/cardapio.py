@@ -68,13 +68,7 @@ except Exception, exception:
 # set up translations
 
 APP = 'cardapio'
-
-# try local path for locale first (useful when coding)
 DIR = os.path.join(os.path.dirname(__file__), 'locale')
-
-# otherwise, use global locale (for when deployed)
-if not os.path.exists(DIR):
-	DIR = os.path.join(get_python_lib(), 'cardapio', 'locale')
 
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
@@ -101,6 +95,8 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
+	plugin_api_version = 1.0
+
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
@@ -113,13 +109,13 @@ class Cardapio(dbus.service.Object):
 		self.auto_toggled_sidebar_button = False
 		self.last_visibility_toggle = 0
 
+		self.visible = False
 		self.app_list = []
 		self.section_list = {}
 		self.selected_section = None
-
 		self.no_results_to_show = False
-
-		self.visible = False
+		self.plugin_files = []
+		self.active_plugins = []
 
 		self.app_tree = gmenu.lookup_tree('applications.menu')
 		self.sys_tree = gmenu.lookup_tree('settings.menu')
@@ -128,8 +124,8 @@ class Cardapio(dbus.service.Object):
 		self.exec_pattern = re.compile("^(.*?)\s+\%[a-zA-Z]$")
 		self.sanitize_query_pattern = re.compile("[^a-zA-Z0-9]")
 
-		self.set_up_dbus()
-		self.set_up_tracker_search()
+		self.setup_dbus()
+		self.setup_plugins()
 		self.setup_ui()
 
 		self.app_tree.add_monitor(self.on_menu_data_changed)
@@ -147,21 +143,48 @@ class Cardapio(dbus.service.Object):
 		gtk.main_quit()
 
 
-	def set_up_dbus(self):
+	def setup_dbus(self):
 
 		DBusGMainLoop(set_as_default=True)
 		self.bus = dbus.SessionBus()
 		dbus.service.Object.__init__(self, self.bus, Cardapio.bus_obj_str)
 
+	
+	def setup_plugins(self):
 
-	def set_up_tracker_search(self):
+		self.search_timer_local  = None
+		self.search_timer_remote = None
+		self.discover_plugins()
+		self.activate_plugins()
 
-		self.tracker = None
-		self.search_timer = None
 
-		if self.bus.request_name('org.freedesktop.Tracker1') == dbus.bus.REQUEST_NAME_REPLY_IN_QUEUE:
-			tracker_object = self.bus.get_object('org.freedesktop.Tracker1', '/org/freedesktop/Tracker1/Resources')
-			self.tracker = dbus.Interface(tracker_object, 'org.freedesktop.Tracker1.Resources') 
+	def activate_plugins(self):
+
+		self.active_plugins = []
+		
+		for active_plugin in self.settings['active plugins']:
+
+			active_plugin_file = active_plugin + '.py'
+
+			if active_plugin_file in self.plugin_files:
+
+				plugin_module = __import__('plugins.%s' % active_plugin, fromlist = active_plugin, level=-1)
+				plugin = plugin_module.CardapioPlugin(self.settings, self.handle_search_result, self.handle_search_error)
+				if plugin.plugin_api_version != Cardapio.plugin_api_version: continue
+
+				self.active_plugins.append(plugin)
+				
+
+	def discover_plugins(self):
+
+		plugin_dir = os.path.join(os.path.dirname(__file__), 'plugins')
+
+		for root, dir, files in os.walk(plugin_dir):
+			for file_ in files:
+				filename = os.path.join(root, file_)
+
+				if len(file_) > 3 and file_[-3:] == '.py':
+					self.plugin_files.append(file_)
 
 
 	def on_logout_button_clicked(self, widget):
@@ -261,14 +284,16 @@ class Cardapio(dbus.service.Object):
 		except  : pass
 		finally : config_file.close()
 
-		self.set_config_option(s, 'window size'             , None           ) # format: [px, px]
-		self.set_config_option(s, 'show session buttons'    , False          ) # bool
-		self.set_config_option(s, 'min search string length', 3              ) # characters
-		self.set_config_option(s, 'menu rebuild delay'      , 30             ) # seconds
-		self.set_config_option(s, 'search results limit'    , 15             ) # results
-		self.set_config_option(s, 'search update delay'     , 100            ) # msec
-		self.set_config_option(s, 'keybinding'              , '<Super>space' ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
-		self.set_config_option(s, 'applet label'            , Cardapio.distro_name) # string
+		self.set_config_option(s, 'window size'                , None           ) # format: [px, px]
+		self.set_config_option(s, 'show session buttons'       , False          ) # bool
+		self.set_config_option(s, 'min search string length'   , 3              ) # characters
+		self.set_config_option(s, 'menu rebuild delay'         , 30             ) # seconds
+		self.set_config_option(s, 'search results limit'       , 5              ) # results
+		self.set_config_option(s, 'local search update delay'  , 100            ) # msec
+		self.set_config_option(s, 'remote search update delay' , 300            ) # msec
+		self.set_config_option(s, 'keybinding'                 , '<Super>space' ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
+		self.set_config_option(s, 'applet label'               , Cardapio.distro_name) # string
+		self.set_config_option(s, 'active plugins'             , ['tracker', 'google']) # filenames
 
 		# this is useful so that the user can edit the config file on first-run 
 		# without need to quit cardapio first:
@@ -394,7 +419,7 @@ class Cardapio(dbus.service.Object):
 		# slabs that should go *after* regular application slabs
 		self.add_session_slab()
 		self.add_system_slab()
-		self.add_search_results_slab()
+		self.add_plugin_slabs()
 
 		self.build_favorites_list()
 		self.build_places_list()
@@ -550,13 +575,18 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			self.all_sections_sidebar_button.set_sensitive(True)
+			self.no_results_to_show = True
 
-		if self.tracker is not None:
+
+		if self.active_plugins:
+
 			if len(text) >= self.settings['min search string length']:
-				self.schedule_search_with_tracker(text)
+				self.schedule_search_with_plugin(text)
+
 			else:
-				self.set_section_is_empty(self.search_section_slab)
-				self.search_section_slab.hide()
+				for plugin in self.active_plugins:
+					self.set_section_is_empty(plugin.section_slab)
+					plugin.section_slab.hide()
 
 
 	def search_menus(self, text):
@@ -580,65 +610,114 @@ class Cardapio(dbus.service.Object):
 			self.consider_showing_no_results_text()
 
 
-	def schedule_search_with_tracker(self, text):
+	def schedule_search_with_plugin(self, text):
 
-		if self.search_timer is not None:
-			glib.source_remove(self.search_timer)
+		if self.search_timer_local is not None:
+			glib.source_remove(self.search_timer_local)
 
-		self.search_timer = glib.timeout_add(self.settings['search update delay'], self.search_with_tracker, text)
+		if self.search_timer_remote is not None:
+			glib.source_remove(self.search_timer_remote)
+
+		delay_type = 'local search update delay'
+		delay = self.settings[delay_type]
+		self.search_timer_local = glib.timeout_add(delay, self.search_with_plugin, text, delay_type)
+
+		delay_type = 'remote search update delay'
+		delay = self.settings[delay_type]
+		self.search_timer_remote = glib.timeout_add(delay, self.search_with_plugin, text, delay_type)
+
+		self.search_with_plugin(text, None)
 
 
-	def search_with_tracker(self, text):
+	def search_with_plugin(self, text, delay_type):
 
-		glib.source_remove(self.search_timer)
-		self.search_timer = None
+		if delay_type == 'local search update delay':
+			glib.source_remove(self.search_timer_local)
+			self.search_timer_local = None
 
-		# no .lower(), since there's no fn:lower-case in tracker (yet!)
-		#text = urllib2.quote(text).lower()
-		text = urllib2.quote(text)
+		elif delay_type == 'remote search update delay':
+			glib.source_remove(self.search_timer_remote)
+			self.search_timer_remote = None
 
-		self.tracker.SparqlQuery(
-			"""
-				SELECT ?uri ?mime
-				WHERE { 
-					?item a nie:InformationElement;
-						nie:url ?uri;
-						nie:mimeType ?mime;
-						tracker:available true.
-					FILTER (fn:contains(?uri, "%s"))
-					}
-				ORDER BY ASC(?uri)
-				LIMIT %d
-			""" 
-			% (text, self.settings['search results limit']),
-			dbus_interface='org.freedesktop.Tracker1.Resources',
-			reply_handler=self.handle_search_result,
-			error_handler=self.handle_search_error
-			)
-
-		# Things I've tried:
-		#
-		#			FILTER (fn:contains(?title, '%s'))
-		#
-		#			FILTER (regex(?title, '%s', 'i'))
-		#
-		#			?item fts:match '%s'.
-		#			ORDER BY DESC(fts:rank(?item))
-		#
-
-		# Tracker issues:
-		#
-		# - no support for fn:lower-case, so i can't do:
-		#
-		#       FILTER (fn:contains(fn:lower-case(?title), '%s'))
-		#
-		# - fts:match does not match source code! so not good for searching
-		# files in general, only documents.
-		#
-		# - regex works, but it's too slow for normal use...
+		for plugin in self.active_plugins:
+			if plugin.search_delay_type == delay_type:
+				if plugin.is_running: plugin.cancel()
+				plugin.is_running = True
+				plugin.search(text)
 
 		return False
 		# Required! makes this a "one-shot" timer, rather than "periodic"
+
+
+	def handle_search_error(self, plugin, error):
+
+		plugin.is_running = False
+		print('Plugin error: %s' % plugin.name)
+		print(error)
+
+
+	def handle_search_result(self, plugin, results):
+
+		plugin.is_running = False
+
+		if len(self.search_entry.get_text()) < self.settings['min search string length']:
+
+			# Handle the case where user presses backspace *very* quickly, and the
+			# search starts when len(text) > min_search_string_length, but after
+			# search_update_delay milliseconds this method is called while the
+			# search entry now has len(text) < min_search_string_length
+
+			# Anyways, it's hard to explain, but suffice to say it's a race
+			# condition and we handle it here.
+
+			self.set_section_is_empty(plugin.section_slab)
+			plugin.section_slab.hide()
+			return
+
+		gtk.gdk.threads_enter()
+
+		container = plugin.section_contents.parent
+		container.remove(plugin.section_contents)
+		plugin.section_contents = gtk.VBox()
+		container.add(plugin.section_contents)
+
+		for result in results:
+
+			dummy, canonical_path = urllib2.splittype(result['xdg uri'])
+			parent_name, child_name = os.path.split(canonical_path)
+
+			icon_name = result['icon name'].replace('/', '-')
+			if not self.icon_theme.has_icon(icon_name):
+				icon_name = 'text-x-generic'
+
+			button = self.add_launcher_entry(result['name'], icon_name, plugin.section_contents, tooltip = result['tooltip'])
+			button.connect('clicked', self.on_xdg_button_clicked, result['xdg uri'])
+
+		if results:
+
+			self.no_results_to_show = False
+
+			plugin.section_contents.show()
+			self.set_section_has_entries(plugin.section_slab)
+
+			if self.selected_section is None or self.selected_section == plugin.section_slab:
+				plugin.section_slab.show()
+				self.hide_no_results_text()
+
+			else:
+				self.consider_showing_no_results_text()
+
+		else:
+
+			self.set_section_is_empty(plugin.section_slab)
+
+			if self.selected_section is None or self.selected_section == plugin.section_slab:
+				plugin.section_slab.hide()
+
+			if self.no_results_to_show:
+				self.consider_showing_no_results_text()
+
+		gtk.gdk.threads_leave()
 
 
 	def is_searchfield_empty(self):
@@ -721,9 +800,6 @@ class Cardapio(dbus.service.Object):
 
 		else: return False
 		return True
-
-		# TODO: send all alphanumeric keys to entry field
-		# (or all non-tab, non-shift-tab, non-enter, non-esc, non-modifier keys)
 
 
 	# make Tab go from first result element to text entry widget
@@ -1190,12 +1266,15 @@ class Cardapio(dbus.service.Object):
 		self.system_section_contents = section_contents
 
 
-	def add_search_results_slab(self):
+	def add_plugin_slabs(self):
 
-		# add system category to application pane
-		section_slab, section_contents = self.add_slab(_('Other Results'), 'system-search', hide = True)
-		self.search_section_slab = section_slab
-		self.search_section_contents = section_contents
+		self.plugin_section_slabs = []
+
+		for plugin in self.active_plugins:
+
+			section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, hide = plugin.hide_from_sidebar)
+			plugin.section_slab = section_slab
+			plugin.section_contents = section_contents
 
 
 	def clear_pane(self, container):
@@ -1354,67 +1433,6 @@ class Cardapio(dbus.service.Object):
 		return has_no_leaves
 
 
-	def handle_search_error(self, error):
-
-		print(error)
-
-
-	def handle_search_result(self, results):
-
-		if len(self.search_entry.get_text()) < self.settings['min search string length']:
-
-			# Handle the case where user presses backspace *very* quickly, and the
-			# search starts when len(text) > min_search_string_length, but after
-			# search_update_delay milliseconds this method is called while the
-			# search entry now has len(text) < min_search_string_length
-
-			# Anyways, it's hard to explain, but suffice to say it's a race
-			# condition and we handle it here.
-
-			self.set_section_is_empty(self.search_section_slab)
-			self.search_section_slab.hide()
-			return
-
-		container = self.search_section_contents.parent
-		container.remove(self.search_section_contents)
-		self.search_section_contents = gtk.VBox()
-		container.add(self.search_section_contents)
-
-		for result in results:
-
-			dummy, canonical_path = urllib2.splittype(result[0])
-			parent_name, child_name = os.path.split(canonical_path)
-
-			icon_name = result[1].replace('/', '-')
-			if not self.icon_theme.has_icon(icon_name):
-				icon_name = 'text-x-generic'
-
-			button = self.add_launcher_entry(child_name, icon_name, self.search_section_contents, tooltip = canonical_path)
-			button.connect('clicked', self.on_xdg_button_clicked, canonical_path)
-
-		if results:
-
-			self.search_section_contents.show()
-			self.set_section_has_entries(self.search_section_slab)
-
-			if self.selected_section is None or self.selected_section == self.search_section_slab:
-				self.search_section_slab.show()
-				self.hide_no_results_text()
-
-			else:
-				self.consider_showing_no_results_text()
-
-		else:
-
-			self.set_section_is_empty(self.search_section_slab)
-
-			if self.selected_section is None or self.selected_section == self.search_section_slab:
-				self.search_section_slab.hide()
-
-			if self.no_results_to_show:
-				self.consider_showing_no_results_text()
-
-
 	def prepare_colors(self):
 
 		dummy_window = gtk.Window()
@@ -1546,7 +1564,10 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if self.selected_section is None:
-			self.show_no_results_text()
+
+			if self.no_results_to_show:
+				self.show_no_results_text()
+
 			return 
 			
 		if self.section_list[self.selected_section]['has-entries']:
@@ -1563,7 +1584,8 @@ class Cardapio(dbus.service.Object):
 		self.hide_section(self.help_section_slab   , fully_hide)
 		self.hide_section(self.session_section_slab, fully_hide)
 		self.hide_section(self.system_section_slab , fully_hide)
-		self.hide_section(self.search_section_slab , fully_hide)
+		
+		self.hide_plugin_sections(fully_hide)
 
 
 	def hide_section(self, section_slab, fully_hide = False):
@@ -1573,6 +1595,13 @@ class Cardapio(dbus.service.Object):
 			self.section_list[section_slab]['category'].hide()
 
 		section_slab.hide()
+
+
+	def hide_plugin_sections(self, fully_hide = False):
+
+		for plugin in self.active_plugins:
+			if plugin.hide_from_sidebar:
+				self.hide_section(plugin.section_slab, fully_hide)
 
 
 	def set_section_has_entries(self, section_slab):
@@ -1620,6 +1649,81 @@ class Cardapio(dbus.service.Object):
 		mystr = re.sub("'", "\\'", mystr)
 		mystr = re.sub('"', '\\"', mystr)
 		return mystr
+
+
+class CardapioPluginInterface:
+
+	author             = ''
+	name               = ''
+	description        = ''
+	version            = ''
+
+	plugin_api_version = 1.0
+
+	# one of: None, 'local search update delay', 'remote search update delay'
+	search_delay_type  = 'local search update delay'
+
+	category_name      = '' # use gettext for category
+	category_icon      = ''
+	hide_from_sidebar  = True
+
+	is_running = False
+
+	def __init__(self, settings, handle_search_result, handle_search_error):
+		"""
+		This constructor gets called whenever a plugin is activated.
+		(Typically once per session, unless the user is turning plugins on/off)
+		
+		Note: DO NOT WRITE ANYTHING IN THE settings DICT!!
+		"""
+		pass
+
+
+	def __del__(self):
+		"""
+		This destructor gets called whenever a plugin is deactivated
+		(Typically once per session, unless the user is turning plugins on/off)
+		"""
+		pass
+		
+
+	def search(self, text):
+		"""
+		REQUIRED 
+
+		This method gets called when a new text string is entered in the search
+		field. It must output a list where each item is a dicts following format
+		below:
+
+		item = {}
+
+		# required:
+		item['name'] = 'Music'
+		item['tooltip'] = 'Show your Music folder'
+		item['icon name'] = 'text-x-generic'
+		item['xdg uri'] = '~/Music' 
+
+		Where 'xdg uri' is a URI that works with the terminal command xdg-open
+		(in the future, 'xdg uri' will probably be optional, and you'll be able
+		to provide your own methods for handling the onclick even of the search
+		results)
+		"""
+		pass
+
+
+	def cancel(self):
+		"""
+		Cancels the current search operation.
+		"""
+		pass
+
+
+
+# make a few of useful modules and functions available to plugins
+import __builtin__
+__builtin__._ = _
+__builtin__.dbus = dbus
+__builtin__.CardapioPluginInterface = CardapioPluginInterface
 
 
 def return_true(*dummy):

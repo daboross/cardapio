@@ -35,7 +35,9 @@ if len(sys.argv) == 2:
 		applet_factory(app, None)
 		app.reparent(main_window)
 		main_window.show_all()
+		gtk.gdk.threads_enter()
 		gtk.main()
+		gtk.gdk.threads_leave()
 
 
 	elif sys.argv[1] == 'show':
@@ -43,7 +45,9 @@ if len(sys.argv) == 2:
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
 			del bus
 			Cardapio()
+			gtk.gdk.threads_enter()
 			gtk.main()
+			gtk.gdk.threads_leave()
 
 		else:
 			show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide')
@@ -55,7 +59,9 @@ if len(sys.argv) == 2:
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
 			del bus
 			Cardapio(hidden = True)
+			gtk.gdk.threads_enter()
 			gtk.main()
+			gtk.gdk.threads_leave()
 
 
 else:

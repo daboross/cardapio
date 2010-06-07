@@ -1,165 +1,164 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-06 20:21-0400\n"
+"POT-Creation-Date: 2010-06-07 19:18-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-06-07 07:56+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
 
-#: cardapio.py:222 cardapio.py:231
+#: cardapio.py:261 cardapio.py:270
 #, python-format
 msgid "Error! Path \"%s\" already exists!"
 msgstr ""
 
-#: cardapio.py:322
+#: cardapio.py:364
 msgid "_Edit Menus"
 msgstr ""
 
-#: cardapio.py:323
+#: cardapio.py:365
 msgid "_About Cardapio"
 msgstr ""
 
-#: cardapio.py:324
+#: cardapio.py:366
 msgid "_About Gnome"
 msgstr ""
 
-#: cardapio.py:325
+#: cardapio.py:367
 #, python-format
 msgid "_About %(distro_name)s"
 msgstr ""
 
-#: cardapio.py:361
+#: cardapio.py:403
 msgid "All"
 msgstr ""
 
-#: cardapio.py:361
+#: cardapio.py:403
 msgid "Show all categories"
 msgstr ""
 
-#: cardapio.py:928
+#: cardapio.py:1021
 msgid "Control Center"
 msgstr ""
 
-#: cardapio.py:929
+#: cardapio.py:1022
 msgid "The Gnome configuration tool"
 msgstr ""
 
-#: cardapio.py:935
+#: cardapio.py:1028
 msgid "Help and Support"
 msgstr ""
 
-#: cardapio.py:936
+#: cardapio.py:1029
 #, python-format
 msgid "Get help with %(distro_name)s"
 msgstr ""
 
-#: cardapio.py:953
+#: cardapio.py:1046
 msgid "Home"
 msgstr ""
 
-#: cardapio.py:953
+#: cardapio.py:1046
 msgid "Open your personal folder"
 msgstr ""
 
-#: cardapio.py:956
+#: cardapio.py:1049
 msgid "Computer"
 msgstr ""
 
-#: cardapio.py:956
+#: cardapio.py:1049
 msgid ""
 "Browse all local and remote disks and folders accessible from this computer"
 msgstr ""
 
-#: cardapio.py:967
+#: cardapio.py:1060
 msgid "Desktop"
 msgstr ""
 
-#: cardapio.py:988
+#: cardapio.py:1081
 msgid "Trash"
 msgstr ""
 
-#: cardapio.py:988
+#: cardapio.py:1081
 msgid "Open the trash"
 msgstr ""
 
-#: cardapio.py:1059
+#: cardapio.py:1152
 msgid "Lock Screen"
 msgstr ""
 
-#: cardapio.py:1060
+#: cardapio.py:1153
 msgid "Protect your computer from unauthorized use"
 msgstr ""
 
-#: cardapio.py:1071
+#: cardapio.py:1164
 msgid "Log Out..."
 msgstr ""
 
-#: cardapio.py:1072
+#: cardapio.py:1165
 msgid "Log out of this session to log in as a different user"
 msgstr ""
 
-#: cardapio.py:1080
+#: cardapio.py:1173
 msgid "Shut Down..."
 msgstr ""
 
-#: cardapio.py:1081
+#: cardapio.py:1174
 msgid "Shut down the system"
 msgstr ""
 
-#: cardapio.py:1144
+#: cardapio.py:1237
 msgid "Help"
 msgstr ""
 
-#: cardapio.py:1151
+#: cardapio.py:1244
 msgid "Places"
 msgstr ""
 
-#: cardapio.py:1151
+#: cardapio.py:1244
 msgid "Access documents and folders"
 msgstr ""
 
-#: cardapio.py:1157
+#: cardapio.py:1250
 msgid "Pinned items"
 msgstr ""
 
-#: cardapio.py:1157
+#: cardapio.py:1250
 msgid "Your favorite applications"
 msgstr ""
 
-#: cardapio.py:1164
+#: cardapio.py:1257
 msgid "Session"
 msgstr ""
 
-#: cardapio.py:1171
+#: cardapio.py:1264
 msgid "System"
 msgstr ""
 
-#: cardapio.py:1179
-msgid "Other Results"
-msgstr ""
-
-#: cardapio.py:1416
+#: cardapio.py:1451
 #, python-format
 msgid "No menu editing apps found! Tried these: %s"
 msgstr ""
 
-#: cardapio.py:1513
+#: cardapio.py:1548
 msgid "No results to show"
 msgstr ""
 
-#: cardapio.py:1541
+#: cardapio.py:1579
 #, python-format
 msgid "No results to show in \"%(category_name)s\""
 msgstr ""
 
-#: cardapio.py:1619
+#: cardapio.py:1740
 msgid "Access applications, folders, system settings, etc."
 msgstr ""
 

@@ -1,3 +1,16 @@
+cardapio (0.9.60-ubuntu2) lucid; urgency=low
+
+  * Now with plugin support
+  * Included plugins are: Tracker and Google Search
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 7 Jun 2010 19:16:00 -0400
+
+cardapio (0.9.50-ubuntu2) lucid; urgency=low
+
+  * Fixing setup.py to make the package build
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 7 Jun 2010 13:07:00 -0400
+
 cardapio (0.9.50-ubuntu1) lucid; urgency=low
 
   * Added the ability to do translations
