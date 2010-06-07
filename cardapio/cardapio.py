@@ -17,6 +17,27 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+# Before version 1.0:
+# TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
+# TODO: make applet extend in every direction
+# TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
+
+# After version 1.0:
+# TODO: make a preferences window that exposes the options from .config/Cardapio/config.ini
+# TODO: make "places" use custom icons
+# TODO: fix Win+Space untoggle
+# TODO: fix tabbing of first_app_widget
+# TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
+# TODO: add mount points to "places", allow ejecting from context menu
+# TODO: multiple columns when window is wide enough (like gnome-control-center)
+# TODO: slash "/" should navigate inside folders, Esc pops out
+# TODO: search results have context menu with "Open with...", "Show parent folder", and so on.
+# TODO: figure out if tracker can sort the results by relevancy
+# TODO: make on_icon_theme_changed / on_gtk_settings_changed more lightweight by keeping all themeable widgets in an array
+# TODO: add debug console window to cardapio, to facilitate debugging the applet
+# plus other TODO's elsewhere in the code...
+
+
 try:
 	import os
 	import re
@@ -37,42 +58,37 @@ try:
 	import dbus, dbus.service
 	from xdg import BaseDirectory, DesktopEntry
 	from dbus.mainloop.glib import DBusGMainLoop
+	from distutils.sysconfig import get_python_lib
 
 except Exception, exception:
 	print(exception)
 	sys.exit(1)
 
 
-APP = 'Cardapio'
-DIR = 'locale'
+# set up translations
+
+APP = 'cardapio'
+
+# try local path for locale first (useful when coding)
+DIR = os.path.join(os.path.dirname(__file__), 'locale')
+
+# otherwise, use global locale (for when deployed)
+if not os.path.exists(DIR):
+	DIR = os.path.join(get_python_lib(), 'cardapio', 'locale')
 
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
+
 if hasattr(gettext, 'bind_textdomain_codeset'):
-    gettext.bind_textdomain_codeset(APP,'UTF-8')
+    gettext.bind_textdomain_codeset(APP, 'UTF-8')
+
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-
-# Before version 1.0:
-# TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
-# TODO: make applet extend in every direction
-# TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
-
-# After version 1.0:
-# TODO: make a preferences window that exposes the options from .config/Cardapio/config.ini
-# TODO: make "places" use custom icons
-# TODO: fix Win+Space untoggle
-# TODO: fix tabbing of first_app_widget
-# TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
-# TODO: add mount points to "places", allow ejecting from context menu
-# TODO: multiple columns when window is wide enough (like gnome-control-center)
-# TODO: slash "/" should navigate inside folders, Esc pops out
-# TODO: search results have context menu with "Open with...", "Show parent folder", and so on.
-# TODO: figure out if tracker can sort the results by relevancy
-# TODO: make on_icon_theme_changed / on_gtk_settings_changed more lightweight by keeping all themeable widgets in an array
-# TODO: add debug console window to cardapio, to facilitate debugging the applet
-# plus other TODO's elsewhere in the code...
+# hack for making translations work with ui files
+import gtk.glade
+gtk.glade.bindtextdomain(APP, DIR)
+gtk.glade.textdomain(APP)
 
 
 class Cardapio(dbus.service.Object):
@@ -281,6 +297,7 @@ class Cardapio(dbus.service.Object):
 		self.uifile = os.path.join(cardapio_path, 'cardapio.ui')
 
 		self.builder = gtk.Builder()
+		self.builder.set_translation_domain(APP)
 		self.builder.add_from_file(self.uifile)
 		self.builder.connect_signals(self)
 

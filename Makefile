@@ -2,6 +2,7 @@
 #
 PYTHON=`which python`
 DESTDIR=/
+PYDIR=`python -c 'from distutils.sysconfig import get_python_lib; print(get_python_lib())'`
 
 all:
 	@echo "make install - Install on local system"
@@ -10,6 +11,8 @@ all:
 
 install:
 	$(PYTHON) setup.py install --root $(DESTDIR) $(COMPILE)
+	mkdir -p $(PYDIR)/cardapio/locale
+	cp -rf cardapio/locale $(PYDIR)/cardapio
 
 buildsrc:
 	debuild -S
