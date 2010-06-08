@@ -1,4 +1,5 @@
 import simplejson, urllib2, gio
+from glib import GError
 
 if '_' not in locals():
 	_ = lambda x: x
@@ -22,14 +23,17 @@ class CardapioPlugin(CardapioPluginInterface):
 	def __init__(self, settings, cardapio_result_handler, cardapio_error_handler):
 
 		self.query_url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=large&q=%s'
-		self.timeout = settings['remote search update delay'] * 2
-		self.search_results_limit = settings['search results limit']
+
+		#self.search_results_limit = settings['search results limit']
 		self.cardapio_result_handler = cardapio_result_handler
 		self.cardapio_error_handler = cardapio_error_handler
 		self.search_controller = gio.Cancellable()
 
 
 	def search(self, text):
+
+		# TODO: we should really check if there's an internet connection before
+		# proceeding...
 
 		text = urllib2.quote(text)
 		self.search_controller.reset()
@@ -46,7 +50,14 @@ class CardapioPlugin(CardapioPluginInterface):
 	
 	def handle_search_result(self, gdaemonfile = None, response = None):
 
-		response = self.stream.load_contents_finish(response)[0]
+		try:
+			response = self.stream.load_contents_finish(response)[0]
+
+		except GError, e:
+			# no need to worry if there's no response: maybe there's no internet
+			# connection...
+			return
+
 		raw_results = simplejson.loads(response)
 
 		parsed_results = [] 
@@ -65,4 +76,5 @@ class CardapioPlugin(CardapioPluginInterface):
 			parsed_results.append(item)
 
 		self.cardapio_result_handler(self, parsed_results)
+
 
