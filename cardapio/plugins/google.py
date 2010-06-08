@@ -38,7 +38,9 @@ class CardapioPlugin(CardapioPluginInterface):
 		text = urllib2.quote(text)
 		self.search_controller.reset()
 
-		self.stream = gio.File(self.query_url % text)
+		query = self.query_url % text
+
+		self.stream = gio.File(query)
 		self.stream.load_contents_async(self.handle_search_result, cancellable = self.search_controller)
 
 
@@ -56,6 +58,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		except GError, e:
 			# no need to worry if there's no response: maybe there's no internet
 			# connection...
+			self.cardapio_result_handler(self, [])
 			return
 
 		raw_results = simplejson.loads(response)
@@ -64,6 +67,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		if 'Error' in raw_results:
 			self.cardapio_error_handler(self, raw_results['Error'])
+			self.cardapio_result_handler(self, [])
 			return
 		
 		for raw_result in raw_results['responseData']['results']:

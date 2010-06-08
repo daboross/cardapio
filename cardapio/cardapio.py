@@ -570,6 +570,7 @@ class Cardapio(dbus.service.Object):
 
 	def on_searchentry_changed(self, widget):
 
+		self.no_results_to_show = True
 		text = self.search_entry.get_text().strip()
 
 		self.search_menus(text)
@@ -580,7 +581,6 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			self.all_sections_sidebar_button.set_sensitive(True)
-			self.no_results_to_show = True
 
 
 		if self.active_plugins:
@@ -608,6 +608,7 @@ class Cardapio(dbus.service.Object):
 			else:
 				app['button'].show()
 				self.set_section_has_entries(app['section'])
+				self.no_results_to_show = False
 
 		if self.selected_section is None:
 			self.show_all_nonempty_sections()
@@ -646,7 +647,7 @@ class Cardapio(dbus.service.Object):
 
 		for plugin in self.active_plugins:
 			if plugin.search_delay_type == delay_type:
-				if plugin.is_running: plugin.cancel()
+				#if plugin.is_running: plugin.cancel()
 				plugin.is_running = True
 				plugin.search(text)
 
@@ -719,8 +720,7 @@ class Cardapio(dbus.service.Object):
 			if self.selected_section is None or self.selected_section == plugin.section_slab:
 				plugin.section_slab.hide()
 
-			if self.no_results_to_show:
-				self.consider_showing_no_results_text()
+			self.consider_showing_no_results_text()
 
 		gtk.gdk.threads_leave()
 
