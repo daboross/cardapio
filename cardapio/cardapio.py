@@ -161,6 +161,10 @@ class Cardapio(dbus.service.Object):
 	def activate_plugins(self):
 
 		self.active_plugins = []
+
+		package_root = ''
+		if __package__ is not None:
+			package_root = __package__ + '.'
 		
 		for active_plugin in self.settings['active plugins']:
 
@@ -168,7 +172,8 @@ class Cardapio(dbus.service.Object):
 
 			if active_plugin_file in self.plugin_files:
 
-				plugin_module = __import__('plugins.%s' % active_plugin, fromlist = active_plugin, level=-1)
+				package = '%splugins.%s' % (package_root, active_plugin)
+				plugin_module = __import__(package, fromlist = 'CardapioPlugin', level = -1)
 				plugin = plugin_module.CardapioPlugin(self.settings, self.handle_search_result, self.handle_search_error)
 				if plugin.plugin_api_version != Cardapio.plugin_api_version: continue
 
@@ -290,7 +295,7 @@ class Cardapio(dbus.service.Object):
 		self.set_config_option(s, 'menu rebuild delay'         , 30             ) # seconds
 		self.set_config_option(s, 'search results limit'       , 5              ) # results
 		self.set_config_option(s, 'local search update delay'  , 100            ) # msec
-		self.set_config_option(s, 'remote search update delay' , 300            ) # msec
+		self.set_config_option(s, 'remote search update delay' , 500            ) # msec
 		self.set_config_option(s, 'keybinding'                 , '<Super>space' ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
 		self.set_config_option(s, 'applet label'               , Cardapio.distro_name) # string
 		self.set_config_option(s, 'active plugins'             , ['tracker', 'google']) # filenames
@@ -727,6 +732,9 @@ class Cardapio(dbus.service.Object):
 
 	def on_searchentry_activate(self, widget):
 
+		for plugin in self.active_plugins:
+			if plugin.is_running: plugin.cancel()
+
 		if self.is_searchfield_empty():
 			self.hide_all_transitory_sections()
 			return 
@@ -749,11 +757,9 @@ class Cardapio(dbus.service.Object):
 				visible_children = [c for c in contents.get_children() if c.get_property('visible')]
 
 				if visible_children:
-
 					self.window.set_focus(visible_children[0])
 
 			else:
-
 				first_app_widget = self.get_first_visible_app()
 				if first_app_widget is not None: 
 					self.window.set_focus(first_app_widget)
@@ -761,12 +767,13 @@ class Cardapio(dbus.service.Object):
 
 		elif event.keyval == gtk.gdk.keyval_from_name('Escape'):
 
-			if not self.is_searchfield_empty():
+			for plugin in self.active_plugins:
+				if plugin.is_running: plugin.cancel()
 
+			if not self.is_searchfield_empty():
 				self.clear_search_entry()
 
 			elif self.selected_section is not None:
-
 				self.show_all_nonempty_sections()
 
 			else:
