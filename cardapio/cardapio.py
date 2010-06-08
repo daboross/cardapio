@@ -575,12 +575,12 @@ class Cardapio(dbus.service.Object):
 		self.search_menus(text)
 
 		if len(text) == 0:
+			#self.no_results_to_show = False
 			self.hide_all_transitory_sections(fully_hide = True)
-			self.hide_no_results_text()
+			return
 
 		else:
 			self.all_sections_sidebar_button.set_sensitive(True)
-
 
 		if self.active_plugins:
 
@@ -1223,10 +1223,20 @@ class Cardapio(dbus.service.Object):
 		if hide:
 			sidebar_button.hide()
 			section_slab.hide()
-			self.section_list[section_slab] = {'has-entries': False, 'category': sidebar_button, 'contents': section_contents, 'title': title_str}
+			self.section_list[section_slab] = {
+					'has entries': False, 
+					'category': sidebar_button, 
+					'contents': section_contents, 
+					'title': title_str,
+					}
 
 		else:
-			self.section_list[section_slab] = {'has-entries': True, 'category': sidebar_button, 'contents': section_contents, 'title': title_str}
+			self.section_list[section_slab] = {
+					'has entries': True, 
+					'category': sidebar_button, 
+					'contents': section_contents, 
+					'title': title_str,
+					}
 
 		return section_slab, section_contents
 
@@ -1285,7 +1295,6 @@ class Cardapio(dbus.service.Object):
 	def clear_search_entry(self):
 
 		self.search_entry.set_text('')
-		self.hide_all_transitory_sections()
 
 
 	def add_sidebar_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = True):
@@ -1498,7 +1507,7 @@ class Cardapio(dbus.service.Object):
 		self.no_results_to_show = True
 
 		for sec in self.section_list:
-			if self.section_list[sec]['has-entries']:
+			if self.section_list[sec]['has entries']:
 				sec.show()
 				self.no_results_to_show = False
 			else:
@@ -1557,11 +1566,6 @@ class Cardapio(dbus.service.Object):
 
 	def consider_showing_no_results_text(self):
 
-		"""
-		Show the "No Results" text if there's no selected section, or if the
-		selected section is "Other results"
-		"""
-
 		if self.selected_section is None:
 
 			if self.no_results_to_show:
@@ -1569,7 +1573,7 @@ class Cardapio(dbus.service.Object):
 
 			return 
 			
-		if self.section_list[self.selected_section]['has-entries']:
+		if self.section_list[self.selected_section]['has entries']:
 			self.selected_section.show()
 			self.hide_no_results_text()
 
@@ -1590,7 +1594,7 @@ class Cardapio(dbus.service.Object):
 	def hide_section(self, section_slab, fully_hide = False):
 
 		if fully_hide:
-			self.section_list[section_slab]['has-entries'] = False
+			self.section_list[section_slab]['has entries'] = False
 			self.section_list[section_slab]['category'].hide()
 
 		section_slab.hide()
@@ -1605,13 +1609,13 @@ class Cardapio(dbus.service.Object):
 
 	def set_section_has_entries(self, section_slab):
 
-		self.section_list[section_slab]['has-entries'] = True
+		self.section_list[section_slab]['has entries'] = True
 		self.section_list[section_slab]['category'].show()
 
 
 	def set_section_is_empty(self, section_slab):
 
-		self.section_list[section_slab]['has-entries'] = False
+		self.section_list[section_slab]['has entries'] = False
 		self.section_list[section_slab]['category'].hide()
 
 
