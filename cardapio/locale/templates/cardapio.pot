@@ -1,0 +1,229 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-06-08 01:55-0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: cardapio.py:266 cardapio.py:275
+#, python-format
+msgid "Error! Path \"%s\" already exists!"
+msgstr ""
+
+#: cardapio.py:369
+msgid "_Edit Menus"
+msgstr ""
+
+#: cardapio.py:370
+msgid "_About Cardapio"
+msgstr ""
+
+#: cardapio.py:371
+msgid "_About Gnome"
+msgstr ""
+
+#: cardapio.py:372
+#, python-format
+msgid "_About %(distro_name)s"
+msgstr ""
+
+#: cardapio.py:408
+msgid "All"
+msgstr ""
+
+#: cardapio.py:408
+msgid "Show all categories"
+msgstr ""
+
+#: cardapio.py:1028
+msgid "Control Center"
+msgstr ""
+
+#: cardapio.py:1029
+msgid "The Gnome configuration tool"
+msgstr ""
+
+#: cardapio.py:1035
+msgid "Help and Support"
+msgstr ""
+
+#: cardapio.py:1036
+#, python-format
+msgid "Get help with %(distro_name)s"
+msgstr ""
+
+#: cardapio.py:1053
+msgid "Home"
+msgstr ""
+
+#: cardapio.py:1053
+msgid "Open your personal folder"
+msgstr ""
+
+#: cardapio.py:1056
+msgid "Computer"
+msgstr ""
+
+#: cardapio.py:1056
+msgid ""
+"Browse all local and remote disks and folders accessible from this computer"
+msgstr ""
+
+#: cardapio.py:1067
+msgid "Desktop"
+msgstr ""
+
+#: cardapio.py:1088
+msgid "Trash"
+msgstr ""
+
+#: cardapio.py:1088
+msgid "Open the trash"
+msgstr ""
+
+#: cardapio.py:1159
+msgid "Lock Screen"
+msgstr ""
+
+#: cardapio.py:1160
+msgid "Protect your computer from unauthorized use"
+msgstr ""
+
+#: cardapio.py:1171
+msgid "Log Out..."
+msgstr ""
+
+#: cardapio.py:1172
+msgid "Log out of this session to log in as a different user"
+msgstr ""
+
+#: cardapio.py:1180
+msgid "Shut Down..."
+msgstr ""
+
+#: cardapio.py:1181
+msgid "Shut down the system"
+msgstr ""
+
+#: cardapio.py:1244
+msgid "Help"
+msgstr ""
+
+#: cardapio.py:1251
+msgid "Places"
+msgstr ""
+
+#: cardapio.py:1251
+msgid "Access documents and folders"
+msgstr ""
+
+#: cardapio.py:1257
+msgid "Pinned items"
+msgstr ""
+
+#: cardapio.py:1257
+msgid "Your favorite applications"
+msgstr ""
+
+#: cardapio.py:1264
+msgid "Session"
+msgstr ""
+
+#: cardapio.py:1271
+msgid "System"
+msgstr ""
+
+#: cardapio.py:1458
+#, python-format
+msgid "No menu editing apps found! Tried these: %s"
+msgstr ""
+
+#: cardapio.py:1555
+msgid "No results to show"
+msgstr ""
+
+#: cardapio.py:1586
+#, python-format
+msgid "No results to show in \"%(category_name)s\""
+msgstr ""
+
+#: cardapio.py:1752
+msgid "Access applications, folders, system settings, etc."
+msgstr ""
+
+#: cardapio.ui.h:1
+msgid "&#xA9; Thiago Teixeira 2010"
+msgstr ""
+
+#: cardapio.ui.h:2
+msgid ""
+"<big>Data has recently changed.</big>\n"
+"Rebuilding...\t"
+msgstr ""
+
+#: cardapio.ui.h:4
+msgid "Applet label:"
+msgstr ""
+
+#: cardapio.ui.h:5
+msgid "Cardapio"
+msgstr ""
+
+#: cardapio.ui.h:6
+msgid "GNU General Public License v2\t"
+msgstr ""
+
+#: cardapio.ui.h:7
+msgid "Interface"
+msgstr ""
+
+#: cardapio.ui.h:8
+msgid "Search"
+msgstr ""
+
+#: cardapio.ui.h:9
+msgid "Section Name"
+msgstr ""
+
+#: cardapio.ui.h:10
+msgid "Session buttons:"
+msgstr ""
+
+#: cardapio.ui.h:11
+msgid "Shortcut key:"
+msgstr ""
+
+#: cardapio.ui.h:12
+msgid "View"
+msgstr ""
+
+#: cardapio.ui.h:13
+msgid "page 2"
+msgstr ""
+
+#: cardapio.ui.h:14
+msgid "page 3"
+msgstr ""
+
+#: cardapio.ui.h:15
+msgid "show"
+msgstr ""
+
+#: plugins/google.py:17
+msgid "Web Results"
+msgstr ""
+
+#: plugins/tracker.py:17
+msgid "Local Results"
+msgstr ""
