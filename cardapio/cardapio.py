@@ -119,6 +119,8 @@ class Cardapio(dbus.service.Object):
 
 		self.app_tree = gmenu.lookup_tree('applications.menu')
 		self.sys_tree = gmenu.lookup_tree('settings.menu')
+		self.app_tree.add_monitor(self.on_menu_data_changed)
+		self.sys_tree.add_monitor(self.on_menu_data_changed)
 
 		# TODO: internationalize these
 		self.exec_pattern = re.compile("^(.*?)\s+\%[a-zA-Z]$")
@@ -127,9 +129,6 @@ class Cardapio(dbus.service.Object):
 		self.setup_dbus()
 		self.setup_plugins()
 		self.setup_ui()
-
-		self.app_tree.add_monitor(self.on_menu_data_changed)
-		self.sys_tree.add_monitor(self.on_menu_data_changed)
 
 		self.keybinding = self.settings['keybinding']
 		keybinder.bind(self.keybinding, self.show_hide)
@@ -1193,13 +1192,6 @@ class Cardapio(dbus.service.Object):
 
 
 	def build_system_list(self):
-
-		for node in self.sys_tree.root.contents:
-
-			if isinstance(node, gmenu.Entry):
-
-				button = self.add_sidebar_button(node.name, node.icon, self.sideapp_pane, tooltip = node.get_comment(), use_toggle_button = False)
-				button.connect('clicked', self.on_app_button_clicked, node.desktop_file_path)
 
 		self.add_tree_to_app_list(self.sys_tree.root, self.system_section_contents)
 
