@@ -1674,6 +1674,11 @@ class CardapioPluginInterface:
 	category_icon      = ''
 	hide_from_sidebar  = True
 
+	# TODO: add to the plugin API (post version 1.0):
+	# keyword  - plugin will only be executed if the keyword is the first word in the query
+	# shortcut - a letter or number so that Alt+letter selects this plugin's category
+	# what else?
+
 	is_running = False
 
 	def __init__(self, settings, handle_search_result, handle_search_error):
@@ -1699,7 +1704,7 @@ class CardapioPluginInterface:
 		REQUIRED 
 
 		This method gets called when a new text string is entered in the search
-		field. It must output a list where each item is a dicts following format
+		field. It must output a list where each item is a dict following format
 		below:
 
 		item = {}
