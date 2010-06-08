@@ -21,7 +21,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def __init__(self, settings, cardapio_result_handler, cardapio_error_handler):
 
-		self.query_url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&q=%s'
+		self.query_url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=large&q=%s'
 		self.timeout = settings['remote search update delay'] * 2
 		self.search_results_limit = settings['search results limit']
 		self.cardapio_result_handler = cardapio_result_handler
