@@ -40,6 +40,10 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		query = self.query_url % text
 
+		# TODO: I'm sure this is not the best way of doing remote procedure
+		# calls, but I can't seem to find anything that is this easy to use and
+		# compatible with gtk. Argh :(
+
 		self.stream = gio.File(query)
 		self.stream.load_contents_async(self.handle_search_result, cancellable = self.search_controller)
 
