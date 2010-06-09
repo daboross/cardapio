@@ -999,8 +999,8 @@ class Cardapio(dbus.service.Object):
 		else: #if bg_type == gnomeapplet.PIXMAP_BACKGROUND:
 			style = self.panel_button.style
 			style.bg_pixmap[gtk.STATE_NORMAL] = pixmap
-			style.bg_pixmap[gtk.STATE_INSENSITIVE] = pixmap
 			self.panel_button.parent.set_style(style)
+			self.panel_button.parent.set_style(style) # repetition is required to fix a weird drawing bug
 
 
 	def auto_toggle_panel_button(self, state):
