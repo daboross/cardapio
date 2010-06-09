@@ -51,6 +51,7 @@ try:
 	import locale
 	import urllib2
 	import gettext
+	import logging
 	import commands
 	import keybinder
 	import subprocess
@@ -63,7 +64,6 @@ try:
 except Exception, exception:
 	print(exception)
 	sys.exit(1)
-
 
 # set up translations
 
@@ -99,6 +99,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
+
+		logging.basicConfig(filename = '/tmp/cardapio.log', level = logging.DEBUG)
+		logging.info('----------------- Cardapio launched -----------------')
 
 		self.read_config_file()
 
@@ -976,39 +979,28 @@ class Cardapio(dbus.service.Object):
 			return True # required! or we get strange focus problems
 
 
-	def on_panel_change_background(self, widget, type, color, pixmap):
+	def on_panel_change_background(self, widget, bg_type, color, pixmap):
 
-		widget.set_style(None)
-		rc_style = gtk.RcStyle()
-		self.panel_applet.modify_style(rc_style)
+		self.panel_button.set_style(None)
 
-		if (type == gnomeapplet.NO_BACKGROUND):
+		clean_style = gtk.RcStyle()
+		self.panel_button.parent.modify_style(clean_style)
+
+		if bg_type == gnomeapplet.NO_BACKGROUND:
+			# TODO: fix bug where going from "Solid color" back to "None (use
+			# system theme)" causes cardapio to keep a "Solid color" background.
+			# This means I probably need to reset some theme-related property here,
+			# I just don't know what...
 			pass
 
-		elif (type == gnomeapplet.COLOR_BACKGROUND):
-			self.panel_applet.modify_bg(gtk.STATE_NORMAL, color)
+		elif bg_type == gnomeapplet.COLOR_BACKGROUND:
 			self.panel_button.parent.modify_bg(gtk.STATE_NORMAL, color)
 
-		elif (type == gnomeapplet.PIXMAP_BACKGROUND):
-			style = self.panel_applet.style
+		else: #if bg_type == gnomeapplet.PIXMAP_BACKGROUND:
+			style = self.panel_button.style
 			style.bg_pixmap[gtk.STATE_NORMAL] = pixmap
-			self.panel_applet.set_style(style)  
-			self.panel_button.parent.set_style(style) # TODO: make this transparent?
-
-
-	def on_applet_realize(self, widget):
-
-		panel = self.panel_applet.get_toplevel().window
-		panel_width, panel_height = panel.get_size()
-		applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
-	
-		#orientation = self.panel_applet.get_orient()
-	
-		#if orientation == gnomeapplet.ORIENT_UP or orientation == gnomeapplet.ORIENT_DOWN:
-		#	self.panel_button.set_size_request(-1, panel_height)
-	
-		#if orientation == gnomeapplet.ORIENT_LEFT or orientation == gnomeapplet.ORIENT_RIGHT:
-		#	self.panel_button.set_size_request(panel_width, -1)
+			style.bg_pixmap[gtk.STATE_INSENSITIVE] = pixmap
+			self.panel_button.parent.set_style(style)
 
 
 	def auto_toggle_panel_button(self, state):
@@ -1748,6 +1740,7 @@ def applet_factory(applet, iid):
 	button.set_tooltip_text(_('Access applications, folders, system settings, etc.'))
 	button_icon = gtk.image_new_from_icon_name('distributor-logo', gtk.ICON_SIZE_SMALL_TOOLBAR)
 	button.set_image(button_icon)
+	button.set_always_show_image(True)
 
 	menu = gtk.MenuBar()
 	menu.set_name('CardapioAppletMenu')
@@ -1786,8 +1779,8 @@ def applet_factory(applet, iid):
 		''')
 
 	applet.connect('change-background', cardapio.on_panel_change_background)
-	applet.connect('realize', cardapio.on_applet_realize)
 	applet.add(menu)
+	applet.set_applet_flags(gnomeapplet.EXPAND_MINOR)
 
 	applet.show_all()
 
