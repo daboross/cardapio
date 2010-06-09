@@ -1000,6 +1000,7 @@ class Cardapio(dbus.service.Object):
 			style = self.panel_button.style
 			style.bg_pixmap[gtk.STATE_NORMAL] = pixmap
 			self.panel_button.parent.set_style(style)
+			self.panel_button.parent.set_style(style)
 			self.panel_button.parent.set_style(style) # repetition is required to fix a weird drawing bug
 
 
