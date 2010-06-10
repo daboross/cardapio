@@ -22,9 +22,16 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def __init__(self, settings, cardapio_result_handler, cardapio_error_handler):
 
-		self.query_url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=large&q=%s'
+		# The google search API only supports two sizes for the result list,
+		# that is: small (4 results) or large (8 results). So this plugin
+		# chooses the most appropriate given the 'search results limit' user
+		# preference.
 
-		#self.search_results_limit = settings['search results limit']
+		if settings['search results limit'] >= 8:
+			self.query_url = r'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=large&q=%s'
+		else:
+			self.query_url = r'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=small&q=%s'
+
 		self.cardapio_result_handler = cardapio_result_handler
 		self.cardapio_error_handler = cardapio_error_handler
 		self.search_controller = gio.Cancellable()

@@ -324,7 +324,7 @@ class Cardapio(dbus.service.Object):
 		self.set_config_option(s, 'menu rebuild delay'         , 10             ) # seconds
 		self.set_config_option(s, 'search results limit'       , 5              ) # results
 		self.set_config_option(s, 'local search update delay'  , 100            ) # msec
-		self.set_config_option(s, 'remote search update delay' , 500            ) # msec
+		self.set_config_option(s, 'remote search update delay' , 250            ) # msec
 		self.set_config_option(s, 'keybinding'                 , '<Super>space' ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
 		self.set_config_option(s, 'applet label'               , Cardapio.distro_name) # string
 		self.set_config_option(s, 'active plugins'             , ['tracker', 'google']) # filenames
