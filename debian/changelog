@@ -1,3 +1,9 @@
+cardapio (0.9.80-ubuntu1) lucid; urgency=low
+
+  * Added configuration window
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 9 Jun 2010 23:11:00 -0400
+
 cardapio (0.9.71-ubuntu1) lucid; urgency=low
 
   * Small change to fix a drawing bug in the applet
