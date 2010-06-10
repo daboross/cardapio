@@ -117,6 +117,7 @@ class Cardapio(dbus.service.Object):
 		self.section_list = {}
 		self.selected_section = None
 		self.no_results_to_show = False
+		self.keybinding = None
 		self.plugin_files = []
 		self.active_plugins = []
 
@@ -132,9 +133,6 @@ class Cardapio(dbus.service.Object):
 		self.setup_dbus()
 		self.setup_plugins()
 		self.setup_ui()
-
-		self.keybinding = self.settings['keybinding']
-		keybinder.bind(self.keybinding, self.show_hide)
 
 		if not hidden: self.show()
 
@@ -337,6 +335,7 @@ class Cardapio(dbus.service.Object):
 		self.window             = self.get_object('MainWindow')
 		self.message_window     = self.get_object('MessageWindow')
 		self.about_dialog       = self.get_object('AboutDialog')
+		self.options_dialog     = self.get_object('OptionsDialog')
 		self.application_pane   = self.get_object('ApplicationPane')
 		self.category_pane      = self.get_object('CategoryPane')
 		self.sideapp_pane       = self.get_object('SideappPane')
@@ -361,13 +360,15 @@ class Cardapio(dbus.service.Object):
 
 		self.context_menu_xml = '''
 			<popup name="button3">
-				<menuitem name="Item 1" verb="Edit" label="%s" pixtype="stock" pixname="gtk-edit"/>
-				<menuitem name="Item 2" verb="AboutCardapio" label="%s" pixtype="stock" pixname="gtk-about"/>
+				<menuitem name="Item 1" verb="Preferences" label="%s" pixtype="stock" pixname="gtk-preferences"/>
+				<menuitem name="Item 2" verb="Edit" label="%s" pixtype="stock" pixname="gtk-edit"/>
+				<menuitem name="Item 3" verb="AboutCardapio" label="%s" pixtype="stock" pixname="gtk-about"/>
 				<separator />
-				<menuitem name="Item 3" verb="AboutGnome" label="%s" pixtype="stock" pixname="gtk-about"/>
-				<menuitem name="Item 4" verb="AboutDistro" label="%s" pixtype="stock" pixname="gtk-about"/>
+				<menuitem name="Item 4" verb="AboutGnome" label="%s" pixtype="stock" pixname="gtk-about"/>
+				<menuitem name="Item 5" verb="AboutDistro" label="%s" pixtype="stock" pixname="gtk-about"/>
 			</popup>
 			''' % (
+				_('_Preferences'), 
 				_('_Edit Menus'), 
 				_('_About Cardapio'), 
 				_('_About Gnome'), 
@@ -383,6 +384,7 @@ class Cardapio(dbus.service.Object):
 
 		self.context_menu_verbs = [
 			('Edit', self.launch_edit_app),
+			('Preferences', self.open_options_dialog),
 			('AboutCardapio', self.open_about_dialog),
 			('AboutGnome', self.open_about_dialog),
 			('AboutDistro', self.open_about_dialog)
@@ -392,6 +394,24 @@ class Cardapio(dbus.service.Object):
 			self.panel_applet.connect('destroy', self.quit)
 
 		self.build_ui()
+		self.set_ui_from_options()
+
+
+	def set_ui_from_options(self):
+
+		if self.keybinding is not None:
+			keybinder.unbind(self.keybinding)
+
+		self.keybinding = self.settings['keybinding']
+		keybinder.bind(self.keybinding, self.show_hide)
+
+		if self.panel_button is not None:
+			self.panel_button.set_label(self.settings['applet label'])
+
+		if self.settings['show session buttons']:
+			self.session_pane.show()
+		else:
+			self.session_pane.hide()
 
 
 	def build_ui(self):
@@ -434,7 +454,7 @@ class Cardapio(dbus.service.Object):
 		self.build_system_list()
 		self.build_help_list()
 
-		self.show_message(False)
+		self.set_message_window_visible(False)
 
 
 	def rebuild_ui(self, show_message = False):
@@ -444,11 +464,34 @@ class Cardapio(dbus.service.Object):
 			self.rebuild_timer = None
 
 		if show_message:
-			self.show_message(True)
+			self.set_message_window_visible(True)
 
 		glib.idle_add(self.build_ui)
 
+
+	def on_options_apply_clicked(self, *dummy):
+
+		self.settings['keybinding'] = self.get_object('OptionKeybinding').get_text()
+		self.settings['applet label'] = self.get_object('OptionAppletLabel').get_text()
+		self.settings['show session buttons'] = self.get_object('OptionSessionButtons').get_active()
+
+		self.set_ui_from_options()
+
+
+	def open_options_dialog(self, widget, verb):
+
+		self.get_object('OptionKeybinding').set_text(self.settings['keybinding'])
+		self.get_object('OptionAppletLabel').set_text(self.settings['applet label'])
+		self.get_object('OptionSessionButtons').set_active(self.settings['show session buttons'])
+
+		self.options_dialog.show()
+
 	
+	def close_options_dialog(self, widget, response = None):
+
+		self.options_dialog.hide()
+
+
 	def open_about_dialog(self, widget, verb):
 
 		if verb == 'AboutCardapio':
@@ -833,6 +876,7 @@ class Cardapio(dbus.service.Object):
 			message_width, message_height = self.message_window.get_size()
 			offset_x = (window_width - message_width) / 2
 			offset_y = (window_height - message_height) / 2
+
 		else:
 			window = self.window
 			offset_x = offset_y = 0
@@ -861,7 +905,7 @@ class Cardapio(dbus.service.Object):
 		window_x = panel_x + applet_x
 		window_y = panel_y + applet_y + applet_height
 
-		# move window to one edge always matches some edge of the panel button 
+		# move window so one edge always matches some edge of the panel button 
 
 		if window_x + window_width > screen_width:
 			window_x = panel_x + applet_x + applet_width - window_width
@@ -889,15 +933,15 @@ class Cardapio(dbus.service.Object):
 		self.settings['window size'] = self.window.get_size()
 
 
-	def show_message(self, state = True):
+	def set_message_window_visible(self, state = True):
 
 		if state == False:
 			self.message_window.hide()
-			#self.message_window.set_keep_above(False)
 			return
 
 		self.reposition_window(is_message_window = True)
-		#self.message_window.set_keep_above(True)
+
+		self.message_window.set_keep_above(True)
 		self.show_window_on_top(self.message_window)
 
 		# ensure window is rendered immediately
@@ -1153,9 +1197,8 @@ class Cardapio(dbus.service.Object):
 			button = self.add_launcher_entry(button_label, 'system-lock-screen', self.session_section_contents, tooltip = button_tooltip, app_list = self.app_list)
 			button.connect('clicked', self.on_lockscreen_button_clicked)
 
-			if self.settings['show session buttons']:
-				button = self.add_button(button_label, 'system-lock-screen', self.left_session_pane, tooltip = button_tooltip, is_launcher_button = True)
-				button.connect('clicked', self.on_lockscreen_button_clicked)
+			button = self.add_button(button_label, 'system-lock-screen', self.left_session_pane, tooltip = button_tooltip, is_launcher_button = True)
+			button.connect('clicked', self.on_lockscreen_button_clicked)
 
 
 		if can_manage_session:
@@ -1165,23 +1208,16 @@ class Cardapio(dbus.service.Object):
 			button = self.add_launcher_entry(button_label, 'system-log-out', self.session_section_contents, tooltip = button_tooltip, app_list = self.app_list)
 			button.connect('clicked', self.on_logout_button_clicked)
 
-			if self.settings['show session buttons']:
-				button = self.add_button(button_label, 'system-log-out', self.right_session_pane, tooltip = button_tooltip, is_launcher_button = True)
-				button.connect('clicked', self.on_logout_button_clicked)
+			button = self.add_button(button_label, 'system-log-out', self.right_session_pane, tooltip = button_tooltip, is_launcher_button = True)
+			button.connect('clicked', self.on_logout_button_clicked)
 
 			button_label = _('Shut Down...')
 			button_tooltip = _('Shut down the system')
 			button = self.add_launcher_entry(button_label, 'system-shutdown', self.session_section_contents, tooltip = button_tooltip, app_list = self.app_list)
 			button.connect('clicked', self.on_shutdown_button_clicked)
 
-			if self.settings['show session buttons']:
-				button = self.add_button(button_label, 'system-shutdown', self.right_session_pane, tooltip = button_tooltip, is_launcher_button = True)
-				button.connect('clicked', self.on_shutdown_button_clicked)
-
-		if self.settings['show session buttons'] and (can_lock_screen or can_manage_session):
-			self.session_pane.show()
-		else:
-			self.session_pane.hide()
+			button = self.add_button(button_label, 'system-shutdown', self.right_session_pane, tooltip = button_tooltip, is_launcher_button = True)
+			button.connect('clicked', self.on_shutdown_button_clicked)
 
 
 	def build_system_list(self):
@@ -1737,7 +1773,6 @@ def applet_factory(applet, iid):
 
 	cardapio = Cardapio(hidden = True, panel_button = button, panel_applet = applet)
 
-	button.set_label(cardapio.settings['applet label'])
 	button.set_tooltip_text(_('Access applications, folders, system settings, etc.'))
 	button_icon = gtk.image_new_from_icon_name('distributor-logo', gtk.ICON_SIZE_SMALL_TOOLBAR)
 	button.set_image(button_icon)

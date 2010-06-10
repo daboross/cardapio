@@ -345,9 +345,9 @@
         <child>
           <object class="GtkAlignment" id="alignment1">
             <property name="visible">True</property>
-            <property name="top_padding">8</property>
-            <property name="left_padding">8</property>
-            <property name="right_padding">8</property>
+            <property name="top_padding">6</property>
+            <property name="left_padding">6</property>
+            <property name="right_padding">6</property>
             <child>
               <object class="GtkNotebook" id="notebook1">
                 <property name="visible">True</property>
@@ -390,7 +390,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkEntry" id="entry1">
+                          <object class="GtkEntry" id="OptionKeybinding">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="invisible_char">&#x2022;</property>
@@ -402,7 +402,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkCheckButton" id="checkbutton1">
+                          <object class="GtkCheckButton" id="OptionSessionButtons">
                             <property name="label" translatable="yes">Show session buttons in bottom pane</property>
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
@@ -417,7 +417,7 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkEntry" id="entry2">
+                          <object class="GtkEntry" id="OptionAppletLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="invisible_char">&#x2022;</property>
@@ -445,7 +445,6 @@
                 </child>
                 <child>
                   <object class="GtkAlignment" id="alignment3">
-                    <property name="visible">True</property>
                     <property name="top_padding">5</property>
                     <property name="bottom_padding">5</property>
                     <property name="left_padding">5</property>
@@ -513,7 +512,7 @@
             </child>
           </object>
           <packing>
-            <property name="position">1</property>
+            <property name="position">0</property>
           </packing>
         </child>
         <child internal-child="action_area">
@@ -521,17 +520,33 @@
             <property name="visible">True</property>
             <property name="layout_style">end</property>
             <child>
+              <object class="GtkButton" id="button2">
+                <property name="label">gtk-apply</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+                <signal name="clicked" handler="on_options_apply_clicked"/>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkButton" id="button1">
                 <property name="label">gtk-close</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
+                <signal name="clicked" handler="close_options_dialog"/>
               </object>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">0</property>
+                <property name="position">1</property>
               </packing>
             </child>
           </object>
@@ -544,6 +559,7 @@
       </object>
     </child>
     <action-widgets>
+      <action-widget response="0">button2</action-widget>
       <action-widget response="0">button1</action-widget>
     </action-widgets>
   </object>
@@ -639,11 +655,12 @@ Rebuilding...	</property>
   <object class="GtkMenu" id="CardapioContextMenu">
     <property name="visible">True</property>
     <child>
-      <object class="GtkMenuItem" id="menuitem1">
+      <object class="GtkImageMenuItem" id="menuitem1">
+        <property name="label">gtk-preferences</property>
         <property name="visible">True</property>
         <property name="tooltip_text" translatable="yes">Configure Cardapio's properties</property>
-        <property name="label" translatable="yes">Configure</property>
         <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
       </object>
     </child>
     <child>
@@ -651,7 +668,6 @@ Rebuilding...	</property>
         <property name="visible">True</property>
         <property name="tooltip_text" translatable="yes">Resize the Cardapio window</property>
         <property name="label" translatable="yes">Resize</property>
-        <property name="use_underline">True</property>
       </object>
     </child>
   </object>
