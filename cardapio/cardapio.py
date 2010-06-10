@@ -120,7 +120,7 @@ class Cardapio(dbus.service.Object):
 		self.keybinding              = None
 		self.search_timer_local      = None
 		self.search_timer_remote     = None
-		self.plugin_database         = []
+		self.plugin_database         = {}
 		self.active_plugin_instances = []
 
 		self.app_tree = gmenu.lookup_tree('applications.menu')
@@ -138,8 +138,8 @@ class Cardapio(dbus.service.Object):
 
 		self.setup_dbus()
 		self.setup_base_ui() # must be the first ui-related method to be called
+		self.build_ui() 
 		self.build_plugin_database() 
-		self.build_ui() # must go after build_plugin_database
 		self.setup_ui_from_settings() 
 
 		if not hidden: self.show()
@@ -172,7 +172,7 @@ class Cardapio(dbus.service.Object):
 
 	def build_plugin_database(self):
 
-		self.plugin_database = []
+		self.plugin_database = {}
 		plugin_dir = os.path.join(os.path.dirname(__file__), 'plugins')
 
 		for root, dir_, files in os.walk(plugin_dir):
@@ -186,15 +186,14 @@ class Cardapio(dbus.service.Object):
 					plugin_class = self.get_plugin_class(short_filename)
 					if plugin_class is None: continue
 
-					self.plugin_database.append({
-						'short_filename' : short_filename,
+					self.plugin_database[short_filename] = {
 						'name' : plugin_class.name,
 						'author' : plugin_class.author,
 						'description' : plugin_class.description,
 						'category name' : plugin_class.category_name,
 						'category icon' : plugin_class.category_icon,
 						'hide from sidebar' : plugin_class.hide_from_sidebar,
-						})
+						}
 
 
 	def activate_plugins_from_settings(self):
@@ -215,17 +214,15 @@ class Cardapio(dbus.service.Object):
 
 			plugin = plugin_class(self.settings, self.handle_search_result, self.handle_search_error)
 
-			plugin_info = [p for p in self.plugin_database if p['short_filename'] == short_filename]
-			if len(plugin_info) != 1:
-				# this should never happen
-				logging.error('Plugin error! Duplicate plugin in database: %s' % short_filename)
-				continue
+			section_slab, section_contents = self.add_plugin_slab(plugin)
 
-			plugin_info = plugin_info[0]
-			plugin.section_slab     = plugin_info['section slab']
+			plugin_info = self.plugin_database[short_filename]
+			plugin.short_filename = short_filename
+			plugin.section_slab     = section_slab
 			plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
 
 			self.active_plugin_instances.append(plugin)
+
 
 
 	def on_logout_button_clicked(self, widget):
@@ -481,7 +478,6 @@ class Cardapio(dbus.service.Object):
 		# slabs that should go *after* regular application slabs
 		self.add_session_slab()
 		self.add_system_slab()
-		self.add_plugin_slabs()
 
 		self.build_favorites_list()
 		self.build_places_list()
@@ -531,11 +527,15 @@ class Cardapio(dbus.service.Object):
 		self.plugin_tree_model = self.get_object('PluginListstore')
 		self.plugin_tree_model.clear()
 
-		for plugin_info in self.plugin_database:
+		# place active plugins at the top of the list, in order
+		plugin_list = []
+		plugin_list += [p.short_filename for p in self.active_plugin_instances]
+		plugin_list += [short_filename for short_filename in self.plugin_database if short_filename not in plugin_list]
 
-			short_filename = plugin_info['short_filename']
+		for short_filename in plugin_list:
 
 			active = (short_filename in self.settings['active plugins'])
+			plugin_info = self.plugin_database[short_filename]
 
 			title = '<big><b>%(plugin_name)s</b></big>\n<i>by %(plugin_author)s</i>\n%(plugin_description)s' % {
 					'plugin_name' : plugin_info['name'],
@@ -1376,12 +1376,10 @@ class Cardapio(dbus.service.Object):
 		self.system_section_contents = section_contents
 
 
-	def add_plugin_slabs(self):
+	def add_plugin_slab(self, plugin):
 
-		for plugin_info in self.plugin_database:
-
-			section_slab, section_contents = self.add_slab(plugin_info['category name'], plugin_info['category icon'], hide = plugin_info['hide from sidebar'])
-			plugin_info['section slab'] = section_slab
+		section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, hide = plugin.hide_from_sidebar)
+		return section_slab, section_contents
 
 
 	def clear_pane(self, container):
