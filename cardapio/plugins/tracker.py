@@ -6,8 +6,8 @@ if '_' not in locals():
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = 'Thiago Teixeira'
-	name               = 'Tracker plugin'
-	description        = 'Search local files and folders indexed with Tracker'
+	name               = _('Tracker plugin')
+	description        = _('Search local files and folders indexed with Tracker')
 	version            = '1.0'
 
 	plugin_api_version = 1.0

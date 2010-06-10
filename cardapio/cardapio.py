@@ -1753,8 +1753,8 @@ class Cardapio(dbus.service.Object):
 class CardapioPluginInterface:
 
 	author             = ''
-	name               = ''
-	description        = ''
+	name               = '' # use gettext for name
+	description        = '' # use gettext for description
 	version            = ''
 
 	plugin_api_version = 1.0

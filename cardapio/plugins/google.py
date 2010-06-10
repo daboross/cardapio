@@ -7,8 +7,8 @@ if '_' not in locals():
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = 'Thiago Teixeira'
-	name               = 'Google plugin'
-	description        = 'Perform quick Google searches'
+	name               = _('Google plugin')
+	description        = _('Perform quick Google searches')
 	version            = '1.0'
 
 	plugin_api_version = 1.0
