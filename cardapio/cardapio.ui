@@ -13,6 +13,7 @@
     <property name="decorated">False</property>
     <property name="mnemonics_visible">False</property>
     <signal name="destroy" handler="on_mainwindow_destroy"/>
+    <signal name="button_press_event" handler="on_mainwindow_button_press"/>
     <signal name="key_press_event" handler="on_mainwindow_after_key_press" after="yes"/>
     <signal name="key_press_event" handler="on_mainwindow_key_press"/>
     <signal name="focus_out_event" handler="on_mainwindow_focus_out"/>
@@ -23,14 +24,12 @@
         <property name="visible">True</property>
         <property name="resize_mode">queue</property>
         <child>
-          <object class="GtkAlignment" id="MainWindowMargin">
+          <object class="GtkTable" id="Margins">
             <property name="visible">True</property>
-            <property name="top_padding">4</property>
-            <property name="bottom_padding">4</property>
-            <property name="left_padding">4</property>
-            <property name="right_padding">4</property>
+            <property name="n_rows">3</property>
+            <property name="n_columns">3</property>
             <child>
-              <object class="GtkVBox" id="vbox3">
+              <object class="GtkVBox" id="MainWindowInnerArea">
                 <property name="visible">True</property>
                 <property name="spacing">4</property>
                 <child>
@@ -322,6 +321,74 @@
                   </packing>
                 </child>
               </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="right_attach">2</property>
+                <property name="top_attach">1</property>
+                <property name="bottom_attach">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEventBox" id="MarginTop">
+                <property name="height_request">4</property>
+                <property name="visible">True</property>
+                <signal name="button_press_event" handler="start_resize"/>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="right_attach">3</property>
+                <property name="y_options">GTK_FILL</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEventBox" id="MarginBottom">
+                <property name="height_request">4</property>
+                <property name="visible">True</property>
+                <signal name="button_press_event" handler="start_resize"/>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="right_attach">3</property>
+                <property name="top_attach">2</property>
+                <property name="bottom_attach">3</property>
+                <property name="y_options">GTK_FILL</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEventBox" id="MarginLeft">
+                <property name="width_request">4</property>
+                <property name="visible">True</property>
+                <signal name="button_press_event" handler="start_resize"/>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="top_attach">1</property>
+                <property name="bottom_attach">2</property>
+                <property name="x_options">GTK_FILL</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEventBox" id="MarginRight">
+                <property name="width_request">4</property>
+                <property name="visible">True</property>
+                <signal name="button_press_event" handler="start_resize"/>
+                <child>
+                  <placeholder/>
+                </child>
+              </object>
+              <packing>
+                <property name="left_attach">2</property>
+                <property name="right_attach">3</property>
+                <property name="top_attach">1</property>
+                <property name="bottom_attach">2</property>
+                <property name="x_options">GTK_FILL</property>
+              </packing>
             </child>
           </object>
         </child>
@@ -665,16 +732,18 @@ Rebuilding...	</property>
       <object class="GtkImageMenuItem" id="menuitem1">
         <property name="label">gtk-properties</property>
         <property name="visible">True</property>
-        <property name="tooltip_text" translatable="yes">Configure Cardapio's properties</property>
         <property name="use_underline">True</property>
         <property name="use_stock">True</property>
+        <signal name="activate" handler="open_options_dialog"/>
       </object>
     </child>
     <child>
-      <object class="GtkMenuItem" id="menuitem2">
+      <object class="GtkImageMenuItem" id="menuitem2">
+        <property name="label" translatable="yes">Edit Menus</property>
         <property name="visible">True</property>
-        <property name="tooltip_text" translatable="yes">Resize the Cardapio window</property>
-        <property name="label" translatable="yes">Resize</property>
+        <property name="image">image2</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="launch_edit_app"/>
       </object>
     </child>
   </object>
@@ -694,5 +763,9 @@ Rebuilding...	</property>
   <object class="GtkImage" id="image1">
     <property name="visible">True</property>
     <property name="icon_name">emblem-favorite</property>
+  </object>
+  <object class="GtkImage" id="image2">
+    <property name="visible">True</property>
+    <property name="stock">gtk-edit</property>
   </object>
 </interface>

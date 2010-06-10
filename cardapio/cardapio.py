@@ -375,6 +375,9 @@ class Cardapio(dbus.service.Object):
 		self.left_session_pane  = self.get_object('LeftSessionPane')
 		self.right_session_pane = self.get_object('RightSessionPane')
 
+		self.context_menu       = self.get_object('CardapioContextMenu')
+		self.app_context_menu   = self.get_object('AppContextMenu')
+
 		self.icon_theme = gtk.icon_theme_get_default()
 		self.icon_theme.connect('changed', self.on_icon_theme_changed)
 		self.icon_size_app = gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
@@ -412,8 +415,8 @@ class Cardapio(dbus.service.Object):
 		# Maybe we can use pixtype="pixbuf" with get_pixbuf_icon() somehow...
 
 		self.context_menu_verbs = [
-			('Edit', self.launch_edit_app),
 			('Properties', self.open_options_dialog),
+			('Edit', self.launch_edit_app),
 			('AboutCardapio', self.open_about_dialog),
 			('AboutGnome', self.open_about_dialog),
 			('AboutDistro', self.open_about_dialog)
@@ -514,7 +517,7 @@ class Cardapio(dbus.service.Object):
 		self.about_dialog.hide()
 
 
-	def open_options_dialog(self, widget, verb):
+	def open_options_dialog(self, *dummy):
 
 		self.get_object('OptionKeybinding').set_text(self.settings['keybinding'])
 		self.get_object('OptionAppletLabel').set_text(self.settings['applet label'])
@@ -579,6 +582,54 @@ class Cardapio(dbus.service.Object):
 		self.quit()
 
 
+	def on_mainwindow_button_press(self, widget, event):
+
+		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
+			self.context_menu.popup(None, None, None, event.button, event.time)
+
+
+	def start_resize(self, widget, event):
+
+		window_x, window_y = self.window.get_position()
+		x = event.x_root - window_x
+		y = event.y_root - window_y
+		window_width, window_height = self.window.get_size()
+		resize_margin = 10
+		
+		if x < resize_margin:
+
+			if y < resize_margin:
+				edge = gtk.gdk.WINDOW_EDGE_NORTH_WEST
+
+			elif y > window_height - resize_margin:
+				edge = gtk.gdk.WINDOW_EDGE_SOUTH_WEST
+
+			else:
+				edge = gtk.gdk.WINDOW_EDGE_WEST
+
+		elif x > window_width - resize_margin:
+
+			if y < resize_margin:
+				edge = gtk.gdk.WINDOW_EDGE_NORTH_EAST
+
+			elif y > window_height - resize_margin:
+				edge = gtk.gdk.WINDOW_EDGE_SOUTH_EAST
+
+			else:
+				edge = gtk.gdk.WINDOW_EDGE_EAST
+
+		else:
+			if y < resize_margin:
+				edge = gtk.gdk.WINDOW_EDGE_NORTH
+
+			else:
+				edge = gtk.gdk.WINDOW_EDGE_SOUTH
+		
+		x = int(event.x_root)
+		y = int(event.y_root)
+		self.window.window.begin_resize_drag(edge, event.button, x, y, event.time)
+
+
 	def on_mainwindow_key_press(self, widget, event):
 
 		if self.window.get_focus() != self.search_entry:
@@ -609,6 +660,10 @@ class Cardapio(dbus.service.Object):
 
 		# make sure clicking the applet button doesn't cause a focus-out event
 		if (0 <= x <= w and 0 <= y <= h): 
+			return
+
+		# make sure showing the context menu doesn't cause a focus-out event
+		if self.context_menu.get_visible() or self.app_context_menu.get_visible():
 			return
 
 		# make sure resizing doesn't cause a focus-out event
@@ -1112,8 +1167,6 @@ class Cardapio(dbus.service.Object):
 			style = self.panel_button.style
 			style.bg_pixmap[gtk.STATE_NORMAL] = pixmap
 			self.panel_button.parent.set_style(style)
-			self.panel_button.parent.set_style(style)
-			self.panel_button.parent.set_style(style) # repetition is required to fix a weird drawing bug
 
 
 	def auto_toggle_panel_button(self, state):
@@ -1543,7 +1596,7 @@ class Cardapio(dbus.service.Object):
 		self.get_object('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
 
 
-	def launch_edit_app(self, widget, verb):
+	def launch_edit_app(self, *dummy):
 
 		for app in  Cardapio.menu_editing_apps:
 			if self.launch_raw(app): return
