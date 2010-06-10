@@ -36,9 +36,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def search(self, text):
 
-		# no .lower(), since there's no fn:lower-case in tracker (yet!)
-		#text = urllib2.quote(text).lower()
-		text = urllib2.quote(text)
+		text = urllib2.quote(text).lower()
 
 		self.tracker.SparqlQuery(
 			"""
@@ -48,7 +46,7 @@ class CardapioPlugin(CardapioPluginInterface):
 						nie:url ?uri;
 						nie:mimeType ?mime;
 						tracker:available true.
-					FILTER (fn:contains(?uri, "%s"))
+					FILTER (fn:contains(fn:lower-case(?uri), "%s"))
 					}
 				ORDER BY ASC(?uri)
 				LIMIT %d

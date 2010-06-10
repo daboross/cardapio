@@ -19,22 +19,18 @@
 
 # Before version 1.0:
 # TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
-# TODO: make applet extend in every direction
 # TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
 
 # After version 1.0:
-# TODO: make a preferences window that exposes the options from .config/Cardapio/config.ini
 # TODO: make "places" use custom icons
-# TODO: fix Win+Space untoggle
-# TODO: fix tabbing of first_app_widget
+# TODO: fix shift-tab from first app widget
 # TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
 # TODO: add mount points to "places", allow ejecting from context menu
 # TODO: multiple columns when window is wide enough (like gnome-control-center)
 # TODO: slash "/" should navigate inside folders, Esc pops out
+# TODO: add "most recent" and "most frequent" with a zeitgeist plugin
 # TODO: search results have context menu with "Open with...", "Show parent folder", and so on.
 # TODO: figure out if tracker can sort the results by relevancy
-# TODO: make on_icon_theme_changed / on_gtk_settings_changed more lightweight by keeping all themeable widgets in an array
-# TODO: add debug console window to cardapio, to facilitate debugging the applet
 # plus other TODO's elsewhere in the code...
 
 
@@ -325,7 +321,7 @@ class Cardapio(dbus.service.Object):
 		self.set_config_option(s, 'window size'                , None           ) # format: [px, px]
 		self.set_config_option(s, 'show session buttons'       , False          ) # bool
 		self.set_config_option(s, 'min search string length'   , 3              ) # characters
-		self.set_config_option(s, 'menu rebuild delay'         , 30             ) # seconds
+		self.set_config_option(s, 'menu rebuild delay'         , 10             ) # seconds
 		self.set_config_option(s, 'search results limit'       , 5              ) # results
 		self.set_config_option(s, 'local search update delay'  , 100            ) # msec
 		self.set_config_option(s, 'remote search update delay' , 500            ) # msec
