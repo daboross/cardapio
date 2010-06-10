@@ -112,14 +112,16 @@ class Cardapio(dbus.service.Object):
 		self.auto_toggled_sidebar_button = False
 		self.last_visibility_toggle = 0
 
-		self.visible = False
-		self.app_list = []
-		self.section_list = {}
-		self.selected_section = None
-		self.no_results_to_show = False
-		self.keybinding = None
-		self.plugin_files = []
-		self.active_plugins = []
+		self.visible                 = False
+		self.app_list                = []
+		self.section_list            = {}
+		self.selected_section        = None
+		self.no_results_to_show      = False
+		self.keybinding              = None
+		self.search_timer_local      = None
+		self.search_timer_remote     = None
+		self.plugin_database         = []
+		self.active_plugin_instances = []
 
 		self.app_tree = gmenu.lookup_tree('applications.menu')
 		self.sys_tree = gmenu.lookup_tree('settings.menu')
@@ -130,9 +132,15 @@ class Cardapio(dbus.service.Object):
 		self.exec_pattern = re.compile("^(.*?)\s+\%[a-zA-Z]$")
 		self.sanitize_query_pattern = re.compile("[^a-zA-Z0-9]")
 
+		self.package_root = ''
+		if __package__ is not None:
+			self.package_root = __package__ + '.'
+
 		self.setup_dbus()
-		self.setup_plugins()
-		self.setup_ui()
+		self.setup_base_ui() # must be the first ui-related method to be called
+		self.build_plugin_database() 
+		self.build_ui() # must go after build_plugin_database
+		self.setup_ui_from_settings() 
 
 		if not hidden: self.show()
 
@@ -150,46 +158,74 @@ class Cardapio(dbus.service.Object):
 		dbus.service.Object.__init__(self, self.bus, Cardapio.bus_obj_str)
 
 	
-	def setup_plugins(self):
+	def get_plugin_class(self, short_filename):
 
-		self.search_timer_local  = None
-		self.search_timer_remote = None
-		self.discover_plugins()
-		self.activate_plugins()
+		package = '%splugins.%s' % (self.package_root, short_filename)
+		plugin_module = __import__(package, fromlist = 'CardapioPlugin', level = -1)
+		plugin_class = plugin_module.CardapioPlugin
+
+		if plugin_class.plugin_api_version != Cardapio.plugin_api_version: 
+			return None
+
+		return plugin_class
 
 
-	def activate_plugins(self):
+	def build_plugin_database(self):
 
-		self.active_plugins = []
-
-		package_root = ''
-		if __package__ is not None:
-			package_root = __package__ + '.'
-		
-		for active_plugin in self.settings['active plugins']:
-
-			active_plugin_file = active_plugin + '.py'
-
-			if active_plugin_file in self.plugin_files:
-
-				package = '%splugins.%s' % (package_root, active_plugin)
-				plugin_module = __import__(package, fromlist = 'CardapioPlugin', level = -1)
-				plugin = plugin_module.CardapioPlugin(self.settings, self.handle_search_result, self.handle_search_error)
-				if plugin.plugin_api_version != Cardapio.plugin_api_version: continue
-
-				self.active_plugins.append(plugin)
-				
-
-	def discover_plugins(self):
-
+		self.plugin_database = []
 		plugin_dir = os.path.join(os.path.dirname(__file__), 'plugins')
 
-		for root, dir, files in os.walk(plugin_dir):
-			for file_ in files:
-				filename = os.path.join(root, file_)
+		for root, dir_, files in os.walk(plugin_dir):
 
-				if len(file_) > 3 and file_[-3:] == '.py':
-					self.plugin_files.append(file_)
+			for file_ in files:
+
+				if len(file_) > 3 and file_[-3:] == '.py' and file_[0] != '_':
+
+					short_filename = file_[:-3]
+
+					plugin_class = self.get_plugin_class(short_filename)
+					if plugin_class is None: continue
+
+					self.plugin_database.append({
+						'short_filename' : short_filename,
+						'name' : plugin_class.name,
+						'author' : plugin_class.author,
+						'description' : plugin_class.description,
+						'category name' : plugin_class.category_name,
+						'category icon' : plugin_class.category_icon,
+						'hide from sidebar' : plugin_class.hide_from_sidebar,
+						})
+
+
+	def activate_plugins_from_settings(self):
+
+		for plugin in self.active_plugin_instances:
+			del(plugin)
+
+		self.active_plugin_instances = []
+
+		for short_filename in self.settings['active plugins']:
+
+			short_filename = str(short_filename)
+
+			plugin_class = self.get_plugin_class(short_filename)
+			if plugin_class is None: 
+				logging.error('Plugin error! Incorrect API version: %s' % short_filename)
+				continue
+
+			plugin = plugin_class(self.settings, self.handle_search_result, self.handle_search_error)
+
+			plugin_info = [p for p in self.plugin_database if p['short_filename'] == short_filename]
+			if len(plugin_info) != 1:
+				# this should never happen
+				logging.error('Plugin error! Duplicate plugin in database: %s' % short_filename)
+				continue
+
+			plugin_info = plugin_info[0]
+			plugin.section_slab     = plugin_info['section slab']
+			plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
+
+			self.active_plugin_instances.append(plugin)
 
 
 	def on_logout_button_clicked(self, widget):
@@ -319,7 +355,7 @@ class Cardapio(dbus.service.Object):
 		json.dump(self.settings, config_file, sort_keys = True, indent = 4)
 
 
-	def setup_ui(self):
+	def setup_base_ui(self):
 
 		self.rebuild_timer = None
 
@@ -360,7 +396,7 @@ class Cardapio(dbus.service.Object):
 
 		self.context_menu_xml = '''
 			<popup name="button3">
-				<menuitem name="Item 1" verb="Preferences" label="%s" pixtype="stock" pixname="gtk-preferences"/>
+				<menuitem name="Item 1" verb="Properties" label="%s" pixtype="stock" pixname="gtk-properties"/>
 				<menuitem name="Item 2" verb="Edit" label="%s" pixtype="stock" pixname="gtk-edit"/>
 				<menuitem name="Item 3" verb="AboutCardapio" label="%s" pixtype="stock" pixname="gtk-about"/>
 				<separator />
@@ -368,7 +404,7 @@ class Cardapio(dbus.service.Object):
 				<menuitem name="Item 5" verb="AboutDistro" label="%s" pixtype="stock" pixname="gtk-about"/>
 			</popup>
 			''' % (
-				_('_Preferences'), 
+				_('_Properties'), 
 				_('_Edit Menus'), 
 				_('_About Cardapio'), 
 				_('_About Gnome'), 
@@ -384,7 +420,7 @@ class Cardapio(dbus.service.Object):
 
 		self.context_menu_verbs = [
 			('Edit', self.launch_edit_app),
-			('Preferences', self.open_options_dialog),
+			('Properties', self.open_options_dialog),
 			('AboutCardapio', self.open_about_dialog),
 			('AboutGnome', self.open_about_dialog),
 			('AboutDistro', self.open_about_dialog)
@@ -393,11 +429,8 @@ class Cardapio(dbus.service.Object):
 		if self.panel_applet is not None:
 			self.panel_applet.connect('destroy', self.quit)
 
-		self.build_ui()
-		self.set_ui_from_options()
 
-
-	def set_ui_from_options(self):
+	def setup_ui_from_settings(self):
 
 		if self.keybinding is not None:
 			keybinder.unbind(self.keybinding)
@@ -412,6 +445,8 @@ class Cardapio(dbus.service.Object):
 			self.session_pane.show()
 		else:
 			self.session_pane.hide()
+
+		self.activate_plugins_from_settings()
 
 
 	def build_ui(self):
@@ -469,29 +504,6 @@ class Cardapio(dbus.service.Object):
 		glib.idle_add(self.build_ui)
 
 
-	def on_options_apply_clicked(self, *dummy):
-
-		self.settings['keybinding'] = self.get_object('OptionKeybinding').get_text()
-		self.settings['applet label'] = self.get_object('OptionAppletLabel').get_text()
-		self.settings['show session buttons'] = self.get_object('OptionSessionButtons').get_active()
-
-		self.set_ui_from_options()
-
-
-	def open_options_dialog(self, widget, verb):
-
-		self.get_object('OptionKeybinding').set_text(self.settings['keybinding'])
-		self.get_object('OptionAppletLabel').set_text(self.settings['applet label'])
-		self.get_object('OptionSessionButtons').set_active(self.settings['show session buttons'])
-
-		self.options_dialog.show()
-
-	
-	def close_options_dialog(self, widget, response = None):
-
-		self.options_dialog.hide()
-
-
 	def open_about_dialog(self, widget, verb):
 
 		if verb == 'AboutCardapio':
@@ -508,6 +520,62 @@ class Cardapio(dbus.service.Object):
 	def on_about_dialog_close(self, widget, response = None):
 
 		self.about_dialog.hide()
+
+
+	def open_options_dialog(self, widget, verb):
+
+		self.get_object('OptionKeybinding').set_text(self.settings['keybinding'])
+		self.get_object('OptionAppletLabel').set_text(self.settings['applet label'])
+		self.get_object('OptionSessionButtons').set_active(self.settings['show session buttons'])
+
+		self.plugin_tree_model = self.get_object('PluginListstore')
+		self.plugin_tree_model.clear()
+
+		for plugin_info in self.plugin_database:
+
+			short_filename = plugin_info['short_filename']
+
+			active = (short_filename in self.settings['active plugins'])
+
+			title = '<big><b>%(plugin_name)s</b></big>\n<i>by %(plugin_author)s</i>\n%(plugin_description)s' % {
+					'plugin_name' : plugin_info['name'],
+					'plugin_author': plugin_info['author'],
+					'plugin_description': plugin_info['description'],
+					}
+
+			self.plugin_tree_model.append([short_filename, active, title])
+
+		self.options_dialog.show()
+
+	
+	def close_options_dialog(self, widget, response = None):
+
+		self.options_dialog.hide()
+
+
+	def on_options_apply_clicked(self, *dummy):
+
+		self.settings['keybinding'] = self.get_object('OptionKeybinding').get_text()
+		self.settings['applet label'] = self.get_object('OptionAppletLabel').get_text()
+		self.settings['show session buttons'] = self.get_object('OptionSessionButtons').get_active()
+
+		self.settings['active plugins'] = []
+		iter_ = self.plugin_tree_model.get_iter_first()
+
+		while iter_ is not None:
+
+			if self.plugin_tree_model.get_value(iter_, 1):
+				self.settings['active plugins'].append(self.plugin_tree_model.get_value(iter_, 0))
+
+			iter_ = self.plugin_tree_model.iter_next(iter_)
+
+		self.setup_ui_from_settings()
+
+
+	def on_plugin_state_toggled(self, cell, path):
+
+		iter_ = self.plugin_tree_model.get_iter(path)
+		self.plugin_tree_model.set_value(iter_, 1, not cell.get_active())	
 
 
 	def on_mainwindow_destroy(self, widget):
@@ -628,13 +696,13 @@ class Cardapio(dbus.service.Object):
 		else:
 			self.all_sections_sidebar_button.set_sensitive(True)
 
-		if self.active_plugins:
+		if self.active_plugin_instances:
 
 			if len(text) >= self.settings['min search string length']:
-				self.schedule_search_with_plugin(text)
+				self.schedule_search_with_plugins(text)
 
 			else:
-				for plugin in self.active_plugins:
+				for plugin in self.active_plugin_instances:
 					self.set_section_is_empty(plugin.section_slab)
 					plugin.section_slab.hide()
 
@@ -661,7 +729,7 @@ class Cardapio(dbus.service.Object):
 			self.consider_showing_no_results_text()
 
 
-	def schedule_search_with_plugin(self, text):
+	def schedule_search_with_plugins(self, text):
 
 		if self.search_timer_local is not None:
 			glib.source_remove(self.search_timer_local)
@@ -671,16 +739,16 @@ class Cardapio(dbus.service.Object):
 
 		delay_type = 'local search update delay'
 		delay = self.settings[delay_type]
-		self.search_timer_local = glib.timeout_add(delay, self.search_with_plugin, text, delay_type)
+		self.search_timer_local = glib.timeout_add(delay, self.search_with_plugins, text, delay_type)
 
 		delay_type = 'remote search update delay'
 		delay = self.settings[delay_type]
-		self.search_timer_remote = glib.timeout_add(delay, self.search_with_plugin, text, delay_type)
+		self.search_timer_remote = glib.timeout_add(delay, self.search_with_plugins, text, delay_type)
 
-		self.search_with_plugin(text, None)
+		self.search_with_plugins(text, None)
 
 
-	def search_with_plugin(self, text, delay_type):
+	def search_with_plugins(self, text, delay_type):
 
 		if delay_type == 'local search update delay':
 			glib.source_remove(self.search_timer_local)
@@ -690,7 +758,7 @@ class Cardapio(dbus.service.Object):
 			glib.source_remove(self.search_timer_remote)
 			self.search_timer_remote = None
 
-		for plugin in self.active_plugins:
+		for plugin in self.active_plugin_instances:
 			if plugin.search_delay_type == delay_type:
 				#if plugin.is_running: plugin.cancel()
 				plugin.is_running = True
@@ -703,8 +771,8 @@ class Cardapio(dbus.service.Object):
 	def handle_search_error(self, plugin, error):
 
 		plugin.is_running = False
-		print('Plugin error: %s' % plugin.name)
-		print(error)
+		logging.error('Plugin error (%s):\n %s' % (plugin.name, error))
+		self.handle_search_result(plugin, [])
 
 
 	def handle_search_result(self, plugin, results):
@@ -728,6 +796,10 @@ class Cardapio(dbus.service.Object):
 		gtk.gdk.threads_enter()
 
 		container = plugin.section_contents.parent
+		if container is None:
+			# plugin was deactivated while waiting for search result
+			return
+
 		container.remove(plugin.section_contents)
 		plugin.section_contents = gtk.VBox()
 		container.add(plugin.section_contents)
@@ -777,7 +849,7 @@ class Cardapio(dbus.service.Object):
 
 	def on_searchentry_activate(self, widget):
 
-		for plugin in self.active_plugins:
+		for plugin in self.active_plugin_instances:
 			if plugin.is_running: plugin.cancel()
 
 		if self.is_searchfield_empty():
@@ -812,7 +884,7 @@ class Cardapio(dbus.service.Object):
 
 		elif event.keyval == gtk.gdk.keyval_from_name('Escape'):
 
-			for plugin in self.active_plugins:
+			for plugin in self.active_plugin_instances:
 				if plugin.is_running: plugin.cancel()
 
 			if not self.is_searchfield_empty():
@@ -1306,13 +1378,10 @@ class Cardapio(dbus.service.Object):
 
 	def add_plugin_slabs(self):
 
-		self.plugin_section_slabs = []
+		for plugin_info in self.plugin_database:
 
-		for plugin in self.active_plugins:
-
-			section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, hide = plugin.hide_from_sidebar)
-			plugin.section_slab = section_slab
-			plugin.section_contents = section_contents
+			section_slab, section_contents = self.add_slab(plugin_info['category name'], plugin_info['category icon'], hide = plugin_info['hide from sidebar'])
+			plugin_info['section slab'] = section_slab
 
 
 	def clear_pane(self, container):
@@ -1440,9 +1509,9 @@ class Cardapio(dbus.service.Object):
 			self.icon_theme.handler_block_by_func(self.on_icon_theme_changed)
 			return self.icon_theme.load_icon(icon_name, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
 		except:
-			for dir in BaseDirectory.xdg_data_dirs:
+			for dir_ in BaseDirectory.xdg_data_dirs:
 				for i in ('pixmaps', 'icons'):
-					path = os.path.join(dir, i, icon_value)
+					path = os.path.join(dir_, i, icon_value)
 					if os.path.isfile(path):
 						return gtk.gdk.pixbuf_new_from_file_at_size(path, icon_size, icon_size)
 		finally:
@@ -1608,7 +1677,7 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			self.selected_section.hide()
-			self.show_no_results_text(_('No results to show in "%(category_name)s"') % {'category_name': self.section_list[self.selected_section]['title']})
+			self.show_no_results_text(_('No results to show in "%(category_name)s"') % {'category name': self.section_list[self.selected_section]['title']})
 
 
 	def hide_all_transitory_sections(self, fully_hide = False):
@@ -1631,7 +1700,7 @@ class Cardapio(dbus.service.Object):
 
 	def hide_plugin_sections(self, fully_hide = False):
 
-		for plugin in self.active_plugins:
+		for plugin in self.active_plugin_instances:
 			if plugin.hide_from_sidebar:
 				self.hide_section(plugin.section_slab, fully_hide)
 
@@ -1761,6 +1830,7 @@ import __builtin__
 __builtin__._ = _
 __builtin__.dbus = dbus
 __builtin__.CardapioPluginInterface = CardapioPluginInterface
+__builtin__.logging = logging
 
 
 def return_true(*dummy):

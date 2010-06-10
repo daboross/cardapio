@@ -32,19 +32,19 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def search(self, text):
 
-		# TODO: we should really check if there's an internet connection before
-		# proceeding...
-
-		text = urllib2.quote(text)
-		self.search_controller.reset()
-
-		query = self.query_url % text
-
 		# TODO: I'm sure this is not the best way of doing remote procedure
 		# calls, but I can't seem to find anything that is this easy to use and
 		# compatible with gtk. Argh :(
 
+		# TODO: we should really check if there's an internet connection before
+		# proceeding...
+
+		text = urllib2.quote(text)
+
+		query = self.query_url % text
 		self.stream = gio.File(query)
+
+		self.search_controller.reset()
 		self.stream.load_contents_async(self.handle_search_result, cancellable = self.search_controller)
 
 
@@ -62,7 +62,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		except GError, e:
 			# no need to worry if there's no response: maybe there's no internet
 			# connection...
-			self.cardapio_result_handler(self, [])
+			self.cardapio_error_handler(self, 'no response')
 			return
 
 		raw_results = simplejson.loads(response)
@@ -71,7 +71,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		if 'Error' in raw_results:
 			self.cardapio_error_handler(self, raw_results['Error'])
-			self.cardapio_result_handler(self, [])
 			return
 		
 		for raw_result in raw_results['responseData']['results']:
