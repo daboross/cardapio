@@ -56,6 +56,7 @@ try:
 	from xdg import BaseDirectory, DesktopEntry
 	from dbus.mainloop.glib import DBusGMainLoop
 	from distutils.sysconfig import get_python_lib
+	from Alacarte.MenuEditor import MenuEditor
 
 except Exception, exception:
 	print(exception)
@@ -84,7 +85,6 @@ gtk.glade.textdomain(APP)
 class Cardapio(dbus.service.Object):
 
 	distro_name = commands.getoutput('lsb_release -is')
-	menu_editing_apps = ('alacarte', 'gmenu-simple-editor')
 
 	min_visibility_toggle_interval = 0.010 # seconds (this is a bit of a hack to fix some focus problems)
 
@@ -108,16 +108,18 @@ class Cardapio(dbus.service.Object):
 		self.auto_toggled_sidebar_button = False
 		self.last_visibility_toggle = 0
 
-		self.visible                 = False
-		self.app_list                = []
-		self.section_list            = {}
-		self.selected_section        = None
-		self.no_results_to_show      = False
-		self.keybinding              = None
-		self.search_timer_local      = None
-		self.search_timer_remote     = None
-		self.plugin_database         = {}
-		self.active_plugin_instances = []
+		self.visible                   = False
+		self.app_list                  = []
+		self.section_list              = {}
+		self.selected_section          = None
+		self.no_results_to_show        = False
+		self.previously_focused_widget = None
+		self.app_clicked               = None
+		self.keybinding                = None
+		self.search_timer_local        = None
+		self.search_timer_remote       = None
+		self.plugin_database           = {}
+		self.active_plugin_instances   = []
 
 		self.app_tree = gmenu.lookup_tree('applications.menu')
 		self.sys_tree = gmenu.lookup_tree('settings.menu')
@@ -374,9 +376,10 @@ class Cardapio(dbus.service.Object):
 		self.session_pane       = self.get_object('SessionPane')
 		self.left_session_pane  = self.get_object('LeftSessionPane')
 		self.right_session_pane = self.get_object('RightSessionPane')
-
 		self.context_menu       = self.get_object('CardapioContextMenu')
 		self.app_context_menu   = self.get_object('AppContextMenu')
+		self.pin_menuitem       = self.get_object('PinMenuItem')
+		self.unpin_menuitem     = self.get_object('UnpinMenuItem')
 
 		self.icon_theme = gtk.icon_theme_get_default()
 		self.icon_theme.connect('changed', self.on_icon_theme_changed)
@@ -582,7 +585,7 @@ class Cardapio(dbus.service.Object):
 		self.quit()
 
 
-	def on_mainwindow_button_press(self, widget, event):
+	def on_mainwindow_button_pressed(self, widget, event):
 
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 			self.context_menu.popup(None, None, None, event.button, event.time)
@@ -630,13 +633,16 @@ class Cardapio(dbus.service.Object):
 		self.window.window.begin_resize_drag(edge, event.button, x, y, event.time)
 
 
-	def on_mainwindow_key_press(self, widget, event):
+	def on_mainwindow_key_pressed(self, widget, event):
+
+		# make sure we aren't already at the search_entry, nor are we going
+		# there due to this keypress
 
 		if self.window.get_focus() != self.search_entry:
 			self.previously_focused_widget = self.window.get_focus()
 
 
-	def on_mainwindow_after_key_press(self, widget, event):
+	def on_mainwindow_after_key_pressed(self, widget, event):
 
 		w = self.window.get_focus()
 
@@ -723,7 +729,7 @@ class Cardapio(dbus.service.Object):
 		self.schedule_rebuild()
 
 
-	def on_searchentry_icon_press(self, widget, iconpos, event):
+	def on_searchentry_icon_pressed(self, widget, iconpos, event):
 
 		if self.is_searchfield_empty():
 			self.show_all_nonempty_sections()
@@ -914,7 +920,7 @@ class Cardapio(dbus.service.Object):
 		self.clear_search_entry()
 
 
-	def on_searchentry_key_press_event(self, widget, event):
+	def on_searchentry_key_pressed(self, widget, event):
 
 		# make Tab go to first result element
 		if event.keyval == gtk.gdk.keyval_from_name('Tab'):
@@ -964,7 +970,7 @@ class Cardapio(dbus.service.Object):
 		return None
 
 
-	def on_mainwindow_key_press_event(self, widget, event):
+	def on_mainwindow_key_pressed(self, widget, event):
 
 		if self.search_entry.is_focus(): return False
 
@@ -978,7 +984,7 @@ class Cardapio(dbus.service.Object):
 
 
 	# make Tab go from first result element to text entry widget
-	def on_first_button_key_press_event(self, widget, event):
+	def on_first_button_key_pressed(self, widget, event):
 
 		if event.keyval == gtk.gdk.keyval_from_name('ISO_Left_Tab'):
 
@@ -1128,7 +1134,7 @@ class Cardapio(dbus.service.Object):
 		window.window.focus() 
 
 
-	def on_panel_button_press(self, widget, event):
+	def on_panel_button_pressed(self, widget, event):
 		# used for the menu only
 
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
@@ -1474,7 +1480,7 @@ class Cardapio(dbus.service.Object):
 
 		if is_launcher_button:
 			icon_size = self.icon_size_app
-			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
+			label.modify_fg(gtk.STATE_NORMAL, self.style_appbutton_fg)
 		else:
 			icon_size = self.icon_size_category
 
@@ -1508,7 +1514,7 @@ class Cardapio(dbus.service.Object):
 		if section_title is not None:
 			label = section_slab.get_label_widget()
 			label.set_text(section_title)
-			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
+			label.modify_fg(gtk.STATE_NORMAL, self.style_appbutton_fg)
 
 		s = str(len(section_slab));
 		c = str(len(section_contents));
@@ -1576,7 +1582,8 @@ class Cardapio(dbus.service.Object):
 			if isinstance(node, gmenu.Entry):
 
 				button = self.add_launcher_entry(node.name, node.icon, parent_widget, tooltip = node.get_comment(), app_list = self.app_list)
-				button.connect('clicked', self.on_app_button_clicked, node.desktop_file_path)
+				button.connect('clicked', self.on_appbutton_clicked, node.desktop_file_path)
+				button.connect('button-press-event', self.on_appbutton_button_pressed, node)
 				has_no_leaves = False
 
 			elif isinstance(node, gmenu.Directory) and recursive:
@@ -1591,20 +1598,67 @@ class Cardapio(dbus.service.Object):
 		dummy_window = gtk.Window()
 		dummy_window.realize()
 		app_style = dummy_window.get_style()
-		self.style_app_button_bg = app_style.base[gtk.STATE_NORMAL]
-		self.style_app_button_fg = app_style.text[gtk.STATE_NORMAL]
-		self.get_object('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
+		self.style_appbutton_bg = app_style.base[gtk.STATE_NORMAL]
+		self.style_appbutton_fg = app_style.text[gtk.STATE_NORMAL]
+		self.get_object('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_appbutton_bg)
 
 
 	def launch_edit_app(self, *dummy):
 
-		for app in  Cardapio.menu_editing_apps:
-			if self.launch_raw(app): return
-
-		print(_('No menu editing apps found! Tried these: %s') % ', '.join(Cardapio.menu_editing_apps))
+		self.launch_raw('alacarte')
 
 
-	def on_app_button_clicked(self, widget, desktop_path):
+	def on_pin_this_app_clicked(self, widget):
+
+		# TODO: use the saved widget to extract: icon, name, comment, command.
+		# Then use editor.createItem(...)
+
+		editor = MenuEditor()
+
+		if type(self.app_clicked) is gmenu.Entry:
+			editor.copyItem(self.app_clicked, self.app_tree.root)
+
+		# TODO: figure out how to stop the menu from rebuilding, and instead
+		# rebuild it myself.
+
+
+	def on_unpin_this_app_clicked(self, widget):
+
+		editor = MenuEditor()
+		editor.deleteItem(self.app_clicked)
+
+		# TODO: figure out how to stop the menu from rebuilding, and instead
+		# rebuild it myself.
+
+
+	def on_appbutton_button_pressed(self, widget, event, app_info):
+
+		# for now, just return, since this feature is not ready
+		return
+
+		# TODO: save the widget instead of app_info
+
+		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
+
+			already_pinned = False
+
+			for node in self.app_tree.root.contents:
+				if node == app_info: 
+					already_pinned = True
+					break
+
+			if already_pinned:
+				self.pin_menuitem.hide()
+				self.unpin_menuitem.show()
+			else:
+				self.pin_menuitem.show()
+				self.unpin_menuitem.hide()
+
+			self.app_clicked = app_info
+			self.app_context_menu.popup(None, None, None, event.button, event.time)
+
+
+	def on_appbutton_clicked(self, widget, desktop_path):
 
 		if os.path.exists(desktop_path):
 
@@ -1900,7 +1954,7 @@ def applet_factory(applet, iid):
 	menu.add(button)
 
 	button.connect('button-press-event', cardapio.on_panel_button_toggled)
-	menu.connect('button-press-event', cardapio.on_panel_button_press)
+	menu.connect('button-press-event', cardapio.on_panel_button_pressed)
 
 	# make sure menuitem doesn't change focus on mouseout/mousein
 	button.connect('enter-notify-event', return_true)
