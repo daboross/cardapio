@@ -1198,19 +1198,32 @@ class Cardapio(dbus.service.Object):
 	def on_panel_button_pressed(self, widget, event):
 		# used for the menu only
 
-		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
-			widget.emit_stop_by_name('button-press-event')
-			self.panel_applet.setup_menu(self.context_menu_xml, self.context_menu_verbs, None)
+		if event.type == gtk.gdk.BUTTON_PRESS:
+
+			if event.button == 3:
+
+				widget.emit_stop_by_name('button-press-event')
+				self.panel_applet.setup_menu(self.context_menu_xml, self.context_menu_verbs, None)
+
+			if event.button == 2:
+
+				# make sure middle click does nothing, so it can be used to move
+				# the applet
+
+				widget.emit_stop_by_name('button-press-event')
+				self.hide()
 
 
 	def on_panel_button_toggled(self, widget, event):
 
-		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 1:
+		if event.type == gtk.gdk.BUTTON_PRESS:
 
-			if self.visible: self.hide()
-			else: self.show()
+			if event.button == 1:
 
-			return True # required! or we get strange focus problems
+				if self.visible: self.hide()
+				else: self.show()
+
+				return True # required! or we get strange focus problems
 
 
 	def on_panel_size_changed(self, widget, allocation):
