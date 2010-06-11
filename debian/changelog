@@ -1,3 +1,15 @@
+cardapio (0.9.90-ubuntu1) lucid; urgency=low
+
+  * Made icon changeable
+  * Made icon change size with panel
+  * Made applet change orientation with panel
+  * Added borders for resizing Cardapio
+  * Made the Tracker search be case insensitive
+  * And several other changes
+  * OMG we are fast approaching version 1.0!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 10 Jun 2010 23:01:00 -0400
+
 cardapio (0.9.80-ubuntu1) lucid; urgency=low
 
   * Added configuration window
