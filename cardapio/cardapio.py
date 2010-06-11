@@ -156,9 +156,9 @@ class Cardapio(dbus.service.Object):
 		dbus.service.Object.__init__(self, self.bus, Cardapio.bus_obj_str)
 
 	
-	def get_plugin_class(self, short_filename):
+	def get_plugin_class(self, basename):
 
-		package = '%splugins.%s' % (self.package_root, short_filename)
+		package = '%splugins.%s' % (self.package_root, basename)
 		plugin_module = __import__(package, fromlist = 'CardapioPlugin', level = -1)
 		plugin_class = plugin_module.CardapioPlugin
 
@@ -179,12 +179,12 @@ class Cardapio(dbus.service.Object):
 
 				if len(file_) > 3 and file_[-3:] == '.py' and file_[0] != '_':
 
-					short_filename = file_[:-3]
+					basename = file_[:-3]
 
-					plugin_class = self.get_plugin_class(short_filename)
+					plugin_class = self.get_plugin_class(basename)
 					if plugin_class is None: continue
 
-					self.plugin_database[short_filename] = {
+					self.plugin_database[basename] = {
 						'name' : plugin_class.name,
 						'author' : plugin_class.author,
 						'description' : plugin_class.description,
@@ -201,21 +201,21 @@ class Cardapio(dbus.service.Object):
 
 		self.active_plugin_instances = []
 
-		for short_filename in self.settings['active plugins']:
+		for basename in self.settings['active plugins']:
 
-			short_filename = str(short_filename)
+			basename = str(basename)
 
-			plugin_class = self.get_plugin_class(short_filename)
+			plugin_class = self.get_plugin_class(basename)
 			if plugin_class is None: 
-				logging.error('Plugin error! Incorrect API version: %s' % short_filename)
+				logging.error('Plugin error! Incorrect API version: %s' % basename)
 				continue
 
 			plugin = plugin_class(self.settings, self.handle_search_result, self.handle_search_error)
 
 			section_slab, section_contents = self.add_plugin_slab(plugin)
 
-			plugin_info = self.plugin_database[short_filename]
-			plugin.short_filename = short_filename
+			plugin_info = self.plugin_database[basename]
+			plugin.basename = basename
 			plugin.section_slab     = section_slab
 			plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
 
@@ -320,26 +320,30 @@ class Cardapio(dbus.service.Object):
 		except  : pass
 		finally : config_file.close()
 
-		self.set_config_option(s, 'window size'                , None           ) # format: [px, px]
-		self.set_config_option(s, 'show session buttons'       , False          ) # bool
-		self.set_config_option(s, 'min search string length'   , 3              ) # characters
-		self.set_config_option(s, 'menu rebuild delay'         , 10             ) # seconds
-		self.set_config_option(s, 'search results limit'       , 5              ) # results
-		self.set_config_option(s, 'local search update delay'  , 100            ) # msec
-		self.set_config_option(s, 'remote search update delay' , 250            ) # msec
-		self.set_config_option(s, 'keybinding'                 , '<Super>space' ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
-		self.set_config_option(s, 'applet label'               , Cardapio.distro_name) # string
-		self.set_config_option(s, 'active plugins'             , ['tracker', 'google']) # filenames
+		self.read_config_option(s, 'window size'                , None           ) # format: [px, px]
+		self.read_config_option(s, 'show session buttons'       , False          ) # bool
+		self.read_config_option(s, 'min search string length'   , 3              ) # characters
+		self.read_config_option(s, 'menu rebuild delay'         , 10             ) # seconds
+		self.read_config_option(s, 'search results limit'       , 5              ) # results
+		self.read_config_option(s, 'local search update delay'  , 100            ) # msec
+		self.read_config_option(s, 'remote search update delay' , 250            ) # msec
+		self.read_config_option(s, 'keybinding'                 , '<Super>space' ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
+		self.read_config_option(s, 'applet label'               , Cardapio.distro_name) # string
+		self.read_config_option(s, 'applet icon'                , 'distributor-logo', True) # string (either a path to the icon, or an icon name)
+		self.read_config_option(s, 'active plugins'             , ['tracker', 'google']) # filenames
 
 		# this is useful so that the user can edit the config file on first-run 
 		# without need to quit cardapio first:
 		self.save_config_file()
 
 
-	def set_config_option(self, s, key, val):
+	def read_config_option(self, s, key, val, override_empty = False):
 
 		if key in s:
-			self.settings[key] = s[key]
+			if override_empty and not s[key]:
+				self.settings[key] = val
+			else:
+				self.settings[key] = s[key]
 		else: 
 			self.settings[key] = val
 
@@ -383,8 +387,8 @@ class Cardapio(dbus.service.Object):
 
 		self.icon_theme = gtk.icon_theme_get_default()
 		self.icon_theme.connect('changed', self.on_icon_theme_changed)
-		self.icon_size_app = gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
-		self.icon_size_category = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
+		self.icon_size_app = gtk.ICON_SIZE_LARGE_TOOLBAR
+		self.icon_size_category = gtk.ICON_SIZE_MENU
 
 		# make sure buttons have icons!
 		self.gtk_settings = gtk.settings_get_default()
@@ -415,7 +419,7 @@ class Cardapio(dbus.service.Object):
 		# full paths :-/
 		#
 		# TODO:
-		# Maybe we can use pixtype="pixbuf" with get_pixbuf_icon() somehow...
+		# Maybe we can use pixtype="pixbuf" with get_icon() somehow...
 
 		self.context_menu_verbs = [
 			('Properties', self.open_options_dialog),
@@ -429,6 +433,34 @@ class Cardapio(dbus.service.Object):
 			self.panel_applet.connect('destroy', self.quit)
 
 
+	def get_best_stock_icon_size(self):
+
+			best_icon_size = 0
+			best_icon_diff = 100000000
+
+			panel = self.panel_button.get_toplevel().window
+
+			if panel is None: 
+				return gtk.ICON_SIZE_LARGE_TOOLBAR
+
+			panel_size = min(panel.get_size())
+
+			for icon_size in range(1,7):
+				icon_diff = abs(gtk.icon_size_lookup(icon_size)[0] - panel_size)
+				if icon_diff <= best_icon_diff:
+					best_icon_diff = icon_diff
+					best_icon_size = icon_size
+
+			return best_icon_size
+
+
+	def setup_panel_button(self):
+
+		self.panel_button.set_label(self.settings['applet label'])
+		button_icon = self.get_icon(self.settings['applet icon'], self.get_best_stock_icon_size(), 'distributor-logo')
+		self.panel_button.set_image(button_icon)
+
+
 	def setup_ui_from_settings(self):
 
 		if self.keybinding is not None:
@@ -438,7 +470,7 @@ class Cardapio(dbus.service.Object):
 		keybinder.bind(self.keybinding, self.show_hide)
 
 		if self.panel_button is not None:
-			self.panel_button.set_label(self.settings['applet label'])
+			self.setup_panel_button()
 
 		if self.settings['show session buttons']:
 			self.session_pane.show()
@@ -469,6 +501,12 @@ class Cardapio(dbus.service.Object):
 
 		self.no_results_slab, dummy, self.no_results_label = self.add_application_section('Dummy text')
 		self.hide_no_results_text()
+
+		if self.panel_applet is None:
+			self.get_object('LabelAppletLabel').hide()
+			self.get_object('OptionAppletLabel').hide()
+			self.get_object('LabelAppletIcon').hide()
+			self.get_object('OptionAppletIcon').hide()
 
 		# slabs that should go *before* regular application slabs
 		self.add_favorites_slab()
@@ -524,6 +562,7 @@ class Cardapio(dbus.service.Object):
 
 		self.get_object('OptionKeybinding').set_text(self.settings['keybinding'])
 		self.get_object('OptionAppletLabel').set_text(self.settings['applet label'])
+		self.get_object('OptionAppletIcon').set_text(self.settings['applet icon'])
 		self.get_object('OptionSessionButtons').set_active(self.settings['show session buttons'])
 
 		self.plugin_tree_model = self.get_object('PluginListstore')
@@ -531,13 +570,13 @@ class Cardapio(dbus.service.Object):
 
 		# place active plugins at the top of the list, in order
 		plugin_list = []
-		plugin_list += [p.short_filename for p in self.active_plugin_instances]
-		plugin_list += [short_filename for short_filename in self.plugin_database if short_filename not in plugin_list]
+		plugin_list += [p.basename for p in self.active_plugin_instances]
+		plugin_list += [basename for basename in self.plugin_database if basename not in plugin_list]
 
-		for short_filename in plugin_list:
+		for basename in plugin_list:
 
-			active = (short_filename in self.settings['active plugins'])
-			plugin_info = self.plugin_database[short_filename]
+			active = (basename in self.settings['active plugins'])
+			plugin_info = self.plugin_database[basename]
 
 			title = '<big><b>%(plugin_name)s</b></big>\n<i>by %(plugin_author)s</i>\n%(plugin_description)s' % {
 					'plugin_name' : plugin_info['name'],
@@ -545,7 +584,7 @@ class Cardapio(dbus.service.Object):
 					'plugin_description': plugin_info['description'],
 					}
 
-			self.plugin_tree_model.append([short_filename, active, title])
+			self.plugin_tree_model.append([basename, active, title])
 
 		self.options_dialog.show()
 
@@ -559,6 +598,7 @@ class Cardapio(dbus.service.Object):
 
 		self.settings['keybinding'] = self.get_object('OptionKeybinding').get_text()
 		self.settings['applet label'] = self.get_object('OptionAppletLabel').get_text()
+		self.settings['applet icon'] = self.get_object('OptionAppletIcon').get_text()
 		self.settings['show session buttons'] = self.get_object('OptionSessionButtons').get_active()
 
 		self.settings['active plugins'] = []
@@ -1152,6 +1192,25 @@ class Cardapio(dbus.service.Object):
 			return True # required! or we get strange focus problems
 
 
+	def on_panel_change_size(self, widget, allocation):
+
+		self.panel_applet.handler_block(self.size_allocate_handler)
+		self.setup_panel_button() 
+		glib.timeout_add(100, self.on_panel_change_size_done) # added this to avoid an infinite loop
+
+
+	def on_panel_change_size_done(self):
+
+		self.panel_applet.handler_unblock(self.size_allocate_handler)
+		return False # must return false to cancel the timer
+
+
+	def on_panel_change_orientation(self, *args):
+
+		# TODO: implement this
+		pass
+
+
 	def on_panel_change_background(self, widget, bg_type, color, pixmap):
 
 		self.panel_button.set_style(None)
@@ -1484,10 +1543,10 @@ class Cardapio(dbus.service.Object):
 		else:
 			icon_size = self.icon_size_category
 
-		icon_pixbuf = self.get_pixbuf_icon(icon_name, icon_size)
+		icon = self.get_icon(icon_name, icon_size)
 
 		hbox = gtk.HBox()
-		hbox.add(gtk.image_new_from_pixbuf(icon_pixbuf))
+		hbox.add(icon)
 		hbox.add(label)
 		hbox.set_spacing(5)
 		hbox.set_homogeneous(False)
@@ -1541,36 +1600,40 @@ class Cardapio(dbus.service.Object):
 		return section_slab, section_contents
 
 
-	def get_pixbuf_icon(self, icon_value, icon_size, fallback_icon = 'application-x-executable'):
 
-		if not icon_value: icon_value = fallback_icon
+	def get_icon(self, icon_value, icon_size, fallback_icon = 'application-x-executable'):
+
+		if not icon_value: 
+			icon_value = fallback_icon
+
+		icon_size_pixels = gtk.icon_size_lookup(icon_size)[0]
+
+		icon_pixbuf = None
+		icon_name = icon_value
 
 		if os.path.isabs(icon_value):
 			if os.path.isfile(icon_value):
-				try:
-					return gtk.gdk.pixbuf_new_from_file_at_size(icon_value, icon_size, icon_size)
-				except glib.GError:
-					return None
+				icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icon_value, icon_size_pixels, icon_size_pixels)
 			icon_name = os.path.basename(icon_value)
-		else:
-			icon_name = icon_value
 
 		if re.match('.*\.(png|xpm|svg)$', icon_name) is not None:
 			icon_name = icon_name[:-4]
 
-		try:
-			self.icon_theme.handler_block_by_func(self.on_icon_theme_changed)
-			return self.icon_theme.load_icon(icon_name, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
-		except:
-			for dir_ in BaseDirectory.xdg_data_dirs:
-				for i in ('pixmaps', 'icons'):
-					path = os.path.join(dir_, i, icon_value)
-					if os.path.isfile(path):
-						return gtk.gdk.pixbuf_new_from_file_at_size(path, icon_size, icon_size)
-		finally:
-			self.icon_theme.handler_unblock_by_func(self.on_icon_theme_changed)
+		if icon_pixbuf is None:
+			if self.icon_theme.has_icon(icon_name):
+				icon_pixbuf = self.icon_theme.load_icon(icon_name, icon_size_pixels, gtk.ICON_LOOKUP_FORCE_SIZE)
 
-		return self.get_pixbuf_icon(fallback_icon, icon_size)
+			else:
+				for dir_ in BaseDirectory.xdg_data_dirs:
+					for subdir in ('pixmaps', 'icons'):
+						path = os.path.join(dir_, subdir, icon_value)
+						if os.path.isfile(path):
+							icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, icon_size_pixels, icon_size_pixels)
+
+		if icon_pixbuf is None:
+			return gtk.image_new_from_icon_name(fallback_icon, icon_size)
+
+		return gtk.image_new_from_pixbuf(icon_pixbuf)
 
 
 	def add_tree_to_app_list(self, tree, parent_widget, recursive = True):
@@ -1945,8 +2008,6 @@ def applet_factory(applet, iid):
 	cardapio = Cardapio(hidden = True, panel_button = button, panel_applet = applet)
 
 	button.set_tooltip_text(_('Access applications, folders, system settings, etc.'))
-	button_icon = gtk.image_new_from_icon_name('distributor-logo', gtk.ICON_SIZE_SMALL_TOOLBAR)
-	button.set_image(button_icon)
 	button.set_always_show_image(True)
 
 	menu = gtk.MenuBar()
@@ -1985,11 +2046,14 @@ def applet_factory(applet, iid):
 		#widget "*Cardapio.*" style:highest "cardapio-applet-style"
 		''')
 
+	cardapio.size_allocate_handler = applet.connect('size-allocate', cardapio.on_panel_change_size)
+	applet.connect('change-orient', cardapio.on_panel_change_orientation)
 	applet.connect('change-background', cardapio.on_panel_change_background)
 	applet.add(menu)
 	applet.set_applet_flags(gnomeapplet.EXPAND_MINOR)
 
 	applet.show_all()
+	cardapio.setup_panel_button()
 
 	return True
 
