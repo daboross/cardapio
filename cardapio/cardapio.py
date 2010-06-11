@@ -19,7 +19,6 @@
 
 # Before version 1.0:
 # TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
-# TODO: handle left and right panel orientations (rotate menuitem), and change-orient signal
 
 # After version 1.0:
 # TODO: make "places" use custom icons
@@ -435,23 +434,24 @@ class Cardapio(dbus.service.Object):
 
 	def get_best_stock_icon_size(self):
 
-			best_icon_size = 0
-			best_icon_diff = 100000000
+		best_icon_size = 0
+		best_icon_diff = 100000000
 
-			panel = self.panel_button.get_toplevel().window
+		panel = self.panel_button.get_toplevel().window
 
-			if panel is None: 
-				return gtk.ICON_SIZE_LARGE_TOOLBAR
+		if panel is None: 
+			logging.debug(1)
+			return gtk.ICON_SIZE_LARGE_TOOLBAR
 
-			panel_size = min(panel.get_size())
+		panel_size = min(panel.get_size())
 
-			for icon_size in range(1,7):
-				icon_diff = abs(gtk.icon_size_lookup(icon_size)[0] - panel_size)
-				if icon_diff <= best_icon_diff:
-					best_icon_diff = icon_diff
-					best_icon_size = icon_size
+		for icon_size in range(1,7):
+			icon_diff = abs(gtk.icon_size_lookup(icon_size)[0] - panel_size)
+			if icon_diff <= best_icon_diff:
+				best_icon_diff = icon_diff
+				best_icon_size = icon_size
 
-			return best_icon_size
+		return best_icon_size
 
 
 	def setup_panel_button(self):
@@ -1068,7 +1068,7 @@ class Cardapio(dbus.service.Object):
 		if orientation == gnomeapplet.ORIENT_UP or orientation == gnomeapplet.ORIENT_DOWN:
 			applet_height = panel_height
 
-		if orientation == gnomeapplet.ORIENT_LEFT or orientation == gnomeapplet.ORIENT_RIGHT:
+		elif orientation == gnomeapplet.ORIENT_LEFT or orientation == gnomeapplet.ORIENT_RIGHT:
 			applet_width = panel_width
 
 		window_x = panel_x + applet_x
@@ -1192,28 +1192,42 @@ class Cardapio(dbus.service.Object):
 			return True # required! or we get strange focus problems
 
 
-	def on_panel_change_size(self, widget, allocation):
+	def on_panel_size_changed(self, widget, allocation):
 
 		self.panel_applet.handler_block(self.size_allocate_handler)
-		self.setup_panel_button() 
-		glib.timeout_add(100, self.on_panel_change_size_done) # added this to avoid an infinite loop
+		glib.timeout_add(100, self.setup_panel_button)
+		glib.timeout_add(200, self.on_panel_size_change_done) # added this to avoid an infinite loop
 
 
-	def on_panel_change_size_done(self):
+	def on_panel_size_change_done(self):
 
 		self.panel_applet.handler_unblock(self.size_allocate_handler)
 		return False # must return false to cancel the timer
 
 
-	def on_panel_change_orientation(self, *args):
+	def panel_change_orientation(self, *dummy):
 
-		# TODO: implement this
-		pass
+		orientation = self.panel_applet.get_orient()
+
+		if orientation == gnomeapplet.ORIENT_UP or orientation == gnomeapplet.ORIENT_DOWN:
+			self.panel_button.parent.set_child_pack_direction(gtk.PACK_DIRECTION_LTR)
+			self.panel_button.child.set_angle(0)
+			self.panel_button.child.set_alignment(0, 0.5)
+
+		elif orientation == gnomeapplet.ORIENT_RIGHT:
+			self.panel_button.parent.set_child_pack_direction(gtk.PACK_DIRECTION_BTT)
+			self.panel_button.child.set_angle(90)
+			self.panel_button.child.set_alignment(0.5, 0)
+
+		elif orientation == gnomeapplet.ORIENT_LEFT:
+			self.panel_button.parent.set_child_pack_direction(gtk.PACK_DIRECTION_TTB)
+			self.panel_button.child.set_angle(270)
+			self.panel_button.child.set_alignment(0.5, 0)
 
 
 	def on_panel_change_background(self, widget, bg_type, color, pixmap):
 
-		self.panel_button.set_style(None)
+		self.panel_button.parent.set_style(None)
 
 		clean_style = gtk.RcStyle()
 		self.panel_button.parent.modify_style(clean_style)
@@ -2046,14 +2060,16 @@ def applet_factory(applet, iid):
 		#widget "*Cardapio.*" style:highest "cardapio-applet-style"
 		''')
 
-	cardapio.size_allocate_handler = applet.connect('size-allocate', cardapio.on_panel_change_size)
-	applet.connect('change-orient', cardapio.on_panel_change_orientation)
-	applet.connect('change-background', cardapio.on_panel_change_background)
 	applet.add(menu)
-	applet.set_applet_flags(gnomeapplet.EXPAND_MINOR)
 
+	cardapio.size_allocate_handler = applet.connect('size-allocate', cardapio.on_panel_size_changed)
+	applet.connect('change-orient', cardapio.panel_change_orientation)
+	applet.connect('change-background', cardapio.on_panel_change_background)
+
+	applet.set_applet_flags(gnomeapplet.EXPAND_MINOR)
 	applet.show_all()
-	cardapio.setup_panel_button()
+
+	cardapio.panel_change_orientation()
 
 	return True
 
