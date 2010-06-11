@@ -440,7 +440,6 @@ class Cardapio(dbus.service.Object):
 		panel = self.panel_button.get_toplevel().window
 
 		if panel is None: 
-			logging.debug(1)
 			return gtk.ICON_SIZE_LARGE_TOOLBAR
 
 		panel_size = min(panel.get_size())
