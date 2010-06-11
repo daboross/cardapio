@@ -396,6 +396,15 @@ class Cardapio(dbus.service.Object):
 
 		self.window.set_keep_above(True)
 
+		self.get_object('MarginLeft').realize()
+		self.get_object('MarginRight').realize()
+		self.get_object('MarginTop').realize()
+		self.get_object('MarginBottom').realize()
+		self.get_object('MarginLeft').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_SIDE))
+		self.get_object('MarginRight').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.RIGHT_SIDE))
+		self.get_object('MarginTop').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.TOP_SIDE))
+		self.get_object('MarginBottom').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_SIDE))
+
 		self.context_menu_xml = '''
 			<popup name="button3">
 				<menuitem name="Item 1" verb="Properties" label="%s" pixtype="stock" pixname="gtk-properties"/>
