@@ -1,3 +1,9 @@
+cardapio (0.9.92-ubuntu1) lucid; urgency=low
+
+  * Fixed three bugs: #592571, #592618, #592630 
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 11 Jun 2010 13:27:00 -0400
+
 cardapio (0.9.91-ubuntu1) lucid; urgency=low
 
   * Added resize cursors to the margins

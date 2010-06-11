@@ -90,8 +90,8 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
+	version = '0.9.92'
 	plugin_api_version = 1.0
-
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
@@ -319,17 +319,19 @@ class Cardapio(dbus.service.Object):
 		except  : pass
 		finally : config_file.close()
 
-		self.read_config_option(s, 'window size'                , None           ) # format: [px, px]
-		self.read_config_option(s, 'show session buttons'       , False          ) # bool
-		self.read_config_option(s, 'min search string length'   , 3              ) # characters
-		self.read_config_option(s, 'menu rebuild delay'         , 10             ) # seconds
-		self.read_config_option(s, 'search results limit'       , 5              ) # results
-		self.read_config_option(s, 'local search update delay'  , 100            ) # msec
-		self.read_config_option(s, 'remote search update delay' , 250            ) # msec
-		self.read_config_option(s, 'keybinding'                 , '<Super>space' ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
-		self.read_config_option(s, 'applet label'               , Cardapio.distro_name) # string
-		self.read_config_option(s, 'applet icon'                , 'distributor-logo', True) # string (either a path to the icon, or an icon name)
-		self.read_config_option(s, 'active plugins'             , ['tracker', 'google']) # filenames
+		self.read_config_option(s, 'cardapio version'           , self.version)
+
+		self.read_config_option(s, 'window size'                , None                     ) # format: [px, px]
+		self.read_config_option(s, 'show session buttons'       , False                    ) # bool
+		self.read_config_option(s, 'min search string length'   , 3                        ) # characters
+		self.read_config_option(s, 'menu rebuild delay'         , 10                       ) # seconds
+		self.read_config_option(s, 'search results limit'       , 5                        ) # results
+		self.read_config_option(s, 'local search update delay'  , 100                      ) # msec
+		self.read_config_option(s, 'remote search update delay' , 250                      ) # msec
+		self.read_config_option(s, 'keybinding'                 , '<Super>space'           ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
+		self.read_config_option(s, 'applet label'               , Cardapio.distro_name     ) # string
+		self.read_config_option(s, 'applet icon'                , 'distributor-logo', True ) # string (either a path to the icon, or an icon name)
+		self.read_config_option(s, 'active plugins'             , ['tracker', 'google']    ) # filenames
 
 		# this is useful so that the user can edit the config file on first-run 
 		# without need to quit cardapio first:
