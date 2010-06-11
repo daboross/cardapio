@@ -399,11 +399,19 @@ class Cardapio(dbus.service.Object):
 		self.get_object('MarginLeft').realize()
 		self.get_object('MarginRight').realize()
 		self.get_object('MarginTop').realize()
+		self.get_object('MarginTopLeft').realize()
+		self.get_object('MarginTopRight').realize()
 		self.get_object('MarginBottom').realize()
+		self.get_object('MarginBottomLeft').realize()
+		self.get_object('MarginBottomRight').realize()
 		self.get_object('MarginLeft').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_SIDE))
 		self.get_object('MarginRight').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.RIGHT_SIDE))
 		self.get_object('MarginTop').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.TOP_SIDE))
+		self.get_object('MarginTopLeft').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.TOP_LEFT_CORNER))
+		self.get_object('MarginTopRight').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.TOP_RIGHT_CORNER))
 		self.get_object('MarginBottom').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_SIDE))
+		self.get_object('MarginBottomLeft').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_LEFT_CORNER))
+		self.get_object('MarginBottomRight').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_RIGHT_CORNER))
 
 		self.context_menu_xml = '''
 			<popup name="button3">
@@ -716,9 +724,14 @@ class Cardapio(dbus.service.Object):
 		if (0 <= x <= w and 0 <= y <= h): 
 			return
 
-		# make sure showing the context menu doesn't cause a focus-out event
-		if self.context_menu.get_visible() or self.app_context_menu.get_visible():
-			return
+		# Removed this because of a regression: the get_visible() commands
+		# seems to *always* return True!!!
+		#
+		# TODO: figure this out
+		#
+		# # make sure showing the context menu doesn't cause a focus-out event
+		# if self.context_menu.get_visible() or self.app_context_menu.get_visible():
+		# 	return
 
 		# make sure resizing doesn't cause a focus-out event
 		window_x, window_y, window_w, window_h = self.window.get_allocation()
