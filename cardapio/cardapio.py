@@ -221,7 +221,6 @@ class Cardapio(dbus.service.Object):
 			self.active_plugin_instances.append(plugin)
 
 
-
 	def on_logout_button_clicked(self, widget):
 
 		self.hide()
@@ -436,31 +435,31 @@ class Cardapio(dbus.service.Object):
 			self.panel_applet.connect('destroy', self.quit)
 
 
-	def get_best_stock_icon_size(self):
-
-		best_icon_size = 0
-		best_icon_diff = 100000000
+	def get_best_icon_size(self):
 
 		panel = self.panel_button.get_toplevel().window
 
 		if panel is None: 
-			return gtk.ICON_SIZE_LARGE_TOOLBAR
+			return gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
 
 		panel_size = min(panel.get_size())
 
+		# "snap" the icon size to the closest stock icon size
 		for icon_size in range(1,7):
-			icon_diff = abs(gtk.icon_size_lookup(icon_size)[0] - panel_size)
-			if icon_diff <= best_icon_diff:
-				best_icon_diff = icon_diff
-				best_icon_size = icon_size
 
-		return best_icon_size
+			icon_size_pixels = gtk.icon_size_lookup(icon_size)[0]
+
+			if abs(icon_size_pixels - panel_size) < 3:
+				return icon_size_pixels
+
+		# if no stock icon size if close enough, then use the panel size
+		return panel_size
 
 
 	def setup_panel_button(self):
 
 		self.panel_button.set_label(self.settings['applet label'])
-		button_icon = self.get_icon(self.settings['applet icon'], self.get_best_stock_icon_size(), 'distributor-logo')
+		button_icon = self.get_icon(self.settings['applet icon'], self.get_best_icon_size(), 'distributor-logo')
 		self.panel_button.set_image(button_icon)
 
 
@@ -1569,7 +1568,8 @@ class Cardapio(dbus.service.Object):
 		else:
 			icon_size = self.icon_size_category
 
-		icon = self.get_icon(icon_name, icon_size)
+		icon_size_pixels = gtk.icon_size_lookup(icon_size)[0]
+		icon = self.get_icon(icon_name, icon_size_pixels)
 
 		hbox = gtk.HBox()
 		hbox.add(icon)
@@ -1632,14 +1632,12 @@ class Cardapio(dbus.service.Object):
 		if not icon_value: 
 			icon_value = fallback_icon
 
-		icon_size_pixels = gtk.icon_size_lookup(icon_size)[0]
-
 		icon_pixbuf = None
 		icon_name = icon_value
 
 		if os.path.isabs(icon_value):
 			if os.path.isfile(icon_value):
-				icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icon_value, icon_size_pixels, icon_size_pixels)
+				icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icon_value, icon_size, icon_size)
 			icon_name = os.path.basename(icon_value)
 
 		if re.match('.*\.(png|xpm|svg)$', icon_name) is not None:
@@ -1647,17 +1645,17 @@ class Cardapio(dbus.service.Object):
 
 		if icon_pixbuf is None:
 			if self.icon_theme.has_icon(icon_name):
-				icon_pixbuf = self.icon_theme.load_icon(icon_name, icon_size_pixels, gtk.ICON_LOOKUP_FORCE_SIZE)
+				icon_pixbuf = self.icon_theme.load_icon(icon_name, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
 
 			else:
 				for dir_ in BaseDirectory.xdg_data_dirs:
 					for subdir in ('pixmaps', 'icons'):
 						path = os.path.join(dir_, subdir, icon_value)
 						if os.path.isfile(path):
-							icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, icon_size_pixels, icon_size_pixels)
+							icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, icon_size, icon_size)
 
 		if icon_pixbuf is None:
-			return gtk.image_new_from_icon_name(fallback_icon, icon_size)
+			icon_pixbuf = self.icon_theme.load_icon(fallback_icon, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
 
 		return gtk.image_new_from_pixbuf(icon_pixbuf)
 
