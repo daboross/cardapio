@@ -1,3 +1,10 @@
+cardapio (0.9.93-ubuntu1) lucid; urgency=low
+
+  * Fixed panel sizing and orientation bugs
+  * Made the configuration window update the settings in real time
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 12 Jun 2010 14:46:00 -0400
+
 cardapio (0.9.92-ubuntu1) lucid; urgency=low
 
   * Fixed three bugs: #592571, #592618, #592630 
