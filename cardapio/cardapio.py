@@ -138,6 +138,7 @@ class Cardapio(dbus.service.Object):
 		self.build_ui() 
 		self.build_plugin_database() 
 		self.setup_ui_from_settings() 
+		self.activate_plugins_from_settings()
 
 		if not hidden: self.show()
 
@@ -214,7 +215,7 @@ class Cardapio(dbus.service.Object):
 			section_slab, section_contents = self.add_plugin_slab(plugin)
 
 			plugin_info = self.plugin_database[basename]
-			plugin.basename = basename
+			plugin.basename         = basename
 			plugin.section_slab     = section_slab
 			plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
 
@@ -369,6 +370,7 @@ class Cardapio(dbus.service.Object):
 		self.app_context_menu   = self.get_object('AppContextMenu')
 		self.pin_menuitem       = self.get_object('PinMenuItem')
 		self.unpin_menuitem     = self.get_object('UnpinMenuItem')
+		self.plugin_tree_model  = self.get_object('PluginListstore')
 
 		self.icon_theme = gtk.icon_theme_get_default()
 		self.icon_theme.connect('changed', self.on_icon_theme_changed)
@@ -405,8 +407,8 @@ class Cardapio(dbus.service.Object):
 				<menuitem name="Item 2" verb="Edit" label="%s" pixtype="stock" pixname="gtk-edit"/>
 				<menuitem name="Item 3" verb="AboutCardapio" label="%s" pixtype="stock" pixname="gtk-about"/>
 				<separator />
-				<menuitem name="Item 4" verb="AboutGnome" label="%s" pixtype="stock" pixname="gtk-about"/>
-				<menuitem name="Item 5" verb="AboutDistro" label="%s" pixtype="stock" pixname="gtk-about"/>
+				<menuitem name="Item 4" verb="AboutGnome" label="%s" pixtype="none"/>
+				<menuitem name="Item 5" verb="AboutDistro" label="%s" pixtype="none"/>
 			</popup>
 			''' % (
 				_('_Properties'), 
@@ -415,13 +417,6 @@ class Cardapio(dbus.service.Object):
 				_('_About Gnome'), 
 				_('_About %(distro_name)s') % {'distro_name' : Cardapio.distro_name}
 			)
-
-		# NOTE: pixtype="filename" should be used for both
-		# "gnome-logo-icon-transparent" and "distributor-logo", but it requires
-		# full paths :-/
-		#
-		# TODO:
-		# Maybe we can use pixtype="pixbuf" with get_icon() somehow...
 
 		self.context_menu_verbs = [
 			('Properties', self.open_options_dialog),
@@ -478,8 +473,6 @@ class Cardapio(dbus.service.Object):
 			self.session_pane.show()
 		else:
 			self.session_pane.hide()
-
-		self.activate_plugins_from_settings()
 
 
 	def build_ui(self):
@@ -567,7 +560,6 @@ class Cardapio(dbus.service.Object):
 		self.get_object('OptionAppletIcon').set_text(self.settings['applet icon'])
 		self.get_object('OptionSessionButtons').set_active(self.settings['show session buttons'])
 
-		self.plugin_tree_model = self.get_object('PluginListstore')
 		self.plugin_tree_model.clear()
 
 		# place active plugins at the top of the list, in order
@@ -596,12 +588,16 @@ class Cardapio(dbus.service.Object):
 		self.options_dialog.hide()
 
 
-	def on_options_apply_clicked(self, *dummy):
+	def on_options_changed(self, *dummy):
 
 		self.settings['keybinding'] = self.get_object('OptionKeybinding').get_text()
 		self.settings['applet label'] = self.get_object('OptionAppletLabel').get_text()
 		self.settings['applet icon'] = self.get_object('OptionAppletIcon').get_text()
 		self.settings['show session buttons'] = self.get_object('OptionSessionButtons').get_active()
+		self.setup_ui_from_settings()
+
+
+	def on_plugin_apply_clicked(self, widget):
 
 		self.settings['active plugins'] = []
 		iter_ = self.plugin_tree_model.get_iter_first()
@@ -613,7 +609,7 @@ class Cardapio(dbus.service.Object):
 
 			iter_ = self.plugin_tree_model.iter_next(iter_)
 
-		self.setup_ui_from_settings()
+		self.activate_plugins_from_settings()
 
 
 	def on_plugin_state_toggled(self, cell, path):

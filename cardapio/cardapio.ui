@@ -534,6 +534,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="invisible_char">&#x2022;</property>
+                            <signal name="focus_out_event" handler="on_options_changed"/>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -546,6 +547,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="invisible_char">&#x2022;</property>
+                            <signal name="focus_out_event" handler="on_options_changed"/>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -562,6 +564,7 @@
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
                             <property name="draw_indicator">True</property>
+                            <signal name="toggled" handler="on_options_changed"/>
                           </object>
                           <packing>
                             <property name="right_attach">2</property>
@@ -587,6 +590,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="invisible_char">&#x2022;</property>
+                            <signal name="focus_out_event" handler="on_options_changed"/>
                           </object>
                           <packing>
                             <property name="left_attach">1</property>
@@ -617,48 +621,71 @@
                     <property name="left_padding">5</property>
                     <property name="right_padding">5</property>
                     <child>
-                      <object class="GtkScrolledWindow" id="scrolledwindow2">
+                      <object class="GtkVBox" id="vbox1">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="hscrollbar_policy">automatic</property>
-                        <property name="vscrollbar_policy">automatic</property>
-                        <property name="shadow_type">in</property>
                         <child>
-                          <object class="GtkTreeView" id="PluginTreeView">
+                          <object class="GtkScrolledWindow" id="scrolledwindow2">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
-                            <property name="model">PluginListstore</property>
-                            <property name="headers_visible">False</property>
-                            <property name="headers_clickable">False</property>
-                            <property name="reorderable">True</property>
-                            <property name="rules_hint">True</property>
-                            <property name="search_column">1</property>
+                            <property name="hscrollbar_policy">automatic</property>
+                            <property name="vscrollbar_policy">automatic</property>
+                            <property name="shadow_type">in</property>
                             <child>
-                              <object class="GtkTreeViewColumn" id="treeviewcolumn1">
-                                <property name="sizing">autosize</property>
+                              <object class="GtkTreeView" id="PluginTreeView">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="model">PluginListstore</property>
+                                <property name="headers_visible">False</property>
+                                <property name="headers_clickable">False</property>
+                                <property name="reorderable">True</property>
+                                <property name="rules_hint">True</property>
+                                <property name="search_column">1</property>
                                 <child>
-                                  <object class="GtkCellRendererToggle" id="cellrenderertoggle1">
-                                    <signal name="toggled" handler="on_plugin_state_toggled"/>
+                                  <object class="GtkTreeViewColumn" id="treeviewcolumn1">
+                                    <property name="sizing">autosize</property>
+                                    <child>
+                                      <object class="GtkCellRendererToggle" id="cellrenderertoggle1">
+                                        <signal name="toggled" handler="on_plugin_state_toggled"/>
+                                      </object>
+                                      <attributes>
+                                        <attribute name="active">1</attribute>
+                                      </attributes>
+                                    </child>
                                   </object>
-                                  <attributes>
-                                    <attribute name="active">1</attribute>
-                                  </attributes>
                                 </child>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkTreeViewColumn" id="treeviewcolumn2">
                                 <child>
-                                  <object class="GtkCellRendererText" id="cellrenderertext1">
-                                    <property name="wrap_mode">word-char</property>
+                                  <object class="GtkTreeViewColumn" id="treeviewcolumn2">
+                                    <child>
+                                      <object class="GtkCellRendererText" id="cellrenderertext1">
+                                        <property name="wrap_mode">word-char</property>
+                                      </object>
+                                      <attributes>
+                                        <attribute name="markup">2</attribute>
+                                      </attributes>
+                                    </child>
                                   </object>
-                                  <attributes>
-                                    <attribute name="markup">2</attribute>
-                                  </attributes>
                                 </child>
                               </object>
                             </child>
                           </object>
+                          <packing>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="button2">
+                            <property name="label">gtk-apply</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <property name="use_stock">True</property>
+                            <signal name="clicked" handler="on_plugin_apply_clicked"/>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">False</property>
+                            <property name="position">1</property>
+                          </packing>
                         </child>
                       </object>
                     </child>
@@ -689,21 +716,6 @@
             <property name="visible">True</property>
             <property name="layout_style">end</property>
             <child>
-              <object class="GtkButton" id="button2">
-                <property name="label">gtk-apply</property>
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
-                <signal name="clicked" handler="on_options_apply_clicked"/>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">False</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
               <object class="GtkButton" id="button1">
                 <property name="label">gtk-close</property>
                 <property name="visible">True</property>
@@ -715,7 +727,7 @@
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">False</property>
-                <property name="position">1</property>
+                <property name="position">0</property>
               </packing>
             </child>
           </object>
@@ -728,7 +740,6 @@
       </object>
     </child>
     <action-widgets>
-      <action-widget response="0">button2</action-widget>
       <action-widget response="0">button1</action-widget>
     </action-widgets>
   </object>
