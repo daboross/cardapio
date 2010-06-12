@@ -1741,6 +1741,9 @@ class Cardapio(dbus.service.Object):
 
 			return self.launch_raw(path)
 
+		else:
+			logging.warn('Warning: Tried launching an app that does not exist: %s' % desktop_path)
+
 
 	def on_xdg_button_clicked(self, widget, path):
 
