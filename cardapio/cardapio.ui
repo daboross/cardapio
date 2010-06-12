@@ -17,6 +17,7 @@
     <signal name="key_press_event" handler="on_mainwindow_after_key_pressed" after="yes"/>
     <signal name="key_press_event" handler="on_mainwindow_key_pressed"/>
     <signal name="focus_out_event" handler="on_mainwindow_focus_out"/>
+    <signal name="size_allocate" handler="end_resize"/>
     <signal name="configure_event" handler="on_mainwindow_configure_event"/>
     <signal name="delete_event" handler="on_mainwindow_delete_event"/>
     <child>

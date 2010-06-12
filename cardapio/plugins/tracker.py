@@ -8,9 +8,12 @@ class CardapioPlugin(CardapioPluginInterface):
 	author             = 'Thiago Teixeira'
 	name               = _('Tracker plugin')
 	description        = _('Search local files and folders indexed with Tracker')
-	version            = '1.0'
 
-	plugin_api_version = 1.0
+	url                = ''
+	help_text          = ''
+	version            = '1.1'
+
+	plugin_api_version = 1.1
 
 	search_delay_type  = 'local search update delay'
 
@@ -19,7 +22,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	hide_from_sidebar  = True
 
 
-	def __init__(self, settings, handle_search_result, handle_search_error):
+	def __init__(self, settings, write_to_log, handle_search_result, handle_search_error):
 
 		self.tracker = None
 		bus = dbus.SessionBus()
@@ -27,11 +30,15 @@ class CardapioPlugin(CardapioPluginInterface):
 		if bus.request_name('org.freedesktop.Tracker1') == dbus.bus.REQUEST_NAME_REPLY_IN_QUEUE:
 			tracker_object = bus.get_object('org.freedesktop.Tracker1', '/org/freedesktop/Tracker1/Resources')
 			self.tracker = dbus.Interface(tracker_object, 'org.freedesktop.Tracker1.Resources') 
+		else:
+			self.loaded = False
+			return 
 
 		self.search_results_limit = settings['search results limit']
 
 		self.cardapio_results_handler = handle_search_result
 		self.cardapio_error_handler = handle_search_error
+		self.loaded = True
 
 
 	def search(self, text):

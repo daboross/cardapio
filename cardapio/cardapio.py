@@ -91,7 +91,6 @@ class Cardapio(dbus.service.Object):
 	bus_obj_str  = '/org/varal/Cardapio'
 
 	version = '0.9.93'
-	plugin_api_version = 1.0
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
@@ -159,11 +158,15 @@ class Cardapio(dbus.service.Object):
 	def get_plugin_class(self, basename):
 
 		package = '%splugins.%s' % (self.package_root, basename)
-		plugin_module = __import__(package, fromlist = 'CardapioPlugin', level = -1)
+		try:
+			plugin_module = __import__(package, fromlist = 'CardapioPlugin', level = -1)
+		except:
+			return 'Could not find the plugin module'
+
 		plugin_class = plugin_module.CardapioPlugin
 
-		if plugin_class.plugin_api_version != Cardapio.plugin_api_version: 
-			return None
+		if plugin_class.plugin_api_version != CardapioPluginInterface.plugin_api_version: 
+			return 'Incorrect API version'
 
 		return plugin_class
 
@@ -182,7 +185,7 @@ class Cardapio(dbus.service.Object):
 					basename = file_[:-3]
 
 					plugin_class = self.get_plugin_class(basename)
-					if plugin_class is None: continue
+					if type(plugin_class) is str: continue
 
 					self.plugin_database[basename] = {
 						'name' : plugin_class.name,
@@ -206,20 +209,38 @@ class Cardapio(dbus.service.Object):
 			basename = str(basename)
 
 			plugin_class = self.get_plugin_class(basename)
-			if plugin_class is None: 
-				logging.error('Plugin error! Incorrect API version: %s' % basename)
+			if type(plugin_class) is str: 
+				logging.error('[plugin: %s] %s' % (basename, plugin_class))
+				self.settings['active plugins'].remove(basename)
 				continue
 
-			plugin = plugin_class(self.settings, self.handle_search_result, self.handle_search_error)
+			plugin = plugin_class(self.settings, self.write_to_plugin_log, self.handle_search_result, self.handle_search_error)
+
+			if not plugin.loaded:
+				self.write_to_plugin_log(plugin, 'Plugin did not load properly')
+				continue
 
 			section_slab, section_contents = self.add_plugin_slab(plugin)
 
-			plugin_info = self.plugin_database[basename]
 			plugin.basename         = basename
 			plugin.section_slab     = section_slab
 			plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
 
 			self.active_plugin_instances.append(plugin)
+
+
+	def write_to_plugin_log(self, plugin, text, is_error = False, is_warning = False):
+
+		if is_error: 
+			write = logging.error
+
+		elif is_warning: 
+			write = logging.warning
+
+		else:
+			write = logging.debug
+
+		write('[%s] %s'  % (plugin.name, text))
 
 
 	def on_all_sections_sidebar_button_clicked(self, widget):
@@ -618,6 +639,8 @@ class Cardapio(dbus.service.Object):
 
 	def start_resize(self, widget, event):
 
+		self.window.handler_block_by_func(self.on_mainwindow_focus_out)
+
 		window_x, window_y = self.window.get_position()
 		x = event.x_root - window_x
 		y = event.y_root - window_y
@@ -655,7 +678,16 @@ class Cardapio(dbus.service.Object):
 		
 		x = int(event.x_root)
 		y = int(event.y_root)
+
 		self.window.window.begin_resize_drag(edge, event.button, x, y, event.time)
+
+
+	def end_resize(self, window, allocation):
+
+		try:
+			self.window.handler_unblock_by_func(self.on_mainwindow_focus_out)
+		except:
+			pass
 
 
 	def on_mainwindow_key_pressed(self, widget, event):
@@ -740,8 +772,7 @@ class Cardapio(dbus.service.Object):
 
 	def on_gtk_settings_changed(self, gobj, property_changed):
 
-		if property_changed.name == 'gtk-color-scheme'\
-				or property_changed.name == 'gtk-theme-name':
+		if property_changed.name == 'gtk-color-scheme' or property_changed.name == 'gtk-theme-name':
 			self.prepare_colors()
 			self.schedule_rebuild()
 
@@ -785,13 +816,14 @@ class Cardapio(dbus.service.Object):
 
 		if self.active_plugin_instances:
 
-			if len(text) >= self.settings['min search string length']:
-				self.schedule_search_with_plugins(text)
+			self.schedule_search_with_plugins(text)
 
-			else:
+			if len(text) < self.settings['min search string length']:
+
 				for plugin in self.active_plugin_instances:
-					self.set_section_is_empty(plugin.section_slab)
-					plugin.section_slab.hide()
+					if plugin.hide_from_sidebar:
+						self.set_section_is_empty(plugin.section_slab)
+						plugin.section_slab.hide()
 
 
 	def search_menus(self, text):
@@ -847,18 +879,19 @@ class Cardapio(dbus.service.Object):
 
 		for plugin in self.active_plugin_instances:
 			if plugin.search_delay_type == delay_type:
-				#if plugin.is_running: plugin.cancel()
-				plugin.is_running = True
-				plugin.search(text)
+				if not plugin.hide_from_sidebar or len(text) >= self.settings['min search string length']:
+					#if plugin.is_running: plugin.cancel()
+					plugin.is_running = True
+					plugin.search(text)
 
 		return False
 		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
-	def handle_search_error(self, plugin, error):
+	def handle_search_error(self, plugin, text):
 
 		plugin.is_running = False
-		logging.error('Plugin error (%s):\n %s' % (plugin.name, error))
+		self.write_to_plugin_log(plugin, text, is_error = True)
 		self.handle_search_result(plugin, [])
 
 
@@ -1210,14 +1243,14 @@ class Cardapio(dbus.service.Object):
 
 	def on_panel_size_changed(self, widget, allocation):
 
-		self.panel_applet.handler_block(self.size_allocate_handler)
+		self.panel_applet.handler_block_by_func(self.on_panel_size_changed)
 		glib.timeout_add(100, self.setup_panel_button)
 		glib.timeout_add(200, self.on_panel_size_change_done) # added this to avoid an infinite loop
 
 
 	def on_panel_size_change_done(self):
 
-		self.panel_applet.handler_unblock(self.size_allocate_handler)
+		self.panel_applet.handler_unblock_by_func(self.on_panel_size_changed)
 		return False # must return false to cancel the timer
 
 
@@ -1960,7 +1993,7 @@ class CardapioPluginInterface:
 	help_text          = ''
 	version            = ''
 
-	plugin_api_version = 1.0
+	plugin_api_version = 1.1
 
 	# one of: None, 'local search update delay', 'remote search update delay'
 	search_delay_type  = 'local search update delay'
@@ -1976,14 +2009,18 @@ class CardapioPluginInterface:
 
 	is_running = False
 
-	def __init__(self, settings, handle_search_result, handle_search_error):
+	def __init__(self, settings, write_to_log, handle_search_result, handle_search_error):
 		"""
 		This constructor gets called whenever a plugin is activated.
 		(Typically once per session, unless the user is turning plugins on/off)
+
+		The constructor *must* set the instance variable self.loaded to True of False.
+		For example, the Tracker plugin sets self.loaded to False if Tracker is not
+		installed in the system.
 		
 		Note: DO NOT WRITE ANYTHING IN THE settings DICT!!
 		"""
-		pass
+		self.loaded = False
 
 
 	def __del__(self):
@@ -2085,7 +2122,7 @@ def applet_factory(applet, iid):
 
 	applet.add(menu)
 
-	cardapio.size_allocate_handler = applet.connect('size-allocate', cardapio.on_panel_size_changed)
+	applet.connect('size-allocate', cardapio.on_panel_size_changed)
 	applet.connect('change-orient', cardapio.panel_change_orientation)
 	applet.connect('change-background', cardapio.on_panel_change_background)
 

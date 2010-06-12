@@ -9,9 +9,12 @@ class CardapioPlugin(CardapioPluginInterface):
 	author             = 'Thiago Teixeira'
 	name               = _('Google plugin')
 	description        = _('Perform quick Google searches')
+
+	url                = ''
+	help_text          = ''
 	version            = '1.0'
 
-	plugin_api_version = 1.0
+	plugin_api_version = 1.1
 
 	search_delay_type  = 'remote search update delay'
 
@@ -20,7 +23,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	hide_from_sidebar  = True
 
 
-	def __init__(self, settings, cardapio_result_handler, cardapio_error_handler):
+	def __init__(self, settings, write_to_log, cardapio_result_handler, cardapio_error_handler):
 
 		# The google search API only supports two sizes for the result list,
 		# that is: small (4 results) or large (8 results). So this plugin
@@ -35,6 +38,8 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.cardapio_result_handler = cardapio_result_handler
 		self.cardapio_error_handler = cardapio_error_handler
 		self.search_controller = gio.Cancellable()
+
+		self.loaded = True
 
 
 	def search(self, text):
