@@ -314,7 +314,7 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'remote search update delay' , 250                      ) # msec
 		self.read_config_option(s, 'keybinding'                 , '<Super>space'           ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
 		self.read_config_option(s, 'applet label'               , Cardapio.distro_name     ) # string
-		self.read_config_option(s, 'applet icon'                , 'distributor-logo', True ) # string (either a path to the icon, or an icon name)
+		self.read_config_option(s, 'applet icon'                , 'start-here', True       ) # string (either a path to the icon, or an icon name)
 		self.read_config_option(s, 'active plugins'             , ['tracker', 'google']    ) # filenames
 
 		# this is useful so that the user can edit the config file on first-run 
