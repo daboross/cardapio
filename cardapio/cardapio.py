@@ -222,26 +222,6 @@ class Cardapio(dbus.service.Object):
 			self.active_plugin_instances.append(plugin)
 
 
-	def on_logout_button_clicked(self, widget):
-
-		self.hide()
-		# TODO: make sure dialog is focused
-		self.launch_raw('gnome-session-save --logout-dialog')
-
-
-	def on_shutdown_button_clicked(self, widget):
-
-		self.hide()
-		# TODO: make sure dialog is focused
-		self.launch_raw('gnome-session-save --shutdown-dialog')
-
-
-	def on_lockscreen_button_clicked(self, widget):
-
-		self.hide()
-		self.launch_raw('gnome-screensaver-command --lock')
-
-
 	def on_all_sections_sidebar_button_clicked(self, widget):
 
 		if self.auto_toggled_sidebar_button:
@@ -1400,31 +1380,37 @@ class Cardapio(dbus.service.Object):
 
 	def build_session_list(self):
 
-		dbus_services = self.bus.list_names()
+		items = [
+			[
+				_('Lock Screen'),
+				_('Protect your computer from unauthorized use'),
+				'system-lock-screen',
+				'gnome-screensaver-command --lock',
+				self.left_session_pane,
+			],
+			[
+				_('Log Out...'),
+				_('Log out of this session to log in as a different user'),
+				'system-log-out', 
+				'gnome-session-save --logout-dialog',
+				self.right_session_pane,
+			],
+			[
+				_('Shut Down...'),
+				_('Shut down the system'),
+				'system-shutdown',
+				'gnome-session-save --shutdown-dialog',
+				self.right_session_pane,
+			],
+		]
 
-		button_label = _('Lock Screen')
-		button_tooltip = _('Protect your computer from unauthorized use')
-		button = self.add_launcher_entry(button_label, 'system-lock-screen', self.session_section_contents, tooltip = button_tooltip, app_list = self.app_list)
-		button.connect('clicked', self.on_lockscreen_button_clicked)
+		for item in items:
 
-		button = self.add_button(button_label, 'system-lock-screen', self.left_session_pane, tooltip = button_tooltip, is_launcher_button = True)
-		button.connect('clicked', self.on_lockscreen_button_clicked)
+			button = self.add_launcher_entry(item[0], item[2], self.session_section_contents, tooltip = item[1], app_list = self.app_list)
+			button.connect('clicked', self.launch_raw_on_click, item[3])
 
-		button_label = _('Log Out...')
-		button_tooltip = _('Log out of this session to log in as a different user')
-		button = self.add_launcher_entry(button_label, 'system-log-out', self.session_section_contents, tooltip = button_tooltip, app_list = self.app_list)
-		button.connect('clicked', self.on_logout_button_clicked)
-
-		button = self.add_button(button_label, 'system-log-out', self.right_session_pane, tooltip = button_tooltip, is_launcher_button = True)
-		button.connect('clicked', self.on_logout_button_clicked)
-
-		button_label = _('Shut Down...')
-		button_tooltip = _('Shut down the system')
-		button = self.add_launcher_entry(button_label, 'system-shutdown', self.session_section_contents, tooltip = button_tooltip, app_list = self.app_list)
-		button.connect('clicked', self.on_shutdown_button_clicked)
-
-		button = self.add_button(button_label, 'system-shutdown', self.right_session_pane, tooltip = button_tooltip, is_launcher_button = True)
-		button.connect('clicked', self.on_shutdown_button_clicked)
+			button = self.add_button(item[0], item[2], item[4], tooltip = item[1], is_launcher_button = True)
+			button.connect('clicked', self.launch_raw_on_click, item[3])
 
 
 	def build_system_list(self):
@@ -1776,12 +1762,16 @@ class Cardapio(dbus.service.Object):
 
 		try:
 			subprocess.Popen(path, shell = True, cwd = self.user_home_folder)
-
 		except OSError:
 			return False
 
 		self.hide()
 		return True
+
+
+	def launch_raw_on_click(self, widget, command):
+
+		self.launch_raw(command)
 
 
 	def show_all_nonempty_sections(self):
