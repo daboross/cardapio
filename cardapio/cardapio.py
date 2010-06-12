@@ -417,7 +417,14 @@ class Cardapio(dbus.service.Object):
 		if panel is None: 
 			return gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
 
-		panel_size = min(panel.get_size())
+		panel_width, panel_height = panel.get_size()
+		orientation = self.panel_applet.get_orient()
+
+		if orientation == gnomeapplet.ORIENT_DOWN or orientation == gnomeapplet.ORIENT_UP:
+			panel_size = panel_height
+
+		else:
+			panel_size = panel_width
 
 		# "snap" the icon size to the closest stock icon size
 		for icon_size in range(1,7):
@@ -1044,32 +1051,45 @@ class Cardapio(dbus.service.Object):
 		panel_width, panel_height = panel.get_size()
 
 		applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
-
-		# update coordinates according to panel orientation
 		orientation = self.panel_applet.get_orient()
 
-		if orientation == gnomeapplet.ORIENT_UP or orientation == gnomeapplet.ORIENT_DOWN:
-			applet_height = panel_height
+		# weird:
+		# - orient_up    means panel is at the bottom
+		# - orient_down  means panel is at the top
+		# - orient_left  means panel is at the ritgh
+		# - orient_right means panel is at the left
 
-		elif orientation == gnomeapplet.ORIENT_LEFT or orientation == gnomeapplet.ORIENT_RIGHT:
-			applet_width = panel_width
-
-		window_x = panel_x + applet_x
-		window_y = panel_y + applet_y + applet_height
-
-		# move window so one edge always matches some edge of the panel button 
-
-		if window_x + window_width > screen_width:
-			window_x = panel_x + applet_x + applet_width - window_width
-
-		if window_y + window_height > screen_height:
+		# top
+		if orientation == gnomeapplet.ORIENT_DOWN:
+			window_x = panel_x + applet_x
+			window_y = panel_y + applet_y + applet_height
+			
+		# bottom
+		elif orientation == gnomeapplet.ORIENT_UP:
+			window_x = panel_x + applet_x
 			window_y = panel_y + applet_y - window_height
 
-		# if it is impossible, do out best to have the top-left corner of our
-		# window visible at least
+		# left
+		elif orientation == gnomeapplet.ORIENT_RIGHT:
+			window_x = panel_x + applet_x + applet_width
+			window_y = panel_y + applet_y
+		
+		# right
+		elif orientation == gnomeapplet.ORIENT_LEFT:
+			window_x = panel_x + applet_x - window_width
+			window_y = panel_y + applet_y
 
-		if window_x < 0: window_x = 0
-		if window_y < 0: window_y = 0
+		if window_x + window_width > screen_width:
+			window_x = screen_width - window_width
+
+		if window_y + window_height > screen_height:
+			window_y = screen_height - window_height
+
+		if window_x < 0:
+			window_x = 0
+
+		if window_y < 0:
+			window_y = 0
 
 		window.move(window_x + offset_x, window_y + offset_y)
 
@@ -1934,6 +1954,10 @@ class CardapioPluginInterface:
 	author             = ''
 	name               = '' # use gettext for name
 	description        = '' # use gettext for description
+
+	# not yet used:
+	url                = ''
+	help_text          = ''
 	version            = ''
 
 	plugin_api_version = 1.0
