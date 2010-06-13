@@ -889,23 +889,23 @@ Rebuilding...	</property>
       </object>
     </child>
     <child>
-      <object class="GtkImageMenuItem" id="AddToLeftPaneMenuItem">
-        <property name="label" translatable="yes">_Add to left pane</property>
+      <object class="GtkImageMenuItem" id="AddSysPaneMenuItem">
+        <property name="label" translatable="yes">_Add to system pane</property>
         <property name="visible">True</property>
         <property name="use_underline">True</property>
         <property name="image">image4</property>
         <property name="use_stock">False</property>
-        <signal name="activate" handler="on_add_to_left_pane_clicked"/>
+        <signal name="activate" handler="on_add_to_system_pane_clicked"/>
       </object>
     </child>
     <child>
-      <object class="GtkImageMenuItem" id="RemoveFromLeftPaneMenuItem">
-        <property name="label" translatable="yes">_Remove from left pane</property>
+      <object class="GtkImageMenuItem" id="RemoveSysPaneMenuItem">
+        <property name="label" translatable="yes">_Remove from system pane</property>
         <property name="visible">True</property>
         <property name="use_underline">True</property>
         <property name="image">image5</property>
         <property name="use_stock">False</property>
-        <signal name="activate" handler="on_remove_from_left_pane_clicked"/>
+        <signal name="activate" handler="on_remove_from_system_pane_clicked"/>
       </object>
     </child>
   </object>

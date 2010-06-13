@@ -322,8 +322,8 @@ class Cardapio(dbus.service.Object):
 		finally: 
 			config_file.close()
 
-		default_left_pane_items = []
-		default_left_pane_items.append(
+		default_system_pane_items = []
+		default_system_pane_items.append(
 			{
 				'name'      : _('Control Center'),
 				'icon name' : 'gnome-control-center',
@@ -334,7 +334,7 @@ class Cardapio(dbus.service.Object):
 
 		path = commands.getoutput('which software-center')
 		if os.path.exists(path):
-			default_left_pane_items.append(
+			default_system_pane_items.append(
 				{
 					'name'      : _('Ubuntu Software Center'), 
 					'icon name' : 'softwarecenter',
@@ -343,7 +343,7 @@ class Cardapio(dbus.service.Object):
 					'command'   : 'software-center', 
 				})
 
-		default_left_pane_items.append(
+		default_system_pane_items.append(
 			{
 				'name'      : _('Help and Support'), 
 				'icon name' : 'help-contents',
@@ -364,7 +364,7 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'applet label'               , Cardapio.distro_name     ) # string
 		self.read_config_option(s, 'applet icon'                , 'start-here'             , override_empty_str = True) # string (either a path to the icon, or an icon name)
 		self.read_config_option(s, 'pinned items'               , []                       ) 
-		self.read_config_option(s, 'left pane items'            , default_left_pane_items  )
+		self.read_config_option(s, 'system pane items'          , default_system_pane_items)
 		self.read_config_option(s, 'active plugins'             , ['tracker', 'google']    ) # filenames
 
 		self.settings['cardapio version'] = self.version
@@ -432,8 +432,8 @@ class Cardapio(dbus.service.Object):
 		self.app_context_menu          = self.get_object('AppContextMenu')
 		self.pin_menuitem              = self.get_object('PinMenuItem')
 		self.unpin_menuitem            = self.get_object('UnpinMenuItem')
-		self.add_to_pane_menuitem      = self.get_object('AddToLeftPaneMenuItem')
-		self.remove_from_pane_menuitem = self.get_object('RemoveFromLeftPaneMenuItem')
+		self.add_to_pane_menuitem      = self.get_object('AddSysPaneMenuItem')
+		self.remove_from_pane_menuitem = self.get_object('RemoveSysPaneMenuItem')
 		self.plugin_tree_model         = self.get_object('PluginListstore')
 
 		self.icon_theme = gtk.icon_theme_get_default()
@@ -598,7 +598,6 @@ class Cardapio(dbus.service.Object):
 		self.build_places_list()
 		self.build_session_list()
 		self.build_system_list()
-		self.build_left_pane_list()
 
 		self.set_message_window_visible(False)
 
@@ -1359,9 +1358,19 @@ class Cardapio(dbus.service.Object):
 			else: self.panel_button.deselect()
 
 
-	def build_left_pane_list(self):
+	def remove_from_app_list(self, app_list, section_slab, app_info):
 
-		for app in self.settings['left pane items']:
+		command = app_info['command']
+
+		for app in app_list:
+			if section_slab == app['section'] and command == app['command']:
+				app_list.remove(app)
+				break
+
+
+	def build_system_list(self):
+
+		for app in self.settings['system pane items']:
 
 			button = self.add_sidebar_button(app['name'], app['icon name'], self.sideapp_pane, tooltip = app['tooltip'], use_toggle_button = False)
 			self.connect_command(button, app['type'], app['command'])
@@ -1369,6 +1378,8 @@ class Cardapio(dbus.service.Object):
 			button.launcher_info = app
 
 			button = self.add_launcher_entry(app['name'], app['icon name'], self.system_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
+
+		self.add_tree_to_app_list(self.sys_tree.root, self.system_section_contents)
 
 
 	def build_places_list(self):
@@ -1521,10 +1532,6 @@ class Cardapio(dbus.service.Object):
 			button.connect('clicked', self.on_raw_button_clicked, item[3])
 
 
-	def build_system_list(self):
-
-		self.add_tree_to_app_list(self.sys_tree.root, self.system_section_contents)
-
 
 	def build_applications_list(self):
 
@@ -1628,7 +1635,7 @@ class Cardapio(dbus.service.Object):
 		if app_list is not None:
 
 			dummy, basename = os.path.split(command)
-			app_list.append({'name': button_str.lower(), 'button': button, 'section': parent_widget.parent.parent, 'basename' : basename})
+			app_list.append({'name': button_str.lower(), 'button': button, 'section': parent_widget.parent.parent, 'basename' : basename, 'command' : command})
 
 			# NOTE: IF THERE ARE CHANGES IN THE UI FILE, THIS MAY PRODUCE
 			# HARD-TO-FIND BUGS!!
@@ -1828,20 +1835,21 @@ class Cardapio(dbus.service.Object):
 		self.build_favorites_list()
 
 
-	def on_add_to_left_pane_clicked(self, widget):
+	def on_add_to_system_pane_clicked(self, widget):
 
-		self.settings['left pane items'].append(self.app_clicked)
+		self.settings['system pane items'].append(self.app_clicked)
 		self.clear_pane(self.system_section_contents)
  		self.clear_pane(self.sideapp_pane)
-		self.build_left_pane_list()
+		self.build_system_list()
 
 
-	def on_remove_from_left_pane_clicked(self, widget):
+	def on_remove_from_system_pane_clicked(self, widget):
 
-		self.settings['left pane items'].remove(self.app_clicked)
+		self.settings['system pane items'].remove(self.app_clicked)
+		self.remove_from_app_list(self.app_list, self.system_section_slab, self.app_clicked)
 		self.clear_pane(self.system_section_contents)
  		self.clear_pane(self.sideapp_pane)
-		self.build_left_pane_list()
+		self.build_system_list()
 
 
 	def on_appbutton_button_pressed(self, widget, event):
@@ -1849,16 +1857,16 @@ class Cardapio(dbus.service.Object):
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 
 			already_pinned = False
-			already_on_left_pane = False
+			already_on_system_pane = False
 
 			for command in [app['command'] for app in self.settings['pinned items']]:
 				if command == widget.launcher_info['command']: 
 					already_pinned = True
 					break
 
-			for command in [app['command'] for app in self.settings['left pane items']]:
+			for command in [app['command'] for app in self.settings['system pane items']]:
 				if command == widget.launcher_info['command']: 
-					already_on_left_pane = True
+					already_on_system_pane = True
 					break
 
 			if already_pinned:
@@ -1868,7 +1876,7 @@ class Cardapio(dbus.service.Object):
 				self.pin_menuitem.show()
 				self.unpin_menuitem.hide()
 
-			if already_on_left_pane:
+			if already_on_system_pane:
 				self.add_to_pane_menuitem.hide()
 				self.remove_from_pane_menuitem.show()
 			else:
