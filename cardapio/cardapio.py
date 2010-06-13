@@ -1500,6 +1500,7 @@ class Cardapio(dbus.service.Object):
 
 			button = self.add_launcher_entry(item[0], item[2], self.session_section_contents, 'raw', item[3], tooltip = item[1], app_list = self.app_list)
 			button = self.add_button(item[0], item[2], item[4], tooltip = item[1], is_launcher_button = True)
+			button.connect('clicked', self.on_raw_button_clicked, item[3])
 
 
 	def build_system_list(self):
