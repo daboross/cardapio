@@ -106,7 +106,7 @@ class Cardapio(dbus.service.Object):
 		self.last_visibility_toggle = 0
 
 		self.visible                   = False
-		self.app_list                  = []
+		self.app_list                  = []    # used for searching the menu
 		self.section_list              = {}
 		self.selected_section          = None
 		self.no_results_to_show        = False
@@ -365,11 +365,7 @@ class Cardapio(dbus.service.Object):
 
 	def save_config_file(self):
 
-		if self.get_object('MainSplitter').get_property('position_set'):
-			self.settings['splitter position'] = self.get_object('MainSplitter').get_position()
-
-		else:
-			self.settings['splitter position'] = 0
+		self.settings['splitter position'] = self.get_object('MainSplitter').get_position()
 
 		config_file = self.get_config_file('w')
 		json.dump(self.settings, config_file, sort_keys = True, indent = 4)
@@ -874,7 +870,7 @@ class Cardapio(dbus.service.Object):
 
 		for app in self.app_list:
 
-			if app['name'].find(text) == -1:
+			if app['name'].find(text) == -1 and app['basename'].find(text) == -1:
 				app['button'].hide()
 			else:
 				app['button'].show()
@@ -1615,8 +1611,10 @@ class Cardapio(dbus.service.Object):
 		button = self.add_button(button_str, icon_name, parent_widget, tooltip, is_launcher_button = True)
 
 		if app_list is not None:
-			app_list.append({'name': button_str.lower(), 'button': button, 'section': parent_widget.parent.parent})
-			# save the app name, its button, and the section slab it came from
+
+			dummy, basename = os.path.split(command)
+			app_list.append({'name': button_str.lower(), 'button': button, 'section': parent_widget.parent.parent, 'basename' : basename})
+
 			# NOTE: IF THERE ARE CHANGES IN THE UI FILE, THIS MAY PRODUCE
 			# HARD-TO-FIND BUGS!!
 
