@@ -1,3 +1,9 @@
+cardapio (0.9.97-ubuntu2) lucid; urgency=low
+
+  * Removing a file that got into the package for no reason :(
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 01:25:00 -0400
+
 cardapio (0.9.97-ubuntu1) lucid; urgency=low
 
   * Fixed a critical bug that made it not launch!

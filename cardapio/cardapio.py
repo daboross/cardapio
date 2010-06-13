@@ -351,9 +351,13 @@ class Cardapio(dbus.service.Object):
 
 		if force_update_from_version is not None:
 
-			user_version = [int(i) for i in user_settings['cardapio version'].split('.')]
+			if 'cardapio version' in user_settings:
+				user_version = [int(i) for i in user_settings['cardapio version'].split('.')]
 
-			if 'cardapio version' not in user_settings or user_version < force_update_from_version:
+			else:
+				user_version = 0
+
+			if user_version < force_update_from_version:
 
 				self.settings[key] = val
 
@@ -1650,6 +1654,10 @@ class Cardapio(dbus.service.Object):
 		if is_launcher_button:
 			icon_size = self.icon_size_app
 			label.modify_fg(gtk.STATE_NORMAL, self.style_appbutton_fg)
+			# TODO: figure out how to set max width so that it is the best for
+			# the window and font sizes
+			#label.set_ellipsize(pango.ELLIPSIZE_END)
+			#label.set_max_width_chars(20)
 		else:
 			icon_size = self.icon_size_category
 
