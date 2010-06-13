@@ -1064,19 +1064,6 @@ class Cardapio(dbus.service.Object):
 		return None
 
 
-	def on_mainwindow_key_pressed(self, widget, event):
-
-		if self.search_entry.is_focus(): return False
-
-		if event.keyval == gtk.gdk.keyval_from_name('Escape'):
-
-			self.clear_search_entry()
-			self.window.set_focus(self.search_entry)
-
-		else: return False
-		return True
-
-
 	# make Tab go from first result element to text entry widget
 	def on_first_button_key_pressed(self, widget, event):
 
