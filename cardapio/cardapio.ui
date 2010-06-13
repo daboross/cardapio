@@ -174,16 +174,8 @@
                                     </child>
                                   </object>
                                 </child>
-                                <child type="label">
-                                  <object class="GtkLabel" id="SideappLabel">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="use_markup">True</property>
-                                    <attributes>
-                                      <attribute name="weight" value="bold"/>
-                                      <attribute name="scale" value="1.250000"/>
-                                    </attributes>
-                                  </object>
+                                <child type="label_item">
+                                  <placeholder/>
                                 </child>
                               </object>
                               <packing>
@@ -896,6 +888,26 @@ Rebuilding...	</property>
         <signal name="activate" handler="on_unpin_this_app_clicked"/>
       </object>
     </child>
+    <child>
+      <object class="GtkImageMenuItem" id="AddToLeftPaneMenuItem">
+        <property name="label" translatable="yes">_Add to left pane</property>
+        <property name="visible">True</property>
+        <property name="use_underline">True</property>
+        <property name="image">image4</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="on_add_to_left_pane_clicked"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="RemoveFromLeftPaneMenuItem">
+        <property name="label" translatable="yes">_Remove from left pane</property>
+        <property name="visible">True</property>
+        <property name="use_underline">True</property>
+        <property name="image">image5</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="on_remove_from_left_pane_clicked"/>
+      </object>
+    </child>
   </object>
   <object class="GtkImage" id="image1">
     <property name="visible">True</property>
@@ -906,6 +918,14 @@ Rebuilding...	</property>
     <property name="stock">gtk-edit</property>
   </object>
   <object class="GtkImage" id="image3">
+    <property name="visible">True</property>
+    <property name="stock">gtk-remove</property>
+  </object>
+  <object class="GtkImage" id="image4">
+    <property name="visible">True</property>
+    <property name="stock">gtk-add</property>
+  </object>
+  <object class="GtkImage" id="image5">
     <property name="visible">True</property>
     <property name="stock">gtk-remove</property>
   </object>

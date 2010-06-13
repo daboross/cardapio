@@ -322,8 +322,38 @@ class Cardapio(dbus.service.Object):
 		finally: 
 			config_file.close()
 
+		default_left_pane_items = []
+		default_left_pane_items.append(
+			{
+				'name'      : _('Control Center'),
+				'icon name' : 'gnome-control-center',
+				'tooltip'   : _('The Gnome configuration tool'),
+				'type'      : 'raw',
+				'command'   : 'gnome-control-center',
+			})
+
+		path = commands.getoutput('which software-center')
+		if os.path.exists(path):
+			default_left_pane_items.append(
+				{
+					'name'      : _('Ubuntu Software Center'), 
+					'icon name' : 'softwarecenter',
+					'tooltip'   : _('Lets you choose from thousands of free applications available for Ubuntu'), 
+					'type'      : 'raw',
+					'command'   : 'software-center', 
+				})
+
+		default_left_pane_items.append(
+			{
+				'name'      : _('Help and Support'), 
+				'icon name' : 'help-contents',
+				'tooltip'   : _('Get help with %(distro_name)s') % {'distro_name':Cardapio.distro_name}, 
+				'type'      : 'raw',
+				'command'   : 'gnome-help', 
+			})
+
 		self.read_config_option(s, 'window size'                , None                     ) # format: [px, px]
-		self.read_config_option(s, 'splitter position'          , 0                        ) # format: [px, px]
+		self.read_config_option(s, 'splitter position'          , 0                        ) # int in pixels
 		self.read_config_option(s, 'show session buttons'       , False                    ) # bool
 		self.read_config_option(s, 'min search string length'   , 3                        ) # characters
 		self.read_config_option(s, 'menu rebuild delay'         , 10                       , force_update_from_version = [0,9,96]) # seconds
@@ -333,7 +363,8 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'keybinding'                 , '<Super>space'           ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
 		self.read_config_option(s, 'applet label'               , Cardapio.distro_name     ) # string
 		self.read_config_option(s, 'applet icon'                , 'start-here'             , override_empty_str = True) # string (either a path to the icon, or an icon name)
-		self.read_config_option(s, 'pinned items'               , []                       ) # URIs
+		self.read_config_option(s, 'pinned items'               , []                       ) 
+		self.read_config_option(s, 'left pane items'            , default_left_pane_items  )
 		self.read_config_option(s, 'active plugins'             , ['tracker', 'google']    ) # filenames
 
 		self.settings['cardapio version'] = self.version
@@ -384,24 +415,26 @@ class Cardapio(dbus.service.Object):
 		self.builder.connect_signals(self)
 
 		self.get_object = self.builder.get_object
-		self.window             = self.get_object('MainWindow')
-		self.message_window     = self.get_object('MessageWindow')
-		self.about_dialog       = self.get_object('AboutDialog')
-		self.options_dialog     = self.get_object('OptionsDialog')
-		self.application_pane   = self.get_object('ApplicationPane')
-		self.category_pane      = self.get_object('CategoryPane')
-		self.sideapp_pane       = self.get_object('SideappPane')
-		self.search_entry       = self.get_object('SearchEntry')
-		self.scrolled_window    = self.get_object('ScrolledWindow')
-		self.scroll_adjustment  = self.scrolled_window.get_vadjustment()
-		self.session_pane       = self.get_object('SessionPane')
-		self.left_session_pane  = self.get_object('LeftSessionPane')
-		self.right_session_pane = self.get_object('RightSessionPane')
-		self.context_menu       = self.get_object('CardapioContextMenu')
-		self.app_context_menu   = self.get_object('AppContextMenu')
-		self.pin_menuitem       = self.get_object('PinMenuItem')
-		self.unpin_menuitem     = self.get_object('UnpinMenuItem')
-		self.plugin_tree_model  = self.get_object('PluginListstore')
+		self.window                    = self.get_object('MainWindow')
+		self.message_window            = self.get_object('MessageWindow')
+		self.about_dialog              = self.get_object('AboutDialog')
+		self.options_dialog            = self.get_object('OptionsDialog')
+		self.application_pane          = self.get_object('ApplicationPane')
+		self.category_pane             = self.get_object('CategoryPane')
+		self.sideapp_pane              = self.get_object('SideappPane')
+		self.search_entry              = self.get_object('SearchEntry')
+		self.scrolled_window           = self.get_object('ScrolledWindow')
+		self.scroll_adjustment         = self.scrolled_window.get_vadjustment()
+		self.session_pane              = self.get_object('SessionPane')
+		self.left_session_pane         = self.get_object('LeftSessionPane')
+		self.right_session_pane        = self.get_object('RightSessionPane')
+		self.context_menu              = self.get_object('CardapioContextMenu')
+		self.app_context_menu          = self.get_object('AppContextMenu')
+		self.pin_menuitem              = self.get_object('PinMenuItem')
+		self.unpin_menuitem            = self.get_object('UnpinMenuItem')
+		self.add_to_pane_menuitem      = self.get_object('AddToLeftPaneMenuItem')
+		self.remove_from_pane_menuitem = self.get_object('RemoveFromLeftPaneMenuItem')
+		self.plugin_tree_model         = self.get_object('PluginListstore')
 
 		self.icon_theme = gtk.icon_theme_get_default()
 		self.icon_theme.connect('changed', self.on_icon_theme_changed)
@@ -554,7 +587,6 @@ class Cardapio(dbus.service.Object):
 		# slabs that should go *before* regular application slabs
 		self.add_favorites_slab()
 		self.add_places_slab()
-		self.add_help_slab()
 
 		self.build_applications_list()
 
@@ -566,7 +598,7 @@ class Cardapio(dbus.service.Object):
 		self.build_places_list()
 		self.build_session_list()
 		self.build_system_list()
-		self.build_help_list()
+		self.build_left_pane_list()
 
 		self.set_message_window_visible(False)
 
@@ -1327,31 +1359,16 @@ class Cardapio(dbus.service.Object):
 			else: self.panel_button.deselect()
 
 
-	def build_help_list(self):
+	def build_left_pane_list(self):
 
-		items = [
-			[
-				'gnome-control-center', 
-				_('Control Center'), 
-				_('The Gnome configuration tool'), 
-				'gnome-control-center',
-				self.system_section_contents
-			],
-			[
-				'gnome-help', 
-				_('Help and Support'), 
-				_('Get help with %(distro_name)s') % {'distro_name':Cardapio.distro_name}, 
-				'help-contents',
-				self.help_section_contents
-			],
-		]
+		for app in self.settings['left pane items']:
 
-		for item in items:
+			button = self.add_sidebar_button(app['name'], app['icon name'], self.sideapp_pane, tooltip = app['tooltip'], use_toggle_button = False)
+			self.connect_command(button, app['type'], app['command'])
 
-			button = self.add_sidebar_button(item[1], item[3], self.sideapp_pane, tooltip = item[2], use_toggle_button = False)
-			button.connect('clicked', self.on_raw_button_clicked, item[0])
+			button.launcher_info = app
 
-			button = self.add_launcher_entry(item[1], item[3], item[4], 'raw', item[0], tooltip = item[2], app_list = self.app_list)
+			button = self.add_launcher_entry(app['name'], app['icon name'], self.system_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
 
 
 	def build_places_list(self):
@@ -1449,7 +1466,12 @@ class Cardapio(dbus.service.Object):
 		
 		for app in self.settings['pinned items']:
 
-			button = self.add_launcher_entry(app['name'], app['icon_name'], self.favorites_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
+			# fixing a misspelling from the old config files...
+			if 'icon_name' in app:
+				app['icon name'] = app['icon_name']
+				app.pop('icon_name')
+
+			button = self.add_launcher_entry(app['name'], app['icon name'], self.favorites_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
 
 			if app['name'].lower().find(text) == -1:
 				button.hide()
@@ -1549,13 +1571,6 @@ class Cardapio(dbus.service.Object):
 		return section_slab, section_contents
 
 
-	def add_help_slab(self):
-
-		section_slab, section_contents = self.add_slab(_('Help'), 'system-help', hide = True)
-		self.help_section_slab = section_slab
-		self.help_section_contents = section_contents
-
-
 	def add_places_slab(self):
 
 		section_slab, section_contents = self.add_slab(_('Places'), 'folder', tooltip = _('Access documents and folders'), hide = False)
@@ -1618,7 +1633,21 @@ class Cardapio(dbus.service.Object):
 			# NOTE: IF THERE ARE CHANGES IN THE UI FILE, THIS MAY PRODUCE
 			# HARD-TO-FIND BUGS!!
 
-		button.connect('button-press-event', self.on_appbutton_button_pressed)
+		self.connect_command(button, command_type, command)
+
+		# save some metadata for easy access
+		button.launcher_info = {
+			'name'       : self.unescape(button_str),
+			'tooltip'    : tooltip,
+			'icon name'  : icon_name,
+			'command'    : command,
+			'type'       : command_type,
+		}
+
+		return button
+
+
+	def connect_command(self, button, command_type, command):
 
 		if command_type == 'app':
 			button.connect('clicked', self.on_appbutton_clicked, command)
@@ -1629,15 +1658,7 @@ class Cardapio(dbus.service.Object):
 		elif command_type == 'xdg':
 			button.connect('clicked', self.on_xdg_button_clicked, command)
 
-		# save some metadata for easy access
-		button.launcher_info = {}
-		button.launcher_info['name']      = self.unescape(button_str)
-		button.launcher_info['tooltip']   = tooltip
-		button.launcher_info['icon_name'] = icon_name
-		button.launcher_info['command']   = command
-		button.launcher_info['type']      = command_type
-
-		return button
+		button.connect('button-press-event', self.on_appbutton_button_pressed)
 
 
 	def add_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = None, is_launcher_button = True, append = True):
@@ -1807,15 +1828,37 @@ class Cardapio(dbus.service.Object):
 		self.build_favorites_list()
 
 
+	def on_add_to_left_pane_clicked(self, widget):
+
+		self.settings['left pane items'].append(self.app_clicked)
+		self.clear_pane(self.system_section_contents)
+ 		self.clear_pane(self.sideapp_pane)
+		self.build_left_pane_list()
+
+
+	def on_remove_from_left_pane_clicked(self, widget):
+
+		self.settings['left pane items'].remove(self.app_clicked)
+		self.clear_pane(self.system_section_contents)
+ 		self.clear_pane(self.sideapp_pane)
+		self.build_left_pane_list()
+
+
 	def on_appbutton_button_pressed(self, widget, event):
 
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 
 			already_pinned = False
+			already_on_left_pane = False
 
 			for command in [app['command'] for app in self.settings['pinned items']]:
 				if command == widget.launcher_info['command']: 
 					already_pinned = True
+					break
+
+			for command in [app['command'] for app in self.settings['left pane items']]:
+				if command == widget.launcher_info['command']: 
+					already_on_left_pane = True
 					break
 
 			if already_pinned:
@@ -1824,6 +1867,13 @@ class Cardapio(dbus.service.Object):
 			else:
 				self.pin_menuitem.show()
 				self.unpin_menuitem.hide()
+
+			if already_on_left_pane:
+				self.add_to_pane_menuitem.hide()
+				self.remove_from_pane_menuitem.show()
+			else:
+				self.add_to_pane_menuitem.show()
+				self.remove_from_pane_menuitem.hide()
 
 			self.app_clicked = widget.launcher_info
 
@@ -1958,7 +2008,6 @@ class Cardapio(dbus.service.Object):
 
 	def hide_all_transitory_sections(self, fully_hide = False):
 
-		self.hide_section(self.help_section_slab   , fully_hide)
 		self.hide_section(self.session_section_slab, fully_hide)
 		self.hide_section(self.system_section_slab , fully_hide)
 		
