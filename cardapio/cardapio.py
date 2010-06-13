@@ -136,12 +136,16 @@ class Cardapio(dbus.service.Object):
 		self.setup_base_ui() # must be the first ui-related method to be called
 		self.build_ui() 
 		self.build_plugin_database() 
-		self.setup_ui_from_settings() 
+		self.setup_ui_from_all_settings() 
 		self.activate_plugins_from_settings()
 
 		self.schedule_search_with_plugins('')
 
 		if not hidden: self.show()
+
+		# this is useful so that the user can edit the config file on first-run 
+		# without need to quit cardapio first:
+		self.save_config_file()
 
 
 	def quit(self, *dummy):
@@ -321,6 +325,7 @@ class Cardapio(dbus.service.Object):
 		self.settings['cardapio version'] = self.version
 
 		self.read_config_option(s, 'window size'                , None                     ) # format: [px, px]
+		self.read_config_option(s, 'splitter position'          , 0                        ) # format: [px, px]
 		self.read_config_option(s, 'show session buttons'       , False                    ) # bool
 		self.read_config_option(s, 'min search string length'   , 3                        ) # characters
 		self.read_config_option(s, 'menu rebuild delay'         , 10                       , force_update_from_version = [0,9,95]) # seconds
@@ -332,10 +337,6 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'applet icon'                , 'start-here'             , override_empty_str = True) # string (either a path to the icon, or an icon name)
 		self.read_config_option(s, 'pinned items'               , []                       ) # URIs
 		self.read_config_option(s, 'active plugins'             , ['tracker', 'google']    ) # filenames
-
-		# this is useful so that the user can edit the config file on first-run 
-		# without need to quit cardapio first:
-		self.save_config_file()
 
 
 	def read_config_option(self, user_settings, key, val, override_empty_str = False, force_update_from_version = None):
@@ -358,6 +359,12 @@ class Cardapio(dbus.service.Object):
 
 
 	def save_config_file(self):
+
+		if self.get_object('MainSplitter').get_property('position_set'):
+			self.settings['splitter position'] = self.get_object('MainSplitter').get_position()
+
+		else:
+			self.settings['splitter position'] = 0
 
 		config_file = self.get_config_file('w')
 		json.dump(self.settings, config_file, sort_keys = True, indent = 4)
@@ -488,7 +495,15 @@ class Cardapio(dbus.service.Object):
 		self.panel_button.set_image(button_icon)
 
 
-	def setup_ui_from_settings(self):
+	def setup_ui_from_all_settings(self):
+
+		self.setup_ui_from_gui_settings()
+
+		if self.settings['splitter position'] > 0:
+			self.get_object('MainSplitter').set_position(self.settings['splitter position'])
+
+
+	def setup_ui_from_gui_settings(self):
 
 		if self.keybinding is not None:
 			keybinder.unbind(self.keybinding)
@@ -624,7 +639,7 @@ class Cardapio(dbus.service.Object):
 		self.settings['applet label'] = self.get_object('OptionAppletLabel').get_text()
 		self.settings['applet icon'] = self.get_object('OptionAppletIcon').get_text()
 		self.settings['show session buttons'] = self.get_object('OptionSessionButtons').get_active()
-		self.setup_ui_from_settings()
+		self.setup_ui_from_gui_settings()
 
 
 	def on_plugin_apply_clicked(self, widget):
