@@ -89,7 +89,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.94'
+	version = '0.9.95'
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
@@ -307,18 +307,18 @@ class Cardapio(dbus.service.Object):
 		except  : pass
 		finally : config_file.close()
 
-		self.read_config_option(s, 'cardapio version'           , self.version)
+		self.settings['cardapio version'] = self.version
 
 		self.read_config_option(s, 'window size'                , None                     ) # format: [px, px]
 		self.read_config_option(s, 'show session buttons'       , False                    ) # bool
 		self.read_config_option(s, 'min search string length'   , 3                        ) # characters
-		self.read_config_option(s, 'menu rebuild delay'         , 10                       ) # seconds
+		self.read_config_option(s, 'menu rebuild delay'         , 10                       , force_update_from_version = [0,9,95]) # seconds
 		self.read_config_option(s, 'search results limit'       , 5                        ) # results
-		self.read_config_option(s, 'local search update delay'  , 100                      ) # msec
-		self.read_config_option(s, 'remote search update delay' , 250                      ) # msec
+		self.read_config_option(s, 'local search update delay'  , 100                      , force_update_from_version = [0,9,95]) # msec
+		self.read_config_option(s, 'remote search update delay' , 250                      , force_update_from_version = [0,9,95]) # msec
 		self.read_config_option(s, 'keybinding'                 , '<Super>space'           ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
 		self.read_config_option(s, 'applet label'               , Cardapio.distro_name     ) # string
-		self.read_config_option(s, 'applet icon'                , 'start-here', True       ) # string (either a path to the icon, or an icon name)
+		self.read_config_option(s, 'applet icon'                , 'start-here'             , override_empty_str = True) # string (either a path to the icon, or an icon name)
 		self.read_config_option(s, 'pinned items'               , []                       ) # URIs
 		self.read_config_option(s, 'active plugins'             , ['tracker', 'google']    ) # filenames
 
@@ -327,15 +327,23 @@ class Cardapio(dbus.service.Object):
 		self.save_config_file()
 
 
-	def read_config_option(self, s, key, val, override_empty = False):
+	def read_config_option(self, user_settings, key, val, override_empty_str = False, force_update_from_version = None):
 
-		if key in s:
-			if override_empty and not s[key]:
+		if key in user_settings:
+			if override_empty_str and len(user_settings[key]) == 0:
 				self.settings[key] = val
 			else:
-				self.settings[key] = s[key]
+				self.settings[key] = user_settings[key]
 		else: 
 			self.settings[key] = val
+
+		if force_update_from_version is not None:
+
+			user_version = [int(i) for i in user_settings['cardapio version'].split('.')]
+
+			if 'cardapio version' not in user_settings or user_version < force_update_from_version:
+
+				self.settings[key] = val
 
 
 	def save_config_file(self):
@@ -1426,7 +1434,7 @@ class Cardapio(dbus.service.Object):
 		
 		for app in self.settings['pinned items']:
 
-			button = self.add_launcher_entry(app['name'], app['icon_name'], self.favorites_section_contents, app['command_type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
+			button = self.add_launcher_entry(app['name'], app['icon_name'], self.favorites_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
 
 			if app['name'].find(text) == -1:
 				button.hide()
@@ -1596,11 +1604,11 @@ class Cardapio(dbus.service.Object):
 
 		# save some metadata for easy access
 		button.launcher_info = {}
-		button.launcher_info['name']         = button_str
-		button.launcher_info['tooltip']      = tooltip
-		button.launcher_info['icon_name']    = icon_name
-		button.launcher_info['command']      = command
-		button.launcher_info['command_type'] = command_type
+		button.launcher_info['name']      = button_str
+		button.launcher_info['tooltip']   = tooltip
+		button.launcher_info['icon_name'] = icon_name
+		button.launcher_info['command']   = command
+		button.launcher_info['type']      = command_type
 
 		return button
 
