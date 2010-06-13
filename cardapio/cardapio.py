@@ -328,10 +328,10 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'splitter position'          , 0                        ) # format: [px, px]
 		self.read_config_option(s, 'show session buttons'       , False                    ) # bool
 		self.read_config_option(s, 'min search string length'   , 3                        ) # characters
-		self.read_config_option(s, 'menu rebuild delay'         , 10                       , force_update_from_version = [0.9.96]) # seconds
+		self.read_config_option(s, 'menu rebuild delay'         , 10                       , force_update_from_version = [0,9,96]) # seconds
 		self.read_config_option(s, 'search results limit'       , 5                        ) # results
-		self.read_config_option(s, 'local search update delay'  , 100                      , force_update_from_version = [0.9.96]) # msec
-		self.read_config_option(s, 'remote search update delay' , 250                      , force_update_from_version = [0.9.96]) # msec
+		self.read_config_option(s, 'local search update delay'  , 100                      , force_update_from_version = [0,9,96]) # msec
+		self.read_config_option(s, 'remote search update delay' , 250                      , force_update_from_version = [0,9,96]) # msec
 		self.read_config_option(s, 'keybinding'                 , '<Super>space'           ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
 		self.read_config_option(s, 'applet label'               , Cardapio.distro_name     ) # string
 		self.read_config_option(s, 'applet icon'                , 'start-here'             , override_empty_str = True) # string (either a path to the icon, or an icon name)
