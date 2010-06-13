@@ -1200,6 +1200,8 @@ class Cardapio(dbus.service.Object):
 		self.visible = False
 		self.last_visibility_toggle = time.time()
 
+		self.save_dimensions()
+
 		self.window.hide()
 
 		self.clear_search_entry()
