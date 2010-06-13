@@ -1425,23 +1425,25 @@ class Cardapio(dbus.service.Object):
 
 	def build_favorites_list(self):
 
-		if len(self.settings['pinned items']) == 0:
-			self.hide_section(self.favorites_section_slab, fully_hide = True)
-			return
-
 		self.show_section(self.favorites_section_slab, fully_show = True)
 		text = self.search_entry.get_text().lower()
+
+		no_results = True 
 		
 		for app in self.settings['pinned items']:
 
 			button = self.add_launcher_entry(app['name'], app['icon_name'], self.favorites_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
 
-			if app['name'].find(text) == -1:
+			if app['name'].lower().find(text) == -1:
 				button.hide()
 			else:
 				button.show()
 				self.set_section_has_entries(self.favorites_section_slab)
-				self.no_results_to_show = False
+				no_results = False
+
+		if no_results:
+			self.hide_section(self.favorites_section_slab, fully_hide = True)
+			return
 
 
 	def build_session_list(self):
@@ -1597,8 +1599,10 @@ class Cardapio(dbus.service.Object):
 
 		if command_type == 'app':
 			button.connect('clicked', self.on_appbutton_clicked, command)
+
 		elif command_type == 'raw':
 			button.connect('clicked', self.on_raw_button_clicked, command)
+
 		elif command_type == 'xdg':
 			button.connect('clicked', self.on_xdg_button_clicked, command)
 
