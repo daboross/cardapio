@@ -1,8 +1,14 @@
+cardapio (0.9.96-ubuntu1) lucid; urgency=low
+
+  * Bug fixes :)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 01:25:00 -0400
+
 cardapio (0.9.95-ubuntu1) lucid; urgency=low
 
   * Added pinning/unpinning GUI
 
- -- Thiago Teixeira <tvst@hotmail.com>  Sat, 12 Jun 2010 24:38:00 -0400
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 12 Jun 2010 23:38:00 -0400
 
 cardapio (0.9.94-ubuntu1) lucid; urgency=low
 
