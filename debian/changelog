@@ -1,3 +1,9 @@
+cardapio (0.9.97-ubuntu1) lucid; urgency=low
+
+  * Fixed a critical bug that made it not launch!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 01:25:00 -0400
+
 cardapio (0.9.96-ubuntu1) lucid; urgency=low
 
   * Bug fixes :)
