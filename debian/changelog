@@ -1,3 +1,9 @@
+cardapio (0.9.98-ubuntu3) lucid; urgency=low
+
+  * Other small fixes...
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 12:43:00 -0400
+
 cardapio (0.9.98-ubuntu2) lucid; urgency=low
 
   * Fixes the default window size

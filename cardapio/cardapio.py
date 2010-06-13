@@ -322,8 +322,6 @@ class Cardapio(dbus.service.Object):
 		finally: 
 			config_file.close()
 
-		self.settings['cardapio version'] = self.version
-
 		self.read_config_option(s, 'window size'                , None                     ) # format: [px, px]
 		self.read_config_option(s, 'splitter position'          , 0                        ) # format: [px, px]
 		self.read_config_option(s, 'show session buttons'       , False                    ) # bool
@@ -337,6 +335,9 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'applet icon'                , 'start-here'             , override_empty_str = True) # string (either a path to the icon, or an icon name)
 		self.read_config_option(s, 'pinned items'               , []                       ) # URIs
 		self.read_config_option(s, 'active plugins'             , ['tracker', 'google']    ) # filenames
+
+		self.settings['cardapio version'] = self.version
+
 
 
 	def read_config_option(self, user_settings, key, val, override_empty_str = False, force_update_from_version = None):
@@ -505,6 +506,8 @@ class Cardapio(dbus.service.Object):
 
 		if self.settings['splitter position'] > 0:
 			self.get_object('MainSplitter').set_position(self.settings['splitter position'])
+
+		self.restore_dimensions()
 
 
 	def setup_ui_from_gui_settings(self):
@@ -1205,7 +1208,6 @@ class Cardapio(dbus.service.Object):
 		self.last_visibility_toggle = time.time()
 
 		self.save_dimensions()
-
 		self.window.hide()
 
 		self.clear_search_entry()
