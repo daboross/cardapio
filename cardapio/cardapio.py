@@ -1459,7 +1459,9 @@ class Cardapio(dbus.service.Object):
 
 		if no_results:
 			self.hide_section(self.favorites_section_slab, fully_hide = True)
-			return
+
+		elif self.selected_section is not None and self.selected_section != self.favorites_section_slab:
+			self.hide_section(self.favorites_section_slab)
 
 
 	def build_session_list(self):
