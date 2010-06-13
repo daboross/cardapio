@@ -833,7 +833,7 @@ class Cardapio(dbus.service.Object):
 
 		for app in self.app_list:
 
-			if app['title'].find(text) == -1:
+			if app['name'].find(text) == -1:
 				app['button'].hide()
 			else:
 				app['button'].show()
@@ -1422,9 +1422,18 @@ class Cardapio(dbus.service.Object):
 			return
 
 		self.show_section(self.favorites_section_slab, fully_show = True)
-
+		text = self.search_entry.get_text().lower()
+		
 		for app in self.settings['pinned items']:
+
 			button = self.add_launcher_entry(app['name'], app['icon_name'], self.favorites_section_contents, app['command_type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
+
+			if app['name'].find(text) == -1:
+				button.hide()
+			else:
+				button.show()
+				self.set_section_has_entries(self.favorites_section_slab)
+				self.no_results_to_show = False
 
 
 	def build_session_list(self):
@@ -1495,7 +1504,7 @@ class Cardapio(dbus.service.Object):
 					'has entries': False, 
 					'category': sidebar_button, 
 					'contents': section_contents, 
-					'title': title_str,
+					'name': title_str,
 					}
 
 		else:
@@ -1503,7 +1512,7 @@ class Cardapio(dbus.service.Object):
 					'has entries': True, 
 					'category': sidebar_button, 
 					'contents': section_contents, 
-					'title': title_str,
+					'name': title_str,
 					}
 
 		return section_slab, section_contents
@@ -1571,7 +1580,7 @@ class Cardapio(dbus.service.Object):
 		button = self.add_button(button_str, icon_name, parent_widget, tooltip, is_launcher_button = True)
 
 		if app_list is not None:
-			app_list.append({'title': button_str.lower(), 'button': button, 'section': parent_widget.parent.parent})
+			app_list.append({'name': button_str.lower(), 'button': button, 'section': parent_widget.parent.parent})
 			# save the app name, its button, and the section slab it came from
 			# NOTE: IF THERE ARE CHANGES IN THE UI FILE, THIS MAY PRODUCE
 			# HARD-TO-FIND BUGS!!
@@ -1905,7 +1914,7 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			self.selected_section.hide()
-			self.show_no_results_text(_('No results to show in "%(category_name)s"') % {'category name': self.section_list[self.selected_section]['title']})
+			self.show_no_results_text(_('No results to show in "%(category_name)s"') % {'category name': self.section_list[self.selected_section]['name']})
 
 
 	def hide_all_transitory_sections(self, fully_hide = False):
