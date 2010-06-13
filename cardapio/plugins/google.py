@@ -1,9 +1,6 @@
 import simplejson, urllib2, gio
 from glib import GError
 
-if '_' not in locals():
-	_ = lambda x: x
-
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = 'Thiago Teixeira'

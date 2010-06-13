@@ -1,8 +1,5 @@
 import urllib2, os
 
-if '_' not in locals():
-	_ = lambda x: x
-
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = 'Thiago Teixeira'
