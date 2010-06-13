@@ -84,7 +84,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			formatted_result = {}
 			formatted_result['name'] = child_name
 			formatted_result['icon name'] = icon_name
-			formatted_result['tooltip'] = canonical_path
+			formatted_result['tooltip'] = result[0]
 			formatted_result['xdg uri'] = canonical_path
 
 			formatted_results.append(formatted_result)

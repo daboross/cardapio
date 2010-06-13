@@ -303,9 +303,15 @@ class Cardapio(dbus.service.Object):
 		self.settings = {}
 		s = {}
 
-		try     : s = json.load(config_file)
-		except  : pass
-		finally : config_file.close()
+		try: 
+			s = json.load(config_file)
+
+		except Exception, exception:
+			logging.warning('Could not read config file:')
+			logging.warning(exception)
+
+		finally: 
+			config_file.close()
 
 		self.settings['cardapio version'] = self.version
 
@@ -1439,6 +1445,7 @@ class Cardapio(dbus.service.Object):
 			else:
 				button.show()
 				self.set_section_has_entries(self.favorites_section_slab)
+				self.no_results_to_show = False
 				no_results = False
 
 		if no_results:
@@ -1608,7 +1615,7 @@ class Cardapio(dbus.service.Object):
 
 		# save some metadata for easy access
 		button.launcher_info = {}
-		button.launcher_info['name']      = button_str
+		button.launcher_info['name']      = self.unescape(button_str)
 		button.launcher_info['tooltip']   = tooltip
 		button.launcher_info['icon_name'] = icon_name
 		button.launcher_info['command']   = command
