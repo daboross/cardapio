@@ -90,7 +90,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.93'
+	version = '0.9.94'
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
@@ -138,6 +138,8 @@ class Cardapio(dbus.service.Object):
 		self.build_plugin_database() 
 		self.setup_ui_from_settings() 
 		self.activate_plugins_from_settings()
+
+		self.schedule_search_with_plugins('')
 
 		if not hidden: self.show()
 
@@ -496,7 +498,7 @@ class Cardapio(dbus.service.Object):
 		self.section_list = {}
 		self.app_list = []
 
-		button = self.add_sidebar_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'))
+		button = self.add_sidebar_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'), append = False)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_sections_sidebar_button = button 
 		self.set_sidebar_button_active(button, True)
@@ -684,10 +686,7 @@ class Cardapio(dbus.service.Object):
 
 	def end_resize(self, window, allocation):
 
-		try:
-			self.window.handler_unblock_by_func(self.on_mainwindow_focus_out)
-		except:
-			pass
+		self.window.handler_unblock_by_func(self.on_mainwindow_focus_out)
 
 
 	def on_mainwindow_key_pressed(self, widget, event):
@@ -725,19 +724,11 @@ class Cardapio(dbus.service.Object):
 		if (0 <= x <= w and 0 <= y <= h): 
 			return
 
-		# Removed this because of a regression: the get_visible() commands
-		# seems to *always* return True!!!
-		#
-		# TODO: figure this out
-		#
-		# # make sure showing the context menu doesn't cause a focus-out event
-		# if self.context_menu.get_visible() or self.app_context_menu.get_visible():
-		# 	return
-
 		# make sure resizing doesn't cause a focus-out event
-		window_x, window_y, window_w, window_h = self.window.get_allocation()
+		window_x, window_y = self.window.window.get_origin()
+		window_w, window_h = self.window.window.get_size()
 
-		if window_x <= x <= window_x + window_w and window_y <= y <= window_y + window_h:
+		if 0 <= x <= window_w and 0 <= y <= window_h:
 
 			mask = widget.window.get_pointer()[2]
 
@@ -805,25 +796,23 @@ class Cardapio(dbus.service.Object):
 		text = self.search_entry.get_text().strip()
 
 		self.search_menus(text)
+		self.schedule_search_with_plugins(text)
 
 		if len(text) == 0:
 			#self.no_results_to_show = False
+
 			self.hide_all_transitory_sections(fully_hide = True)
 			return
 
 		else:
 			self.all_sections_sidebar_button.set_sensitive(True)
 
-		if self.active_plugin_instances:
+		if len(text) < self.settings['min search string length']:
 
-			self.schedule_search_with_plugins(text)
-
-			if len(text) < self.settings['min search string length']:
-
-				for plugin in self.active_plugin_instances:
-					if plugin.hide_from_sidebar:
-						self.set_section_is_empty(plugin.section_slab)
-						plugin.section_slab.hide()
+			for plugin in self.active_plugin_instances:
+				if plugin.hide_from_sidebar:
+					self.set_section_is_empty(plugin.section_slab)
+					plugin.section_slab.hide()
 
 
 	def search_menus(self, text):
@@ -899,7 +888,7 @@ class Cardapio(dbus.service.Object):
 
 		plugin.is_running = False
 
-		if len(self.search_entry.get_text()) < self.settings['min search string length']:
+		if plugin.hide_from_sidebar and len(self.search_entry.get_text()) < self.settings['min search string length']:
 
 			# Handle the case where user presses backspace *very* quickly, and the
 			# search starts when len(text) > min_search_string_length, but after
@@ -1481,13 +1470,13 @@ class Cardapio(dbus.service.Object):
 				self.add_slab(node.name, node.icon, node.get_comment(), node = node, hide = False)
 
 
-	def add_slab(self, title_str, icon_name = None, tooltip = '', hide = False, node = None):
+	def add_slab(self, title_str, icon_name = None, tooltip = '', hide = False, node = None, append = True):
 
 		# add category to category pane
-		sidebar_button = self.add_sidebar_button(title_str, icon_name, self.category_pane, tooltip = tooltip)
+		sidebar_button = self.add_sidebar_button(title_str, icon_name, self.category_pane, tooltip = tooltip, append = append)
 
 		# add category to application pane
-		section_slab, section_contents, dummy = self.add_application_section(title_str)
+		section_slab, section_contents, dummy = self.add_application_section(title_str, append = append)
 
 		if node is not None:
 			# add all apps in this category to application pane
@@ -1531,7 +1520,7 @@ class Cardapio(dbus.service.Object):
 
 	def add_favorites_slab(self):
 
-		section_slab, section_contents = self.add_slab(_('Pinned items'), 'emblem-favorite', tooltip = _('Your favorite applications'), hide = False)
+		section_slab, section_contents = self.add_slab(_('Pinned items'), 'emblem-favorite', tooltip = _('Your favorite applications'), hide = False, append = False)
 		self.favorites_section_slab = section_slab
 		self.favorites_section_contents = section_contents
 
@@ -1552,7 +1541,8 @@ class Cardapio(dbus.service.Object):
 
 	def add_plugin_slab(self, plugin):
 
-		section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, hide = plugin.hide_from_sidebar)
+		append = (plugin.category_position == 'end')
+		section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, hide = plugin.hide_from_sidebar, append = append)
 		return section_slab, section_contents
 
 
@@ -1567,9 +1557,9 @@ class Cardapio(dbus.service.Object):
 		self.search_entry.set_text('')
 
 
-	def add_sidebar_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = True):
+	def add_sidebar_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = True, append = True):
 
-		return self.add_button(button_str, icon_name, parent_widget, tooltip, use_toggle_button = use_toggle_button, is_launcher_button = False)
+		return self.add_button(button_str, icon_name, parent_widget, tooltip, use_toggle_button = use_toggle_button, is_launcher_button = False, append = append)
 
 
 	def add_launcher_entry(self, button_str, icon_name, parent_widget, tooltip = '', app_list = None):
@@ -1585,7 +1575,7 @@ class Cardapio(dbus.service.Object):
 		return button
 
 
-	def add_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = None, is_launcher_button = True):
+	def add_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = None, is_launcher_button = True, append = True):
 
 		if is_launcher_button or use_toggle_button == False:
 			button = gtk.Button()
@@ -1622,12 +1612,15 @@ class Cardapio(dbus.service.Object):
 		button.set_use_underline(False)
 
 		button.show_all()
+		#if append:
+		#	parent_widget.pack_end(button, expand = False, fill = False)
+		#else:
 		parent_widget.pack_start(button, expand = False, fill = False)
 
 		return button
 
 
-	def add_application_section(self, section_title = None):
+	def add_application_section(self, section_title = None, append = True):
 
 		section_slab, section_contents = self.add_section()
 
@@ -1642,6 +1635,9 @@ class Cardapio(dbus.service.Object):
 		section_slab.set_name('SectionSlab' + s)
 		section_contents.set_name('SectionContents' + s + c)
 
+		#if append:
+		#	self.application_pane.pack_end(section_slab, expand = False, fill = False)
+		#else:
 		self.application_pane.pack_start(section_slab, expand = False, fill = False)
 
 		return section_slab, section_contents, label
@@ -1995,11 +1991,12 @@ class CardapioPluginInterface:
 
 	plugin_api_version = 1.1
 
-	# one of: None, 'local search update delay', 'remote search update delay'
-	search_delay_type  = 'local search update delay'
+	# one of: None, 'local', 'remote'
+	search_delay_type  = 'local'
 
 	category_name      = '' # use gettext for category
-	category_icon      = ''
+	category_icon      = '' # TODO: implement this
+	category_position  = 'end' # one of: 'start' or 'end'
 	hide_from_sidebar  = True
 
 	# TODO: add to the plugin API (post version 1.0):

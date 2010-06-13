@@ -16,10 +16,11 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	plugin_api_version = 1.1
 
-	search_delay_type  = 'remote search update delay'
+	search_delay_type  = 'remote'
 
 	category_name      = _('Web Results')
 	category_icon      = 'system-search'
+	category_position  = 'end'
 	hide_from_sidebar  = True
 
 

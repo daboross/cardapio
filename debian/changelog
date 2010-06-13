@@ -1,3 +1,9 @@
+cardapio (0.9.94-ubuntu1) lucid; urgency=low
+
+  * Fixed resizing bug
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 12 Jun 2010 18:18:00 -0400
+
 cardapio (0.9.93-ubuntu1) lucid; urgency=low
 
   * Fixed panel sizing and orientation bugs
