@@ -176,27 +176,32 @@ class Cardapio(dbus.service.Object):
 	def build_plugin_database(self):
 
 		self.plugin_database = {}
-		plugin_dir = os.path.join(os.path.dirname(__file__), 'plugins')
+		plugin_dirs = [
+			os.path.join(os.path.dirname(__file__), 'plugins'), 
+			os.path.join(DesktopEntry.xdg_config_home, 'Cardapio', 'plugins')
+			]
 
-		for root, dir_, files in os.walk(plugin_dir):
+		for plugin_dir in plugin_dirs:
 
-			for file_ in files:
+			for root, dir_, files in os.walk(plugin_dir):
 
-				if len(file_) > 3 and file_[-3:] == '.py' and file_[0] != '_':
+				for file_ in files:
 
-					basename = file_[:-3]
+					if len(file_) > 3 and file_[-3:] == '.py' and file_[0] != '_':
 
-					plugin_class = self.get_plugin_class(basename)
-					if type(plugin_class) is str: continue
+						basename = file_[:-3]
 
-					self.plugin_database[basename] = {
-						'name' : plugin_class.name,
-						'author' : plugin_class.author,
-						'description' : plugin_class.description,
-						'category name' : plugin_class.category_name,
-						'category icon' : plugin_class.category_icon,
-						'hide from sidebar' : plugin_class.hide_from_sidebar,
-						}
+						plugin_class = self.get_plugin_class(basename)
+						if type(plugin_class) is str: continue
+
+						self.plugin_database[basename] = {
+							'name' : plugin_class.name,
+							'author' : plugin_class.author,
+							'description' : plugin_class.description,
+							'category name' : plugin_class.category_name,
+							'category icon' : plugin_class.category_icon,
+							'hide from sidebar' : plugin_class.hide_from_sidebar,
+							}
 
 
 	def activate_plugins_from_settings(self):
