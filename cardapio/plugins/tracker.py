@@ -15,7 +15,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	plugin_api_version = 1.1
 
-	search_delay_type  = 'local'
+	search_delay_type  = 'local search update delay'
 
 	category_name      = _('Local Results')
 	category_icon      = 'system-search'

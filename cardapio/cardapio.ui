@@ -17,7 +17,7 @@
     <signal name="key_press_event" handler="on_mainwindow_after_key_pressed" after="yes"/>
     <signal name="key_press_event" handler="on_mainwindow_key_pressed"/>
     <signal name="focus_out_event" handler="on_mainwindow_focus_out"/>
-    <signal name="size_allocate" handler="end_resize"/>
+    <signal name="size_allocate" handler="unblock_focus_out_event"/>
     <signal name="configure_event" handler="on_mainwindow_configure_event"/>
     <signal name="delete_event" handler="on_mainwindow_delete_event"/>
     <child>
@@ -836,6 +836,7 @@ Rebuilding...	</property>
   </object>
   <object class="GtkMenu" id="CardapioContextMenu">
     <property name="visible">True</property>
+    <signal name="hide" handler="unblock_focus_out_event"/>
     <child>
       <object class="GtkImageMenuItem" id="menuitem1">
         <property name="label">gtk-properties</property>
@@ -857,6 +858,7 @@ Rebuilding...	</property>
   </object>
   <object class="GtkMenu" id="AppContextMenu">
     <property name="visible">True</property>
+    <signal name="hide" handler="unblock_focus_out_event"/>
     <child>
       <object class="GtkImageMenuItem" id="PinMenuItem">
         <property name="label" translatable="yes">_Pin this item</property>
@@ -872,6 +874,7 @@ Rebuilding...	</property>
       <object class="GtkImageMenuItem" id="UnpinMenuItem">
         <property name="label" translatable="yes">_Unpin this item</property>
         <property name="visible">True</property>
+        <property name="use_underline">True</property>
         <property name="image">image3</property>
         <property name="use_stock">False</property>
         <signal name="activate" handler="on_unpin_this_app_clicked"/>
