@@ -1,17 +1,20 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-13 19:14-0400\n"
+"POT-Creation-Date: 2010-06-14 02:16-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2010-06-14 01:04+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
 
 #: cardapio.py:293 cardapio.py:302
 #, python-format
@@ -44,122 +47,122 @@ msgstr ""
 msgid "Get help with %(distro_name)s"
 msgstr ""
 
-#: cardapio.py:478
+#: cardapio.py:485
 msgid "_Properties"
 msgstr ""
 
-#: cardapio.py:479
+#: cardapio.py:486
 msgid "_Edit Menus"
 msgstr ""
 
-#: cardapio.py:480
+#: cardapio.py:487 cardapio.ui.h:20
 msgid "_About Cardapio"
 msgstr ""
 
-#: cardapio.py:481
+#: cardapio.py:488
 msgid "_About Gnome"
 msgstr ""
 
-#: cardapio.py:482
+#: cardapio.py:489
 #, python-format
 msgid "_About %(distro_name)s"
 msgstr ""
 
-#: cardapio.py:572
+#: cardapio.py:595
 msgid "All"
 msgstr ""
 
-#: cardapio.py:572
+#: cardapio.py:595
 msgid "Show all categories"
 msgstr ""
 
-#: cardapio.py:1387
+#: cardapio.py:1426
 msgid "Home"
 msgstr ""
 
-#: cardapio.py:1387
+#: cardapio.py:1426
 msgid "Open your personal folder"
 msgstr ""
 
-#: cardapio.py:1388
+#: cardapio.py:1427
 msgid "Computer"
 msgstr ""
 
-#: cardapio.py:1388
+#: cardapio.py:1427
 msgid ""
 "Browse all local and remote disks and folders accessible from this computer"
 msgstr ""
 
-#: cardapio.py:1398
+#: cardapio.py:1437
 msgid "Desktop"
 msgstr ""
 
-#: cardapio.py:1419
+#: cardapio.py:1458
 msgid "Trash"
 msgstr ""
 
-#: cardapio.py:1419
+#: cardapio.py:1458
 msgid "Open the trash"
 msgstr ""
 
-#: cardapio.py:1506
+#: cardapio.py:1545
 msgid "Lock Screen"
 msgstr ""
 
-#: cardapio.py:1507
+#: cardapio.py:1546
 msgid "Protect your computer from unauthorized use"
 msgstr ""
 
-#: cardapio.py:1513
+#: cardapio.py:1552
 msgid "Log Out..."
 msgstr ""
 
-#: cardapio.py:1514
+#: cardapio.py:1553
 msgid "Log out of this session to log in as a different user"
 msgstr ""
 
-#: cardapio.py:1520
+#: cardapio.py:1559
 msgid "Shut Down..."
 msgstr ""
 
-#: cardapio.py:1521
+#: cardapio.py:1560
 msgid "Shut down the system"
 msgstr ""
 
-#: cardapio.py:1583
+#: cardapio.py:1622
 msgid "Places"
 msgstr ""
 
-#: cardapio.py:1583
+#: cardapio.py:1622
 msgid "Access documents and folders"
 msgstr ""
 
-#: cardapio.py:1589
+#: cardapio.py:1628
 msgid "Pinned items"
 msgstr ""
 
-#: cardapio.py:1589
+#: cardapio.py:1628
 msgid "Your favorite applications"
 msgstr ""
 
-#: cardapio.py:1596
+#: cardapio.py:1635
 msgid "Session"
 msgstr ""
 
-#: cardapio.py:1603
+#: cardapio.py:1642
 msgid "System"
 msgstr ""
 
-#: cardapio.py:1988
+#: cardapio.py:2027
 msgid "No results to show"
 msgstr ""
 
-#: cardapio.py:2014
+#: cardapio.py:2053
 #, python-format
 msgid "No results to show in \"%(category_name)s\""
 msgstr ""
 
-#: cardapio.py:2195
+#: cardapio.py:2234
 msgid "Access applications, folders, system settings, etc."
 msgstr ""
 
@@ -174,74 +177,82 @@ msgid ""
 msgstr ""
 
 #: cardapio.ui.h:4
-msgid "Applet icon:"
+msgid "Applet"
 msgstr ""
 
 #: cardapio.ui.h:5
-msgid "Applet label:"
+msgid "Applet icon:"
 msgstr ""
 
 #: cardapio.ui.h:6
-msgid "Cardapio"
+msgid "Applet label:"
 msgstr ""
 
 #: cardapio.ui.h:7
-msgid "Cardapio Properties"
+msgid "Cardapio"
 msgstr ""
 
 #: cardapio.ui.h:8
-msgid "Edit Menus"
+msgid "Cardapio Properties"
 msgstr ""
 
 #: cardapio.ui.h:9
-msgid "GNU General Public License v2\t"
+msgid "Edit Menus"
 msgstr ""
 
 #: cardapio.ui.h:10
-msgid "General"
+msgid "GNU General Public License v2\t"
 msgstr ""
 
 #: cardapio.ui.h:11
-msgid "Place this in the \"Pinned Items\" list"
+msgid "General"
 msgstr ""
 
 #: cardapio.ui.h:12
-msgid "Plugins"
+msgid "Open menu when cursor hovers the applet"
 msgstr ""
 
 #: cardapio.ui.h:13
-msgid "Search"
+msgid "Place this in the \"Pinned Items\" list"
 msgstr ""
 
 #: cardapio.ui.h:14
-msgid "Section Name"
+msgid "Plugins"
 msgstr ""
 
 #: cardapio.ui.h:15
-msgid "Shortcut key:"
+msgid "Search"
 msgstr ""
 
 #: cardapio.ui.h:16
-msgid "Show session buttons in bottom pane"
+msgid "Section Name"
 msgstr ""
 
 #: cardapio.ui.h:17
-msgid "View"
+msgid "Shortcut key:"
 msgstr ""
 
 #: cardapio.ui.h:18
-msgid "_Add to system pane"
+msgid "Show session buttons in bottom pane"
 msgstr ""
 
 #: cardapio.ui.h:19
-msgid "_Pin this item"
-msgstr ""
-
-#: cardapio.ui.h:20
-msgid "_Remove from system pane"
+msgid "View"
 msgstr ""
 
 #: cardapio.ui.h:21
+msgid "_Add to side pane"
+msgstr ""
+
+#: cardapio.ui.h:22
+msgid "_Pin this item"
+msgstr ""
+
+#: cardapio.ui.h:23
+msgid "_Remove from side pane"
+msgstr ""
+
+#: cardapio.ui.h:24
 msgid "_Unpin this item"
 msgstr ""
 

@@ -1,3 +1,10 @@
+cardapio (0.9.102-ubuntu1) lucid; urgency=low
+
+  * fixed issue where 'open on hover' and 'show session buttons' were
+  conflicting when showing the options dialog
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 22:00:00 -0400
+
 cardapio (0.9.101-ubuntu1) lucid; urgency=low
 
   * renamed system pane to side pane
