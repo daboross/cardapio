@@ -1,3 +1,15 @@
+cardapio (0.9.103-ubuntu2) lucid; urgency=low
+
+  * simple bugfix
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 14 Jun 2010 17:45:00 -0400
+
+cardapio (0.9.103-ubuntu1) lucid; urgency=low
+
+  * assorted bugfixes, mainly to do with the sidepane and window sizing
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 14 Jun 2010 17:45:00 -0400
+
 cardapio (0.9.102-ubuntu1) lucid; urgency=low
 
   * fixed issue where 'open on hover' and 'show session buttons' were

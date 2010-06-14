@@ -89,7 +89,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.102'
+	version = '0.9.103'
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
@@ -428,7 +428,7 @@ class Cardapio(dbus.service.Object):
 		self.options_dialog            = self.get_object('OptionsDialog')
 		self.application_pane          = self.get_object('ApplicationPane')
 		self.category_pane             = self.get_object('CategoryPane')
-		self.sidepane              = self.get_object('SideappPane')
+		self.sidepane                  = self.get_object('SideappPane')
 		self.search_entry              = self.get_object('SearchEntry')
 		self.scrolled_window           = self.get_object('ScrolledWindow')
 		self.scroll_adjustment         = self.scrolled_window.get_vadjustment()
@@ -1532,12 +1532,10 @@ class Cardapio(dbus.service.Object):
 
 		for app in self.settings['side pane items']:
 
+			button = self.add_app_entry(app['name'], app['icon name'], self.sidepane_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
+
 			button = self.add_sidebar_button(app['name'], app['icon name'], self.sidepane, tooltip = app['tooltip'], use_toggle_button = False)
 			self.connect_command(button, app['type'], app['command'])
-
-			button.app_info = app
-
-			button = self.add_app_entry(app['name'], app['icon name'], self.sidepane_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
 
 
 	def build_session_list(self):
@@ -2086,6 +2084,7 @@ class Cardapio(dbus.service.Object):
 
 		self.hide_section(self.session_section_slab, fully_hide)
 		self.hide_section(self.system_section_slab , fully_hide)
+		self.hide_section(self.sidepane_section_slab, fully_hide)
 		
 		self.hide_plugin_sections(fully_hide)
 
