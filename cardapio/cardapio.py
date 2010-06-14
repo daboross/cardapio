@@ -355,6 +355,7 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'window size'                , None                     ) # format: [px, px]
 		self.read_config_option(s, 'splitter position'          , 0                        ) # int in pixels
 		self.read_config_option(s, 'show session buttons'       , False                    ) # bool
+		self.read_config_option(s, 'open on hover'              , False                    ) # bool
 		self.read_config_option(s, 'min search string length'   , 3                        ) # characters
 		self.read_config_option(s, 'menu rebuild delay'         , 10                       , force_update_from_version = [0,9,96]) # seconds
 		self.read_config_option(s, 'search results limit'       , 5                        ) # results
@@ -469,8 +470,8 @@ class Cardapio(dbus.service.Object):
 			<popup name="button3">
 				<menuitem name="Item 1" verb="Properties" label="%s" pixtype="stock" pixname="gtk-properties"/>
 				<menuitem name="Item 2" verb="Edit" label="%s" pixtype="stock" pixname="gtk-edit"/>
-				<menuitem name="Item 3" verb="AboutCardapio" label="%s" pixtype="stock" pixname="gtk-about"/>
 				<separator />
+				<menuitem name="Item 3" verb="AboutCardapio" label="%s" pixtype="stock" pixname="gtk-about"/>
 				<menuitem name="Item 4" verb="AboutGnome" label="%s" pixtype="none"/>
 				<menuitem name="Item 5" verb="AboutDistro" label="%s" pixtype="none"/>
 			</popup>
@@ -528,6 +529,25 @@ class Cardapio(dbus.service.Object):
 		button_icon = self.get_icon(self.settings['applet icon'], self.get_best_icon_size(), 'distributor-logo')
 		self.panel_button.set_image(button_icon)
 
+		if self.panel_button.parent is None: return
+
+		self.panel_button.parent.connect('button-press-event', self.on_panel_button_pressed)
+
+		if 'applet_press_handler' in dir(self):
+			self.panel_button.disconnect(self.applet_press_handler)
+			self.panel_button.disconnect(self.applet_enter_handler)
+			self.panel_button.disconnect(self.applet_leave_handler)
+
+		if self.settings['open on hover']:
+			self.applet_press_handler = self.panel_button.connect('button-press-event', return_true)
+			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', self.show)
+			self.applet_leave_handler = self.panel_button.connect('leave-notify-event', self.hide)
+
+		else:
+			self.applet_press_handler = self.panel_button.connect('button-press-event', self.on_panel_button_toggled)
+			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', return_true)
+			self.applet_leave_handler = self.panel_button.connect('leave-notify-event', return_true)
+
 
 	def setup_ui_from_all_settings(self):
 
@@ -579,10 +599,7 @@ class Cardapio(dbus.service.Object):
 		self.hide_no_results_text()
 
 		if self.panel_applet is None:
-			self.get_object('LabelAppletLabel').hide()
-			self.get_object('OptionAppletLabel').hide()
-			self.get_object('LabelAppletIcon').hide()
-			self.get_object('OptionAppletIcon').hide()
+			self.get_object('AppletOptionPane').hide()
 
 		# slabs that should go *before* regular application slabs
 		self.add_favorites_slab()
@@ -614,17 +631,17 @@ class Cardapio(dbus.service.Object):
 		glib.idle_add(self.build_ui)
 
 
-	def open_about_dialog(self, widget, verb):
+	def open_about_dialog(self, widget, verb = None):
 
-		if verb == 'AboutCardapio':
-			self.about_dialog.show()
-
-		elif verb == 'AboutGnome':
+		if verb == 'AboutGnome':
 			self.launch_raw('gnome-about')
 
 		elif verb == 'AboutDistro':
 			self.launch_raw('yelp ghelp:about-%s' % Cardapio.distro_name.lower())
 			# i'm assuming this is the pattern for all distros...
+
+		else:
+			self.about_dialog.show()
 
 
 	def on_about_dialog_close(self, widget, response = None):
@@ -638,6 +655,7 @@ class Cardapio(dbus.service.Object):
 		self.get_object('OptionAppletLabel').set_text(self.settings['applet label'])
 		self.get_object('OptionAppletIcon').set_text(self.settings['applet icon'])
 		self.get_object('OptionSessionButtons').set_active(self.settings['show session buttons'])
+		self.get_object('OptionOpenOnHover').set_active(self.settings['open on hover'])
 
 		self.plugin_tree_model.clear()
 
@@ -673,6 +691,7 @@ class Cardapio(dbus.service.Object):
 		self.settings['applet label'] = self.get_object('OptionAppletLabel').get_text()
 		self.settings['applet icon'] = self.get_object('OptionAppletIcon').get_text()
 		self.settings['show session buttons'] = self.get_object('OptionSessionButtons').get_active()
+		self.settings['open on hover'] = self.get_object('OptionOpenOnHover').get_active()
 		self.setup_ui_from_gui_settings()
 
 
@@ -1207,7 +1226,7 @@ class Cardapio(dbus.service.Object):
 			gtk.main_iteration()
 
 
-	def show(self):
+	def show(self, *dummy):
 
 		self.auto_toggle_panel_button(True)
 
@@ -1227,7 +1246,7 @@ class Cardapio(dbus.service.Object):
 			self.rebuild_ui(show_message = True)
 
 
-	def hide(self):
+	def hide(self, *dummy):
 
 		self.auto_toggle_panel_button(False)
 
@@ -2198,13 +2217,6 @@ def applet_factory(applet, iid):
 	menu = gtk.MenuBar()
 	menu.set_name('CardapioAppletMenu')
 	menu.add(button)
-
-	button.connect('button-press-event', cardapio.on_panel_button_toggled)
-	menu.connect('button-press-event', cardapio.on_panel_button_pressed)
-
-	# make sure menuitem doesn't change focus on mouseout/mousein
-	button.connect('enter-notify-event', return_true)
-	button.connect('leave-notify-event', return_true)
 
 	gtk.rc_parse_string('''
 		style "cardapio-applet-menu-style"
