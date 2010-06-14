@@ -112,7 +112,7 @@ class Cardapio(dbus.service.Object):
 		self.no_results_to_show        = False
 		self.previously_focused_widget = None
 		self.focus_out_blocked         = False
-		self.app_clicked               = None
+		self.clicked_app               = None
 		self.keybinding                = None
 		self.search_timer_local        = None
 		self.search_timer_remote       = None
@@ -236,6 +236,7 @@ class Cardapio(dbus.service.Object):
 			plugin.basename         = basename
 			plugin.section_slab     = section_slab
 			plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
+			plugin.is_running       = False
 
 			self.active_plugin_instances.append(plugin)
 
@@ -427,7 +428,7 @@ class Cardapio(dbus.service.Object):
 		self.options_dialog            = self.get_object('OptionsDialog')
 		self.application_pane          = self.get_object('ApplicationPane')
 		self.category_pane             = self.get_object('CategoryPane')
-		self.sideapp_pane              = self.get_object('SideappPane')
+		self.sidepane              = self.get_object('SideappPane')
 		self.search_entry              = self.get_object('SearchEntry')
 		self.scrolled_window           = self.get_object('ScrolledWindow')
 		self.scroll_adjustment         = self.scrolled_window.get_vadjustment()
@@ -584,7 +585,7 @@ class Cardapio(dbus.service.Object):
 
 		self.clear_pane(self.application_pane)
 		self.clear_pane(self.category_pane)
-		self.clear_pane(self.sideapp_pane)
+		self.clear_pane(self.sidepane)
 		self.clear_pane(self.left_session_pane)
 		self.clear_pane(self.right_session_pane)
 
@@ -605,6 +606,7 @@ class Cardapio(dbus.service.Object):
 
 		# slabs that should go *before* regular application slabs
 		self.add_favorites_slab()
+		self.add_sidepane_slab()
 		self.add_places_slab()
 
 		self.build_applications_list()
@@ -617,6 +619,7 @@ class Cardapio(dbus.service.Object):
 		self.build_places_list()
 		self.build_session_list()
 		self.build_system_list()
+		self.build_sidepane_list()
 
 		self.set_message_window_visible(False)
 
@@ -1030,9 +1033,6 @@ class Cardapio(dbus.service.Object):
 
 		for result in results:
 
-			dummy, canonical_path = urllib2.splittype(result['xdg uri'])
-			parent_name, child_name = os.path.split(canonical_path)
-
 			icon_name = result['icon name'].replace('/', '-')
 			if not self.icon_theme.has_icon(icon_name):
 				icon_name = 'text-x-generic'
@@ -1396,26 +1396,14 @@ class Cardapio(dbus.service.Object):
 			else: self.panel_button.deselect()
 
 
-	def remove_from_app_list(self, app_list, section_slab, app_info):
+	def remove_from_app_list(self, section_slab, app_info = None):
 
-		command = app_info['command']
-
-		for app in app_list:
-			if section_slab == app['section'] and command == app['command']:
-				app_list.remove(app)
-				break
+		for app in self.app_list:
+			if section_slab == app['section'] and (app_info is None or app_info['command'] == app['command']):
+				self.app_list.remove(app)
 
 
 	def build_system_list(self):
-
-		for app in self.settings['side pane items']:
-
-			button = self.add_sidebar_button(app['name'], app['icon name'], self.sideapp_pane, tooltip = app['tooltip'], use_toggle_button = False)
-			self.connect_command(button, app['type'], app['command'])
-
-			button.app_info = app
-
-			button = self.add_app_entry(app['name'], app['icon name'], self.system_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
 
 		self.add_tree_to_app_list(self.sys_tree.root, self.system_section_contents)
 
@@ -1540,6 +1528,18 @@ class Cardapio(dbus.service.Object):
 			self.hide_section(self.favorites_section_slab)
 
 
+	def build_sidepane_list(self):
+
+		for app in self.settings['side pane items']:
+
+			button = self.add_sidebar_button(app['name'], app['icon name'], self.sidepane, tooltip = app['tooltip'], use_toggle_button = False)
+			self.connect_command(button, app['type'], app['command'])
+
+			button.app_info = app
+
+			button = self.add_app_entry(app['name'], app['icon name'], self.sidepane_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
+
+
 	def build_session_list(self):
 
 		items = [
@@ -1631,6 +1631,13 @@ class Cardapio(dbus.service.Object):
 		self.favorites_section_contents = section_contents
 
 
+	def add_sidepane_slab(self):
+
+		section_slab, section_contents = self.add_slab(_('Side Pane'), 'emblem-favorite', tooltip = _('Items pinned to the side pane'), hide = True, append = False)
+		self.sidepane_section_slab = section_slab
+		self.sidepane_section_contents = section_contents
+
+
 	def add_session_slab(self):
 
 		section_slab, section_contents = self.add_slab(_('Session'), 'session-properties', hide = True)
@@ -1674,7 +1681,10 @@ class Cardapio(dbus.service.Object):
 
 		if app_list is not None:
 
-			dummy, basename = os.path.split(command)
+			path, basename = os.path.split(command)
+			if basename : basename, dummy = os.path.splitext(basename)
+			else        : basename = path
+
 			app_list.append({'name': button_str.lower(), 'button': button, 'section': parent_widget.parent.parent, 'basename' : basename, 'command' : command})
 
 			# NOTE: IF THERE ARE CHANGES IN THE UI FILE, THIS MAY PRODUCE
@@ -1864,33 +1874,37 @@ class Cardapio(dbus.service.Object):
 
 	def on_pin_this_app_clicked(self, widget):
 
-		self.settings['pinned items'].append(self.app_clicked)
+		self.settings['pinned items'].append(self.clicked_app)
 		self.clear_pane(self.favorites_section_contents)
+		self.remove_from_app_list(self.favorites_section_slab)
 		self.build_favorites_list()
 
 
 	def on_unpin_this_app_clicked(self, widget):
 
-		self.settings['pinned items'].remove(self.app_clicked)
+		self.settings['pinned items'].remove(self.clicked_app)
 		self.clear_pane(self.favorites_section_contents)
+		self.remove_from_app_list(self.favorites_section_slab)
 		self.build_favorites_list()
 
 
 	def on_add_to_side_pane_clicked(self, widget):
 
-		self.settings['side pane items'].append(self.app_clicked)
-		self.clear_pane(self.system_section_contents)
- 		self.clear_pane(self.sideapp_pane)
-		self.build_system_list()
+		self.settings['side pane items'].append(self.clicked_app)
+		self.clear_pane(self.sidepane_section_contents)
+ 		self.clear_pane(self.sidepane)
+		self.remove_from_app_list(self.sidepane_section_slab)
+		self.build_sidepane_list()
 
 
 	def on_remove_from_side_pane_clicked(self, widget):
 
-		self.settings['side pane items'].remove(self.app_clicked)
-		self.remove_from_app_list(self.app_list, self.system_section_slab, self.app_clicked)
-		self.clear_pane(self.system_section_contents)
- 		self.clear_pane(self.sideapp_pane)
-		self.build_system_list()
+		self.settings['side pane items'].remove(self.clicked_app)
+		self.remove_from_app_list(self.sidepane_section_slab, self.clicked_app)
+		self.clear_pane(self.sidepane_section_contents)
+ 		self.clear_pane(self.sidepane)
+		self.remove_from_app_list(self.sidepane_section_slab)
+		self.build_sidepane_list()
 
 
 	def on_appbutton_button_pressed(self, widget, event):
@@ -1924,7 +1938,7 @@ class Cardapio(dbus.service.Object):
 				self.add_side_pane_menuitem.show()
 				self.remove_side_pane_menuitem.hide()
 
-			self.app_clicked = widget.app_info
+			self.clicked_app = widget.app_info
 
 			self.block_focus_out_event()
 			self.app_context_menu.popup(None, None, None, event.button, event.time)
@@ -2136,62 +2150,76 @@ class Cardapio(dbus.service.Object):
 
 
 class CardapioPluginInterface:
+	# for documentation, see: https://answers.launchpad.net/cardapio/+faq/1172 
 
-	author             = ''
-	name               = '' # use gettext for name
-	description        = '' # use gettext for description
+	author      = ''
+	name        = ''
+	description = ''
 
 	# not yet used:
-	url                = ''
-	help_text          = ''
-	version            = ''
+	url         = ''
+	help_text   = ''
+	version     = ''
 
 	plugin_api_version = 1.1
 
-	# one of: None, 'local search update delay', 'remote search update delay'
-	search_delay_type  = 'local search update delay'
+	search_delay_type = 'local search update delay'
 
-	category_name      = '' # use gettext for category
-	category_icon      = ''
-	category_position  = 'end' # one of: 'start' or 'end'
-	hide_from_sidebar  = True
+	category_name = ''
+	category_icon = ''
 
-	# TODO: add to the plugin API (post version 1.0):
-	# keyword  - plugin will only be executed if the keyword is the first word in the query
-	# shortcut - a letter or number so that Alt+letter selects this plugin's category
-	# what else?
+	# not yet used:
+	category_position = 'end'
 
-	is_running = False
+	hide_from_sidebar = True
 
 	def __init__(self, settings, write_to_log, handle_search_result, handle_search_error):
 		"""
+		REQUIRED
+
 		This constructor gets called whenever a plugin is activated.
 		(Typically once per session, unless the user is turning plugins on/off)
 
 		The constructor *must* set the instance variable self.loaded to True of False.
 		For example, the Tracker plugin sets self.loaded to False if Tracker is not
 		installed in the system.
-		
+
+		The constructor is given three parameters:
+
+		   - settings - this is a dict containing the same things that you will
+		     find in the config.ini
+
+		   - write_to_log - this is a function that lets you write to Cardapio's
+		     log file, like this: write_to_log(self, 'hi there')
+
+		   - handle_search_result - a function to which you should pass the
+		     search results when you have them
+
+		   - handle_search_error - a function to which you should pass an error
+		     message if the search fails
+
 		Note: DO NOT WRITE ANYTHING IN THE settings DICT!!
 		"""
-		self.loaded = False
+		pass
 
 
 	def __del__(self):
 		"""
+		NOT REQUIRED
+
 		This destructor gets called whenever a plugin is deactivated
 		(Typically once per session, unless the user is turning plugins on/off)
 		"""
 		pass
-		
+
 
 	def search(self, text):
 		"""
-		REQUIRED 
+		REQUIRED
 
 		This method gets called when a new text string is entered in the search
-		field. It must output a list where each item is a dict following format
-		below:
+		field. If the search goes when, it should call handle_search_results with a
+		list where each item is a dict following format below:
 
 		item = {}
 
@@ -2199,22 +2227,28 @@ class CardapioPluginInterface:
 		item['name'] = 'Music'
 		item['tooltip'] = 'Show your Music folder'
 		item['icon name'] = 'text-x-generic'
-		item['xdg uri'] = '~/Music' 
+		item['xdg uri'] = '~/Music'
 
 		Where 'xdg uri' is a URI that works with the terminal command xdg-open
 		(in the future, 'xdg uri' will probably be optional, and you'll be able
-		to provide your own methods for handling the onclick even of the search
+		to provide your own methods for handling the onclick event of the search
 		results)
 		"""
+
+		# you should call handle_search_result or handle_search_error from here
+		# (or from a thread spawned from this method)
+
 		pass
 
 
 	def cancel(self):
 		"""
-		Cancels the current search operation.
+		NOT REQUIRED
+
+		This function should cancel the search operation. This is useful if the search is
+		done in a separate thread (which it should, as much as possible)
 		"""
 		pass
-
 
 
 # make a few of useful modules and functions available to plugins
