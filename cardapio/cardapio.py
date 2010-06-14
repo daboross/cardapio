@@ -89,7 +89,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.99'
+	version = '0.9.100'
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
@@ -536,17 +536,14 @@ class Cardapio(dbus.service.Object):
 		if 'applet_press_handler' in dir(self):
 			self.panel_button.disconnect(self.applet_press_handler)
 			self.panel_button.disconnect(self.applet_enter_handler)
-			self.panel_button.disconnect(self.applet_leave_handler)
 
 		if self.settings['open on hover']:
-			self.applet_press_handler = self.panel_button.connect('button-press-event', return_true)
+			self.applet_press_handler = self.panel_button.connect('button-press-event', self.hide)
 			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', self.show)
-			self.applet_leave_handler = self.panel_button.connect('leave-notify-event', self.hide)
 
 		else:
 			self.applet_press_handler = self.panel_button.connect('button-press-event', self.on_panel_button_toggled)
 			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', return_true)
-			self.applet_leave_handler = self.panel_button.connect('leave-notify-event', return_true)
 
 
 	def setup_ui_from_all_settings(self):

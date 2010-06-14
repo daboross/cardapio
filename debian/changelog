@@ -1,3 +1,10 @@
+cardapio (0.9.100-ubuntu1) lucid; urgency=low
+
+  * Added an option to customize the left-side pane, cleaned up the
+  configuration dialog, fixed bugs, and so on...
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 21:21:00 -0400
+
 cardapio (0.9.99-ubuntu1) lucid; urgency=low
 
   * Fixes a regression with the session buttons
