@@ -89,7 +89,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.100'
+	version = '0.9.101'
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
@@ -652,13 +652,30 @@ class Cardapio(dbus.service.Object):
 		self.about_dialog.hide()
 
 
+	def set_widget_from_option(self, widget_str, option_str):
+
+		widget = self.get_object(widget_str)
+		widget.handler_block_by_func(self.on_options_changed)
+
+		if type(widget) is gtk.Entry:
+			widget.set_text(self.settings[option_str])
+
+		elif type(widget) is gtk.CheckButton:
+			widget.set_active(self.settings[option_str])
+
+		else:
+			logging.error('Widget %s (%s) was not written' % (widget_str, type(widget)))
+
+		widget.handler_unblock_by_func(self.on_options_changed)
+
+
 	def open_options_dialog(self, *dummy):
 
-		self.get_object('OptionKeybinding').set_text(self.settings['keybinding'])
-		self.get_object('OptionAppletLabel').set_text(self.settings['applet label'])
-		self.get_object('OptionAppletIcon').set_text(self.settings['applet icon'])
-		self.get_object('OptionSessionButtons').set_active(self.settings['show session buttons'])
-		self.get_object('OptionOpenOnHover').set_active(self.settings['open on hover'])
+		self.set_widget_from_option('OptionKeybinding', 'keybinding')
+		self.set_widget_from_option('OptionAppletLabel', 'applet label')
+		self.set_widget_from_option('OptionAppletIcon', 'applet icon')
+		self.set_widget_from_option('OptionSessionButtons', 'show session buttons')
+		self.set_widget_from_option('OptionOpenOnHover', 'open on hover')
 
 		self.plugin_tree_model.clear()
 
