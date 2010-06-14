@@ -377,7 +377,6 @@ class Cardapio(dbus.service.Object):
 			self.settings.pop('system pane')
 
 
-
 	def read_config_option(self, user_settings, key, val, override_empty_str = False, force_update_from_version = None):
 
 		if key in user_settings:
@@ -1038,7 +1037,7 @@ class Cardapio(dbus.service.Object):
 			if not self.icon_theme.has_icon(icon_name):
 				icon_name = 'text-x-generic'
 
-			button = self.add_launcher_entry(result['name'], icon_name, plugin.section_contents, 'xdg', result['xdg uri'], tooltip = result['tooltip'])
+			button = self.add_app_entry(result['name'], icon_name, plugin.section_contents, 'xdg', result['xdg uri'], tooltip = result['tooltip'])
 
 		if results:
 
@@ -1414,17 +1413,20 @@ class Cardapio(dbus.service.Object):
 			button = self.add_sidebar_button(app['name'], app['icon name'], self.sideapp_pane, tooltip = app['tooltip'], use_toggle_button = False)
 			self.connect_command(button, app['type'], app['command'])
 
-			button.launcher_info = app
+			button.app_info = app
 
-			button = self.add_launcher_entry(app['name'], app['icon name'], self.system_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
+			button = self.add_app_entry(app['name'], app['icon name'], self.system_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
 
 		self.add_tree_to_app_list(self.sys_tree.root, self.system_section_contents)
+
+		# hackish fix for bug 593627:
+		#self.add_tree_to_app_list(self.app_tree.root, self.system_section_contents, recursive = False)
 
 
 	def build_places_list(self):
 
-		button = self.add_launcher_entry(_('Home'), 'user-home', self.places_section_contents, 'xdg', self.user_home_folder, tooltip = _('Open your personal folder'), app_list = self.app_list)
-		button = self.add_launcher_entry(_('Computer'), 'computer', self.places_section_contents, 'xdg', 'computer:///', tooltip = _('Browse all local and remote disks and folders accessible from this computer'), app_list = self.app_list)
+		button = self.add_app_entry(_('Home'), 'user-home', self.places_section_contents, 'xdg', self.user_home_folder, tooltip = _('Open your personal folder'), app_list = self.app_list)
+		button = self.add_app_entry(_('Computer'), 'computer', self.places_section_contents, 'xdg', 'computer:///', tooltip = _('Browse all local and remote disks and folders accessible from this computer'), app_list = self.app_list)
 
 		xdg_folders_file_path = os.path.join(DesktopEntry.xdg_config_home, 'user-dirs.dirs')
 		xdg_folders_file = file(xdg_folders_file_path, 'r')
@@ -1455,7 +1457,7 @@ class Cardapio(dbus.service.Object):
 		self.bookmark_monitor = gio.File(bookmark_file_path).monitor_file()  # keep a reference to avoid getting it garbage collected
 		self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed)
 
-		button = self.add_launcher_entry(_('Trash'), 'user-trash', self.places_section_contents, 'xdg', 'trash:///', tooltip = _('Open the trash'), app_list = self.app_list)
+		button = self.add_app_entry(_('Trash'), 'user-trash', self.places_section_contents, 'xdg', 'trash:///', tooltip = _('Open the trash'), app_list = self.app_list)
 
 
 	def on_bookmark_monitor_changed(self, monitor, file, other_file, event):
@@ -1504,7 +1506,7 @@ class Cardapio(dbus.service.Object):
 
 		if not urllib2.posixpath.exists(canonical_path): return
 
-		button = self.add_launcher_entry(folder_name, folder_icon, self.places_section_contents, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
+		button = self.add_app_entry(folder_name, folder_icon, self.places_section_contents, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
 
 
 	def build_favorites_list(self):
@@ -1521,7 +1523,7 @@ class Cardapio(dbus.service.Object):
 				app['icon name'] = app['icon_name']
 				app.pop('icon_name')
 
-			button = self.add_launcher_entry(app['name'], app['icon name'], self.favorites_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
+			button = self.add_app_entry(app['name'], app['icon name'], self.favorites_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
 
 			if app['name'].lower().find(text) == -1:
 				button.hide()
@@ -1566,10 +1568,9 @@ class Cardapio(dbus.service.Object):
 
 		for item in items:
 
-			button = self.add_launcher_entry(item[0], item[2], self.session_section_contents, 'raw', item[3], tooltip = item[1], app_list = self.app_list)
-			button = self.add_button(item[0], item[2], item[4], tooltip = item[1], is_launcher_button = True)
+			button = self.add_app_entry(item[0], item[2], self.session_section_contents, 'raw', item[3], tooltip = item[1], app_list = self.app_list)
+			button = self.add_button(item[0], item[2], item[4], tooltip = item[1], is_app_button = True)
 			button.connect('clicked', self.on_raw_button_clicked, item[3])
-
 
 
 	def build_applications_list(self):
@@ -1664,12 +1665,12 @@ class Cardapio(dbus.service.Object):
 
 	def add_sidebar_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = True, append = True):
 
-		return self.add_button(button_str, icon_name, parent_widget, tooltip, use_toggle_button = use_toggle_button, is_launcher_button = False, append = append)
+		return self.add_button(button_str, icon_name, parent_widget, tooltip, use_toggle_button = use_toggle_button, is_app_button = False, append = append)
 
 
-	def add_launcher_entry(self, button_str, icon_name, parent_widget, command_type, command, tooltip = '', app_list = None):
+	def add_app_entry(self, button_str, icon_name, parent_widget, command_type, command, tooltip = '', app_list = None):
 
-		button = self.add_button(button_str, icon_name, parent_widget, tooltip, is_launcher_button = True)
+		button = self.add_button(button_str, icon_name, parent_widget, tooltip, is_app_button = True)
 
 		if app_list is not None:
 
@@ -1680,9 +1681,10 @@ class Cardapio(dbus.service.Object):
 			# HARD-TO-FIND BUGS!!
 
 		self.connect_command(button, command_type, command)
+		button.connect('focus-in-event', self.on_appbutton_focused)
 
 		# save some metadata for easy access
-		button.launcher_info = {
+		button.app_info = {
 			'name'       : self.unescape(button_str),
 			'tooltip'    : tooltip,
 			'icon name'  : icon_name,
@@ -1707,9 +1709,9 @@ class Cardapio(dbus.service.Object):
 		button.connect('button-press-event', self.on_appbutton_button_pressed)
 
 
-	def add_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = None, is_launcher_button = True, append = True):
+	def add_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = None, is_app_button = True, append = True):
 
-		if is_launcher_button or use_toggle_button == False:
+		if is_app_button or use_toggle_button == False:
 			button = gtk.Button()
 		else:
 			button = gtk.ToggleButton()
@@ -1719,7 +1721,7 @@ class Cardapio(dbus.service.Object):
 
 		label = gtk.Label(button_str)
 
-		if is_launcher_button:
+		if is_app_button:
 			icon_size = self.icon_size_app
 			label.modify_fg(gtk.STATE_NORMAL, self.style_appbutton_fg)
 			# TODO: figure out how to set max width so that it is the best for
@@ -1835,7 +1837,7 @@ class Cardapio(dbus.service.Object):
 
 			if isinstance(node, gmenu.Entry):
 
-				button = self.add_launcher_entry(node.name, node.icon, parent_widget, 'app', node.desktop_file_path, tooltip = node.get_comment(), app_list = self.app_list)
+				button = self.add_app_entry(node.name, node.icon, parent_widget, 'app', node.desktop_file_path, tooltip = node.get_comment(), app_list = self.app_list)
 				has_no_leaves = False
 
 			elif isinstance(node, gmenu.Directory) and recursive:
@@ -1899,12 +1901,12 @@ class Cardapio(dbus.service.Object):
 			already_on_side_pane = False
 
 			for command in [app['command'] for app in self.settings['pinned items']]:
-				if command == widget.launcher_info['command']: 
+				if command == widget.app_info['command']: 
 					already_pinned = True
 					break
 
 			for command in [app['command'] for app in self.settings['side pane items']]:
-				if command == widget.launcher_info['command']: 
+				if command == widget.app_info['command']: 
 					already_on_side_pane = True
 					break
 
@@ -1922,10 +1924,23 @@ class Cardapio(dbus.service.Object):
 				self.add_side_pane_menuitem.show()
 				self.remove_side_pane_menuitem.hide()
 
-			self.app_clicked = widget.launcher_info
+			self.app_clicked = widget.app_info
 
 			self.block_focus_out_event()
 			self.app_context_menu.popup(None, None, None, event.button, event.time)
+
+
+	def on_appbutton_focused(self, widget, event):
+
+		alloc = widget.get_allocation()
+		scroller_position = self.scroll_adjustment.value
+		page_size = self.scroll_adjustment.page_size
+
+		if alloc.y < scroller_position:
+			self.scroll_adjustment.set_value(alloc.y)
+
+		elif alloc.y + alloc.height > scroller_position + page_size:
+			self.scroll_adjustment.set_value(alloc.y + alloc.height - page_size)
 
 
 	def on_appbutton_clicked(self, widget, desktop_path):
@@ -2101,17 +2116,6 @@ class Cardapio(dbus.service.Object):
 		if button.get_active() != state:
 			self.auto_toggled_sidebar_button = True
 			button.set_active(state)
-
-
-	def scroll_to_section(self, widget, session_slab):
-
-		self.scroll_to_widget(session_slab)
-
-
-	def scroll_to_widget(self, widget):
-
-		alloc = widget.get_allocation()
-		self.scroll_adjustment.set_value(min(alloc.y, self.scroll_adjustment.upper - self.scroll_adjustment.page_size))
 
 
 	def scroll_to_top(self):
