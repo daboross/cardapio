@@ -1533,8 +1533,11 @@ class Cardapio(dbus.service.Object):
 		for app in self.settings['side pane items']:
 
 			button = self.add_app_entry(app['name'], app['icon name'], self.sidepane_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
+			app_info = button.app_info
 
 			button = self.add_sidebar_button(app['name'], app['icon name'], self.sidepane, tooltip = app['tooltip'], use_toggle_button = False)
+			button.app_info = app_info
+
 			self.connect_command(button, app['type'], app['command'])
 
 
