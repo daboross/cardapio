@@ -37,7 +37,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.cardapio_error_handler = cardapio_error_handler
 		self.search_controller = gio.Cancellable()
 
-		self.action_command = r'xdg-open http://www.google.com/search?q=%s'
+		self.action_command = r"xdg-open 'http://www.google.com/search?q=%s'"
 		self.action = {
 			'name'      : _('More search results'),
 			'tooltip'   : _('Get more search results in your web browser'),
@@ -110,6 +110,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 
 	def more_results_action(self, text):
+
+		text = text.replace("'", r"\'")
+		text = text.replace('"', r'\"')
 
 		try:
 			subprocess.Popen(self.action_command % text, shell = True)

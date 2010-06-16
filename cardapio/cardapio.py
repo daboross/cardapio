@@ -2024,16 +2024,16 @@ class Cardapio(dbus.service.Object):
 		return True
 
 
-	def escape_quotes(self, mystr):
+	def escape_quotes(self, text):
 
-		mystr = re.sub("'", "\\'", mystr)
-		mystr = re.sub('"', '\\"', mystr)
-		return mystr
+		text = text.replace("'", r"\'")
+		text = text.replace('"', r'\"')
+		return text
 
 
-	def unescape(self, mystr):
+	def unescape(self, text):
 
-		return urllib2.unquote(str(mystr)) # NOTE: it is possible that with python3 we will have to change this line
+		return urllib2.unquote(str(text)) # NOTE: it is possible that with python3 we will have to change this line
 
 
 	def show_all_nonempty_sections(self):
