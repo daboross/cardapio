@@ -706,9 +706,10 @@ class Cardapio(dbus.service.Object):
 		self.options_dialog.show()
 
 	
-	def close_options_dialog(self, widget, response = None):
+	def close_options_dialog(self, *args):
 
 		self.options_dialog.hide()
+		return True
 
 
 	def on_options_changed(self, *dummy):
