@@ -1,3 +1,9 @@
+cardapio (0.9.105-ubuntu1) lucid; urgency=low
+
+  * updating user translations.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 15 Jun 2010 23:00:00 -0400
+
 cardapio (0.9.104-ubuntu1) lucid; urgency=low
 
   * fixed the focus/scrolling bug, along with a small regression regarding
