@@ -9,9 +9,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.0'
+	version            = '1.2'
 
-	plugin_api_version = 1.1
+	plugin_api_version = 1.2
 
 	search_delay_type  = 'remote search update delay'
 
@@ -36,6 +36,15 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.cardapio_result_handler = cardapio_result_handler
 		self.cardapio_error_handler = cardapio_error_handler
 		self.search_controller = gio.Cancellable()
+
+		self.action_command = r'xdg-open http://www.google.com/search?q=%s'
+		self.action = {
+			'name'      : _('More search results'),
+			'tooltip'   : _('Get more search results in your web browser'),
+			'icon name' : 'system-search',
+			'type'      : 'callback',
+			'command'   : self.more_results_action,
+			}
 
 		self.loaded = True
 
@@ -85,13 +94,27 @@ class CardapioPlugin(CardapioPluginInterface):
 		
 		for raw_result in raw_results['responseData']['results']:
 
-			item = {}
-			item['name']      = raw_result['titleNoFormatting']
-			item['tooltip']   = raw_result['url']
-			item['xdg uri']   = raw_result['url']
-			item['icon name'] = 'text-html'
+			item = {
+				'name'      : raw_result['titleNoFormatting'],
+				'tooltip'   : raw_result['url'],
+				'icon name' : 'text-html',
+				'type'      : 'xdg',
+				'command'   : raw_result['url'],
+				}
 			parsed_results.append(item)
 
+		if raw_results:
+			parsed_results.append(self.action)
+
 		self.cardapio_result_handler(self, parsed_results)
+
+
+	def more_results_action(self, text):
+
+		try:
+			subprocess.Popen(self.action_command % text, shell = True)
+		except OSError, e:
+			write_to_log(self, 'Error launching plugin action.')
+			write_to_log(self, e)			
 
 

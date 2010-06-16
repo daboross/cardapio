@@ -60,7 +60,7 @@ except Exception, exception:
 	print(exception)
 	sys.exit(1)
 
-# set up translations
+# Set up translations
 
 APP = 'cardapio'
 DIR = os.path.join(os.path.dirname(__file__), 'locale')
@@ -74,11 +74,15 @@ if hasattr(gettext, 'bind_textdomain_codeset'):
 gettext.textdomain(APP)
 _ = gettext.gettext
 
-# hack for making translations work with ui files
+
+# Hack for making translations work with ui files
+
 import gtk.glade
 gtk.glade.bindtextdomain(APP, DIR)
 gtk.glade.textdomain(APP)
 
+
+# Main Cardapio class
 
 class Cardapio(dbus.service.Object):
 
@@ -96,9 +100,9 @@ class Cardapio(dbus.service.Object):
 		logging.basicConfig(filename = '/tmp/cardapio.log', level = logging.DEBUG)
 		logging.info('----------------- Cardapio launched -----------------')
 
-		self.read_config_file()
-
 		self.user_home_folder = os.path.expanduser('~')
+
+		self.read_config_file()
 
 		self.panel_applet = panel_applet
 		self.panel_button = panel_button
@@ -549,7 +553,7 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			self.applet_press_handler = self.panel_button.connect('button-press-event', self.on_panel_button_toggled)
-			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', return_true)
+			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', lambda x: True)
 
 
 	def setup_ui_from_all_settings(self):
@@ -1037,7 +1041,8 @@ class Cardapio(dbus.service.Object):
 			if not self.icon_theme.has_icon(icon_name):
 				icon_name = 'text-x-generic'
 
-			button = self.add_app_entry(result['name'], icon_name, plugin.section_contents, 'xdg', result['xdg uri'], tooltip = result['tooltip'])
+			button = self.add_app_entry(result['name'], icon_name, plugin.section_contents, result['type'], result['command'], tooltip = result['tooltip'])
+
 
 		if results:
 
@@ -1717,6 +1722,9 @@ class Cardapio(dbus.service.Object):
 		elif command_type == 'xdg':
 			button.connect('clicked', self.on_xdg_button_clicked, command)
 
+		elif command_type == 'callback':
+			button.connect('clicked', self.make_callback_handler(command))
+
 		button.connect('button-press-event', self.on_appbutton_button_pressed)
 
 
@@ -1868,6 +1876,17 @@ class Cardapio(dbus.service.Object):
 		self.get_object('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_appbutton_bg)
 
 
+	def make_callback_handler(self, action):
+
+		def callback_handler(widget):
+
+			text = self.search_entry.get_text().strip()
+			self.hide()
+			action(text)
+
+		return callback_handler
+
+
 	def launch_edit_app(self, *dummy):
 
 		self.launch_raw('alacarte')
@@ -1996,11 +2015,25 @@ class Cardapio(dbus.service.Object):
 
 		try:
 			subprocess.Popen(path, shell = True, cwd = self.user_home_folder)
-		except OSError:
+		except OSError, e:
+			logging.error('Could not launch %s' % path)
+			logging.error(e)
 			return False
 
 		self.hide()
 		return True
+
+
+	def escape_quotes(self, mystr):
+
+		mystr = re.sub("'", "\\'", mystr)
+		mystr = re.sub('"', '\\"', mystr)
+		return mystr
+
+
+	def unescape(self, mystr):
+
+		return urllib2.unquote(str(mystr)) # NOTE: it is possible that with python3 we will have to change this line
 
 
 	def show_all_nonempty_sections(self):
@@ -2139,17 +2172,6 @@ class Cardapio(dbus.service.Object):
 		self.scroll_adjustment.set_value(0)
 
 
-	def unescape(self, mystr):
-
-		return urllib2.unquote(str(mystr)) # NOTE: it is possible that with python3 we will have to change this line
-
-
-	def escape_quotes(self, mystr):
-
-		mystr = re.sub("'", "\\'", mystr)
-		mystr = re.sub('"', '\\"', mystr)
-		return mystr
-
 
 class CardapioPluginInterface:
 	# for documentation, see: https://answers.launchpad.net/cardapio/+faq/1172 
@@ -2163,7 +2185,7 @@ class CardapioPluginInterface:
 	help_text   = ''
 	version     = ''
 
-	plugin_api_version = 1.1
+	plugin_api_version = 1.2
 
 	search_delay_type = 'local search update delay'
 
@@ -2195,10 +2217,12 @@ class CardapioPluginInterface:
 		     log file, like this: write_to_log(self, 'hi there')
 
 		   - handle_search_result - a function to which you should pass the
-		     search results when you have them
+		     search results when you have them (see more info below, in the 
+			 search() method)
 
 		   - handle_search_error - a function to which you should pass an error
-		     message if the search fails
+		     message if the search fails (see more info below, in the 
+			 search() method)
 
 		Note: DO NOT WRITE ANYTHING IN THE settings DICT!!
 		"""
@@ -2220,25 +2244,33 @@ class CardapioPluginInterface:
 		REQUIRED
 
 		This method gets called when a new text string is entered in the search
-		field. If the search goes when, it should call handle_search_results with a
-		list where each item is a dict following format below:
+		field. One of the following functions should be called from this method
+		(of from a thread spawned by this method):
 
-		item = {}
+		   * handle_search_result(plugin, results) - if the search goes well
+		   * handle_search_error(plugin, text)     - if there is an error
 
-		# required:
-		item['name'] = 'Music'
-		item['tooltip'] = 'Show your Music folder'
-		item['icon name'] = 'text-x-generic'
-		item['xdg uri'] = '~/Music'
+		The arguments to these functions are:
 
-		Where 'xdg uri' is a URI that works with the terminal command xdg-open
-		(in the future, 'xdg uri' will probably be optional, and you'll be able
-		to provide your own methods for handling the onclick event of the search
-		results)
+		   * plugin  - this plugin instance (that is, it should always be
+		               "self", without quotes)
+		   * text    - some text to be inserted in Cardapio's log.
+		   * results - an array of dict items as described below.
+
+		item = {
+		  'name'      : _('Music'),
+		  'tooltip'   : _('Show your Music folder'),
+		  'icon name' : 'text-x-generic',
+		  'type'      : 'xdg',
+		  'command'   : '~/Music'
+		  }
+
+		Where setting 'type' to 'xdg' means that 'command' should be opened
+		using xdg-open (you should give it a try it in the terminal, first!).
+		Meanwhile, setting 'type' to 'callback' means that 'command' is a
+		function that should be called when the item is clicked. This function
+		will receive as an argument the current search string.
 		"""
-
-		# you should call handle_search_result or handle_search_error from here
-		# (or from a thread spawned from this method)
 
 		pass
 
@@ -2251,18 +2283,6 @@ class CardapioPluginInterface:
 		done in a separate thread (which it should, as much as possible)
 		"""
 		pass
-
-
-# make a few of useful modules and functions available to plugins
-import __builtin__
-__builtin__._ = _
-__builtin__.dbus = dbus
-__builtin__.CardapioPluginInterface = CardapioPluginInterface
-__builtin__.logging = logging
-
-
-def return_true(*dummy):
-	return True
 
 
 def applet_factory(applet, iid):
@@ -2315,5 +2335,13 @@ def applet_factory(applet, iid):
 	cardapio.panel_change_orientation()
 
 	return True
+
+
+import __builtin__
+__builtin__._ = _
+__builtin__.dbus = dbus
+__builtin__.CardapioPluginInterface = CardapioPluginInterface
+__builtin__.logging = logging
+__builtin__.subprocess = subprocess
 
 

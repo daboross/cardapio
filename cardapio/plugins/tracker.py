@@ -8,9 +8,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.1'
+	version            = '1.2'
 
-	plugin_api_version = 1.1
+	plugin_api_version = 1.2
 
 	search_delay_type  = 'local search update delay'
 
@@ -36,6 +36,16 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.cardapio_results_handler = handle_search_result
 		self.cardapio_error_handler = handle_search_error
+
+		self.action_command = r'tracker-search-tool %s'
+		self.action = {
+			'name'      : _('More search results'),
+			'tooltip'   : _('Get more search results with the Tracker search tool'),
+			'icon name' : 'system-search',
+			'type'      : 'callback',
+			'command'   : self.more_results_action,
+			}
+
 		self.loaded = True
 
 
@@ -78,13 +88,28 @@ class CardapioPlugin(CardapioPluginInterface):
 			parent_name, child_name = os.path.split(canonical_path)
 			icon_name = result[1]
 
-			formatted_result = {}
-			formatted_result['name'] = child_name
-			formatted_result['icon name'] = icon_name
-			formatted_result['tooltip'] = result[0]
-			formatted_result['xdg uri'] = canonical_path
+			formatted_result = {
+				'name'      : child_name,
+				'icon name' : icon_name,
+				'tooltip'   : result[0],
+				'command'   : canonical_path,
+				'type'      : 'xdg',
+				}
 
 			formatted_results.append(formatted_result)
 
+		if results:
+			formatted_results.append(self.action)
+
 		self.cardapio_results_handler(self, formatted_results)
+
+
+	def more_results_action(self, text):
+
+		try:
+			subprocess.Popen(self.action_command % text, shell = True)
+		except OSError, e:
+			write_to_log(self, 'Error launching plugin action.')
+			write_to_log(self, e)			
+
 
