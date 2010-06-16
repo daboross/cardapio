@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-16 04:20-0400\n"
+"POT-Creation-Date: 2010-06-16 04:22-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -289,11 +289,11 @@ msgid "Web Results"
 msgstr ""
 
 #: plugins/google.py:42 plugins/tracker.py:42
-msgid "Additional results..."
+msgid "View additional results..."
 msgstr ""
 
 #: plugins/google.py:43
-msgid "Get more search results in your web browser"
+msgid "View additional search results in your web browser"
 msgstr ""
 
 #: plugins/tracker.py:6
@@ -309,5 +309,5 @@ msgid "Local Results"
 msgstr ""
 
 #: plugins/tracker.py:43
-msgid "Get more search results with the Tracker search tool"
+msgid "View additional search results in the Tracker search tool"
 msgstr ""
