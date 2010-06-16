@@ -593,8 +593,8 @@ class Cardapio(dbus.service.Object):
 		self.clear_pane(self.left_session_pane)
 		self.clear_pane(self.right_session_pane)
 
-		self.section_list = {}
-		self.app_list = []
+		self.app_list = []      # holds a list of all apps for searching purposes
+		self.section_list = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
 
 		button = self.add_sidebar_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'), append = False)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
@@ -619,11 +619,11 @@ class Cardapio(dbus.service.Object):
 		self.add_session_slab()
 		self.add_system_slab()
 
-		self.build_favorites_list()
 		self.build_places_list()
 		self.build_session_list()
 		self.build_system_list()
-		self.build_sidepane_list()
+		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
+		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 
 		self.set_message_window_visible(False)
 
@@ -1052,7 +1052,7 @@ class Cardapio(dbus.service.Object):
 			plugin.section_contents.show()
 			self.set_section_has_entries(plugin.section_slab)
 
-			if self.selected_section is None or self.selected_section == plugin.section_slab:
+			if (self.selected_section is None) or (self.selected_section == plugin.section_slab):
 				plugin.section_slab.show()
 				self.hide_no_results_text()
 
@@ -1063,7 +1063,7 @@ class Cardapio(dbus.service.Object):
 
 			self.set_section_is_empty(plugin.section_slab)
 
-			if self.selected_section is None or self.selected_section == plugin.section_slab:
+			if (self.selected_section is None) or (self.selected_section == plugin.section_slab):
 				plugin.section_slab.hide()
 
 			self.consider_showing_no_results_text()
@@ -1402,11 +1402,14 @@ class Cardapio(dbus.service.Object):
 			else: self.panel_button.deselect()
 
 
-	def remove_from_app_list(self, section_slab, app_info = None):
+	def remove_section_from_app_list(self, section_slab):
 
-		for app in self.app_list:
-			if section_slab == app['section'] and (app_info is None or app_info['command'] == app['command']):
-				self.app_list.remove(app)
+		i = 0
+		while i < len(self.app_list):
+
+			app = self.app_list[i]
+			if section_slab == app['section']: self.app_list.pop(i)
+			else: i += 1
 
 
 	def build_system_list(self):
@@ -1503,48 +1506,46 @@ class Cardapio(dbus.service.Object):
 		button = self.add_app_entry(folder_name, folder_icon, self.places_section_contents, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
 
 
-	def build_favorites_list(self):
+	def build_favorites_list(self, slab, list_name):
 
-		self.show_section(self.favorites_section_slab, fully_show = True)
-		text = self.search_entry.get_text().lower()
+		text = self.search_entry.get_text().strip().lower()
 
 		no_results = True 
 		
-		for app in self.settings['pinned items']:
+		for app in self.settings[list_name]:
 
 			# fixing a misspelling from the old config files...
 			if 'icon_name' in app:
 				app['icon name'] = app['icon_name']
 				app.pop('icon_name')
 
-			button = self.add_app_entry(app['name'], app['icon name'], self.favorites_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
+			button = self.add_app_entry(app['name'], app['icon name'], self.section_list[slab]['contents'], app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
 
 			if app['name'].lower().find(text) == -1:
 				button.hide()
+
 			else:
 				button.show()
-				self.set_section_has_entries(self.favorites_section_slab)
+				self.set_section_has_entries(slab)
 				self.no_results_to_show = False
 				no_results = False
 
-		if no_results:
-			self.hide_section(self.favorites_section_slab, fully_hide = True)
+			if slab == self.sidepane_section_slab:
 
-		elif self.selected_section is not None and self.selected_section != self.favorites_section_slab:
-			self.hide_section(self.favorites_section_slab)
+				app_info = button.app_info
+				button = self.add_sidebar_button(app['name'], app['icon name'], self.sidepane, tooltip = app['tooltip'], use_toggle_button = False)
+				button.app_info = app_info
+				self.connect_command(button, app['type'], app['command'])
 
 
-	def build_sidepane_list(self):
+		if no_results or (slab is self.sidepane_section_slab and not text):
+			self.hide_section(slab, fully_hide = True)
 
-		for app in self.settings['side pane items']:
+		elif (self.selected_section is not None) and (self.selected_section != slab):
+			self.hide_section(slab)
 
-			button = self.add_app_entry(app['name'], app['icon name'], self.sidepane_section_contents, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
-			app_info = button.app_info
-
-			button = self.add_sidebar_button(app['name'], app['icon name'], self.sidepane, tooltip = app['tooltip'], use_toggle_button = False)
-			button.app_info = app_info
-
-			self.connect_command(button, app['type'], app['command'])
+		else:
+			self.show_section(slab, fully_show = True)
 
 
 	def build_session_list(self):
@@ -1895,37 +1896,37 @@ class Cardapio(dbus.service.Object):
 
 	def on_pin_this_app_clicked(self, widget):
 
-		self.settings['pinned items'].append(self.clicked_app)
+		self.remove_section_from_app_list(self.favorites_section_slab)
 		self.clear_pane(self.favorites_section_contents)
-		self.remove_from_app_list(self.favorites_section_slab)
-		self.build_favorites_list()
+		self.settings['pinned items'].append(self.clicked_app)
+		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
 
 
 	def on_unpin_this_app_clicked(self, widget):
 
-		self.settings['pinned items'].remove(self.clicked_app)
+		self.remove_section_from_app_list(self.favorites_section_slab)
 		self.clear_pane(self.favorites_section_contents)
-		self.remove_from_app_list(self.favorites_section_slab)
-		self.build_favorites_list()
+		self.settings['pinned items'].remove(self.clicked_app)
+		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
 
 
 	def on_add_to_side_pane_clicked(self, widget):
 
-		self.settings['side pane items'].append(self.clicked_app)
+		self.remove_section_from_app_list(self.sidepane_section_slab)
 		self.clear_pane(self.sidepane_section_contents)
  		self.clear_pane(self.sidepane)
-		self.remove_from_app_list(self.sidepane_section_slab)
-		self.build_sidepane_list()
+		self.settings['side pane items'].append(self.clicked_app)
+		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
+		self.sidepane.queue_resize() # required! or sidepane's allocation will be x,y,width,0 when first item is added
 
 
 	def on_remove_from_side_pane_clicked(self, widget):
 
-		self.settings['side pane items'].remove(self.clicked_app)
-		self.remove_from_app_list(self.sidepane_section_slab, self.clicked_app)
+		self.remove_section_from_app_list(self.sidepane_section_slab)
 		self.clear_pane(self.sidepane_section_contents)
  		self.clear_pane(self.sidepane)
-		self.remove_from_app_list(self.sidepane_section_slab)
-		self.build_sidepane_list()
+		self.settings['side pane items'].remove(self.clicked_app)
+		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 
 
 	def on_appbutton_button_pressed(self, widget, event):
@@ -2121,8 +2122,8 @@ class Cardapio(dbus.service.Object):
 
 	def hide_all_transitory_sections(self, fully_hide = False):
 
-		self.hide_section(self.session_section_slab, fully_hide)
-		self.hide_section(self.system_section_slab , fully_hide)
+		self.hide_section(self.session_section_slab , fully_hide)
+		self.hide_section(self.system_section_slab  , fully_hide)
 		self.hide_section(self.sidepane_section_slab, fully_hide)
 		
 		self.hide_plugin_sections(fully_hide)
