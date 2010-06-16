@@ -39,7 +39,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.action_command = r"xdg-open 'http://www.google.com/search?q=%s'"
 		self.action = {
-			'name'      : _('More search results'),
+			'name'      : _('Additional results...'),
 			'tooltip'   : _('Get more search results in your web browser'),
 			'icon name' : 'system-search',
 			'type'      : 'callback',

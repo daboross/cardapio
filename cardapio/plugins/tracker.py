@@ -39,7 +39,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.action_command = r'tracker-search-tool %s'
 		self.action = {
-			'name'      : _('More search results'),
+			'name'      : _('Additional results...'),
 			'tooltip'   : _('Get more search results with the Tracker search tool'),
 			'icon name' : 'system-search',
 			'type'      : 'callback',
