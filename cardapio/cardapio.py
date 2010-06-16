@@ -553,7 +553,7 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			self.applet_press_handler = self.panel_button.connect('button-press-event', self.on_panel_button_toggled)
-			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', lambda x: True)
+			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', lambda x, y: True)
 
 
 	def setup_ui_from_all_settings(self):
@@ -1930,6 +1930,8 @@ class Cardapio(dbus.service.Object):
 	def on_appbutton_button_pressed(self, widget, event):
 
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
+
+			if widget.app_info['type'] == 'callback': return
 
 			already_pinned = False
 			already_on_side_pane = False

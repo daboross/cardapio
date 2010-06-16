@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-06-16 04:23-0400\n"
+"POT-Creation-Date: 2010-06-16 04:30-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -161,16 +161,16 @@ msgstr ""
 msgid "System"
 msgstr ""
 
-#: cardapio.py:2090
+#: cardapio.py:2092
 msgid "No results to show"
 msgstr ""
 
-#: cardapio.py:2116
+#: cardapio.py:2118
 #, python-format
 msgid "No results to show in \"%(category_name)s\""
 msgstr ""
 
-#: cardapio.py:2294
+#: cardapio.py:2296
 msgid "Access applications, folders, system settings, etc."
 msgstr ""
 
