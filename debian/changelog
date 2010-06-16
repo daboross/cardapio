@@ -1,3 +1,10 @@
+cardapio (0.9.104-ubuntu1) lucid; urgency=low
+
+  * fixed the focus/scrolling bug, along with a small regression regarding
+    the sidepane menu not showing.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 14 Jun 2010 23:55:00 -0400
+
 cardapio (0.9.103-ubuntu2) lucid; urgency=low
 
   * simple bugfix
