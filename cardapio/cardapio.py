@@ -780,7 +780,7 @@ class Cardapio(dbus.service.Object):
 			active = (basename in self.settings['active plugins'])
 			plugin_info = self.plugin_database[basename]
 
-			title = '<big><b>%(plugin_name)s</b></big>\n<i>by %(plugin_author)s</i>\n%(plugin_description)s' % {
+			title = _('<big><b>%(plugin_name)s</b></big>\n<i>by %(plugin_author)s</i>\n%(plugin_description)s') % {
 					'plugin_name' : plugin_info['name'],
 					'plugin_author': plugin_info['author'],
 					'plugin_description': plugin_info['description'],

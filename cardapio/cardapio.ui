@@ -872,7 +872,7 @@
                     <property name="visible">True</property>
                     <property name="xalign">0</property>
                     <property name="label" translatable="yes">&lt;big&gt;Data has recently changed.&lt;/big&gt;
-Rebuilding...	</property>
+Rebuilding&#x2026;</property>
                     <property name="use_markup">True</property>
                   </object>
                   <packing>
