@@ -1,3 +1,11 @@
+cardapio (0.9.106-ubuntu1) lucid; urgency=low
+
+  * changed the plugin api (now at version 1.2) to support callback actions
+  * added callback to tracker and google plugins, to open window with more
+  results
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 16 Jun 2010 23:20:00 -0400
+
 cardapio (0.9.105-ubuntu1) lucid; urgency=low
 
   * updating user translations.

@@ -93,7 +93,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.105'
+	version = '0.9.106'
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
