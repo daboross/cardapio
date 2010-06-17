@@ -3,8 +3,8 @@ import urllib2, os
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = 'Thiago Teixeira'
-	name               = _('Tracker plugin')
-	description        = _('Search local files and folders indexed with Tracker')
+	name               = _('Tracker FTS plugin')
+	description        = _('Search <b>inside</b> local files and folders indexed with Tracker')
 
 	url                = ''
 	help_text          = ''
@@ -14,7 +14,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	search_delay_type  = 'local search update delay'
 
-	category_name      = _('Local Results')
+	category_name      = _('Results within files')
 	category_icon      = 'system-search'
 	category_position  = 'end'
 	hide_from_sidebar  = True
@@ -58,12 +58,11 @@ class CardapioPlugin(CardapioPluginInterface):
 				SELECT ?uri ?mime
 				WHERE { 
 					?item a nie:InformationElement;
+						fts:match "%s";
 						nie:url ?uri;
 						nie:mimeType ?mime;
 						tracker:available true.
-					FILTER (fn:contains(fn:lower-case(?uri), "%s"))
 					}
-				ORDER BY ASC(?uri)
 				LIMIT %d
 			""" 
 			% (text, self.search_results_limit),
@@ -72,18 +71,8 @@ class CardapioPlugin(CardapioPluginInterface):
 			error_handler=self.handle_search_error
 			)
 
-#			"""
-#				SELECT ?uri ?mime
-#				WHERE { 
-#					?item a nie:InformationElement;
-#						fts:match "%s";
-#						nie:url ?uri;
-#						nie:mimeType ?mime;
-#						tracker:available true.
-#					}
-#				ORDER BY DESC(fts:rank(?item))
-#				LIMIT %d
-#			""" 
+		# not using: ORDER BY DESC(fts:rank(?item))
+
 
 	def handle_search_error(self, error):
 
