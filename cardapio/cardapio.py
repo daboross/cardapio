@@ -1303,8 +1303,10 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		window_width, window_height = self.window.get_size()
-		screen_height = gtk.gdk.screen_height()
-		screen_width  = gtk.gdk.screen_width()
+
+		root_window = gtk.gdk.get_default_root_window()
+		screen_property = gtk.gdk.atom_intern('_NET_WORKAREA')
+		screen_x, screen_y, screen_width, screen_height = root_window.property_get(screen_property)[2]
 
 		if is_message_window:
 			window = self.message_window
@@ -1355,17 +1357,17 @@ class Cardapio(dbus.service.Object):
 			window_x = panel_x + applet_x - window_width
 			window_y = panel_y + applet_y
 
-		if window_x + window_width > screen_width:
+		if window_x + window_width > screen_x + screen_width:
 			window_x = screen_width - window_width
 
-		if window_y + window_height > screen_height:
+		if window_y + window_height > screen_y + screen_height:
 			window_y = screen_height - window_height
 
-		if window_x < 0:
-			window_x = 0
+		if window_x < screen_x:
+			window_x = screen_x
 
-		if window_y < 0:
-			window_y = 0
+		if window_y < screen_y:
+			window_y = screen_y
 
 		window.move(window_x + offset_x, window_y + offset_y)
 
