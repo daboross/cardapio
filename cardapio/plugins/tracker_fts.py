@@ -3,7 +3,7 @@ import urllib2, os
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = 'Thiago Teixeira'
-	name               = _('Tracker FTS plugin')
+	name               = _('Tracker full text search plugin')
 	description        = _('Search <b>inside</b> local files and folders indexed with Tracker')
 
 	url                = ''
