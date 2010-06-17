@@ -152,13 +152,27 @@ class Cardapio(dbus.service.Object):
 		self.save_config_file()
 
 
+	def on_mainwindow_destroy(self, widget):
+		"""
+		Handler for when the Cardapio window is destroyed
+		"""
+
+		self.quit()
+
+
 	def quit(self, *dummy):
+		"""
+		Saves the current state and quits
+		"""
 
 		self.save_config_file()
 		gtk.main_quit()
 
 
 	def setup_dbus(self):
+		"""
+		Sets up the session bus
+		"""
 
 		DBusGMainLoop(set_as_default=True)
 		self.bus = dbus.SessionBus()
@@ -166,6 +180,10 @@ class Cardapio(dbus.service.Object):
 
 	
 	def get_plugin_class(self, basename):
+		""" 
+		Returns the CardapioPlugin class from the plugin at plugins/basename.py.
+		If it fails, it returns a string decribing the error.
+		"""
 
 		package = '%splugins.%s' % (self.package_root, basename)
 		try:
@@ -182,6 +200,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def build_plugin_database(self):
+		"""
+		Searches the plugins/ folder for .py files not starting with underscore.
+		Creates the dict self.plugin_database indexed by the plugin filename's base name.
+		"""
 
 		self.plugin_database = {}
 		plugin_dirs = [
@@ -213,6 +235,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def activate_plugins_from_settings(self):
+		"""
+		Initializes plugins in the database if the user's settings say so.
+		"""
 
 		for plugin in self.active_plugin_instances:
 			del(plugin)
@@ -246,6 +271,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def write_to_plugin_log(self, plugin, text, is_error = False, is_warning = False):
+		"""
+		Writes 'text' to the log file, prefixing it with [plugin name].
+		"""
 
 		if is_error: 
 			write = logging.error
@@ -260,6 +288,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_all_sections_sidebar_button_clicked(self, widget):
+		"""
+		Handler for when the user clicks "All" in the sidebar
+		"""
 
 		if self.auto_toggled_sidebar_button:
 			self.auto_toggled_sidebar_button = False
@@ -274,6 +305,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_sidebar_button_clicked(self, widget, section_slab):
+		"""
+		Handler for when the user chooses a category in the sidebar
+		"""
 
 		if self.auto_toggled_sidebar_button:
 			self.auto_toggled_sidebar_button = False
@@ -288,6 +322,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def get_config_file(self, mode):
+		"""
+		Returns a file handler to Cardapio's config file.
+		"""
 
 		config_folder_path = os.path.join(DesktopEntry.xdg_config_home, 'Cardapio')
 
@@ -295,7 +332,7 @@ class Cardapio(dbus.service.Object):
 			os.mkdir(config_folder_path)
 
 		elif not os.path.isdir(config_folder_path):
-			print(_('Error! Path "%s" already exists!') % config_folder_path)
+			logging.error('Error! Path "%s" already exists!' % config_folder_path)
 			sys.exit(1)
 
 		config_file_path = os.path.join(DesktopEntry.xdg_config_home, 'Cardapio', 'config.ini')
@@ -304,13 +341,16 @@ class Cardapio(dbus.service.Object):
 			open(config_file_path, 'w+')
 
 		elif not os.path.isfile(config_file_path):
-			print(_('Error! Path "%s" already exists!') % config_file_path)
+			logging.error('Error! Path "%s" already exists!' % config_file_path)
 			sys.exit(1)
 
 		return open(config_file_path, mode)
 
 
 	def read_config_file(self):
+		"""
+		Reads Cardapio's config file and builds the self.settings dict
+		"""
 
 		config_file = self.get_config_file('r')
 
@@ -383,6 +423,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def read_config_option(self, user_settings, key, val, override_empty_str = False, force_update_from_version = None):
+		"""
+		Reads the config option 'key' from a the 'user_settings' dict, using
+		'val' as a fallback.
+		"""
 
 		if key in user_settings:
 			if override_empty_str and len(user_settings[key]) == 0:
@@ -406,6 +450,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def save_config_file(self):
+		"""
+		Saves the self.settings dict into the config file
+		"""
 
 		self.settings['splitter position'] = self.get_object('MainSplitter').get_position()
 
@@ -414,6 +461,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def setup_base_ui(self):
+		"""
+		Reads the GTK Builder interface file and sets up some UI details
+		"""
 
 		self.rebuild_timer = None
 
@@ -506,6 +556,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def get_best_icon_size(self):
+		"""
+		Returns the best icon size for the current panel size
+		"""
 
 		panel = self.panel_button.get_toplevel().window
 
@@ -534,6 +587,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def setup_panel_button(self):
+		"""
+		Sets up the look and feel of the Cardapio applet button 
+		"""
 
 		self.panel_button.set_label(self.settings['applet label'])
 		button_icon = self.get_icon(self.settings['applet icon'], self.get_best_icon_size(), 'distributor-logo')
@@ -557,6 +613,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def setup_ui_from_all_settings(self):
+		"""
+		Setup UI elements according to user preferences
+		"""
 
 		self.setup_ui_from_gui_settings()
 
@@ -567,6 +626,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def setup_ui_from_gui_settings(self):
+		"""
+		Setup UI elements from the set of preferences that are accessible
+		from the options dialog.
+		"""
 
 		if self.keybinding is not None:
 			keybinder.unbind(self.keybinding)
@@ -584,6 +647,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def build_ui(self):
+		"""
+		Read the contents of all menus and plugins and build the UI
+		elements that support them.
+		"""
 
 		self.prepare_colors()
 
@@ -609,7 +676,7 @@ class Cardapio(dbus.service.Object):
 			self.get_object('AppletOptionPane').hide()
 
 		# slabs that should go *before* regular application slabs
-		self.add_favorites_slab()
+		self.add_pinneditems_slab()
 		self.add_sidepane_slab()
 		self.add_places_slab()
 
@@ -629,6 +696,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def rebuild_ui(self, show_message = False):
+		"""
+		Rebuild the UI after a timer (this is called when the menu data changes,
+		for example)
+		"""
 
 		if self.rebuild_timer is not None:
 			glib.source_remove(self.rebuild_timer)
@@ -641,6 +712,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def open_about_dialog(self, widget, verb = None):
+		"""
+		Opens either the "About Gnome" dialog, or the "About Ubuntu" dialog,
+		or the "About Cardapio" dialog
+		"""
 
 		if verb == 'AboutGnome':
 			self.launch_raw('gnome-about')
@@ -654,11 +729,17 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_about_dialog_close(self, widget, response = None):
+		"""
+		Handler for hiding Cardapio's about dialog
+		"""
 
 		self.about_dialog.hide()
 
 
 	def set_widget_from_option(self, widget_str, option_str):
+		"""
+		Set the value of the widget named 'widget_str' to 'option_str'
+		"""
 
 		widget = self.get_object(widget_str)
 		widget.handler_block_by_func(self.on_options_changed)
@@ -676,6 +757,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def open_options_dialog(self, *dummy):
+		"""
+		Show the Options Dialog and populate its widgets with values from the
+		user's settings (self.settings)
+		"""
 
 		self.set_widget_from_option('OptionKeybinding', 'keybinding')
 		self.set_widget_from_option('OptionAppletLabel', 'applet label')
@@ -707,12 +792,19 @@ class Cardapio(dbus.service.Object):
 
 	
 	def close_options_dialog(self, *args):
+		"""
+		Hides the Options Dialog
+		"""
 
 		self.options_dialog.hide()
 		return True
 
 
 	def on_options_changed(self, *dummy):
+		"""
+		Updates Cardapio's options when the user alters them in the Options
+		Dialog
+		"""
 
 		self.settings['keybinding'] = self.get_object('OptionKeybinding').get_text()
 		self.settings['applet label'] = self.get_object('OptionAppletLabel').get_text()
@@ -723,6 +815,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_plugin_apply_clicked(self, widget):
+		"""
+		Handler for when the user clicks on "Apply" in the plugin tab of the
+		Options Dialog
+		"""
 
 		self.settings['active plugins'] = []
 		iter_ = self.plugin_tree_model.get_iter_first()
@@ -738,17 +834,21 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_plugin_state_toggled(self, cell, path):
+		"""
+		Believe it or not, GTK requires you to manually tell the checkbuttons
+		that reside within a tree to toggle when the user clicks on them.
+		This function does that.
+		"""
 
 		iter_ = self.plugin_tree_model.get_iter(path)
 		self.plugin_tree_model.set_value(iter_, 1, not cell.get_active())	
 
 
-	def on_mainwindow_destroy(self, widget):
-
-		self.quit()
-
-
 	def on_mainwindow_button_pressed(self, widget, event):
+		"""
+		Show context menu when the right mouse button is clicked on the main
+		window
+		"""
 
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 			self.block_focus_out_event()
@@ -756,6 +856,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def start_resize(self, widget, event):
+		"""
+		This function is used to emulate the window manager's resize function
+		from Cardapio's borderless window.
+		"""
 
 		window_x, window_y = self.window.get_position()
 		x = event.x_root - window_x
@@ -800,28 +904,29 @@ class Cardapio(dbus.service.Object):
 
 
 	def block_focus_out_event(self):
+		"""
+		Blocks the focus-out event
+		"""
 
 		self.window.handler_block_by_func(self.on_mainwindow_focus_out)
 		self.focus_out_blocked = True
 
 
 	def unblock_focus_out_event(self, *dummy):
+		"""
+		If the focus-out event was previously blocked, this unblocks it
+		"""
 
 		if self.focus_out_blocked:
 			self.window.handler_unblock_by_func(self.on_mainwindow_focus_out)
 			self.focus_out_blocked = False
 
 
-	def on_mainwindow_key_pressed(self, widget, event):
-
-		# make sure we aren't already at the search_entry, nor are we going
-		# there due to this keypress
-
-		if self.window.get_focus() != self.search_entry:
-			self.previously_focused_widget = self.window.get_focus()
-
-
 	def on_mainwindow_after_key_pressed(self, widget, event):
+		"""
+		Send all keypresses to the search entry, so the user can search
+		from anywhere without the need to focus the search entry first
+		"""
 
 		w = self.window.get_focus()
 
@@ -834,40 +939,41 @@ class Cardapio(dbus.service.Object):
 			self.search_entry.emit('key-press-event', event)
 
 
-	def on_mainwindow_focus_out(self, widget, event):
+	def on_mainwindow_key_pressed(self, widget, event):
+		"""
+		This is a trick to make sure the user isn't already typing at the
+		search entry when we redirect all keypresses to the search entry.
+		Because that would enter two of each key.
+		"""
 
-		if self.panel_applet is None:
-			self.hide()
-			return
+		if self.window.get_focus() != self.search_entry:
+			self.previously_focused_widget = self.window.get_focus()
+
+
+	def on_mainwindow_focus_out(self, widget, event):
+		"""
+		Make Cardapio disappear when it loses focus
+		"""
 
 		x, y, dummy = self.panel_applet.window.get_pointer()
 		dummy, dummy, w, h = self.panel_applet.get_allocation()
 
-		# make sure clicking the applet button doesn't cause a focus-out event
-		if (0 <= x <= w and 0 <= y <= h): 
+		# Make sure clicking the applet button doesn't cause a focus-out event.
+		# Otherwise, the click signal actually happens *after* the focus-out,
+		# which causes the applet to be re-shown rather than disappearing.
+		# So by ignoring this focus-out we actually make sure that Cardapio
+		# will be hidden after all. Silly.
+		if self.panel_applet is not None and (0 <= x <= w and 0 <= y <= h): 
 			return
-
-		# make sure resizing doesn't cause a focus-out event
-		window_x, window_y = self.window.window.get_origin()
-		window_w, window_h = self.window.window.get_size()
-
-		if 0 <= x <= window_w and 0 <= y <= window_h:
-
-			mask = widget.window.get_pointer()[2]
-
-			if (
-				gtk.gdk.BUTTON1_MASK & mask == gtk.gdk.BUTTON1_MASK or
-				gtk.gdk.BUTTON2_MASK & mask == gtk.gdk.BUTTON2_MASK or
-				gtk.gdk.BUTTON3_MASK & mask == gtk.gdk.BUTTON3_MASK or
-				gtk.gdk.BUTTON4_MASK & mask == gtk.gdk.BUTTON4_MASK or
-				gtk.gdk.BUTTON5_MASK & mask == gtk.gdk.BUTTON5_MASK 
-				):
-				return
 
 		self.hide()
 
 
 	def on_mainwindow_delete_event(self, widget, event):
+		"""
+		What happens when the user presses Alt-F4? If in panel mode, 
+		nothing. If in launcher mode, this terminates Cardapio.
+		"""
 
 		if self.panel_applet:
 			# keep window alive if in panel mode
@@ -875,23 +981,43 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_mainwindow_configure_event(self, widget, event):
+		"""
+		Save the window size whenever the user resizes Cardapio
+		"""
 
 		self.save_dimensions()
 
 
 	def on_icon_theme_changed(self, icon_theme):
+		"""
+		Rebuild the Cardapio UI whenever the icon theme changes
+		"""
 
 		self.schedule_rebuild()
 
 
 	def on_gtk_settings_changed(self, gobj, property_changed):
+		"""
+		Rebuild the Cardapio UI whenever the color scheme or gtk theme change
+		"""
 
 		if property_changed.name == 'gtk-color-scheme' or property_changed.name == 'gtk-theme-name':
 			self.prepare_colors()
 			self.schedule_rebuild()
 
 
+	def on_menu_data_changed(self, tree):
+		"""
+		Rebuild the Cardapio UI whenever the menu data changes
+		"""
+
+		self.schedule_rebuild()
+
+
 	def schedule_rebuild(self):
+		"""
+		Rebuilds the Cardapio UI after a timer
+		"""
 
 		if self.rebuild_timer is not None:
 			glib.source_remove(self.rebuild_timer)
@@ -899,14 +1025,12 @@ class Cardapio(dbus.service.Object):
 		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.rebuild_ui)
 
 
-	def on_menu_data_changed(self, tree):
-
-		self.schedule_rebuild()
-
-
 	def on_searchentry_icon_pressed(self, widget, iconpos, event):
+		"""
+		Handler for when the "clear" icon of the search entry is pressed
+		"""
 
-		if self.is_searchfield_empty():
+		if self.is_searchentry_empty():
 			self.show_all_nonempty_sections()
 
 		else:
@@ -914,6 +1038,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_searchentry_changed(self, widget):
+		"""
+		Handler for when the user types something in the search entry
+		"""
 
 		self.no_results_to_show = True
 		text = self.search_entry.get_text().strip()
@@ -939,6 +1066,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def search_menus(self, text):
+		"""
+		Start a menu search
+		"""
 
 		text = text.lower()
 
@@ -961,6 +1091,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def schedule_search_with_plugins(self, text):
+		"""
+		Start a plugin-based search, after some time-outs
+		"""
 
 		if self.search_timer_local is not None:
 			glib.source_remove(self.search_timer_local)
@@ -980,6 +1113,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def search_with_plugins(self, text, delay_type):
+		"""
+		Start a plugin-based search
+		"""
 
 		if delay_type == 'local search update delay':
 			glib.source_remove(self.search_timer_local)
@@ -1001,6 +1137,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def handle_search_error(self, plugin, text):
+		"""
+		Handler for when a plugin returns an error
+		"""
 
 		plugin.is_running = False
 		self.write_to_plugin_log(plugin, text, is_error = True)
@@ -1008,6 +1147,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def handle_search_result(self, plugin, results):
+		"""
+		Handler for when a plugin returns some search results
+		"""
 
 		plugin.is_running = False
 
@@ -1042,7 +1184,7 @@ class Cardapio(dbus.service.Object):
 			if not self.icon_theme.has_icon(icon_name):
 				icon_name = 'text-x-generic'
 
-			button = self.add_app_entry(result['name'], icon_name, plugin.section_contents, result['type'], result['command'], tooltip = result['tooltip'])
+			button = self.add_app_button(result['name'], icon_name, plugin.section_contents, result['type'], result['command'], tooltip = result['tooltip'])
 
 
 		if results:
@@ -1071,17 +1213,23 @@ class Cardapio(dbus.service.Object):
 		gtk.gdk.threads_leave()
 
 
-	def is_searchfield_empty(self):
+	def is_searchentry_empty(self):
+		"""
+		Returns True if the search entry is empty.
+		"""
 
 		return (len(self.search_entry.get_text().strip()) == 0)
 
 
 	def on_searchentry_activate(self, widget):
+		"""
+		Handler for when the user presses Enter on the search entry
+		"""
 
 		for plugin in self.active_plugin_instances:
 			if plugin.is_running: plugin.cancel()
 
-		if self.is_searchfield_empty():
+		if self.is_searchentry_empty():
 			self.hide_all_transitory_sections()
 			return 
 
@@ -1093,6 +1241,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_searchentry_key_pressed(self, widget, event):
+		"""
+		Handler for when the user presses Tab or Escape on the search entry
+		"""
 
 		# make Tab go to first result element
 		if event.keyval == gtk.gdk.keyval_from_name('Tab'):
@@ -1116,7 +1267,7 @@ class Cardapio(dbus.service.Object):
 			for plugin in self.active_plugin_instances:
 				if plugin.is_running: plugin.cancel()
 
-			if not self.is_searchfield_empty():
+			if not self.is_searchentry_empty():
 				self.clear_search_entry()
 
 			elif self.selected_section is not None:
@@ -1130,6 +1281,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def get_first_visible_app(self):
+		"""
+		Returns the first app in the right pane
+		"""
 
 		for slab in self.application_pane.get_children():
 			if not slab.get_visible(): continue
@@ -1142,18 +1296,11 @@ class Cardapio(dbus.service.Object):
 		return None
 
 
-	# make Tab go from first result element to text entry widget
-	def on_first_button_key_pressed(self, widget, event):
-
-		if event.keyval == gtk.gdk.keyval_from_name('ISO_Left_Tab'):
-
-			self.window.set_focus(self.search_entry)
-
-		else: return False
-		return True
-
-
 	def reposition_window(self, is_message_window = False):
+		"""
+		Place the Cardapio window near the applet and make sure it's visible.
+		If there is no applet, place it in the center of the screen.
+		"""
 
 		window_width, window_height = self.window.get_size()
 		screen_height = gtk.gdk.screen_height()
@@ -1224,17 +1371,26 @@ class Cardapio(dbus.service.Object):
 
 
 	def restore_dimensions(self):
+		"""
+		Resize Cardapio according to the user preferences
+		"""
 
 		if self.settings['window size'] is not None: 
 			self.window.resize(*self.settings['window size'])
 
 
 	def save_dimensions(self):
+		"""
+		Save Cardapio's size into the user preferences
+		"""
 
 		self.settings['window size'] = self.window.get_size()
 
 
 	def set_message_window_visible(self, state = True):
+		"""
+		Show/Hide the "Rebuilding" message window
+		"""
 
 		if state == False:
 			self.message_window.hide()
@@ -1252,6 +1408,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def show(self, *dummy):
+		"""
+		Show the Cardapio window
+		"""
 
 		self.auto_toggle_panel_button(True)
 
@@ -1272,6 +1431,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def hide(self, *dummy):
+		"""
+		Hide the Cardapio window
+		"""
 
 		self.auto_toggle_panel_button(False)
 
@@ -1287,6 +1449,9 @@ class Cardapio(dbus.service.Object):
 
 	@dbus.service.method(dbus_interface=bus_name_str, in_signature=None, out_signature=None)
 	def show_hide(self):
+		"""
+		Toggle Show/Hide the Cardapio window. This function is dbus-accessible.
+		"""
 
 		if time.time() - self.last_visibility_toggle < Cardapio.min_visibility_toggle_interval:
 			return
@@ -1296,6 +1461,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def show_window_on_top(self, window):
+		"""
+		Place the Cardapio window on top of all others
+		"""
 
 		window.show_now()
 
@@ -1308,7 +1476,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_panel_button_pressed(self, widget, event):
-		# used for the menu only
+		"""
+		Show the context menu when the user right-clicks the panel applet
+		"""
 
 		if event.type == gtk.gdk.BUTTON_PRESS:
 
@@ -1327,6 +1497,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_panel_button_toggled(self, widget, event):
+		"""
+		Show/Hide cardapio when the panel applet is clicked
+		"""
 
 		if event.type == gtk.gdk.BUTTON_PRESS:
 
@@ -1339,6 +1512,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_panel_size_changed(self, widget, allocation):
+		"""
+		Resize the panel applet when the panel size is changed
+		"""
 
 		self.panel_applet.handler_block_by_func(self.on_panel_size_changed)
 		glib.timeout_add(100, self.setup_panel_button)
@@ -1346,12 +1522,18 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_panel_size_change_done(self):
+		"""
+		Restore a signal handler that we had deactivated
+		"""
 
 		self.panel_applet.handler_unblock_by_func(self.on_panel_size_changed)
 		return False # must return false to cancel the timer
 
 
 	def panel_change_orientation(self, *dummy):
+		"""
+		Resize the panel applet when the panel orientation is changed
+		"""
 
 		orientation = self.panel_applet.get_orient()
 
@@ -1372,6 +1554,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_panel_change_background(self, widget, bg_type, color, pixmap):
+		"""
+		Update the Cardapio applet background when the user changes
+		the panel background
+		"""
 
 		self.panel_button.parent.set_style(None)
 
@@ -1395,6 +1581,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def auto_toggle_panel_button(self, state):
+		"""
+		Toggle the panel applet when the user presses the keybinding
+		"""
 
 		if self.panel_applet is not None:
 
@@ -1403,6 +1592,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def remove_section_from_app_list(self, section_slab):
+		"""
+		Remove from the app list (used when searching) all apps that belong in a
+		given section.
+		"""
 
 		i = 0
 		while i < len(self.app_list):
@@ -1413,6 +1606,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def build_system_list(self):
+		"""
+		Populate the System section
+		"""
 
 		self.add_tree_to_app_list(self.sys_tree.root, self.system_section_contents)
 
@@ -1421,9 +1617,12 @@ class Cardapio(dbus.service.Object):
 
 
 	def build_places_list(self):
+		"""
+		Populate the places list
+		"""
 
-		button = self.add_app_entry(_('Home'), 'user-home', self.places_section_contents, 'xdg', self.user_home_folder, tooltip = _('Open your personal folder'), app_list = self.app_list)
-		button = self.add_app_entry(_('Computer'), 'computer', self.places_section_contents, 'xdg', 'computer:///', tooltip = _('Browse all local and remote disks and folders accessible from this computer'), app_list = self.app_list)
+		button = self.add_app_button(_('Home'), 'user-home', self.places_section_contents, 'xdg', self.user_home_folder, tooltip = _('Open your personal folder'), app_list = self.app_list)
+		button = self.add_app_button(_('Computer'), 'computer', self.places_section_contents, 'xdg', 'computer:///', tooltip = _('Browse all local and remote disks and folders accessible from this computer'), app_list = self.app_list)
 
 		xdg_folders_file_path = os.path.join(DesktopEntry.xdg_config_home, 'user-dirs.dirs')
 		xdg_folders_file = file(xdg_folders_file_path, 'r')
@@ -1454,10 +1653,14 @@ class Cardapio(dbus.service.Object):
 		self.bookmark_monitor = gio.File(bookmark_file_path).monitor_file()  # keep a reference to avoid getting it garbage collected
 		self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed)
 
-		button = self.add_app_entry(_('Trash'), 'user-trash', self.places_section_contents, 'xdg', 'trash:///', tooltip = _('Open the trash'), app_list = self.app_list)
+		button = self.add_app_button(_('Trash'), 'user-trash', self.places_section_contents, 'xdg', 'trash:///', tooltip = _('Open the trash'), app_list = self.app_list)
 
 
 	def on_bookmark_monitor_changed(self, monitor, file, other_file, event):
+		"""
+		Handler for when the user adds/removes a bookmarked folder using
+		Nautilus or some other program
+		"""
 
 		if event == gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
 
@@ -1470,6 +1673,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def get_folder_name_and_path(self, folder_path):
+		"""
+		Returns a folder's name and path from its full filename
+		"""
 
 		path = folder_path.strip(' \n\r\t')
 
@@ -1484,6 +1690,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def get_place_name_and_path(self, folder_path):
+		"""
+		Return the name and path of a bookmarked folder
+		"""
 
 		res = folder_path.split(' ')
 		if len(res) > 1: 
@@ -1495,6 +1704,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def add_place(self, folder_name, folder_path, folder_icon):
+		"""
+		Add a folder to the Places list in Cardapio
+		"""
 
 		folder_path = os.path.expanduser(folder_path.replace('$HOME', '~')).strip(' \n\r\t')
 
@@ -1503,10 +1715,13 @@ class Cardapio(dbus.service.Object):
 
 		if not urllib2.posixpath.exists(canonical_path): return
 
-		button = self.add_app_entry(folder_name, folder_icon, self.places_section_contents, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
+		button = self.add_app_button(folder_name, folder_icon, self.places_section_contents, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
 
 
 	def build_favorites_list(self, slab, list_name):
+		"""
+		Populate either the Pinned Items or Side Pane list
+		"""
 
 		text = self.search_entry.get_text().strip().lower()
 
@@ -1519,7 +1734,7 @@ class Cardapio(dbus.service.Object):
 				app['icon name'] = app['icon_name']
 				app.pop('icon_name')
 
-			button = self.add_app_entry(app['name'], app['icon name'], self.section_list[slab]['contents'], app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
+			button = self.add_app_button(app['name'], app['icon name'], self.section_list[slab]['contents'], app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
 
 			if app['name'].lower().find(text) == -1:
 				button.hide()
@@ -1549,6 +1764,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def build_session_list(self):
+		"""
+		Populate the Session list
+		"""
 
 		items = [
 			[
@@ -1576,12 +1794,15 @@ class Cardapio(dbus.service.Object):
 
 		for item in items:
 
-			button = self.add_app_entry(item[0], item[2], self.session_section_contents, 'raw', item[3], tooltip = item[1], app_list = self.app_list)
+			button = self.add_app_button(item[0], item[2], self.session_section_contents, 'raw', item[3], tooltip = item[1], app_list = self.app_list)
 			button = self.add_button(item[0], item[2], item[4], tooltip = item[1], is_app_button = True)
 			button.connect('clicked', self.on_raw_button_clicked, item[3])
 
 
 	def build_applications_list(self):
+		"""
+		Populate the Applications list by reading the Gnome menus
+		"""
 
 		for node in self.app_tree.root.contents:
 
@@ -1592,6 +1813,11 @@ class Cardapio(dbus.service.Object):
 
 
 	def add_slab(self, title_str, icon_name = None, tooltip = '', hide = False, node = None, append = True):
+		"""
+		Add to the app pane a new section slab (i.e. a container holding a title
+		label and a hbox to be filled with apps). This also adds the section
+		name to the left pane, under the View label.
+		"""
 
 		# add category to category pane
 		sidebar_button = self.add_sidebar_button(title_str, icon_name, self.category_pane, tooltip = tooltip, append = append)
@@ -1627,12 +1853,18 @@ class Cardapio(dbus.service.Object):
 
 
 	def add_places_slab(self):
+		"""
+		Add the Places slab to the app pane
+		"""
 
 		section_slab, section_contents = self.add_slab(_('Places'), 'folder', tooltip = _('Access documents and folders'), hide = False)
 		self.places_section_contents = section_contents
 
 
-	def add_favorites_slab(self):
+	def add_pinneditems_slab(self):
+		"""
+		Add the Pinned Items slab to the app pane
+		"""
 
 		section_slab, section_contents = self.add_slab(_('Pinned items'), 'emblem-favorite', tooltip = _('Your favorite applications'), hide = False, append = False)
 		self.favorites_section_slab = section_slab
@@ -1640,6 +1872,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def add_sidepane_slab(self):
+		"""
+		Add the Side Pane slab to the app pane
+		"""
 
 		section_slab, section_contents = self.add_slab(_('Side Pane'), 'emblem-favorite', tooltip = _('Items pinned to the side pane'), hide = True, append = False)
 		self.sidepane_section_slab = section_slab
@@ -1647,6 +1882,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def add_session_slab(self):
+		"""
+		Add the Session slab to the app pane
+		"""
 
 		section_slab, section_contents = self.add_slab(_('Session'), 'session-properties', hide = True)
 		self.session_section_slab = section_slab
@@ -1654,6 +1892,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def add_system_slab(self):
+		"""
+		Add the System slab to the app pane
+		"""
 
 		section_slab, section_contents = self.add_slab(_('System'), 'applications-system', hide = True)
 		self.system_section_slab = section_slab
@@ -1661,6 +1902,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def add_plugin_slab(self, plugin):
+		"""
+		Add to the app pane a slab representing a given plugin
+		"""
 
 		append = (plugin.category_position == 'end')
 		section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, hide = plugin.hide_from_sidebar, append = append)
@@ -1668,22 +1912,35 @@ class Cardapio(dbus.service.Object):
 
 
 	def clear_pane(self, container):
+		"""
+		Remove all children from a GTK container
+		"""
 
 		for	child in container.get_children():
 			container.remove(child)
 
 
 	def clear_search_entry(self):
+		"""
+		Clears the search entry
+		"""
 
 		self.search_entry.set_text('')
 
 
 	def add_sidebar_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = True, append = True):
+		"""
+		Adds a button to the sidebar. This could be either a section button or
+		one of the "left pane" buttons.
+		"""
 
 		return self.add_button(button_str, icon_name, parent_widget, tooltip, use_toggle_button = use_toggle_button, is_app_button = False, append = append)
 
 
-	def add_app_entry(self, button_str, icon_name, parent_widget, command_type, command, tooltip = '', app_list = None):
+	def add_app_button(self, button_str, icon_name, parent_widget, command_type, command, tooltip = '', app_list = None):
+		"""
+		Adds a new button to the app bar.
+		"""
 
 		button = self.add_button(button_str, icon_name, parent_widget, tooltip, is_app_button = True)
 
@@ -1714,6 +1971,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def connect_command(self, button, command_type, command):
+		"""
+		Connects the appropriate action to a given app's button. Also 
+		connects the context menu handler.
+		"""
 
 		if command_type == 'app':
 			button.connect('clicked', self.on_appbutton_clicked, command)
@@ -1731,6 +1992,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def add_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = None, is_app_button = True, append = True):
+		"""
+		Adds a button to a parent container
+		"""
 
 		if is_app_button or use_toggle_button == False:
 			button = gtk.Button()
@@ -1780,6 +2044,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def add_application_section(self, section_title = None, append = True):
+		"""
+		Adds a new slab to the applications pane
+		"""
 
 		section_slab, section_contents = self.add_section()
 
@@ -1803,6 +2070,11 @@ class Cardapio(dbus.service.Object):
 
 
 	def add_section(self):
+		"""
+		Reads the UI file to return the Slab structure (this makes it easier to
+		design Cardapio, although it slows down the creation of new slabs in
+		this code)
+		"""
 
 		builder = gtk.Builder()
 		builder.add_from_file(self.uifile)
@@ -1818,6 +2090,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def get_icon(self, icon_value, icon_size, fallback_icon = 'application-x-executable'):
+		"""
+		Returns a GTK Image from a given icon name and size. The icon name can be
+		either a path or a named icon from the GTK theme.
+		"""
 
 		if not icon_value: 
 			icon_value = fallback_icon
@@ -1851,6 +2127,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def add_tree_to_app_list(self, tree, parent_widget, recursive = True):
+		"""
+		Adds all the apps in a subtree of Gnome's menu as buttons in a given
+		parent widget
+		"""
 
 		has_no_leaves = True
 
@@ -1858,7 +2138,7 @@ class Cardapio(dbus.service.Object):
 
 			if isinstance(node, gmenu.Entry):
 
-				button = self.add_app_entry(node.name, node.icon, parent_widget, 'app', node.desktop_file_path, tooltip = node.get_comment(), app_list = self.app_list)
+				button = self.add_app_button(node.name, node.icon, parent_widget, 'app', node.desktop_file_path, tooltip = node.get_comment(), app_list = self.app_list)
 				has_no_leaves = False
 
 			elif isinstance(node, gmenu.Directory) and recursive:
@@ -1869,6 +2149,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def prepare_colors(self):
+		"""
+		Reads colors from the GTK theme so that the app pane can look like a
+		GTK treeview
+		"""
 
 		dummy_window = gtk.Window()
 		dummy_window.realize()
@@ -1879,6 +2163,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def make_callback_handler(self, action):
+		"""
+		Returns a function that wraps around a plugin's callback function
+		"""
 
 		def callback_handler(widget):
 
@@ -1890,11 +2177,17 @@ class Cardapio(dbus.service.Object):
 
 
 	def launch_edit_app(self, *dummy):
+		"""
+		Opens Gnome's menu editor
+		"""
 
 		self.launch_raw('alacarte')
 
 
 	def on_pin_this_app_clicked(self, widget):
+		"""
+		Handle the pinning action
+		"""
 
 		self.remove_section_from_app_list(self.favorites_section_slab)
 		self.clear_pane(self.favorites_section_contents)
@@ -1903,6 +2196,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_unpin_this_app_clicked(self, widget):
+		"""
+		Handle the unpinning action
+		"""
 
 		self.remove_section_from_app_list(self.favorites_section_slab)
 		self.clear_pane(self.favorites_section_contents)
@@ -1911,6 +2207,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_add_to_side_pane_clicked(self, widget):
+		"""
+		Handle the "add to sidepane" action
+		"""
 
 		self.remove_section_from_app_list(self.sidepane_section_slab)
 		self.clear_pane(self.sidepane_section_contents)
@@ -1921,6 +2220,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_remove_from_side_pane_clicked(self, widget):
+		"""
+		Handle the "remove from sidepane" action
+		"""
 
 		self.remove_section_from_app_list(self.sidepane_section_slab)
 		self.clear_pane(self.sidepane_section_contents)
@@ -1930,6 +2232,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_appbutton_button_pressed(self, widget, event):
+		"""
+		Show context menu for app buttons
+		"""
 
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 
@@ -1969,6 +2274,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_appbutton_focused(self, widget, event):
+		"""
+		Scroll to app buttons when they gain focus
+		"""
 
 		alloc = widget.get_allocation()
 		scroller_position = self.scroll_adjustment.value
@@ -1982,6 +2290,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_appbutton_clicked(self, widget, desktop_path):
+		"""
+		Handler to run an application or command when an app button is clicked
+		"""
 
 		if os.path.exists(desktop_path):
 
@@ -2000,22 +2311,35 @@ class Cardapio(dbus.service.Object):
 
 
 	def on_xdg_button_clicked(self, widget, path):
+		"""
+		Handler for buttons that map to urls, files and folders
+		"""
 
 		self.launch_xdg(path)
 
 
 	def launch_xdg(self, path):
+		"""
+		Open a url, file or folder
+		"""
 
 		path = self.escape_quotes(self.unescape(path))
 		return self.launch_raw("xdg-open '%s'" % path)
 
 
 	def on_raw_button_clicked(self, widget, path):
+		"""
+		Handler for buttons that directly map to commands that can be typed in a
+		terminal
+		"""
 
 		self.launch_raw(path)
 
 
 	def launch_raw(self, path):
+		"""
+		Run a command as a subprocess
+		"""
 
 		try:
 			subprocess.Popen(path, shell = True, cwd = self.user_home_folder)
@@ -2029,6 +2353,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def escape_quotes(self, text):
+		"""
+		Sanitize a string by escaping quotation marks
+		"""
 
 		text = text.replace("'", r"\'")
 		text = text.replace('"', r'\"')
@@ -2036,11 +2363,17 @@ class Cardapio(dbus.service.Object):
 
 
 	def unescape(self, text):
+		"""
+		Clear all sorts of escaping from a URL, like %20 -> [space]
+		"""
 
 		return urllib2.unquote(str(text)) # NOTE: it is possible that with python3 we will have to change this line
 
 
 	def show_all_nonempty_sections(self):
+		"""
+		Show all sections that currently have search results
+		"""
 
 		self.no_results_to_show = True
 
@@ -2065,11 +2398,14 @@ class Cardapio(dbus.service.Object):
 		widget = self.all_sections_sidebar_button
 		self.set_sidebar_button_active(widget, True) 
 
-		if self.is_searchfield_empty():
+		if self.is_searchentry_empty():
 			widget.set_sensitive(False)
 
 
 	def show_lone_section(self, section_slab):
+		"""
+		Show a single section (because it's been selected in the View pane)
+		"""
 
 		for sec in self.section_list:
 			sec.hide()
@@ -2090,6 +2426,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def show_no_results_text(self, text = None):
+		"""
+		Show the "No results to show" text
+		"""
 
 		if text is None: text = _('No results to show')
 
@@ -2098,11 +2437,17 @@ class Cardapio(dbus.service.Object):
 
 
 	def hide_no_results_text(self):
+		"""
+		Hide the "No results to show" text
+		"""
 
 		self.no_results_slab.hide()
 
 
 	def consider_showing_no_results_text(self):
+		"""
+		Decide whether the "No results" text should be shown
+		"""
 
 		if self.selected_section is None:
 
@@ -2121,6 +2466,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def hide_all_transitory_sections(self, fully_hide = False):
+		"""
+		Hides all sections that should not appear in the sidebar when
+		there is no text in the search entry
+		"""
 
 		self.hide_section(self.session_section_slab , fully_hide)
 		self.hide_section(self.system_section_slab  , fully_hide)
@@ -2130,6 +2479,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def hide_section(self, section_slab, fully_hide = False):
+		"""
+		Hide a section slab
+		"""
 
 		if fully_hide:
 			self.set_section_is_empty(section_slab)
@@ -2138,6 +2490,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def hide_plugin_sections(self, fully_hide = False):
+		"""
+		Hide the section slabs for all plugins that are marked as transitory
+		"""
 
 		for plugin in self.active_plugin_instances:
 			if plugin.hide_from_sidebar:
@@ -2145,6 +2500,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def show_section(self, section_slab, fully_show = False):
+		"""
+		Show a section slab
+		"""
 
 		if fully_show:
 			self.set_section_has_entries(section_slab)
@@ -2153,18 +2511,27 @@ class Cardapio(dbus.service.Object):
 
 
 	def set_section_is_empty(self, section_slab):
+		"""
+		Mark a section as empty (no search results) and hide it
+		"""
 
 		self.section_list[section_slab]['has entries'] = False
 		self.section_list[section_slab]['category'].hide()
 
 
 	def set_section_has_entries(self, section_slab):
+		"""
+		Mark a section as having entries and show it
+		"""
 
 		self.section_list[section_slab]['has entries'] = True
 		self.section_list[section_slab]['category'].show()
 
 
 	def set_sidebar_button_active(self, button, state):
+		"""
+		Toggle a sidebar button
+		"""
 
 		if button.get_active() != state:
 			self.auto_toggled_sidebar_button = True
@@ -2172,6 +2539,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def scroll_to_top(self):
+		"""
+		Scroll to the top of the app pane
+		"""
 
 		self.scroll_adjustment.set_value(0)
 

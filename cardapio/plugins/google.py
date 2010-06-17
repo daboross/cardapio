@@ -117,7 +117,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		try:
 			subprocess.Popen(self.action_command % text, shell = True)
 		except OSError, e:
-			write_to_log(self, 'Error launching plugin action.')
-			write_to_log(self, e)			
+			write_to_log(self, 'Error launching plugin action.', is_error = True)
+			write_to_log(self, e, is_error = True)
 
 
