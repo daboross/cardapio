@@ -1901,7 +1901,7 @@ class Cardapio(dbus.service.Object):
 		Add the Uncategorized slab to the app pane
 		"""
 
-		section_slab, section_contents = self.add_slab(_('Uncategorized'), 'emblem-favorite', tooltip = _('Items that are not under any menu category'), hide = True)
+		section_slab, section_contents = self.add_slab(_('Uncategorized'), 'applications-other', tooltip = _('Items that are not under any menu category'), hide = True)
 		self.uncategorized_section_slab = section_slab
 		self.uncategorized_section_contents = section_contents
 
