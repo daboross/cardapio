@@ -685,10 +685,12 @@ class Cardapio(dbus.service.Object):
 		# slabs that should go *after* regular application slabs
 		self.add_session_slab()
 		self.add_system_slab()
+		self.add_uncategorized_slab()
 
 		self.build_places_list()
 		self.build_session_list()
 		self.build_system_list()
+		self.build_uncategorized_list()
 		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 
@@ -1623,8 +1625,14 @@ class Cardapio(dbus.service.Object):
 
 		self.add_tree_to_app_list(self.sys_tree.root, self.system_section_contents)
 
-		# hackish fix for bug 593627:
-		#self.add_tree_to_app_list(self.app_tree.root, self.system_section_contents, recursive = False)
+
+	def build_uncategorized_list(self):
+		"""
+		Populate the Uncategorized section
+		"""
+
+		self.add_tree_to_app_list(self.app_tree.root, self.uncategorized_section_contents, recursive = False)
+		self.add_tree_to_app_list(self.sys_tree.root, self.uncategorized_section_contents, recursive = False)
 
 
 	def build_places_list(self):
@@ -1819,7 +1827,6 @@ class Cardapio(dbus.service.Object):
 
 			if isinstance(node, gmenu.Directory):
 
-				# add to main pane
 				self.add_slab(node.name, node.icon, node.get_comment(), node = node, hide = False)
 
 
@@ -1890,6 +1897,16 @@ class Cardapio(dbus.service.Object):
 		section_slab, section_contents = self.add_slab(_('Side Pane'), 'emblem-favorite', tooltip = _('Items pinned to the side pane'), hide = True, append = False)
 		self.sidepane_section_slab = section_slab
 		self.sidepane_section_contents = section_contents
+
+
+	def add_uncategorized_slab(self):
+		"""
+		Add the Uncategorized slab to the app pane
+		"""
+
+		section_slab, section_contents = self.add_slab(_('Uncategorized'), 'emblem-favorite', tooltip = _('Items that are not under any menu category'), hide = True)
+		self.uncategorized_section_slab = section_slab
+		self.uncategorized_section_contents = section_contents
 
 
 	def add_session_slab(self):
@@ -2143,20 +2160,15 @@ class Cardapio(dbus.service.Object):
 		parent widget
 		"""
 
-		has_no_leaves = True
-
 		for node in tree.contents:
 
 			if isinstance(node, gmenu.Entry):
 
 				button = self.add_app_button(node.name, node.icon, parent_widget, 'app', node.desktop_file_path, tooltip = node.get_comment(), app_list = self.app_list)
-				has_no_leaves = False
 
 			elif isinstance(node, gmenu.Directory) and recursive:
 
 				self.add_tree_to_app_list(node, parent_widget)
-
-		return has_no_leaves
 
 
 	def prepare_colors(self):
@@ -2482,9 +2494,10 @@ class Cardapio(dbus.service.Object):
 		there is no text in the search entry
 		"""
 
-		self.hide_section(self.session_section_slab , fully_hide)
-		self.hide_section(self.system_section_slab  , fully_hide)
+		self.hide_section(self.session_section_slab, fully_hide)
+		self.hide_section(self.system_section_slab, fully_hide)
 		self.hide_section(self.sidepane_section_slab, fully_hide)
+		self.hide_section(self.uncategorized_section_slab, fully_hide)
 		
 		self.hide_plugin_sections(fully_hide)
 
