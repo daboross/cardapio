@@ -809,6 +809,7 @@
     <property name="authors">Thiago Teixeira</property>
     <signal name="close" handler="on_about_dialog_close"/>
     <signal name="response" handler="on_about_dialog_close"/>
+    <signal name="delete_event" handler="close_about_dialog"/>
     <child internal-child="vbox">
       <object class="GtkVBox" id="dialog-vbox2">
         <property name="visible">True</property>

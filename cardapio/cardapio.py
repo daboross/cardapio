@@ -800,6 +800,15 @@ class Cardapio(dbus.service.Object):
 		return True
 
 
+	def close_about_dialog(self, *args):
+		"""
+		Hides the About Dialog
+		"""
+
+		self.about_dialog.hide()
+		return True
+
+
 	def on_options_changed(self, *dummy):
 		"""
 		Updates Cardapio's options when the user alters them in the Options
