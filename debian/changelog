@@ -1,3 +1,9 @@
+cardapio (0.9.107-ubuntu1) lucid; urgency=low
+
+  * bugfix for window positioning
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 17 Jun 2010 23:52:00 -0400
+
 cardapio (0.9.106-ubuntu1) lucid; urgency=low
 
   * changed the plugin api (now at version 1.2) to support callback actions
