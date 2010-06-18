@@ -138,10 +138,10 @@ class Cardapio(dbus.service.Object):
 
 		self.setup_dbus()
 		self.setup_base_ui() # must be the first ui-related method to be called
-		self.build_ui() 
 		self.build_plugin_database() 
-		self.setup_ui_from_all_settings() 
 		self.activate_plugins_from_settings()
+		self.build_ui() 
+		self.setup_ui_from_all_settings() 
 
 		self.schedule_search_with_plugins('')
 
@@ -260,11 +260,7 @@ class Cardapio(dbus.service.Object):
 				self.write_to_plugin_log(plugin, 'Plugin did not load properly')
 				continue
 
-			section_slab, section_contents = self.add_plugin_slab(plugin)
-
 			plugin.basename         = basename
-			plugin.section_slab     = section_slab
-			plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
 			plugin.is_running       = False
 
 			self.active_plugin_instances.append(plugin)
@@ -663,7 +659,7 @@ class Cardapio(dbus.service.Object):
 		self.app_list = []      # holds a list of all apps for searching purposes
 		self.section_list = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
 
-		button = self.add_sidebar_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'), append = False)
+		button = self.add_sidebar_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'))
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_sections_sidebar_button = button 
 		self.set_sidebar_button_active(button, True)
@@ -686,6 +682,7 @@ class Cardapio(dbus.service.Object):
 		self.add_session_slab()
 		self.add_system_slab()
 		self.add_uncategorized_slab()
+		self.add_plugin_slabs()
 
 		self.build_places_list()
 		self.build_session_list()
@@ -1830,7 +1827,7 @@ class Cardapio(dbus.service.Object):
 				self.add_slab(node.name, node.icon, node.get_comment(), node = node, hide = False)
 
 
-	def add_slab(self, title_str, icon_name = None, tooltip = '', hide = False, node = None, append = True):
+	def add_slab(self, title_str, icon_name = None, tooltip = '', hide = False, node = None):
 		"""
 		Add to the app pane a new section slab (i.e. a container holding a title
 		label and a hbox to be filled with apps). This also adds the section
@@ -1838,10 +1835,10 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		# add category to category pane
-		sidebar_button = self.add_sidebar_button(title_str, icon_name, self.category_pane, tooltip = tooltip, append = append)
+		sidebar_button = self.add_sidebar_button(title_str, icon_name, self.category_pane, tooltip = tooltip)
 
 		# add category to application pane
-		section_slab, section_contents, dummy = self.add_application_section(title_str, append = append)
+		section_slab, section_contents, dummy = self.add_application_section(title_str)
 
 		if node is not None:
 			# add all apps in this category to application pane
@@ -1884,7 +1881,7 @@ class Cardapio(dbus.service.Object):
 		Add the Pinned Items slab to the app pane
 		"""
 
-		section_slab, section_contents = self.add_slab(_('Pinned items'), 'emblem-favorite', tooltip = _('Your favorite applications'), hide = False, append = False)
+		section_slab, section_contents = self.add_slab(_('Pinned items'), 'emblem-favorite', tooltip = _('Your favorite applications'), hide = False)
 		self.favorites_section_slab = section_slab
 		self.favorites_section_contents = section_contents
 
@@ -1894,7 +1891,7 @@ class Cardapio(dbus.service.Object):
 		Add the Side Pane slab to the app pane
 		"""
 
-		section_slab, section_contents = self.add_slab(_('Side Pane'), 'emblem-favorite', tooltip = _('Items pinned to the side pane'), hide = True, append = False)
+		section_slab, section_contents = self.add_slab(_('Side Pane'), 'emblem-favorite', tooltip = _('Items pinned to the side pane'), hide = True)
 		self.sidepane_section_slab = section_slab
 		self.sidepane_section_contents = section_contents
 
@@ -1929,14 +1926,13 @@ class Cardapio(dbus.service.Object):
 		self.system_section_contents = section_contents
 
 
-	def add_plugin_slab(self, plugin):
-		"""
-		Add to the app pane a slab representing a given plugin
-		"""
+	def add_plugin_slabs(self):
 
-		append = (plugin.category_position == 'end')
-		section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, hide = plugin.hide_from_sidebar, append = append)
-		return section_slab, section_contents
+		for plugin in self.active_plugin_instances:
+
+			section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, hide = plugin.hide_from_sidebar)
+			plugin.section_slab     = section_slab
+			plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
 
 
 	def clear_pane(self, container):
@@ -1956,13 +1952,13 @@ class Cardapio(dbus.service.Object):
 		self.search_entry.set_text('')
 
 
-	def add_sidebar_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = True, append = True):
+	def add_sidebar_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = True):
 		"""
 		Adds a button to the sidebar. This could be either a section button or
 		one of the "left pane" buttons.
 		"""
 
-		return self.add_button(button_str, icon_name, parent_widget, tooltip, use_toggle_button = use_toggle_button, is_app_button = False, append = append)
+		return self.add_button(button_str, icon_name, parent_widget, tooltip, use_toggle_button = use_toggle_button, is_app_button = False)
 
 
 	def add_app_button(self, button_str, icon_name, parent_widget, command_type, command, tooltip = '', app_list = None):
@@ -2019,7 +2015,7 @@ class Cardapio(dbus.service.Object):
 		button.connect('button-press-event', self.on_appbutton_button_pressed)
 
 
-	def add_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = None, is_app_button = True, append = True):
+	def add_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = None, is_app_button = True):
 		"""
 		Adds a button to a parent container
 		"""
@@ -2063,15 +2059,12 @@ class Cardapio(dbus.service.Object):
 		button.set_use_underline(False)
 
 		button.show_all()
-		#if append:
-		#	parent_widget.pack_end(button, expand = False, fill = False)
-		#else:
 		parent_widget.pack_start(button, expand = False, fill = False)
 
 		return button
 
 
-	def add_application_section(self, section_title = None, append = True):
+	def add_application_section(self, section_title = None):
 		"""
 		Adds a new slab to the applications pane
 		"""
@@ -2089,9 +2082,6 @@ class Cardapio(dbus.service.Object):
 		section_slab.set_name('SectionSlab' + s)
 		section_contents.set_name('SectionContents' + s + c)
 
-		#if append:
-		#	self.application_pane.pack_end(section_slab, expand = False, fill = False)
-		#else:
 		self.application_pane.pack_start(section_slab, expand = False, fill = False)
 
 		return section_slab, section_contents, label
