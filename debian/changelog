@@ -1,3 +1,10 @@
+cardapio (0.9.109-ubuntu1) lucid; urgency=low
+
+  * fixed the icons in "places"
+  * fixed bug 596270
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 18 Jun 2010 23:00:00 -0400
+
 cardapio (0.9.108-ubuntu1) lucid; urgency=low
 
   * bugfixes
