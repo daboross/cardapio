@@ -128,9 +128,7 @@ class Cardapio(dbus.service.Object):
 		self.app_tree.add_monitor(self.on_menu_data_changed)
 		self.sys_tree.add_monitor(self.on_menu_data_changed)
 
-		# TODO: internationalize these
 		self.exec_pattern = re.compile("^(.*?)\s+\%[a-zA-Z]$")
-		self.sanitize_query_pattern = re.compile("[^a-zA-Z0-9]")
 
 		self.package_root = ''
 		if __package__ is not None:
@@ -1650,8 +1648,6 @@ class Cardapio(dbus.service.Object):
 				path = res.groups()[0]
 				self.add_place(_('Desktop'), path, 'user-desktop')
 
-			# TODO: use this loop to find which folders need special icons 
-
 		xdg_folders_file.close()
 
 		bookmark_file_path = os.path.join(self.user_home_folder, '.gtk-bookmarks')
@@ -1660,7 +1656,6 @@ class Cardapio(dbus.service.Object):
 		for line in bookmark_file.readlines():
 			if line.strip(' \n\r\t'):
 				name, path = self.get_place_name_and_path(line)
-				# TODO: make sure path exists
 				# TODO: if path doesn't exist, add gio monitor (could be a removable disk)
 				self.add_place(name, path, 'folder')
 
@@ -1707,7 +1702,8 @@ class Cardapio(dbus.service.Object):
 
 	def get_place_name_and_path(self, folder_path):
 		"""
-		Return the name and path of a bookmarked folder
+		Return the name and path of a bookmarked folder given a line from the
+		gtk-bookmarks file
 		"""
 
 		res = folder_path.split(' ')
@@ -1731,6 +1727,7 @@ class Cardapio(dbus.service.Object):
 
 		if not urllib2.posixpath.exists(canonical_path): return
 
+		folder_icon = self.get_icon_name_from_path(folder_path, folder_icon)
 		button = self.add_app_button(folder_name, folder_icon, self.places_section_contents, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
 
 
@@ -2106,7 +2103,6 @@ class Cardapio(dbus.service.Object):
 		return section_slab, section_contents
 
 
-
 	def get_icon(self, icon_value, icon_size, fallback_icon = 'application-x-executable'):
 		"""
 		Returns a GTK Image from a given icon name and size. The icon name can be
@@ -2142,6 +2138,33 @@ class Cardapio(dbus.service.Object):
 			icon_pixbuf = self.icon_theme.load_icon(fallback_icon, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
 
 		return gtk.image_new_from_pixbuf(icon_pixbuf)
+
+
+	def get_icon_name_from_path(self, path, fallback):
+		"""
+		Gets the icon name for a given path using GIO
+		"""
+
+		icon = fallback
+		info = None
+
+		try:
+			file_ = gio.File(path)
+			info = file_.query_info("standard::icon")
+
+		except Exception, exception:
+			logging.log('Could not get icon for %s' % path)
+			logging.log(exception)
+
+
+		if info is not None:
+			icons = info.get_icon().get_property("names")
+			for icon_name in icons:
+				if self.icon_theme.has_icon(icon_name):
+					icon = icon_name
+					break
+			
+		return icon
 
 
 	def add_tree_to_app_list(self, tree, parent_widget, recursive = True):
@@ -2313,7 +2336,7 @@ class Cardapio(dbus.service.Object):
 
 			# Strip last part of path if it contains %<a-Z>
 			match = self.exec_pattern.match(path)
-
+			
 			if match is not None:
 				path = match.group(1)
 
