@@ -1,3 +1,9 @@
+cardapio (0.9.108-ubuntu1) lucid; urgency=low
+
+  * bugfixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 18 Jun 2010 23:00:00 -0400
+
 cardapio (0.9.107-ubuntu1) lucid; urgency=low
 
   * bugfix for window positioning
