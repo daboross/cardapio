@@ -1191,7 +1191,8 @@ class Cardapio(dbus.service.Object):
 			fallback_icon = 'text-x-generic'
 
 			if icon_name is not None:
-				icon_name.replace('/', '-')
+
+				icon_name = icon_name.replace('/', '-')
 				if not self.icon_theme.has_icon(icon_name):
 					icon_name = fallback_icon
 
