@@ -1662,12 +1662,19 @@ class Cardapio(dbus.service.Object):
 		xdg_folders_file_path = os.path.join(DesktopEntry.xdg_config_home, 'user-dirs.dirs')
 		xdg_folders_file = file(xdg_folders_file_path, 'r')
 
+		# find desktop path and add desktop button
 		for line in xdg_folders_file.readlines():
 
 			res = re.match('\s*XDG_DESKTOP_DIR\s*=\s*"(.+)"', line)
 			if res is not None:
 				path = res.groups()[0]
+
+				# check if the desktop path is the home folder, in which case we
+				# do *not* need to add the desktop button.
+				if os.path.abspath(path) == self.user_home_folder: break
+
 				self.add_place(_('Desktop'), path, 'user-desktop')
+				break
 
 		xdg_folders_file.close()
 
