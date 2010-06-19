@@ -1324,7 +1324,16 @@ class Cardapio(dbus.service.Object):
 
 		root_window = gtk.gdk.get_default_root_window()
 		screen_property = gtk.gdk.atom_intern('_NET_WORKAREA')
-		screen_x, screen_y, screen_width, screen_height = root_window.property_get(screen_property)[2]
+		screen_dimensions = root_window.property_get(screen_property)[2]
+
+		if screen_dimensions:
+			screen_x, screen_y, screen_width, screen_height = screen_dimensions
+
+		else:
+			logging.warn('Could not get dimensions of usable screen area. Using max screen area instead.')
+			screen_x, screen_y = 0, 0
+			screen_width = gtk.gdk.screen_width()
+			screen_height = gtk.gdk.screen_height()
 
 		if is_message_window:
 			window = self.message_window
