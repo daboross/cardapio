@@ -72,18 +72,6 @@ class CardapioPlugin(CardapioPluginInterface):
 			error_handler=self.handle_search_error
 			)
 
-#			"""
-#				SELECT ?uri ?mime
-#				WHERE { 
-#					?item a nie:InformationElement;
-#						fts:match "%s";
-#						nie:url ?uri;
-#						nie:mimeType ?mime;
-#						tracker:available true.
-#					}
-#				ORDER BY DESC(fts:rank(?item))
-#				LIMIT %d
-#			""" 
 
 	def handle_search_error(self, error):
 

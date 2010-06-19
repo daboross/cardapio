@@ -837,6 +837,7 @@ class Cardapio(dbus.service.Object):
 			iter_ = self.plugin_tree_model.iter_next(iter_)
 
 		self.activate_plugins_from_settings()
+		self.add_plugin_slabs()
 
 
 	def on_plugin_state_toggled(self, cell, path):
@@ -1186,9 +1187,19 @@ class Cardapio(dbus.service.Object):
 
 		for result in results:
 
-			icon_name = result['icon name'].replace('/', '-')
-			if not self.icon_theme.has_icon(icon_name):
-				icon_name = 'text-x-generic'
+			icon_name = result['icon name']
+			fallback_icon = 'text-x-generic'
+
+			if icon_name is not None:
+				icon_name.replace('/', '-')
+				if not self.icon_theme.has_icon(icon_name):
+					icon_name = fallback_icon
+
+			elif result['type'] == 'xdg':
+				icon_name = self.get_icon_name_from_path(result['command'], fallback_icon)
+
+			else:
+				icon_name = fallback_icon
 
 			button = self.add_app_button(result['name'], icon_name, plugin.section_contents, result['type'], result['command'], tooltip = result['tooltip'])
 
@@ -2153,8 +2164,8 @@ class Cardapio(dbus.service.Object):
 			info = file_.query_info("standard::icon")
 
 		except Exception, exception:
-			logging.log('Could not get icon for %s' % path)
-			logging.log(exception)
+			logging.warn('Could not get icon for %s' % path)
+			logging.warn(exception)
 
 
 		if info is not None:
@@ -2671,7 +2682,7 @@ class CardapioPluginInterface:
 		item = {
 		  'name'      : _('Music'),
 		  'tooltip'   : _('Show your Music folder'),
-		  'icon name' : 'text-x-generic',
+		  'icon name' : 'text-x-generic', 
 		  'type'      : 'xdg',
 		  'command'   : '~/Music'
 		  }
@@ -2681,6 +2692,10 @@ class CardapioPluginInterface:
 		Meanwhile, setting 'type' to 'callback' means that 'command' is a
 		function that should be called when the item is clicked. This function
 		will receive as an argument the current search string.
+
+		Note that you can set item['file name'] to None if you want Cardapio
+		to guess the icon from the 'command'. This only works for 'xdg' commands,
+		though.
 		"""
 
 		pass
