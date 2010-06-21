@@ -473,6 +473,12 @@ class Cardapio(dbus.service.Object):
 		self.builder.add_from_file(self.uifile)
 		self.builder.connect_signals(self)
 
+		# HACK: fix names of widgets to allow theming 
+		# (glade doesn't seem to properly add names to widgets anymore...)
+		for widget in self.builder.get_objects():
+			if 'set_name' in dir(widget):
+				widget.set_name(gtk.Buildable.get_name(widget))
+
 		self.get_object = self.builder.get_object
 		self.window                    = self.get_object('MainWindow')
 		self.message_window            = self.get_object('MessageWindow')
