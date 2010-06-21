@@ -60,10 +60,15 @@ except Exception, exception:
 	print(exception)
 	sys.exit(1)
 
+
 # Set up translations
 
+cardapio_path = os.path.dirname(os.path.realpath(__file__))
+prefix_path = cardapio_path.split(os.path.sep)[:-2]
+prefix_path = [os.path.sep] + prefix_path + ['share', 'locale']
+
+DIR = os.path.join(*prefix_path)
 APP = 'cardapio'
-DIR = os.path.join(os.path.dirname(__file__), 'locale')
 
 locale.setlocale(locale.LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
@@ -205,7 +210,7 @@ class Cardapio(dbus.service.Object):
 
 		self.plugin_database = {}
 		plugin_dirs = [
-			os.path.join(os.path.dirname(__file__), 'plugins'), 
+			os.path.join(cardapio_path, 'plugins'), 
 			os.path.join(DesktopEntry.xdg_config_home, 'Cardapio', 'plugins')
 			]
 
@@ -461,7 +466,6 @@ class Cardapio(dbus.service.Object):
 
 		self.rebuild_timer = None
 
-		cardapio_path = os.path.dirname(__file__)
 		self.uifile = os.path.join(cardapio_path, 'cardapio.ui')
 
 		self.builder = gtk.Builder()
@@ -1356,7 +1360,6 @@ class Cardapio(dbus.service.Object):
 
 		panel = self.panel_button.get_toplevel().window
 		panel_x, panel_y = panel.get_origin()
-		panel_width, panel_height = panel.get_size()
 
 		applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
 		orientation = self.panel_applet.get_orient()

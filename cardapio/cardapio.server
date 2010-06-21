@@ -1,13 +1,13 @@
 <oaf_info>
 <oaf_server iid="OAFIID:GNOME_Cardapio_Factory"
-            type="exe" location="/usr/local/bin/cardapio">
+            type="exe" location="cardapio">
 
         <oaf_attribute name="repo_ids" type="stringv">
                 <item value="IDL:Bonobo/GenericFactory:1.0"/>
                 <item value="IDL:Bonobo/Unknown:1.0"/>
         </oaf_attribute>
         <oaf_attribute name="name" type="string" value="Cardapio"/>
-        <oaf_attribute name="description" type="string" _value="A menu with search capabilities."/>
+        <oaf_attribute name="description" type="string" value="A menu with search capabilities."/>
 </oaf_server>
 
 <oaf_server iid="OAFIID:GNOME_Cardapio"
@@ -20,7 +20,7 @@
         </oaf_attribute>
         <oaf_attribute name="name" type="string" value="Cardapio"/>
         <oaf_attribute name="description" type="string" _value="A menu with search capabilities."/>
-        <oaf_attribute name="panel:category" type="string" _value="Miscellaneous"/>
+        <oaf_attribute name="panel:category" type="string" value="Miscellaneous"/>
         <oaf_attribute name="panel:icon" type="string" value="gnome-main-menu"/>
 </oaf_server>
 </oaf_info>
