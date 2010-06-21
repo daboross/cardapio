@@ -1,3 +1,15 @@
+cardapio (0.9.110-ubuntu3) lucid; urgency=low
+
+  * trying to fix the ppa
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Jun 2010 12:05:00 -0400
+
+cardapio (0.9.110-ubuntu2) lucid; urgency=low
+
+  * trying to fix the ppa
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 20 Jun 2010 22:20:00 -0400
+
 cardapio (0.9.110-ubuntu1) lucid; urgency=low
 
   * fixed some critical bugs
