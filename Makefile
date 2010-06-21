@@ -1,11 +1,11 @@
 PYTHON = `which python`
 
-ifeq ($(PREFIX),)
-PREFIX = /usr
+ifeq ($(DESTDIR),)
+DESTDIR = 
 endif
 
-ifeq ($(DESTDIR),)
-DESTDIR =
+ifeq ($(PREFIX),)
+PREFIX = $(DESTDIR)/usr
 endif
 
 all:
@@ -15,33 +15,35 @@ all:
 	@echo "make clean - Get rid of scratch and byte files"
 
 install:
-	mkdir -p $(DESTDIR)$(PREFIX)/lib/cardapio/plugins
-	mkdir -p $(DESTDIR)$(PREFIX)/bin
+	mkdir -p $(PREFIX)/lib/cardapio/plugins
+	cp -f cardapio/cardapio $(PREFIX)/lib/cardapio/
+	cp -f cardapio/cardapio.py $(PREFIX)/lib/cardapio/
+	cp -f cardapio/cardapio.ui $(PREFIX)/lib/cardapio/
+	cp -f cardapio/plugins/* $(PREFIX)/lib/cardapio/plugins/
+	
+	mkdir -p $(PREFIX)/share/locale
+	cp -rf locale/* $(PREFIX)/share/locale/
+	
+	mkdir -p $(PREFIX)/bin
+	ln -s $(PREFIX)/lib/cardapio/cardapio $(PREFIX)/bin/cardapio
+	
 	mkdir -p $(DESTDIR)/usr/lib/bonobo/servers
-	mkdir -p $(DESTDIR)$(PREFIX)/share/locale
-	cp -f cardapio/cardapio $(DESTDIR)$(PREFIX)/lib/cardapio/
-	ln -s $(DESTDIR)$(PREFIX)/lib/cardapio/cardapio $(DESTDIR)$(PREFIX)/bin/cardapio
-	cp -f cardapio/cardapio.py $(DESTDIR)$(PREFIX)/lib/cardapio/
-	cp -f cardapio/cardapio.ui $(DESTDIR)$(PREFIX)/lib/cardapio/
 	cp -f cardapio/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/
-	cp -f cardapio/plugins/* $(DESTDIR)$(PREFIX)/lib/cardapio/plugins/
-	cp -rf locale/* $(DESTDIR)$(PREFIX)/share/locale/
 
 buildsrc:
 	debuild -S
 
 clean:
-	@echo "$(PREFIX)"
 	$(PYTHON) setup.py clean
 	$(MAKE) -f $(CURDIR)/debian/rules clean
 	rm -rf build/ MANIFEST
 	find . -name '*.pyc' -delete
 
 uninstall:
-	rm -rf $(DESTDIR)$(PREFIX)/lib/cardapio
-	rm -rf $(DESTDIR)$(PREFIX)/bin/cardapio
+	rm -rf $(PREFIX)/lib/cardapio
+	rm -rf $(PREFIX)/bin/cardapio
 	rm $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
-	find $(DESTDIR)$(PREFIX)/share/locale -name '*cardapio.mo' -delete
+	find $(PREFIX)/share/locale -name '*cardapio.mo' -delete
 
 oldinstall:
 	$(PYTHON) setup.py install --root $(DESTDIR) --install-layout=deb $(COMPILE)

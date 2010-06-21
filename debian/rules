@@ -14,7 +14,7 @@ install: build
 	dh_installdirs
 
 	$(MAKE) DESTDIR=$(shell pwd)/debian/cardapio COMPILE=--no-compile install
-	rm debian/cardapio/usr/bin/cardapio
+	#rm debian/cardapio/usr/bin/cardapio
 
 binary-indep: build install
 # We have nothing to do by default.
