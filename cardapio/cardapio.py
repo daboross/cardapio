@@ -100,7 +100,7 @@ class Cardapio(dbus.service.Object):
 		logging.basicConfig(filename = '/tmp/cardapio.log', level = logging.DEBUG)
 		logging.info('----------------- Cardapio launched -----------------')
 
-		self.user_home_folder = os.path.expanduser('~')
+		self.user_home_folder = os.path.abspath(os.path.expanduser('~'))
 
 		self.read_config_file()
 
@@ -1327,7 +1327,10 @@ class Cardapio(dbus.service.Object):
 		screen_dimensions = root_window.property_get(screen_property)[2]
 
 		if screen_dimensions:
-			screen_x, screen_y, screen_width, screen_height = screen_dimensions
+			screen_x      = screen_dimensions[0]
+			screen_y      = screen_dimensions[1]
+			screen_width  = screen_dimensions[2]
+			screen_height = screen_dimensions[3]
 
 		else:
 			logging.warn('Could not get dimensions of usable screen area. Using max screen area instead.')
