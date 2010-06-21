@@ -1,3 +1,10 @@
+cardapio (0.9.110-ubuntu1) lucid; urgency=low
+
+  * fixed some critical bugs
+  * changed the build system
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 20 Jun 2010 22:20:00 -0400
+
 cardapio (0.9.109-ubuntu1) lucid; urgency=low
 
   * fixed the icons in "places"
