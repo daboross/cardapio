@@ -804,6 +804,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.options_dialog.hide()
+		self.save_config_file()
 		return True
 
 
