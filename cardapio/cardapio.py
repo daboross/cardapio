@@ -870,6 +870,9 @@ class Cardapio(dbus.service.Object):
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 			self.block_focus_out_event()
 			self.context_menu.popup(None, None, None, event.button, event.time)
+		else:
+			# HACK to make "open in background" less buggy. but we need a better solution
+			self.unblock_focus_out_event()
 
 
 	def start_resize(self, widget, event):
@@ -925,8 +928,9 @@ class Cardapio(dbus.service.Object):
 		Blocks the focus-out event
 		"""
 
-		self.window.handler_block_by_func(self.on_mainwindow_focus_out)
-		self.focus_out_blocked = True
+		if not self.focus_out_blocked:
+			self.window.handler_block_by_func(self.on_mainwindow_focus_out)
+			self.focus_out_blocked = True
 
 
 	def unblock_focus_out_event(self, *dummy):
@@ -2275,6 +2279,14 @@ class Cardapio(dbus.service.Object):
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 
 
+	def on_launch_in_background_pressed(self, widget):
+		"""
+		Handle the "launch in background" action
+		"""
+
+		self.launch_button_command(self.clicked_app, hide = False)
+
+
 	def on_app_button_button_pressed(self, widget, event):
 		"""
 		Show context menu for app buttons
@@ -2284,7 +2296,7 @@ class Cardapio(dbus.service.Object):
 
 		if  event.button == 2:
 
-			self.launch_button_command(widget, hide = False)
+			self.launch_button_command(widget.app_info, hide = False)
 
 		elif event.button == 3:
 
@@ -2345,22 +2357,23 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		hide = (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK != gtk.gdk.CONTROL_MASK)
-		self.launch_button_command(widget, hide = hide)
+		self.launch_button_command(widget.app_info, hide = hide)
 
 
-	def launch_button_command(self, widget, hide):
+	def launch_button_command(self, app_info, hide):
 		"""
-		Execute the widget's app_info['command'], for any app_info['type']
+		Execute app_info['command'], for any app_info['type']
 		"""
 
-		command = widget.app_info['command']
-		command_type = widget.app_info['type']
+		command = app_info['command']
+		command_type = app_info['type']
 
 		if not hide:
 			self.block_focus_out_event()
 			# TODO: I need to call unblock_focus_out_event at some point *after* the
 			# app is launched, but I'm not sure *where* in the code this would
 			# take place...
+			#glib.timeout_add(200, self.unblock_focus_out_event) --> doesn't work
 
 		if command_type == 'app':
 			self.launch_desktop(command, hide)

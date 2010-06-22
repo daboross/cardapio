@@ -931,7 +931,7 @@ Rebuilding&#x2026;</property>
       <object class="GtkImageMenuItem" id="PinMenuItem">
         <property name="label" translatable="yes">_Pin this item</property>
         <property name="visible">True</property>
-        <property name="tooltip_text" translatable="yes">Place this in the "Pinned Items" list</property>
+        <property name="tooltip_text" translatable="yes">Place this item into the "Pinned Items" list</property>
         <property name="use_underline">True</property>
         <property name="image">image1</property>
         <property name="use_stock">False</property>
@@ -942,6 +942,7 @@ Rebuilding&#x2026;</property>
       <object class="GtkImageMenuItem" id="UnpinMenuItem">
         <property name="label" translatable="yes">_Unpin this item</property>
         <property name="visible">True</property>
+        <property name="tooltip_text" translatable="yes">Remove this item from the "Pinned Items" list</property>
         <property name="use_underline">True</property>
         <property name="image">image3</property>
         <property name="use_stock">False</property>
@@ -952,6 +953,7 @@ Rebuilding&#x2026;</property>
       <object class="GtkImageMenuItem" id="AddSidePaneMenuItem">
         <property name="label" translatable="yes">_Add to side pane</property>
         <property name="visible">True</property>
+        <property name="tooltip_text" translatable="yes">Place this item in the side pane</property>
         <property name="use_underline">True</property>
         <property name="image">image4</property>
         <property name="use_stock">False</property>
@@ -962,10 +964,27 @@ Rebuilding&#x2026;</property>
       <object class="GtkImageMenuItem" id="RemoveSidePaneMenuItem">
         <property name="label" translatable="yes">_Remove from side pane</property>
         <property name="visible">True</property>
+        <property name="tooltip_text" translatable="yes">Remove this item from the side pane</property>
         <property name="use_underline">True</property>
         <property name="image">image5</property>
         <property name="use_stock">False</property>
         <signal name="activate" handler="on_remove_from_side_pane_clicked"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem" id="menuitem5">
+        <property name="visible">True</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="menuitem6">
+        <property name="label" translatable="yes">_Launch in background</property>
+        <property name="visible">True</property>
+        <property name="tooltip_text" translatable="yes">Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-Click)</property>
+        <property name="use_underline">True</property>
+        <property name="image">image7</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="on_launch_in_background_pressed"/>
       </object>
     </child>
   </object>
@@ -980,17 +999,25 @@ Rebuilding&#x2026;</property>
   <object class="GtkImage" id="image3">
     <property name="visible">True</property>
     <property name="stock">gtk-remove</property>
+    <property name="icon-size">1</property>
   </object>
   <object class="GtkImage" id="image4">
     <property name="visible">True</property>
     <property name="stock">gtk-add</property>
+    <property name="icon-size">1</property>
   </object>
   <object class="GtkImage" id="image5">
     <property name="visible">True</property>
     <property name="stock">gtk-remove</property>
+    <property name="icon-size">1</property>
   </object>
   <object class="GtkImage" id="image6">
     <property name="visible">True</property>
     <property name="stock">gtk-about</property>
+  </object>
+  <object class="GtkImage" id="image7">
+    <property name="visible">True</property>
+    <property name="stock">gtk-execute</property>
+    <property name="icon-size">1</property>
   </object>
 </interface>
