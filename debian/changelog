@@ -1,3 +1,10 @@
+cardapio (0.9.111-ubuntu1) lucid; urgency=low
+
+  * now with better gtkrc support, and with middle-click / ctrl-click to launch
+  in background
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Jun 2010 23:42:00 -0400
+
 cardapio (0.9.110-ubuntu5) lucid; urgency=low
 
   * fixed the version string

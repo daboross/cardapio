@@ -1,2 +1,7 @@
-cd locale
-tar -zxvf ../launchpad-export.tar.gz
+#!/bin/sh
+
+cd ../locale
+tar -zxvf ../cardapio/launchpad-export.tar.gz
+rm -rf templates
+
+cd -

@@ -25,7 +25,7 @@ install:
 	cp -rf locale/* $(PREFIX)/share/locale/
 	
 	mkdir -p $(PREFIX)/bin
-	ln -s $(PREFIX)/lib/cardapio/cardapio $(PREFIX)/bin/cardapio
+	ln -fs $(PREFIX)/lib/cardapio/cardapio $(PREFIX)/bin/cardapio
 	
 	mkdir -p $(DESTDIR)/usr/lib/bonobo/servers
 	cp -f cardapio/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/
