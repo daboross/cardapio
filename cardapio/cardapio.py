@@ -114,19 +114,20 @@ class Cardapio(dbus.service.Object):
 		self.auto_toggled_sidebar_button = False
 		self.last_visibility_toggle = 0
 
-		self.visible                   = False
-		self.app_list                  = []    # used for searching the menu
-		self.section_list              = {}
-		self.selected_section          = None
-		self.no_results_to_show        = False
-		self.previously_focused_widget = None
-		self.focus_out_blocked         = False
-		self.clicked_app               = None
-		self.keybinding                = None
-		self.search_timer_local        = None
-		self.search_timer_remote       = None
-		self.plugin_database           = {}
-		self.active_plugin_instances   = []
+		self.visible                       = False
+		self.app_list                      = []    # used for searching the menu
+		self.section_list                  = {}
+		self.selected_section              = None
+		self.no_results_to_show            = False
+		self.previously_focused_widget     = None
+		self.opened_last_app_in_background = False
+		self.focus_out_blocked             = False
+		self.clicked_app                   = None
+		self.keybinding                    = None
+		self.search_timer_local            = None
+		self.search_timer_remote           = None
+		self.plugin_database               = {}
+		self.active_plugin_instances       = []
 
 		self.app_tree = gmenu.lookup_tree('applications.menu')
 		self.sys_tree = gmenu.lookup_tree('settings.menu')
@@ -871,9 +872,6 @@ class Cardapio(dbus.service.Object):
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 			self.block_focus_out_event()
 			self.context_menu.popup(None, None, None, event.button, event.time)
-		else:
-			# HACK to make "open in background" less buggy. but we need a better solution
-			self.unblock_focus_out_event()
 
 
 	def start_resize(self, widget, event):
@@ -977,15 +975,25 @@ class Cardapio(dbus.service.Object):
 		Make Cardapio disappear when it loses focus
 		"""
 
-		x, y, dummy = self.panel_applet.window.get_pointer()
-		dummy, dummy, w, h = self.panel_applet.get_allocation()
+		applet_x, applet_y, dummy = self.panel_applet.window.get_pointer()
+		dummy, dummy, applet_w, applet_h = self.panel_applet.get_allocation()
 
 		# Make sure clicking the applet button doesn't cause a focus-out event.
 		# Otherwise, the click signal actually happens *after* the focus-out,
 		# which causes the applet to be re-shown rather than disappearing.
 		# So by ignoring this focus-out we actually make sure that Cardapio
 		# will be hidden after all. Silly.
-		if self.panel_applet is not None and (0 <= x <= w and 0 <= y <= h): 
+
+		if self.panel_applet is not None and (0 <= applet_x <= applet_w and 0 <= applet_y <= applet_h): 
+			return
+
+		# If the last app was opened in the background, make sure Cardapio
+		# doesn't hide when the app gets focused
+
+		if self.opened_last_app_in_background:
+
+			self.opened_last_app_in_background = False
+			self.show_window_on_top(self.window)
 			return
 
 		self.hide()
@@ -1469,6 +1477,8 @@ class Cardapio(dbus.service.Object):
 
 		self.visible = True
 		self.last_visibility_toggle = time.time()
+
+		self.opened_last_app_in_background = False
 
 		if self.rebuild_timer is not None:
 			# build the UI *after* showing the window, so the user gets the
@@ -2369,12 +2379,7 @@ class Cardapio(dbus.service.Object):
 		command = app_info['command']
 		command_type = app_info['type']
 
-		if not hide:
-			self.block_focus_out_event()
-			# TODO: I need to call unblock_focus_out_event at some point *after* the
-			# app is launched, but I'm not sure *where* in the code this would
-			# take place...
-			#glib.timeout_add(200, self.unblock_focus_out_event) --> doesn't work
+		self.opened_last_app_in_background = not hide
 
 		if command_type == 'app':
 			self.launch_desktop(command, hide)
