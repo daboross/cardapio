@@ -1803,8 +1803,8 @@ class Cardapio(dbus.service.Object):
 				app_info = button.app_info
 				button = self.add_sidebar_button(app['name'], app['icon name'], self.sidepane, tooltip = app['tooltip'], use_toggle_button = False)
 				button.app_info = app_info
-				self.connect_command(button, app['type'], app['command'])
-
+				button.connect('clicked', self.on_app_button_clicked)
+				button.connect('button-press-event', self.on_app_button_button_pressed)
 
 		if no_results or (slab is self.sidepane_section_slab and not text):
 			self.hide_section(slab, fully_hide = True)
@@ -1848,8 +1848,10 @@ class Cardapio(dbus.service.Object):
 		for item in items:
 
 			button = self.add_app_button(item[0], item[2], self.session_section_contents, 'raw', item[3], tooltip = item[1], app_list = self.app_list)
+			app_info = button.app_info
 			button = self.add_button(item[0], item[2], item[4], tooltip = item[1], is_app_button = True)
-			button.connect('clicked', self.on_raw_button_clicked, item[3])
+			button.app_info = app_info
+			button.connect('clicked', self.on_app_button_clicked)
 
 
 	def build_applications_list(self):
@@ -2016,8 +2018,9 @@ class Cardapio(dbus.service.Object):
 			# NOTE: IF THERE ARE CHANGES IN THE UI FILE, THIS MAY PRODUCE
 			# HARD-TO-FIND BUGS!!
 
-		self.connect_command(button, command_type, command)
-		button.connect('focus-in-event', self.on_appbutton_focused)
+		button.connect('clicked', self.on_app_button_clicked)
+		button.connect('button-press-event', self.on_app_button_button_pressed)
+		button.connect('focus-in-event', self.on_app_button_focused)
 
 		# save some metadata for easy access
 		button.app_info = {
@@ -2029,27 +2032,6 @@ class Cardapio(dbus.service.Object):
 		}
 
 		return button
-
-
-	def connect_command(self, button, command_type, command):
-		"""
-		Connects the appropriate action to a given app's button. Also 
-		connects the context menu handler.
-		"""
-
-		if command_type == 'app':
-			button.connect('clicked', self.on_appbutton_clicked, command)
-
-		elif command_type == 'raw':
-			button.connect('clicked', self.on_raw_button_clicked, command)
-
-		elif command_type == 'xdg':
-			button.connect('clicked', self.on_xdg_button_clicked, command)
-
-		elif command_type == 'callback':
-			button.connect('clicked', self.make_callback_handler(command))
-
-		button.connect('button-press-event', self.on_appbutton_button_pressed)
 
 
 	def add_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = None, is_app_button = True):
@@ -2069,7 +2051,7 @@ class Cardapio(dbus.service.Object):
 
 		if is_app_button:
 			icon_size = self.icon_size_app
-			label.modify_fg(gtk.STATE_NORMAL, self.style_appbutton_fg)
+			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
 			# TODO: figure out how to set max width so that it is the best for
 			# the window and font sizes
 			#label.set_ellipsize(pango.ELLIPSIZE_END)
@@ -2111,7 +2093,7 @@ class Cardapio(dbus.service.Object):
 		if section_title is not None:
 			label = section_slab.get_label_widget()
 			label.set_text(section_title)
-			label.modify_fg(gtk.STATE_NORMAL, self.style_appbutton_fg)
+			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
 
 		s = str(len(section_slab));
 		c = str(len(section_contents));
@@ -2233,23 +2215,9 @@ class Cardapio(dbus.service.Object):
 		dummy_window = gtk.Window()
 		dummy_window.realize()
 		app_style = dummy_window.get_style()
-		self.style_appbutton_bg = app_style.base[gtk.STATE_NORMAL]
-		self.style_appbutton_fg = app_style.text[gtk.STATE_NORMAL]
-		self.get_object('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_appbutton_bg)
-
-
-	def make_callback_handler(self, action):
-		"""
-		Returns a function that wraps around a plugin's callback function
-		"""
-
-		def callback_handler(widget):
-
-			text = self.search_entry.get_text().strip()
-			self.hide()
-			action(text)
-
-		return callback_handler
+		self.style_app_button_bg = app_style.base[gtk.STATE_NORMAL]
+		self.style_app_button_fg = app_style.text[gtk.STATE_NORMAL]
+		self.get_object('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
 
 
 	def launch_edit_app(self, *dummy):
@@ -2307,12 +2275,18 @@ class Cardapio(dbus.service.Object):
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 
 
-	def on_appbutton_button_pressed(self, widget, event):
+	def on_app_button_button_pressed(self, widget, event):
 		"""
 		Show context menu for app buttons
 		"""
 
-		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
+		if event.type != gtk.gdk.BUTTON_PRESS: return
+
+		if  event.button == 2:
+
+			self.launch_button_command(widget, hide = False)
+
+		elif event.button == 3:
 
 			if widget.app_info['type'] == 'callback': return
 
@@ -2349,7 +2323,7 @@ class Cardapio(dbus.service.Object):
 			self.app_context_menu.popup(None, None, None, event.button, event.time)
 
 
-	def on_appbutton_focused(self, widget, event):
+	def on_app_button_focused(self, widget, event):
 		"""
 		Scroll to app buttons when they gain focus
 		"""
@@ -2365,14 +2339,52 @@ class Cardapio(dbus.service.Object):
 			self.scroll_adjustment.set_value(alloc.y + alloc.height - page_size)
 
 
-	def on_appbutton_clicked(self, widget, desktop_path):
+	def on_app_button_clicked(self, widget):
 		"""
-		Handler to run an application or command when an app button is clicked
+		Handle the on-click event for buttons on the app list
 		"""
 
-		if os.path.exists(desktop_path):
+		hide = (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK != gtk.gdk.CONTROL_MASK)
+		self.launch_button_command(widget, hide = hide)
 
-			path = DesktopEntry.DesktopEntry(desktop_path).getExec()
+
+	def launch_button_command(self, widget, hide):
+		"""
+		Execute the widget's app_info['command'], for any app_info['type']
+		"""
+
+		command = widget.app_info['command']
+		command_type = widget.app_info['type']
+
+		if not hide:
+			self.block_focus_out_event()
+			# TODO: I need to call unblock_focus_out_event at some point *after* the
+			# app is launched, but I'm not sure *where* in the code this would
+			# take place...
+
+		if command_type == 'app':
+			self.launch_desktop(command, hide)
+
+		elif command_type == 'raw':
+			self.launch_raw(command, hide)
+
+		elif command_type == 'xdg':
+			self.launch_xdg(command, hide)
+
+		elif command_type == 'callback':
+			text = self.search_entry.get_text().strip()
+			if hide: self.hide()
+			command(text)
+
+
+	def launch_desktop(self, command, hide = True):
+		"""
+		Launch applications represented by .desktop files
+		"""
+
+		if os.path.exists(command):
+
+			path = DesktopEntry.DesktopEntry(command).getExec()
 
 			# Strip last part of path if it contains %<a-Z>
 			match = self.exec_pattern.match(path)
@@ -2380,39 +2392,22 @@ class Cardapio(dbus.service.Object):
 			if match is not None:
 				path = match.group(1)
 
-			return self.launch_raw(path)
+			return self.launch_raw(path, hide)
 
 		else:
 			logging.warn('Warning: Tried launching an app that does not exist: %s' % desktop_path)
 
 
-	def on_xdg_button_clicked(self, widget, path):
-		"""
-		Handler for buttons that map to urls, files and folders
-		"""
-
-		self.launch_xdg(path)
-
-
-	def launch_xdg(self, path):
+	def launch_xdg(self, path, hide = True):
 		"""
 		Open a url, file or folder
 		"""
 
 		path = self.escape_quotes(self.unescape(path))
-		return self.launch_raw("xdg-open '%s'" % path)
+		return self.launch_raw("xdg-open '%s'" % path, hide)
 
 
-	def on_raw_button_clicked(self, widget, path):
-		"""
-		Handler for buttons that directly map to commands that can be typed in a
-		terminal
-		"""
-
-		self.launch_raw(path)
-
-
-	def launch_raw(self, path):
+	def launch_raw(self, path, hide = True):
 		"""
 		Run a command as a subprocess
 		"""
@@ -2424,7 +2419,8 @@ class Cardapio(dbus.service.Object):
 			logging.error(e)
 			return False
 
-		self.hide()
+		if hide: self.hide()
+
 		return True
 
 
