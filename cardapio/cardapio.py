@@ -1214,15 +1214,12 @@ class Cardapio(dbus.service.Object):
 			fallback_icon = 'text-x-generic'
 
 			if icon_name is not None:
-
-				icon_name = icon_name.replace('/', '-')
-				if not self.icon_theme.has_icon(icon_name):
-					icon_name = fallback_icon
+				icon_name = self.get_icon_name_from_theme(icon_name)
 
 			elif result['type'] == 'xdg':
-				icon_name = self.get_icon_name_from_path(result['command'], fallback_icon)
+				icon_name = self.get_icon_name_from_path(result['command'])
 
-			else:
+			if icon_name is None:
 				icon_name = fallback_icon
 
 			button = self.add_app_button(result['name'], icon_name, plugin.section_contents, result['type'], result['command'], tooltip = result['tooltip'])
@@ -1782,8 +1779,9 @@ class Cardapio(dbus.service.Object):
 
 		if not urllib2.posixpath.exists(canonical_path): return
 
-		folder_icon = self.get_icon_name_from_path(folder_path, folder_icon)
-		button = self.add_app_button(folder_name, folder_icon, self.places_section_contents, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
+		icon_name = self.get_icon_name_from_path(folder_path)
+		if icon_name is None: icon_name = folder_icon
+		button = self.add_app_button(folder_name, icon_name, self.places_section_contents, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
 
 
 	def build_favorites_list(self, slab, list_name):
@@ -2161,15 +2159,16 @@ class Cardapio(dbus.service.Object):
 			icon_name = icon_name[:-4]
 
 		if icon_pixbuf is None:
-			if self.icon_theme.has_icon(icon_name):
-				icon_pixbuf = self.icon_theme.load_icon(icon_name, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
+			icon_name_ = self.get_icon_name_from_theme(icon_name)
+			if icon_name_ is not None:
+				icon_pixbuf = self.icon_theme.load_icon(icon_name_, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
 
-			else:
-				for dir_ in BaseDirectory.xdg_data_dirs:
-					for subdir in ('pixmaps', 'icons'):
-						path = os.path.join(dir_, subdir, icon_value)
-						if os.path.isfile(path):
-							icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, icon_size, icon_size)
+		if icon_pixbuf is None:
+			for dir_ in BaseDirectory.xdg_data_dirs:
+				for subdir in ('pixmaps', 'icons'):
+					path = os.path.join(dir_, subdir, icon_value)
+					if os.path.isfile(path):
+						icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, icon_size, icon_size)
 
 		if icon_pixbuf is None:
 			icon_pixbuf = self.icon_theme.load_icon(fallback_icon, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
@@ -2177,12 +2176,33 @@ class Cardapio(dbus.service.Object):
 		return gtk.image_new_from_pixbuf(icon_pixbuf)
 
 
-	def get_icon_name_from_path(self, path, fallback):
+	def get_icon_name_from_theme(self, icon_name):
+		"""
+		Find out if this icon exists in the theme (such as 'gtk-open'), or if
+		it's a mimetype (such as audio/mpeg, which has an icon audio-mpeg), or
+		if it has a generic mime icon (such as audio-x-generic)
+		"""
+
+		# replace slashed with dashes for mimetype icons
+		icon_name = icon_name.replace('/', '-')
+
+		if self.icon_theme.has_icon(icon_name):
+			return icon_name
+
+		# try generic mimetype
+		gen_type = icon_name.split('-')[0]
+		icon_name = gen_type + '-x-generic'
+		if self.icon_theme.has_icon(icon_name):	
+			return icon_name
+
+		return None
+
+
+	def get_icon_name_from_path(self, path):
 		"""
 		Gets the icon name for a given path using GIO
 		"""
 
-		icon = fallback
 		info = None
 
 		try:
@@ -2198,10 +2218,9 @@ class Cardapio(dbus.service.Object):
 			icons = info.get_icon().get_property("names")
 			for icon_name in icons:
 				if self.icon_theme.has_icon(icon_name):
-					icon = icon_name
-					break
+					return icon_name
 			
-		return icon
+		return None
 
 
 	def add_tree_to_app_list(self, tree, parent_widget, recursive = True):
