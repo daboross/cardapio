@@ -28,7 +28,6 @@
 # TODO: slash "/" should navigate inside folders, Esc pops out
 # TODO: add "most recent" and "most frequent" with a zeitgeist plugin
 # TODO: search results have context menu with "Open with...", "Show parent folder", and so on.
-# TODO: figure out if tracker can sort the results by relevancy
 # plus other TODO's elsewhere in the code...
 
 
@@ -129,7 +128,7 @@ class Cardapio(dbus.service.Object):
 		self.search_timer_local            = None
 		self.search_timer_remote           = None
 		self.plugin_database               = {}
-		self.active_plugin_instances       = []
+		self.active_plugin_instances       = {}
 
 		self.app_tree = gmenu.lookup_tree('applications.menu')
 		self.sys_tree = gmenu.lookup_tree('settings.menu')
@@ -211,7 +210,8 @@ class Cardapio(dbus.service.Object):
 		Creates the dict self.plugin_database indexed by the plugin filename's base name.
 		"""
 
-		self.plugin_database = {}
+		self.plugin_database = {None : None}
+
 		plugin_dirs = [
 			os.path.join(cardapio_path, 'plugins'), 
 			os.path.join(DesktopEntry.xdg_config_home, 'Cardapio', 'plugins')
@@ -237,6 +237,7 @@ class Cardapio(dbus.service.Object):
 							'category name' : plugin_class.category_name,
 							'category icon' : plugin_class.category_icon,
 							'hide from sidebar' : plugin_class.hide_from_sidebar,
+							'instance' : None,
 							}
 
 
@@ -252,9 +253,11 @@ class Cardapio(dbus.service.Object):
 
 		for basename in self.settings['active plugins']:
 
-			basename = str(basename)
+			if basename is None or basename == 'places': continue
 
+			basename = str(basename)
 			plugin_class = self.get_plugin_class(basename)
+
 			if type(plugin_class) is str: 
 				logging.error('[plugin: %s] %s' % (basename, plugin_class))
 				self.settings['active plugins'].remove(basename)
@@ -270,6 +273,7 @@ class Cardapio(dbus.service.Object):
 			plugin.is_running       = False
 
 			self.active_plugin_instances.append(plugin)
+			self.plugin_database[basename]['instance'] = plugin
 
 
 	def write_to_plugin_log(self, plugin, text, is_error = False, is_warning = False):
@@ -419,7 +423,7 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'applet icon'                , 'start-here'             , override_empty_str = True) # string (either a path to the icon, or an icon name)
 		self.read_config_option(s, 'pinned items'               , []                       ) 
 		self.read_config_option(s, 'side pane items'            , default_side_pane_items  )
-		self.read_config_option(s, 'active plugins'             , ['tracker', 'google']    ) # filenames
+		self.read_config_option(s, 'active plugins'             , ['places', None, 'tracker', 'google'], force_update_from_version = [0,9,112]) 
 
 		self.settings['cardapio version'] = self.version
 
@@ -428,6 +432,9 @@ class Cardapio(dbus.service.Object):
 		if 'system pane' in self.settings:
 			self.settings['side pane'] = self.settings['system pane']
 			self.settings.pop('system pane')
+
+		if None not in self.settings['active plugins']:
+			self.settings['active plugins'] = [None] + self.settings['active plugins']
 
 
 	def read_config_option(self, user_settings, key, val, override_empty_str = False, force_update_from_version = None):
@@ -447,12 +454,12 @@ class Cardapio(dbus.service.Object):
 		if force_update_from_version is not None:
 
 			if 'cardapio version' in user_settings:
-				user_version = [int(i) for i in user_settings['cardapio version'].split('.')]
+				settings_version = [int(i) for i in user_settings['cardapio version'].split('.')]
 
 			else:
-				user_version = 0
+				settings_version = 0
 
-			if user_version < force_update_from_version:
+			if settings_version <= force_update_from_version:
 
 				self.settings[key] = val
 
@@ -688,18 +695,7 @@ class Cardapio(dbus.service.Object):
 		if self.panel_applet is None:
 			self.get_object('AppletOptionPane').hide()
 
-		# slabs that should go *before* regular application slabs
-		self.add_pinneditems_slab()
-		self.add_sidepane_slab()
-		self.add_places_slab()
-
-		self.build_applications_list()
-
-		# slabs that should go *after* regular application slabs
-		self.add_session_slab()
-		self.add_system_slab()
-		self.add_uncategorized_slab()
-		self.add_plugin_slabs()
+		self.add_all_slabs()
 
 		self.build_places_list()
 		self.build_session_list()
@@ -725,6 +721,7 @@ class Cardapio(dbus.service.Object):
 			self.set_message_window_visible(True)
 
 		glib.idle_add(self.build_ui)
+		self.schedule_search_with_plugins('')
 
 
 	def open_about_dialog(self, widget, verb = None):
@@ -788,19 +785,26 @@ class Cardapio(dbus.service.Object):
 
 		# place active plugins at the top of the list, in order
 		plugin_list = []
-		plugin_list += [p.basename for p in self.active_plugin_instances]
+		plugin_list += [basename for basename in self.settings['active plugins']]
 		plugin_list += [basename for basename in self.plugin_database if basename not in plugin_list]
 
 		for basename in plugin_list:
 
 			active = (basename in self.settings['active plugins'])
-			plugin_info = self.plugin_database[basename]
 
-			title = _('<big><b>%(plugin_name)s</b></big>\n<i>by %(plugin_author)s</i>\n%(plugin_description)s') % {
-					'plugin_name' : plugin_info['name'],
-					'plugin_author': plugin_info['author'],
-					'plugin_description': plugin_info['description'],
-					}
+			if basename is None:
+				title = _('<big><b>Application menu</b></big>') + '\n' + _('(cannot be deactivated)')
+
+			elif basename == 'places':
+				title = _('<big><b>Places menu</b></big>') + '\n' + _('(cannot be deactivated)')
+
+			else:
+				plugin_info = self.plugin_database[basename]
+				title = _('<big><b>%(plugin_name)s</b></big>\n<i>by %(plugin_author)s</i>\n%(plugin_description)s') % {
+						'plugin_name' : plugin_info['name'],
+						'plugin_author': plugin_info['author'],
+						'plugin_description': plugin_info['description'],
+						}
 
 			self.plugin_tree_model.append([basename, active, title])
 
@@ -857,7 +861,7 @@ class Cardapio(dbus.service.Object):
 			iter_ = self.plugin_tree_model.iter_next(iter_)
 
 		self.activate_plugins_from_settings()
-		self.add_plugin_slabs()
+		self.schedule_rebuild()
 
 
 	def on_plugin_state_toggled(self, cell, path):
@@ -868,6 +872,10 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		iter_ = self.plugin_tree_model.get_iter(path)
+		basename = self.plugin_tree_model.get_value(iter_, 0)
+
+		if basename is None or basename == 'places': return
+
 		self.plugin_tree_model.set_value(iter_, 1, not cell.get_active())	
 
 
@@ -983,17 +991,19 @@ class Cardapio(dbus.service.Object):
 		Make Cardapio disappear when it loses focus
 		"""
 
-		applet_x, applet_y, dummy = self.panel_applet.window.get_pointer()
-		dummy, dummy, applet_w, applet_h = self.panel_applet.get_allocation()
+		if self.panel_applet is not None:
 
-		# Make sure clicking the applet button doesn't cause a focus-out event.
-		# Otherwise, the click signal actually happens *after* the focus-out,
-		# which causes the applet to be re-shown rather than disappearing.
-		# So by ignoring this focus-out we actually make sure that Cardapio
-		# will be hidden after all. Silly.
+			applet_x, applet_y, dummy = self.panel_applet.window.get_pointer()
+			dummy, dummy, applet_w, applet_h = self.panel_applet.get_allocation()
 
-		if self.panel_applet is not None and (0 <= applet_x <= applet_w and 0 <= applet_y <= applet_h): 
-			return
+			# Make sure clicking the applet button doesn't cause a focus-out event.
+			# Otherwise, the click signal actually happens *after* the focus-out,
+			# which causes the applet to be re-shown rather than disappearing.
+			# So by ignoring this focus-out we actually make sure that Cardapio
+			# will be hidden after all. Silly.
+
+			if self.panel_applet is not None and (0 <= applet_x <= applet_w and 0 <= applet_y <= applet_h): 
+				return
 
 		# If the last app was opened in the background, make sure Cardapio
 		# doesn't hide when the app gets focused
@@ -1735,8 +1745,6 @@ class Cardapio(dbus.service.Object):
 
 		if event == gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
 
-			# TODO: make sure this doesn't fire 5 times per change!
-
 			for item in self.places_section_contents.get_children():
 				self.places_section_contents.remove(item)
 
@@ -1986,13 +1994,27 @@ class Cardapio(dbus.service.Object):
 		self.system_section_contents = section_contents
 
 
-	def add_plugin_slabs(self):
+	def add_all_slabs(self):
 
-		for plugin in self.active_plugin_instances:
+		self.add_pinneditems_slab()
+		self.add_sidepane_slab()
 
-			section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, hide = plugin.hide_from_sidebar)
-			plugin.section_slab     = section_slab
-			plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
+		for basename in self.settings['active plugins']:
+
+			if basename is None:
+				self.build_applications_list()
+				self.add_session_slab()
+				self.add_system_slab()
+				self.add_uncategorized_slab()
+
+			elif basename == 'places':
+				self.add_places_slab()
+
+			else:
+				plugin = self.plugin_database[basename]['instance']
+				section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, hide = plugin.hide_from_sidebar)
+				plugin.section_slab     = section_slab
+				plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
 
 
 	def clear_pane(self, container):
@@ -2682,11 +2704,9 @@ class CardapioPluginInterface:
 
 	search_delay_type = 'local search update delay'
 
-	category_name = ''
-	category_icon = ''
-
-	# not yet used:
-	category_position = 'end'
+	category_name    = ''
+	category_icon    = ''
+	category_tooltip = ''
 
 	hide_from_sidebar = True
 

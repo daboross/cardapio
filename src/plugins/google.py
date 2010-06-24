@@ -17,7 +17,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	category_name      = _('Web Results')
 	category_icon      = 'system-search'
-	category_position  = 'end'
 	hide_from_sidebar  = True
 
 
