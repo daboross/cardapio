@@ -102,10 +102,13 @@ class Cardapio(dbus.service.Object):
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
-		logging.basicConfig(filename = '/tmp/cardapio.log', level = logging.DEBUG)
+		self.create_config_folder()
+		log_file_path = os.path.join(self.config_folder_path, 'cardapio.log')
+
+		logging.basicConfig(filename = log_file_path, level = logging.DEBUG)
 		logging.info('----------------- Cardapio launched -----------------')
 
-		self.user_home_folder = os.path.abspath(os.path.expanduser('~'))
+		self.home_folder_path = os.path.abspath(os.path.expanduser('~'))
 
 		self.read_config_file()
 
@@ -321,27 +324,33 @@ class Cardapio(dbus.service.Object):
 		self.show_lone_section(section_slab)
 
 
+	def create_config_folder(self):
+		"""
+		Creates Cardapio's config folder (usually at ~/.config/Cardapio)
+		"""
+
+		self.config_folder_path = os.path.join(DesktopEntry.xdg_config_home, 'Cardapio')
+
+		if not os.path.exists(self.config_folder_path): 
+			os.mkdir(self.config_folder_path)
+
+		elif not os.path.isdir(self.config_folder_path):
+			logging.error('Error! Cannot create folder "%s" because a file with that name already exists!' % self.config_folder_path)
+			sys.exit(1)
+
+
 	def get_config_file(self, mode):
 		"""
 		Returns a file handler to Cardapio's config file.
 		"""
 
-		config_folder_path = os.path.join(DesktopEntry.xdg_config_home, 'Cardapio')
-
-		if not os.path.exists(config_folder_path): 
-			os.mkdir(config_folder_path)
-
-		elif not os.path.isdir(config_folder_path):
-			logging.error('Error! Path "%s" already exists!' % config_folder_path)
-			sys.exit(1)
-
-		config_file_path = os.path.join(DesktopEntry.xdg_config_home, 'Cardapio', 'config.ini')
+		config_file_path = os.path.join(self.config_folder_path, 'config.ini')
 
 		if not os.path.exists(config_file_path):
 			open(config_file_path, 'w+')
 
 		elif not os.path.isfile(config_file_path):
-			logging.error('Error! Path "%s" already exists!' % config_file_path)
+			logging.error('Error! Cannot create file "%s" because a folder with that name already exists!' % config_file_path)
 			sys.exit(1)
 
 		return open(config_file_path, mode)
@@ -1680,7 +1689,7 @@ class Cardapio(dbus.service.Object):
 		Populate the places list
 		"""
 
-		button = self.add_app_button(_('Home'), 'user-home', self.places_section_contents, 'xdg', self.user_home_folder, tooltip = _('Open your personal folder'), app_list = self.app_list)
+		button = self.add_app_button(_('Home'), 'user-home', self.places_section_contents, 'xdg', self.home_folder_path, tooltip = _('Open your personal folder'), app_list = self.app_list)
 		button = self.add_app_button(_('Computer'), 'computer', self.places_section_contents, 'xdg', 'computer:///', tooltip = _('Browse all local and remote disks and folders accessible from this computer'), app_list = self.app_list)
 
 		xdg_folders_file_path = os.path.join(DesktopEntry.xdg_config_home, 'user-dirs.dirs')
@@ -1695,14 +1704,14 @@ class Cardapio(dbus.service.Object):
 
 				# check if the desktop path is the home folder, in which case we
 				# do *not* need to add the desktop button.
-				if os.path.abspath(path) == self.user_home_folder: break
+				if os.path.abspath(path) == self.home_folder_path: break
 
 				self.add_place(_('Desktop'), path, 'user-desktop')
 				break
 
 		xdg_folders_file.close()
 
-		bookmark_file_path = os.path.join(self.user_home_folder, '.gtk-bookmarks')
+		bookmark_file_path = os.path.join(self.home_folder_path, '.gtk-bookmarks')
 		bookmark_file = file(bookmark_file_path, 'r')
 
 		for line in bookmark_file.readlines():
@@ -2451,7 +2460,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		try:
-			subprocess.Popen(path, shell = True, cwd = self.user_home_folder)
+			subprocess.Popen(path, shell = True, cwd = self.home_folder_path)
 		except OSError, e:
 			logging.error('Could not launch %s' % path)
 			logging.error(e)
@@ -2572,7 +2581,7 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			self.selected_section.hide()
-			self.show_no_results_text(_('No results to show in "%(category_name)s"') % {'category name': self.section_list[self.selected_section]['name']})
+			self.show_no_results_text(_('No results to show in "%(category_name)s"') % {'category_name': self.section_list[self.selected_section]['name']})
 
 
 	def hide_all_transitory_sections(self, fully_hide = False):
