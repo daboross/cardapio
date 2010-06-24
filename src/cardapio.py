@@ -21,7 +21,6 @@
 # TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
 
 # After version 1.0:
-# TODO: make "places" use custom icons
 # TODO: fix shift-tab from first app widget
 # TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
 # TODO: add mount points to "places", allow ejecting from context menu

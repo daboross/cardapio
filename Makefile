@@ -16,10 +16,10 @@ all:
 
 install:
 	mkdir -p $(PREFIX)/lib/cardapio/plugins
-	cp -f cardapio/cardapio $(PREFIX)/lib/cardapio/
-	cp -f cardapio/cardapio.py $(PREFIX)/lib/cardapio/
-	cp -f cardapio/cardapio.ui $(PREFIX)/lib/cardapio/
-	cp -f cardapio/plugins/* $(PREFIX)/lib/cardapio/plugins/
+	cp -f src/cardapio $(PREFIX)/lib/cardapio/
+	cp -f src/cardapio.py $(PREFIX)/lib/cardapio/
+	cp -f src/cardapio.ui $(PREFIX)/lib/cardapio/
+	cp -f src/plugins/* $(PREFIX)/lib/cardapio/plugins/
 	
 	mkdir -p $(PREFIX)/share/locale
 	cp -rf locale/* $(PREFIX)/share/locale/
@@ -28,7 +28,7 @@ install:
 	ln -fs $(PREFIX)/lib/cardapio/cardapio $(PREFIX)/bin/cardapio
 	
 	mkdir -p $(DESTDIR)/usr/lib/bonobo/servers
-	cp -f cardapio/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/
+	cp -f src/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/
 
 buildsrc:
 	debuild -S
