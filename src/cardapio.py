@@ -267,6 +267,7 @@ class Cardapio(dbus.service.Object):
 
 			if not plugin.loaded:
 				self.write_to_plugin_log(plugin, 'Plugin did not load properly')
+				self.settings['active plugins'].remove(basename)
 				continue
 
 			plugin.basename         = basename
@@ -796,18 +797,24 @@ class Cardapio(dbus.service.Object):
 			active = (basename in self.settings['active plugins'])
 
 			if basename is None:
-				title = _('<big><b>Application menu</b></big>') + '\n' + _('(cannot be deactivated)')
+				title = _('<b>Application menu</b>') + '\n' + _('(cannot be deactivated)')
 
 			elif basename == 'places':
-				title = _('<big><b>Places menu</b></big>') + '\n' + _('(cannot be deactivated)')
+				title = _('<b>Places menu</b>') + '\n' + _('(cannot be deactivated)')
 
 			else:
+
 				plugin_info = self.plugin_database[basename]
-				title = _('<big><b>%(plugin_name)s</b></big>\n<i>by %(plugin_author)s</i>\n%(plugin_description)s') % {
+
+				params = {
 						'plugin_name' : plugin_info['name'],
 						'plugin_author': plugin_info['author'],
 						'plugin_description': plugin_info['description'],
 						}
+
+				title = ( '<b>%(plugin_name)s</b>\n<i>'  % params ) + \
+						( _('by %(plugin_author)s')      % params ) + \
+						( '</i>\n%(plugin_description)s' % params )
 
 			self.plugin_tree_model.append([basename, active, title])
 
