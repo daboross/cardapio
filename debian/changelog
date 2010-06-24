@@ -1,3 +1,9 @@
+cardapio (0.9.113-ubuntu1) lucid; urgency=low
+
+  * bug fixes and reorderable plugins/menus
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 23 Jun 2010 23:40:00 -0400
+
 cardapio (0.9.112-ubuntu1) lucid; urgency=low
 
   * bug fixes and better 'launch in background' 

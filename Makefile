@@ -34,9 +34,7 @@ buildsrc:
 	debuild -S
 
 clean:
-	$(PYTHON) setup.py clean
 	$(MAKE) -f $(CURDIR)/debian/rules clean
-	rm -rf build/ MANIFEST
 	find . -name '*.pyc' -delete
 
 uninstall:
@@ -54,4 +52,10 @@ olduninstall:
 	rm file_list.txt
 	rm -rf /usr/lib/python2.6/dist-packages/cardapio/
 	rm -rf /usr/local/lib/python2.6/dist-packages/cardapio/
+
+oldclean:
+	$(PYTHON) setup.py clean
+	$(MAKE) -f $(CURDIR)/debian/rules clean
+	rm -rf build/ MANIFEST
+	find . -name '*.pyc' -delete
 

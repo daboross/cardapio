@@ -423,7 +423,7 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'applet icon'                , 'start-here'             , override_empty_str = True) # string (either a path to the icon, or an icon name)
 		self.read_config_option(s, 'pinned items'               , []                       ) 
 		self.read_config_option(s, 'side pane items'            , default_side_pane_items  )
-		self.read_config_option(s, 'active plugins'             , ['places', None, 'tracker', 'google'], force_update_from_version = [0,9,112]) 
+		self.read_config_option(s, 'active plugins'             , ['places', None, 'tracker', 'google']) 
 
 		self.settings['cardapio version'] = self.version
 
@@ -435,6 +435,9 @@ class Cardapio(dbus.service.Object):
 
 		if None not in self.settings['active plugins']:
 			self.settings['active plugins'] = [None] + self.settings['active plugins']
+
+		if 'places' not in self.settings['active plugins']:
+			self.settings['active plugins'] = ['places'] + self.settings['active plugins']
 
 
 	def read_config_option(self, user_settings, key, val, override_empty_str = False, force_update_from_version = None):
