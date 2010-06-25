@@ -527,8 +527,8 @@ class Cardapio(dbus.service.Object):
 
 		self.icon_theme = gtk.icon_theme_get_default()
 		self.icon_theme.connect('changed', self.on_icon_theme_changed)
-		self.icon_size_app = gtk.ICON_SIZE_LARGE_TOOLBAR
-		self.icon_size_category = gtk.ICON_SIZE_MENU
+		self.icon_size_app = gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
+		self.icon_size_category = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
 
 		# make sure buttons have icons!
 		self.gtk_settings = gtk.settings_get_default()
@@ -620,7 +620,8 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.panel_button.set_label(self.settings['applet label'])
-		button_icon = self.get_icon(self.settings['applet icon'], self.get_best_icon_size(), 'distributor-logo')
+		button_icon_pixbuf = self.get_icon_pixbuf(self.settings['applet icon'], self.get_best_icon_size(), 'distributor-logo')
+		button_icon = gtk.image_new_from_pixbuf(button_icon_pixbuf)
 		self.panel_button.set_image(button_icon)
 
 		if self.panel_button.parent is None: return
@@ -703,7 +704,7 @@ class Cardapio(dbus.service.Object):
 		if self.panel_applet is None:
 			self.get_object('AppletOptionPane').hide()
 
-		self.add_all_slabs()
+		self.add_all_reorderable_slabs()
 
 		self.build_places_list()
 		self.build_session_list()
@@ -1807,7 +1808,8 @@ class Cardapio(dbus.service.Object):
 		dummy, canonical_path = urllib2.splittype(folder_path)
 		canonical_path = self.unescape(canonical_path)
 
-		if not urllib2.posixpath.exists(canonical_path): return
+		# TODO: figure out why this line was here -- doesn't make sense
+		#if not urllib2.posixpath.exists(canonical_path): return
 
 		icon_name = self.get_icon_name_from_path(folder_path)
 		if icon_name is None: icon_name = folder_icon
@@ -2008,7 +2010,10 @@ class Cardapio(dbus.service.Object):
 		self.system_section_contents = section_contents
 
 
-	def add_all_slabs(self):
+	def add_all_reorderable_slabs(self):
+		"""
+		Add all the reorderable slabs to the app pane
+		"""
 
 		self.add_pinneditems_slab()
 		self.add_sidepane_slab()
@@ -2079,6 +2084,15 @@ class Cardapio(dbus.service.Object):
 		button.connect('button-press-event', self.on_app_button_button_pressed)
 		button.connect('focus-in-event', self.on_app_button_focused)
 
+		if command_type == 'app': action = gtk.gdk.ACTION_COPY
+		else: action = gtk.gdk.ACTION_LINK
+
+		if command_type != 'callback' and command_type != 'raw':
+			button.drag_source_set(gtk.gdk.BUTTON1_MASK, [("text/uri-list", 0, 0)], action)
+			button.connect('drag-begin', self.on_app_button_drag_begin)
+			button.connect('drag-data-get', self.on_app_button_data_get)
+			# TODO: drag and drop to reorganize pinned items
+
 		# save some metadata for easy access
 		button.app_info = {
 			'name'       : self.unescape(button_str),
@@ -2107,17 +2121,17 @@ class Cardapio(dbus.service.Object):
 		label = gtk.Label(button_str)
 
 		if is_app_button:
-			icon_size = self.icon_size_app
+			icon_size_pixels = self.icon_size_app
 			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
 			# TODO: figure out how to set max width so that it is the best for
 			# the window and font sizes
 			#label.set_ellipsize(pango.ELLIPSIZE_END)
 			#label.set_max_width_chars(20)
 		else:
-			icon_size = self.icon_size_category
+			icon_size_pixels = self.icon_size_category
 
-		icon_size_pixels = gtk.icon_size_lookup(icon_size)[0]
-		icon = self.get_icon(icon_name, icon_size_pixels)
+		icon_pixbuf = self.get_icon_pixbuf(icon_name, icon_size_pixels)
+		icon = gtk.image_new_from_pixbuf(icon_pixbuf)
 
 		hbox = gtk.HBox()
 		hbox.add(icon)
@@ -2182,7 +2196,7 @@ class Cardapio(dbus.service.Object):
 		return section_slab, section_contents
 
 
-	def get_icon(self, icon_value, icon_size, fallback_icon = 'application-x-executable'):
+	def get_icon_pixbuf(self, icon_value, icon_size, fallback_icon = 'application-x-executable'):
 		"""
 		Returns a GTK Image from a given icon name and size. The icon name can be
 		either a path or a named icon from the GTK theme.
@@ -2217,7 +2231,7 @@ class Cardapio(dbus.service.Object):
 		if icon_pixbuf is None:
 			icon_pixbuf = self.icon_theme.load_icon(fallback_icon, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
 
-		return gtk.image_new_from_pixbuf(icon_pixbuf)
+		return icon_pixbuf
 
 
 	def get_icon_name_from_theme(self, icon_name):
@@ -2251,7 +2265,7 @@ class Cardapio(dbus.service.Object):
 
 		try:
 			file_ = gio.File(path)
-			info = file_.query_info("standard::icon")
+			info = file_.query_info('standard::icon')
 
 		except Exception, exception:
 			logging.warn('Could not get icon for %s' % path)
@@ -2259,7 +2273,7 @@ class Cardapio(dbus.service.Object):
 
 
 		if info is not None:
-			icons = info.get_icon().get_property("names")
+			icons = info.get_icon().get_property('names')
 			for icon_name in icons:
 				if self.icon_theme.has_icon(icon_name):
 					return icon_name
@@ -2423,6 +2437,39 @@ class Cardapio(dbus.service.Object):
 
 		elif alloc.y + alloc.height > scroller_position + page_size:
 			self.scroll_adjustment.set_value(alloc.y + alloc.height - page_size)
+
+	
+	def on_app_button_drag_begin(self, button, drag_context):
+		"""
+		Set up drag action (not much goes on here...)
+		"""
+
+		icon_pixbuf = self.get_icon_pixbuf(button.app_info['icon name'], self.icon_size_app)
+		button.drag_source_set_icon_pixbuf(icon_pixbuf)
+
+
+	def on_app_button_data_get(self, button, drag_context, selection_data, info, time):
+		"""
+		Prepare the data that will be sent to the other app when the drag-and-drop
+		operation is done	
+		"""
+
+		command = button.app_info['command']
+		command_type = button.app_info['type']
+
+		if command_type == 'app':
+			command = 'file://' + command
+
+		elif command_type == 'xdg': 
+
+			path_type, dummy = urllib2.splittype(command)
+			if path_type is None: command = 'file://' + command
+
+			# TODO: figure out how to handle 'computer://' and 'trash://' (it
+			# seems that nautilus has the same problems...)
+
+		# TODO: handle command_type == 'raw' by creating a new desktop file and link?
+		selection_data.set_uris([command])
 
 
 	def on_app_button_clicked(self, widget):
