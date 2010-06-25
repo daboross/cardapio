@@ -434,11 +434,15 @@ class Cardapio(dbus.service.Object):
 			self.settings['side pane'] = self.settings['system pane']
 			self.settings.pop('system pane')
 
-		if None not in self.settings['active plugins']:
-			self.settings['active plugins'] = [None] + self.settings['active plugins']
+		special_names = [None, 'places']
 
-		if 'places' not in self.settings['active plugins']:
-			self.settings['active plugins'] = ['places'] + self.settings['active plugins']
+		for special_name in special_names:
+
+			if special_name not in self.settings['active plugins']:
+				self.settings['active plugins'] = [special_name] + self.settings['active plugins']
+
+			if len([basename for basename in self.settings['active plugins'] if basename == special_name]):
+				self.settings['active plugins'] = [special_name] + [basename for basename in self.settings['active plugins'] if basename != special_name]
 
 
 	def read_config_option(self, user_settings, key, val, override_empty_str = False, force_update_from_version = None):
