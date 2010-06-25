@@ -2037,6 +2037,7 @@ class Cardapio(dbus.service.Object):
 
 			else:
 				plugin = self.plugin_database[basename]['instance']
+				if plugin is None: continue
 				section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, hide = plugin.hide_from_sidebar)
 				plugin.section_slab     = section_slab
 				plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
