@@ -58,6 +58,10 @@ except Exception, exception:
 	print(exception)
 	sys.exit(1)
 
+if gtk.ver < (2, 14, 0):
+	print('Error! Gtk version must be at least 2.14. You have version %s' % gtk.ver)
+	sys.exit(1)
+
 
 # Set up translations
 
@@ -1716,6 +1720,8 @@ class Cardapio(dbus.service.Object):
 		button = self.add_app_button(_('Home'), 'user-home', self.places_section_contents, 'xdg', self.home_folder_path, tooltip = _('Open your personal folder'), app_list = self.app_list)
 		button = self.add_app_button(_('Computer'), 'computer', self.places_section_contents, 'xdg', 'computer:///', tooltip = _('Browse all local and remote disks and folders accessible from this computer'), app_list = self.app_list)
 
+		# TODO network:// ?
+
 		xdg_folders_file_path = os.path.join(DesktopEntry.xdg_config_home, 'user-dirs.dirs')
 		xdg_folders_file = file(xdg_folders_file_path, 'r')
 
@@ -2085,7 +2091,7 @@ class Cardapio(dbus.service.Object):
 		button.connect('focus-in-event', self.on_app_button_focused)
 
 		if command_type == 'app': action = gtk.gdk.ACTION_COPY
-		else: action = gtk.gdk.ACTION_LINK
+		else: action = gtk.gdk.ACTION_LINK # TODO: for the panel, this should be ACTION_COPY. for nautilus, ACTION_LINK
 
 		if command_type != 'callback' and command_type != 'raw':
 			button.drag_source_set(gtk.gdk.BUTTON1_MASK, [("text/uri-list", 0, 0)], action)
@@ -2219,7 +2225,8 @@ class Cardapio(dbus.service.Object):
 		if icon_pixbuf is None:
 			icon_name_ = self.get_icon_name_from_theme(icon_name)
 			if icon_name_ is not None:
-				icon_pixbuf = self.icon_theme.load_icon(icon_name_, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
+				try: icon_pixbuf = self.icon_theme.load_icon(icon_name_, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
+				except: pass
 
 		if icon_pixbuf is None:
 			for dir_ in BaseDirectory.xdg_data_dirs:
