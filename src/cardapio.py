@@ -100,7 +100,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.114'
+	version = '0.9.115'
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
@@ -2452,11 +2452,11 @@ class Cardapio(dbus.service.Object):
 
 		if widget.app_info['type'] == 'xdg' or len(split_command) == 2:
 
-			dummy, canonical_path = split_command
+			path_type, canonical_path = split_command
 			dummy, extension = os.path.splitext(canonical_path)
 
-			# don't show it for .desktop files
-			if extension != '.desktop':
+			# don't show it for computer://, trash://, or .desktop files
+			if path_type != 'computer' and path_type != 'trash' and extension != '.desktop':
 
 				# only show if path that exists
 				if os.path.exists(self.unescape(canonical_path)):
