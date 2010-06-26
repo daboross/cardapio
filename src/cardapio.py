@@ -527,6 +527,7 @@ class Cardapio(dbus.service.Object):
 		self.unpin_menuitem            = self.get_object('UnpinMenuItem')
 		self.add_side_pane_menuitem    = self.get_object('AddSidePaneMenuItem')
 		self.remove_side_pane_menuitem = self.get_object('RemoveSidePaneMenuItem')
+		self.open_folder_menuitem      = self.get_object('OpenParentFolderMenuItem')
 		self.plugin_tree_model         = self.get_object('PluginListstore')
 
 		self.icon_theme = gtk.icon_theme_get_default()
@@ -2375,6 +2376,15 @@ class Cardapio(dbus.service.Object):
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 
 
+	def on_open_parent_folder_pressed(self, widget):
+		"""
+		Handle the "open parent folder" action
+		"""
+
+		parent_folder, dummy = os.path.split(self.clicked_app['command'])
+		self.launch_xdg(parent_folder)
+
+
 	def on_launch_in_background_pressed(self, widget):
 		"""
 		Handle the "launch in background" action
@@ -2396,39 +2406,63 @@ class Cardapio(dbus.service.Object):
 
 		elif event.button == 3:
 
-			if widget.app_info['type'] == 'callback': return
-
-			already_pinned = False
-			already_on_side_pane = False
-
-			for command in [app['command'] for app in self.settings['pinned items']]:
-				if command == widget.app_info['command']: 
-					already_pinned = True
-					break
-
-			for command in [app['command'] for app in self.settings['side pane items']]:
-				if command == widget.app_info['command']: 
-					already_on_side_pane = True
-					break
-
-			if already_pinned:
-				self.pin_menuitem.hide()
-				self.unpin_menuitem.show()
-			else:
-				self.pin_menuitem.show()
-				self.unpin_menuitem.hide()
-
-			if already_on_side_pane:
-				self.add_side_pane_menuitem.hide()
-				self.remove_side_pane_menuitem.show()
-			else:
-				self.add_side_pane_menuitem.show()
-				self.remove_side_pane_menuitem.hide()
-
-			self.clicked_app = widget.app_info
-
+			self.setup_context_menu(widget)
 			self.block_focus_out_event()
 			self.app_context_menu.popup(None, None, None, event.button, event.time)
+
+
+	def setup_context_menu(self, widget):
+		"""
+		Show or hide different context menu options depending on the widget
+		"""
+
+		if widget.app_info['type'] == 'callback': return
+
+		already_pinned = False
+		already_on_side_pane = False
+
+		for command in [app['command'] for app in self.settings['pinned items']]:
+			if command == widget.app_info['command']: 
+				already_pinned = True
+				break
+
+		for command in [app['command'] for app in self.settings['side pane items']]:
+			if command == widget.app_info['command']: 
+				already_on_side_pane = True
+				break
+
+		if already_pinned:
+			self.pin_menuitem.hide()
+			self.unpin_menuitem.show()
+		else:
+			self.pin_menuitem.show()
+			self.unpin_menuitem.hide()
+
+		if already_on_side_pane:
+			self.add_side_pane_menuitem.hide()
+			self.remove_side_pane_menuitem.show()
+		else:
+			self.add_side_pane_menuitem.show()
+			self.remove_side_pane_menuitem.hide()
+
+
+		# figure out whether to show the 'open parent folder' menuitem
+		split_command = urllib2.splittype(widget.app_info['command'])
+		self.open_folder_menuitem.hide()
+
+		if widget.app_info['type'] == 'xdg' or len(split_command) == 2:
+
+			dummy, canonical_path = split_command
+			dummy, extension = os.path.splitext(canonical_path)
+
+			# don't show it for .desktop files
+			if extension != '.desktop':
+
+				# only show if path that exists
+				if os.path.exists(self.unescape(canonical_path)):
+					self.open_folder_menuitem.show()
+
+		self.clicked_app = widget.app_info
 
 
 	def on_app_button_focused(self, widget, event):

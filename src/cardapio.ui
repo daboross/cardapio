@@ -1038,7 +1038,18 @@ Rebuilding&#x2026;</property>
       </object>
     </child>
     <child>
-      <object class="GtkImageMenuItem" id="menuitem6">
+      <object class="GtkImageMenuItem" id="OpenParentFolderMenuItem">
+        <property name="label" translatable="yes">Open parent _folder</property>
+        <property name="visible">True</property>
+        <property name="tooltip_text" translatable="yes">Open this item's parent folder in the file browser</property>
+        <property name="use_underline">True</property>
+        <property name="image">image8</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="on_open_parent_folder_pressed"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="OpenInBackground">
         <property name="label" translatable="yes">_Launch in background</property>
         <property name="visible">True</property>
         <property name="tooltip_text" translatable="yes">Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-Click)</property>
@@ -1080,5 +1091,9 @@ Rebuilding&#x2026;</property>
     <property name="visible">True</property>
     <property name="stock">gtk-execute</property>
     <property name="icon-size">1</property>
+  </object>
+  <object class="GtkImage" id="image8">
+    <property name="visible">True</property>
+    <property name="stock">gtk-directory</property>
   </object>
 </interface>

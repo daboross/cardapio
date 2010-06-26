@@ -15,9 +15,13 @@ all:
 	@echo "make clean - Get rid of scratch and byte files"
 
 install:
+	python -m compileall src/
+	python -m compileall src/plugins/
+	
 	mkdir -p $(PREFIX)/lib/cardapio/plugins
 	cp -f src/cardapio $(PREFIX)/lib/cardapio/
 	cp -f src/cardapio.py $(PREFIX)/lib/cardapio/
+	cp -f src/cardapio.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/cardapio.ui $(PREFIX)/lib/cardapio/
 	cp -f src/plugins/* $(PREFIX)/lib/cardapio/plugins/
 	
