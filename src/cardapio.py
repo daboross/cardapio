@@ -2124,7 +2124,6 @@ class Cardapio(dbus.service.Object):
 			button = gtk.ToggleButton()
 
 		button_str = self.unescape(button_str)
-		tooltip = self.unescape(tooltip)
 
 		label = gtk.Label(button_str)
 
@@ -2150,7 +2149,9 @@ class Cardapio(dbus.service.Object):
 		align = gtk.Alignment(0, 0.5)
 		align.add(hbox)
 
-		if tooltip: button.set_tooltip_text(tooltip)
+		if tooltip: 
+			tooltip = self.unescape(tooltip)
+			button.set_tooltip_text(tooltip)
 
 		button.add(align)
 		button.set_relief(gtk.RELIEF_NONE)
