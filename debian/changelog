@@ -1,3 +1,9 @@
+cardapio (0.9.116-ubuntu1) lucid; urgency=low
+
+  * fixed a few bugs and added 'show-near-mouse' option for Docky
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 26 Jun 2010 23:45:00 -0400
+
 cardapio (0.9.115-ubuntu2) lucid; urgency=low
 
   * updated the version in the cardapio about window :)

@@ -100,7 +100,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.115'
+	version = '0.9.116'
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
@@ -1406,7 +1406,7 @@ class Cardapio(dbus.service.Object):
 			window = self.window
 			offset_x = offset_y = 0
 
-		if self.panel_applet is None:
+		if show_near_mouse or self.panel_applet is None:
 
 			if show_near_mouse:
 				mouse_x, mouse_y, dummy = root_window.get_pointer()
