@@ -1,4 +1,5 @@
 import simplejson, urllib2, gio
+from locale import getdefaultlocale
 from glib import GError
 
 class CardapioPlugin(CardapioPluginInterface):
@@ -22,21 +23,24 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def __init__(self, settings, write_to_log, cardapio_result_handler, cardapio_error_handler):
 
+		language, encoding = getdefaultlocale()
+		google_language_format = language.split('_')[0]
+
 		# The google search API only supports two sizes for the result list,
 		# that is: small (4 results) or large (8 results). So this plugin
 		# chooses the most appropriate given the 'search results limit' user
 		# preference.
 
 		if settings['search results limit'] >= 8:
-			self.query_url = r'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=large&q=%s'
+			self.query_url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=large&lr=lang_%s&q=%%s' % google_language_format
 		else:
-			self.query_url = r'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=small&q=%s'
+			self.query_url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=small&lr=lang_%s&q=%%s' % google_language_format
 
 		self.cardapio_result_handler = cardapio_result_handler
 		self.cardapio_error_handler = cardapio_error_handler
 		self.search_controller = gio.Cancellable()
 
-		self.action_command = r"xdg-open 'http://www.google.com/search?q=%s'"
+		self.action_command = "xdg-open 'http://www.google.com/search?q=%%s&lr=lang_%s'" % google_language_format
 		self.action = {
 			'name'      : _('Show additional results'),
 			'tooltip'   : _('Show additional search results in your web browser'),

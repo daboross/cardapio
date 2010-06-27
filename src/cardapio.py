@@ -65,11 +65,19 @@ if gtk.ver < (2, 14, 0):
 
 # Set up translations
 
+# try path like /usr/share/locale
 cardapio_path = os.path.dirname(os.path.realpath(__file__))
 prefix_path = cardapio_path.split(os.path.sep)[:-2]
 prefix_path = [os.path.sep] + prefix_path + ['share', 'locale']
+prefix_path = os.path.join(*prefix_path)
 
-DIR = os.path.join(*prefix_path)
+# try path like cardapio_path/../locale
+if not os.path.exists(prefix_path):
+	prefix_path = cardapio_path.split(os.path.sep)[:-1]
+	prefix_path = [os.path.sep] + prefix_path + ['locale']
+	prefix_path = os.path.join(*prefix_path)
+
+DIR = prefix_path
 APP = 'cardapio'
 
 locale.setlocale(locale.LC_ALL, '')
