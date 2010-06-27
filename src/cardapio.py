@@ -1372,7 +1372,7 @@ class Cardapio(dbus.service.Object):
 		return None
 
 
-	def reposition_window(self, is_message_window = False):
+	def reposition_window(self, is_message_window = False, show_near_mouse = False):
 		"""
 		Place the Cardapio window near the applet and make sure it's visible.
 		If there is no applet, place it in the center of the screen.
@@ -1407,8 +1407,20 @@ class Cardapio(dbus.service.Object):
 			offset_x = offset_y = 0
 
 		if self.panel_applet is None:
-			window_x = (screen_width - window_width)/2
-			window_y = (screen_height - window_height)/2
+
+			if show_near_mouse:
+				mouse_x, mouse_y, dummy = root_window.get_pointer()
+				if mouse_x < screen_x: mouse_x = screen_x
+				if mouse_y < screen_y: mouse_y = screen_y
+				if mouse_x + window_width  > screen_x + screen_width : mouse_x = screen_x + screen_width  - window_width
+				if mouse_y + window_height > screen_y + screen_height: mouse_y = screen_y + screen_height - window_height
+				window_x = mouse_x
+				window_y = mouse_y
+
+			else:
+				window_x = (screen_width - window_width)/2
+				window_y = (screen_height - window_height)/2
+
 			window.move(window_x + offset_x, window_y + offset_y)
 			return
 
@@ -1496,15 +1508,20 @@ class Cardapio(dbus.service.Object):
 			gtk.main_iteration()
 
 
-	def show(self, *dummy):
+	def show(self, *dummy, **kwargs):
 		"""
 		Show the Cardapio window
 		"""
 
+		if 'show_near_mouse' in kwargs:
+			show_near_mouse = kwargs['show_near_mouse']
+		else:
+			show_near_mouse = False
+
 		self.auto_toggle_panel_button(True)
 
 		self.restore_dimensions()
-		self.reposition_window()
+		self.reposition_window(show_near_mouse = show_near_mouse)
 		self.show_window_on_top(self.window)
 
 		self.window.set_focus(self.search_entry)
@@ -1538,8 +1555,8 @@ class Cardapio(dbus.service.Object):
 		self.show_all_nonempty_sections()
 
 
-	@dbus.service.method(dbus_interface=bus_name_str, in_signature=None, out_signature=None)
-	def show_hide(self):
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = 'b', out_signature = None)
+	def show_hide(self, show_near_mouse = False):
 		"""
 		Toggle Show/Hide the Cardapio window. This function is dbus-accessible.
 		"""
@@ -1547,8 +1564,10 @@ class Cardapio(dbus.service.Object):
 		if time.time() - self.last_visibility_toggle < Cardapio.min_visibility_toggle_interval:
 			return
 
+		show_near_mouse = bool(show_near_mouse)
+
 		if self.visible: self.hide()
-		else: self.show()
+		else: self.show(show_near_mouse = show_near_mouse)
 
 
 	def show_window_on_top(self, window):

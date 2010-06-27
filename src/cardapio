@@ -45,7 +45,18 @@ if len(sys.argv) == 2:
 		gtk.gdk.threads_leave()
 
 
-	elif sys.argv[1] == 'show':
+	elif sys.argv[1] == 'hidden':
+
+		# check if another instance is running
+		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
+			del bus
+			Cardapio(hidden = True)
+			gtk.gdk.threads_enter()
+			gtk.main()
+			gtk.gdk.threads_leave()
+
+
+	elif sys.argv[1] == 'show' or sys.argv[1] == 'show-near-mouse':
 
 		# check if another instance is running
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
@@ -57,18 +68,8 @@ if len(sys.argv) == 2:
 
 		else:
 			show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide')
-			show_hide()
-
-
-	elif sys.argv[1] == 'hidden':
-
-		# check if another instance is running
-		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
-			del bus
-			Cardapio(hidden = True)
-			gtk.gdk.threads_enter()
-			gtk.main()
-			gtk.gdk.threads_leave()
+			show_near_mouse = (sys.argv[1] == 'show-near-mouse')
+			show_hide(show_near_mouse)
 
 
 else:
