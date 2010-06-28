@@ -147,8 +147,6 @@ class Cardapio(dbus.service.Object):
 		self.app_tree.add_monitor(self.on_menu_data_changed)
 		self.sys_tree.add_monitor(self.on_menu_data_changed)
 
-		self.exec_pattern = re.compile("^(.*?)\s+\%[a-zA-Z]$")
-
 		self.package_root = ''
 		if __package__ is not None:
 			self.package_root = __package__ + '.'
@@ -1775,12 +1773,16 @@ class Cardapio(dbus.service.Object):
 		for line in bookmark_file.readlines():
 			if line.strip(' \n\r\t'):
 				name, path = self.get_place_name_and_path(line)
-				# TODO: if path doesn't exist, add gio monitor (could be a removable disk)
 				self.add_place(name, path, 'folder')
 
 		bookmark_file.close()
 
-		self.bookmark_monitor = gio.File(bookmark_file_path).monitor_file()  # keep a reference to avoid getting it garbage collected
+		# re-read bookmarks when volumes are added/removed
+		self.volume_monitor = gio.volume_monitor_get() # keep a reference to avoid getting it garbage-collected
+		self.volume_monitor.connect('drive-changed', self.on_volume_monitor_changed)
+
+		# re-read bookmarks when bookmarks are added/removed
+		self.bookmark_monitor = gio.File(bookmark_file_path).monitor_file() # keep a reference to avoid getting it garbage-collected
 		self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed)
 
 		button = self.add_app_button(_('Trash'), 'user-trash', self.places_section_contents, 'xdg', 'trash:///', tooltip = _('Open the trash'), app_list = self.app_list)
@@ -1794,12 +1796,19 @@ class Cardapio(dbus.service.Object):
 
 		if event == gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
 
-			for item in self.places_section_contents.get_children():
-				self.places_section_contents.remove(item)
-
+			self.clear_pane(self.places_section_contents)
 			self.build_places_list()
 
 
+	def on_volume_monitor_changed(self, drive):
+		"""
+		Handler for when volumes are mounted or ejected 
+		"""
+
+		self.clear_pane(self.places_section_contents)
+		self.build_places_list()
+
+	
 	def get_folder_name_and_path(self, folder_path):
 		"""
 		Returns a folder's name and path from its full filename
@@ -2067,7 +2076,7 @@ class Cardapio(dbus.service.Object):
 				plugin = self.plugin_database[basename]['instance']
 				if plugin is None: continue
 				section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, hide = plugin.hide_from_sidebar)
-				plugin.section_slab     = section_slab
+				plugin.section_slab = section_slab
 				plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
 
 
@@ -2585,11 +2594,15 @@ class Cardapio(dbus.service.Object):
 
 			path = DesktopEntry.DesktopEntry(command).getExec()
 
-			# Strip last part of path if it contains %<a-Z>
-			match = self.exec_pattern.match(path)
+			# Strip parts of the path that contain %<a-Z>
 			
-			if match is not None:
-				path = match.group(1)
+			path_parts = path.split()
+
+			for i in xrange(len(path_parts)):
+				if path_parts[i][0] == '%':
+					path_parts[i] = ''
+
+			path = ' '.join(path_parts)
 
 			return self.launch_raw(path, hide)
 
