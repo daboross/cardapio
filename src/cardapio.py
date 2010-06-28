@@ -2616,6 +2616,21 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		path = self.escape_quotes(self.unescape(path))
+
+		# if the file is executable, ask what to do
+		if os.access(path, os.X_OK):
+
+			dummy, extension = os.path.splitext(path)
+
+			# treat '.desktop' files differently
+			if extension == '.desktop':
+				self.launch_desktop(path)
+				return
+
+			else:
+				# TODO: show "Run in Terminal", "Display", "Cancel", "Run"
+				pass		
+
 		return self.launch_raw("xdg-open '%s'" % path, hide)
 
 
