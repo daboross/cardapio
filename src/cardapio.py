@@ -1285,6 +1285,9 @@ class Cardapio(dbus.service.Object):
 			icon_name = result['icon name']
 			fallback_icon = 'text-x-generic'
 
+			if icon_name == 'inode/symlink':
+				icon_name = None
+
 			if icon_name is not None:
 				icon_name = self.get_icon_name_from_theme(icon_name)
 
@@ -2648,6 +2651,7 @@ class Cardapio(dbus.service.Object):
 		path = self.escape_quotes(self.unescape(path))
 
 		# if the file is executable, ask what to do
+		# TODO: make sure this is for NON-binary files
 		if os.path.isfile(path) and os.access(path, os.X_OK):
 
 			dummy, extension = os.path.splitext(path)
