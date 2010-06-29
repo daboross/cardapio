@@ -1416,10 +1416,12 @@ class Cardapio(dbus.service.Object):
 
 			if show_near_mouse:
 				mouse_x, mouse_y, dummy = root_window.get_pointer()
-				if mouse_x < screen_x: mouse_x = screen_x
-				if mouse_y < screen_y: mouse_y = screen_y
+				if mouse_x + window_width  > screen_x + screen_width : mouse_x = mouse_x - window_width
+				if mouse_y + window_height > screen_y + screen_height: mouse_y = mouse_y - window_height
 				if mouse_x + window_width  > screen_x + screen_width : mouse_x = screen_x + screen_width  - window_width
 				if mouse_y + window_height > screen_y + screen_height: mouse_y = screen_y + screen_height - window_height
+				if mouse_x < screen_x: mouse_x = screen_x
+				if mouse_y < screen_y: mouse_y = screen_y
 				window_x = mouse_x
 				window_y = mouse_y
 
