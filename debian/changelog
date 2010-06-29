@@ -1,3 +1,9 @@
+cardapio (0.9.118-ubuntu1) lucid; urgency=low
+
+  * docky-related bug fixes, and better handling of executable files
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 28 Jun 2010 23:10:00 -0400
+
 cardapio (0.9.117-ubuntu1) lucid; urgency=low
 
   * small bug fixes and new translations
