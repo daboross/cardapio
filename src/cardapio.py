@@ -326,7 +326,7 @@ class Cardapio(dbus.service.Object):
 			widget.set_sensitive(False)
 
 		else:
-			self.show_all_nonempty_sections()
+			self.untoggle_and_show_all_sections()
 
 
 	def on_sidebar_button_clicked(self, widget, section_slab):
@@ -340,10 +340,10 @@ class Cardapio(dbus.service.Object):
 
 		if self.selected_section == section_slab:
 			self.selected_section = None # necessary!
-			self.show_all_nonempty_sections()
+			self.untoggle_and_show_all_sections()
 			return True
 
-		self.show_lone_section(section_slab)
+		self.toggle_and_show_section(section_slab)
 
 
 	def create_config_folder(self):
@@ -1139,7 +1139,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if self.is_searchentry_empty():
-			self.show_all_nonempty_sections()
+			self.untoggle_and_show_all_sections()
 
 		else:
 			self.clear_search_entry()
@@ -1193,7 +1193,7 @@ class Cardapio(dbus.service.Object):
 				self.no_results_to_show = False
 
 		if self.selected_section is None:
-			self.show_all_nonempty_sections()
+			self.untoggle_and_show_all_sections()
 		else:
 			self.consider_showing_no_results_text()
 
@@ -1358,7 +1358,7 @@ class Cardapio(dbus.service.Object):
 
 		if not self.settings['keep search results']:
 			self.clear_search_entry()
-			self.show_all_nonempty_sections() # clear the currently-pressed category
+			self.untoggle_and_show_all_sections()
 
 
 	def on_searchentry_key_pressed(self, widget, event):
@@ -1392,7 +1392,7 @@ class Cardapio(dbus.service.Object):
 				self.clear_search_entry()
 
 			elif self.selected_section is not None:
-				self.show_all_nonempty_sections()
+				self.untoggle_and_show_all_sections()
 
 			else:
 				self.hide()
@@ -1600,7 +1600,7 @@ class Cardapio(dbus.service.Object):
 
 		if not self.settings['keep search results']:
 			self.clear_search_entry()
-			self.show_all_nonempty_sections() # clear the currently-pressed category
+			self.untoggle_and_show_all_sections()
 
 
 	@dbus.service.method(dbus_interface = bus_name_str, in_signature = 'b', out_signature = None)
@@ -2747,9 +2747,10 @@ class Cardapio(dbus.service.Object):
 		return urllib2.unquote(str(text)) # NOTE: it is possible that with python3 we will have to change this line
 
 
-	def show_all_nonempty_sections(self):
+	def untoggle_and_show_all_sections(self):
 		"""
-		Show all sections that currently have search results
+		Show all sections that currently have search results, and untoggle all
+		category buttons
 		"""
 
 		self.no_results_to_show = True
@@ -2779,9 +2780,10 @@ class Cardapio(dbus.service.Object):
 			widget.set_sensitive(False)
 
 
-	def show_lone_section(self, section_slab):
+	def toggle_and_show_section(self, section_slab):
 		"""
-		Show a single section (because it's been selected in the View pane)
+		Show a given section, make sure its button is toggled, and that
+		no other buttons are toggled
 		"""
 
 		for sec in self.section_list:
