@@ -515,12 +515,6 @@ class Cardapio(dbus.service.Object):
 		self.builder.add_from_file(self.uifile)
 		self.builder.connect_signals(self)
 
-		# HACK: fix names of widgets to allow theming 
-		# (glade doesn't seem to properly add names to widgets anymore...)
-		for widget in self.builder.get_objects():
-			if 'set_name' in dir(widget):
-				widget.set_name(gtk.Buildable.get_name(widget))
-
 		self.get_object = self.builder.get_object
 		self.window                    = self.get_object('MainWindow')
 		self.message_window            = self.get_object('MessageWindow')
@@ -544,6 +538,13 @@ class Cardapio(dbus.service.Object):
 		self.remove_side_pane_menuitem = self.get_object('RemoveSidePaneMenuItem')
 		self.open_folder_menuitem      = self.get_object('OpenParentFolderMenuItem')
 		self.plugin_tree_model         = self.get_object('PluginListstore')
+
+		# HACK: fix names of widgets to allow theming 
+		# (glade doesn't seem to properly add names to widgets anymore...)
+		for widget in self.builder.get_objects():
+			if widget == self.about_dialog: continue
+			if 'set_name' in dir(widget):
+				widget.set_name(gtk.Buildable.get_name(widget))
 
 		self.icon_theme = gtk.icon_theme_get_default()
 		self.icon_theme.connect('changed', self.on_icon_theme_changed)

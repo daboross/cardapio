@@ -866,8 +866,10 @@
     <property name="version">0.9.117</property>
     <property name="copyright" translatable="yes">&#xA9; Thiago Teixeira 2010</property>
     <property name="website">http://www.launchpad.net/cardapio</property>
-    <property name="license" translatable="yes">GNU General Public License v3	</property>
+    <property name="license" translatable="yes">GNU General Public License v3
+http://www.gnu.org/licenses/gpl-3.0-standalone.html	</property>
     <property name="authors">Thiago Teixeira</property>
+    <property name="translator_credits" translatable="yes">See https://translations.launchpad.net/cardapio</property>
     <signal name="close" handler="on_dialog_close"/>
     <signal name="response" handler="on_dialog_close"/>
     <signal name="delete_event" handler="on_dialog_close"/>
