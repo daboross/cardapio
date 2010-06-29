@@ -58,6 +58,14 @@ except Exception, exception:
 	print(exception)
 	sys.exit(1)
 
+try:
+	from gnome import execute_terminal_shell
+
+except Exception, exception:
+	print('Warning: you will not be able to execute scripts in the terminal')
+	execute_terminal_shell = None
+
+
 if gtk.ver < (2, 14, 0):
 	print('Error! Gtk version must be at least 2.14. You have version %s' % gtk.ver)
 	sys.exit(1)
@@ -518,6 +526,7 @@ class Cardapio(dbus.service.Object):
 		self.message_window            = self.get_object('MessageWindow')
 		self.about_dialog              = self.get_object('AboutDialog')
 		self.options_dialog            = self.get_object('OptionsDialog')
+		self.executable_file_dialog    = self.get_object('ExecutableFileDialog')
 		self.application_pane          = self.get_object('ApplicationPane')
 		self.category_pane             = self.get_object('CategoryPane')
 		self.sidepane                  = self.get_object('SideappPane')
@@ -744,6 +753,32 @@ class Cardapio(dbus.service.Object):
 		self.schedule_search_with_plugins('')
 
 
+	def show_executable_file_dialog(self, path):
+		"""
+		Opens a dialog similar to the one in Nautilus, that asks whether an
+		executable script should be launched or edited.
+		"""
+
+		basename = os.path.basename(path)
+		arg_dict = {'file_name': basename}
+
+		primary_text = '<big><b>' + _('Do you want to run "%(file_name)s" or display its contents?' % arg_dict) + '</b></big>'
+		secondary_text = _('"%(file_name)s" is an executable text file.' % arg_dict)
+
+		self.get_object('ExecutableDialogPrimaryText').set_markup(primary_text)
+		self.get_object('ExecutableDialogSecondaryText').set_text(secondary_text)
+
+		if execute_terminal_shell is None:
+			self.get_object('ExecutableDialogRunInTerminal').hide()
+
+		self.executable_file_dialog.set_focus(self.get_object('ExecutableDialogCancel'))
+
+		response = self.executable_file_dialog.run()
+		self.executable_file_dialog.hide()
+
+		return response
+
+
 	def open_about_dialog(self, widget, verb = None):
 		"""
 		Opens either the "About Gnome" dialog, or the "About Ubuntu" dialog,
@@ -761,12 +796,13 @@ class Cardapio(dbus.service.Object):
 			self.about_dialog.show()
 
 
-	def on_about_dialog_close(self, widget, response = None):
+	def on_dialog_close(self, dialog, response = None):
 		"""
-		Handler for hiding Cardapio's about dialog
+		Handler for when a dialog's X button is clicked
 		"""
 
-		self.about_dialog.hide()
+		dialog.hide()
+		return True
 
 
 	def set_widget_from_option(self, widget_str, option_str):
@@ -844,15 +880,6 @@ class Cardapio(dbus.service.Object):
 
 		self.options_dialog.hide()
 		self.save_config_file()
-		return True
-
-
-	def close_about_dialog(self, *args):
-		"""
-		Hides the About Dialog
-		"""
-
-		self.about_dialog.hide()
 		return True
 
 
@@ -2620,18 +2647,35 @@ class Cardapio(dbus.service.Object):
 		path = self.escape_quotes(self.unescape(path))
 
 		# if the file is executable, ask what to do
-		if os.access(path, os.X_OK):
+		if os.path.isfile(path) and os.access(path, os.X_OK):
 
 			dummy, extension = os.path.splitext(path)
 
 			# treat '.desktop' files differently
 			if extension == '.desktop':
-				self.launch_desktop(path)
+				self.launch_desktop(path, hide)
 				return
 
 			else:
-				# TODO: show "Run in Terminal", "Display", "Cancel", "Run"
-				pass		
+				# show "Run in Terminal", "Display", "Cancel", "Run"
+				response = self.show_executable_file_dialog(path)
+
+				# if "Run in Terminal"
+				if response == 1: 
+					return self.launch_raw_in_terminal(path, hide)
+
+				# if "Display"
+				elif response == 2: 
+					pass
+
+				# if "Run"
+				elif response == 3:
+					return self.launch_raw(path, hide)
+
+				# if "Cancel"
+				else: 
+					return
+
 
 		return self.launch_raw("xdg-open '%s'" % path, hide)
 
@@ -2643,9 +2687,27 @@ class Cardapio(dbus.service.Object):
 
 		try:
 			subprocess.Popen(path, shell = True, cwd = self.home_folder_path)
-		except OSError, e:
+		except Exception, exception:
 			logging.error('Could not launch %s' % path)
-			logging.error(e)
+			logging.error(exception)
+			return False
+
+		if hide: self.hide()
+
+		return True
+
+
+	def launch_raw_in_terminal(self, path, hide = True):
+		"""
+		Run a command inside Gnome's default terminal
+		"""
+
+		try:
+			execute_terminal_shell(self.home_folder_path, path)
+
+		except Exception, exception:
+			logging.error('Could not launch %s' % path)
+			logging.error(exception)
 			return False
 
 		if hide: self.hide()
