@@ -431,6 +431,7 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'window size'                , None                     ) # format: [px, px]
 		self.read_config_option(s, 'splitter position'          , 0                        ) # int in pixels
 		self.read_config_option(s, 'show session buttons'       , False                    ) # bool
+		self.read_config_option(s, 'keep search results'        , False                    ) # bool
 		self.read_config_option(s, 'open on hover'              , False                    ) # bool
 		self.read_config_option(s, 'min search string length'   , 3                        ) # characters
 		self.read_config_option(s, 'menu rebuild delay'         , 10                       , force_update_from_version = [0,9,96]) # seconds
@@ -542,7 +543,10 @@ class Cardapio(dbus.service.Object):
 		# HACK: fix names of widgets to allow theming 
 		# (glade doesn't seem to properly add names to widgets anymore...)
 		for widget in self.builder.get_objects():
-			if widget == self.about_dialog: continue
+
+			# skip the about dialog or the app name will be overwritten!
+			if widget == self.about_dialog: continue 
+
 			if 'set_name' in dir(widget):
 				widget.set_name(gtk.Buildable.get_name(widget))
 
@@ -836,6 +840,7 @@ class Cardapio(dbus.service.Object):
 		self.set_widget_from_option('OptionAppletLabel', 'applet label')
 		self.set_widget_from_option('OptionAppletIcon', 'applet icon')
 		self.set_widget_from_option('OptionSessionButtons', 'show session buttons')
+		self.set_widget_from_option('OptionKeepResults', 'keep search results')
 		self.set_widget_from_option('OptionOpenOnHover', 'open on hover')
 
 		self.plugin_tree_model.clear()
@@ -894,6 +899,7 @@ class Cardapio(dbus.service.Object):
 		self.settings['applet label'] = self.get_object('OptionAppletLabel').get_text()
 		self.settings['applet icon'] = self.get_object('OptionAppletIcon').get_text()
 		self.settings['show session buttons'] = self.get_object('OptionSessionButtons').get_active()
+		self.settings['keep search results'] = self.get_object('OptionKeepResults').get_active()
 		self.settings['open on hover'] = self.get_object('OptionOpenOnHover').get_active()
 		self.setup_ui_from_gui_settings()
 
@@ -1350,7 +1356,9 @@ class Cardapio(dbus.service.Object):
 		if first_app_widget is not None:
 			first_app_widget.emit('clicked')
 
-		self.clear_search_entry()
+		if not self.settings['keep search results']:
+			self.clear_search_entry()
+			self.show_all_nonempty_sections() # clear the currently-pressed category
 
 
 	def on_searchentry_key_pressed(self, widget, event):
@@ -1590,8 +1598,9 @@ class Cardapio(dbus.service.Object):
 		self.save_dimensions()
 		self.window.hide()
 
-		self.clear_search_entry()
-		self.show_all_nonempty_sections()
+		if not self.settings['keep search results']:
+			self.clear_search_entry()
+			self.show_all_nonempty_sections() # clear the currently-pressed category
 
 
 	@dbus.service.method(dbus_interface = bus_name_str, in_signature = 'b', out_signature = None)
