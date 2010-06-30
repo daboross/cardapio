@@ -25,7 +25,7 @@ os.chdir('..')
 
 setup(
 	name         = 'Cardapio',
-	version      = '0.9.118',
+	version      = '0.9.119',
 	description  = 'A menu with search capabilities.',
 	author       = 'Thiago Teixeira',
 	author_email = 'tvst@hotmail.com',
