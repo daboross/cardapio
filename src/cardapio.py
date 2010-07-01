@@ -533,6 +533,7 @@ class Cardapio(dbus.service.Object):
 		self.right_session_pane        = self.get_object('RightSessionPane')
 		self.context_menu              = self.get_object('CardapioContextMenu')
 		self.app_context_menu          = self.get_object('AppContextMenu')
+		self.app_menu_separator        = self.get_object('AppMenuSeparator')
 		self.pin_menuitem              = self.get_object('PinMenuItem')
 		self.unpin_menuitem            = self.get_object('UnpinMenuItem')
 		self.add_side_pane_menuitem    = self.get_object('AddSidePaneMenuItem')
@@ -2495,10 +2496,20 @@ class Cardapio(dbus.service.Object):
 		Show or hide different context menu options depending on the widget
 		"""
 
-		if widget.app_info['type'] == 'callback': return
+		self.clicked_app = widget.app_info
+		
+		if widget.app_info['type'] == 'callback': 
+			self.pin_menuitem.hide()
+			self.unpin_menuitem.hide()
+			self.add_side_pane_menuitem.hide()
+			self.remove_side_pane_menuitem.hide()
+			self.open_folder_menuitem.hide()
+			self.app_menu_separator.hide()
+			return
 
 		already_pinned = False
 		already_on_side_pane = False
+		self.app_menu_separator.show()
 
 		for command in [app['command'] for app in self.settings['pinned items']]:
 			if command == widget.app_info['command']: 
@@ -2540,8 +2551,6 @@ class Cardapio(dbus.service.Object):
 				# only show if path that exists
 				if os.path.exists(self.unescape(canonical_path)):
 					self.open_folder_menuitem.show()
-
-		self.clicked_app = widget.app_info
 
 
 	def on_app_button_focused(self, widget, event):

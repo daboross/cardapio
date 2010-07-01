@@ -1051,7 +1051,7 @@ Rebuilding&#x2026;</property>
       </object>
     </child>
     <child>
-      <object class="GtkSeparatorMenuItem" id="menuitem5">
+      <object class="GtkSeparatorMenuItem" id="AppMenuSeparator">
         <property name="visible">True</property>
       </object>
     </child>
