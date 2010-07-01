@@ -1,10 +1,23 @@
-cardapio (0.9.120-ubuntu1) lucid; urgency=low
+cardapio (0.9.120-ubuntu1-maverick1) maverick; urgency=low
 
-  * fixed mounting of remote locations
-  * fixed critical bug where cardapio would not launch if config.ini had the
-    wrong permissions
+  * various bug fixes
 
- -- Thiago Teixeira <tvst@hotmail.com>  Wed, 30 Jun 2010 23:32:00 -0400
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 30 Jun 2010 23:30:00 -0400
+
+
+cardapio (0.9.120-ubuntu1-lucid1) lucid; urgency=low
+
+  * various bug fixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 30 Jun 2010 23:30:00 -0400
+
+
+cardapio (0.9.120-ubuntu1-karmic1) karmic; urgency=low
+
+  * various bug fixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 30 Jun 2010 23:30:00 -0400
+
 
 cardapio (0.9.119-ubuntu1) lucid; urgency=low
 
