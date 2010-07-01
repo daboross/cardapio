@@ -375,7 +375,15 @@ class Cardapio(dbus.service.Object):
 			logging.error('Error! Cannot create file "%s" because a folder with that name already exists!' % config_file_path)
 			sys.exit(1)
 
-		return open(config_file_path, mode)
+		try:
+			config_file = open(config_file_path, mode)
+
+		except Exception, exception:
+			logging.error('Could not read config file "%s":' % config_file_path)
+			logging.error(exception)
+			config_file = None
+
+		return config_file
 
 
 	def read_config_file(self):
@@ -392,8 +400,8 @@ class Cardapio(dbus.service.Object):
 			s = json.load(config_file)
 
 		except Exception, exception:
-			logging.warning('Could not read config file:')
-			logging.warning(exception)
+			logging.error('Could not read config file:')
+			logging.error(exception)
 
 		finally: 
 			config_file.close()
@@ -499,6 +507,11 @@ class Cardapio(dbus.service.Object):
 		self.settings['splitter position'] = self.get_object('MainSplitter').get_position()
 
 		config_file = self.get_config_file('w')
+
+		if config_file is None:
+			logging.error("Could not load config file for saving settings")
+			return
+
 		json.dump(self.settings, config_file, sort_keys = True, indent = 4)
 
 
