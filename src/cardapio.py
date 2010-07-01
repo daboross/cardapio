@@ -456,6 +456,12 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'side pane items'            , default_side_pane_items  )
 		self.read_config_option(s, 'active plugins'             , ['places', None, 'tracker', 'google']) 
 
+		# these are a bit of a hack:
+		self.read_config_option(s, 'handler for ftp paths'      , r"nautilus '%s'"         ) # a command line using %s
+		self.read_config_option(s, 'handler for sftp paths'     , r"nautilus '%s'"         ) # a command line using %s
+		self.read_config_option(s, 'handler for smb paths'      , r"nautilus '%s'"         ) # a command line using %s
+		# (see https://bugs.launchpad.net/bugs/593141)
+
 		self.settings['cardapio version'] = self.version
 
 		# clean up the config file whenever options are renamed between versions
@@ -2683,6 +2689,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		path = self.escape_quotes(self.unescape(path))
+		path_type, dummy = urllib2.splittype(path)
 
 		# if the file is executable, ask what to do
 		# TODO: make sure this is for NON-binary files
@@ -2715,6 +2722,9 @@ class Cardapio(dbus.service.Object):
 				else: 
 					return
 
+		elif path_type in ['ftp', 'sftp', 'smb']:
+			special_handler = self.settings['handler for %s paths' % path_type]
+			return self.launch_raw(special_handler % path, hide)
 
 		return self.launch_raw("xdg-open '%s'" % path, hide)
 
