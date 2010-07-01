@@ -12,7 +12,7 @@
     <property name="urgency_hint">True</property>
     <property name="decorated">False</property>
     <property name="mnemonics_visible">False</property>
-    <signal name="configure_event" handler="on_mainwindow_configure_event"/>
+    <signal name="configure_event" handler="save_dimensions"/>
     <signal name="destroy_event" handler="on_mainwindow_destroy"/>
     <signal name="destroy" handler="on_mainwindow_destroy"/>
     <signal name="size_allocate" handler="unblock_focus_out_event"/>
@@ -38,6 +38,7 @@
                   <object class="GtkHPaned" id="MainSplitter">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <signal name="accept_position" handler="save_dimensions"/>
                     <child>
                       <object class="GtkAlignment" id="SidePaneMargin">
                         <property name="visible">True</property>

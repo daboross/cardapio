@@ -41,6 +41,7 @@ try:
 	import json
 	import time
 	import gmenu
+	import signal
 	import locale
 	import urllib2
 	import gettext
@@ -50,7 +51,6 @@ try:
 	import subprocess
 	import gnomeapplet
 	import dbus, dbus.service
-	from signal import signal, SIGTERM
 	from xdg import BaseDirectory, DesktopEntry
 	from dbus.mainloop.glib import DBusGMainLoop
 	from distutils.sysconfig import get_python_lib
@@ -175,10 +175,11 @@ class Cardapio(dbus.service.Object):
 		# without need to quit cardapio first:
 		self.save_config_file()
 
-		signal(SIGTERM, self.quit)
+		signal.signal(signal.SIGTERM, self.on_mainwindow_destroy)
+		signal.signal(signal.SIGQUIT, self.on_mainwindow_destroy)
 
 
-	def on_mainwindow_destroy(self, widget):
+	def on_mainwindow_destroy(self, *dummy):
 		"""
 		Handler for when the Cardapio window is destroyed
 		"""
@@ -512,8 +513,6 @@ class Cardapio(dbus.service.Object):
 		"""
 		Saves the self.settings dict into the config file
 		"""
-
-		self.settings['splitter position'] = self.get_object('MainSplitter').get_position()
 
 		config_file = self.get_config_file('w')
 
@@ -1111,14 +1110,6 @@ class Cardapio(dbus.service.Object):
 			return True
 
 
-	def on_mainwindow_configure_event(self, widget, event):
-		"""
-		Save the window size whenever the user resizes Cardapio
-		"""
-
-		self.save_dimensions()
-
-
 	def on_icon_theme_changed(self, icon_theme):
 		"""
 		Rebuild the Cardapio UI whenever the icon theme changes
@@ -1550,12 +1541,14 @@ class Cardapio(dbus.service.Object):
 			self.window.resize(*self.settings['window size'])
 
 
-	def save_dimensions(self):
+	def save_dimensions(self, *dummy):
 		"""
 		Save Cardapio's size into the user preferences
 		"""
 
 		self.settings['window size'] = self.window.get_size()
+		self.settings['splitter position'] = self.get_object('MainSplitter').get_position()
+		self.save_config_file()
 
 
 	def set_message_window_visible(self, state = True):
