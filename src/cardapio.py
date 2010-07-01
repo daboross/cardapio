@@ -50,6 +50,7 @@ try:
 	import subprocess
 	import gnomeapplet
 	import dbus, dbus.service
+	from signal import signal, SIGTERM
 	from xdg import BaseDirectory, DesktopEntry
 	from dbus.mainloop.glib import DBusGMainLoop
 	from distutils.sysconfig import get_python_lib
@@ -173,6 +174,8 @@ class Cardapio(dbus.service.Object):
 		# this is useful so that the user can edit the config file on first-run 
 		# without need to quit cardapio first:
 		self.save_config_file()
+
+		signal(SIGTERM, self.quit)
 
 
 	def on_mainwindow_destroy(self, widget):
