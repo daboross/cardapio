@@ -17,7 +17,7 @@ for root, dir, files in os.walk('src/plugins'):
 
 setup(
     name         = 'Cardapio',
-    version      = '0.9.120',
+    version      = '0.9.121',
     description  = 'A menu with search capabilities.',
     author       = 'Thiago Teixeira',
     author_email = 'tvst@hotmail.com',

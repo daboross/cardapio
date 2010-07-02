@@ -117,9 +117,9 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.120'
+	version = '0.9.121'
 
-	core_plugins = ['applications', 'places', 'tracker', 'tracker_fts', 'google', 'google_localized']
+	core_plugins = ['applications', 'places', 'tracker', 'tracker_fts', 'google', 'google_localized', 'zg_recent_documents']
 	required_plugins = ['applications', 'places']
 
 	APP_BUTTON = 0
@@ -888,7 +888,7 @@ class Cardapio(dbus.service.Object):
 
 			active = (basename in self.settings['active plugins'])
 
-			if basename is 'applications':
+			if basename == 'applications':
 				name = _('Application menu')
 				title = '<b>%s</b>\n%s' % (name, _('(cannot be deactivated)'))
 

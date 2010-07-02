@@ -1,3 +1,24 @@
+cardapio (0.9.121-ubuntu1-lucid1) lucid; urgency=low
+
+  * added virtual box plugin and fixed a few bugs
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 1 Jul 2010 23:00:00 -0400
+
+
+cardapio (0.9.121-ubuntu1-maverick1) maverick; urgency=low
+
+  * added virtual box plugin and fixed a few bugs
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 1 Jul 2010 23:00:00 -0400
+
+
+cardapio (0.9.121-ubuntu1-karmic1) karmic; urgency=low
+
+  * added virtual box plugin and fixed a few bugs
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 1 Jul 2010 23:00:00 -0400
+
+
 cardapio (0.9.120-ubuntu1-maverick1) maverick; urgency=low
 
   * various bug fixes
