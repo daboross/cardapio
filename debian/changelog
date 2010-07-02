@@ -1,3 +1,10 @@
+cardapio (0.9.122-ubuntu1-lucid1) lucid; urgency=low
+
+  * added zeitgeist plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 2 Jul 2010 15:10:00 -0400
+
+
 cardapio (0.9.121-ubuntu1-lucid1) lucid; urgency=low
 
   * added virtual box plugin and fixed a few bugs

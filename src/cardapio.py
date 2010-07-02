@@ -117,7 +117,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.121'
+	version = '0.9.122'
 
 	core_plugins = ['applications', 'places', 'tracker', 'tracker_fts', 'google', 'google_localized', 'zg_recent_documents']
 	required_plugins = ['applications', 'places']
