@@ -478,11 +478,17 @@
   </object>
   <object class="GtkListStore" id="PluginListstore">
     <columns>
-      <!-- column-name plugin_name -->
+      <!-- column-name basename -->
       <column type="gchararray"/>
       <!-- column-name active -->
       <column type="gboolean"/>
       <!-- column-name title -->
+      <column type="gchararray"/>
+      <!-- column-name is core plugin -->
+      <column type="gboolean"/>
+      <!-- column-name name -->
+      <column type="gchararray"/>
+      <!-- column-name tooltip -->
       <column type="gchararray"/>
     </columns>
   </object>
@@ -755,10 +761,29 @@
                                 <property name="headers_clickable">False</property>
                                 <property name="reorderable">True</property>
                                 <property name="rules_hint">True</property>
-                                <property name="search_column">1</property>
+                                <property name="search_column">4</property>
+                                <property name="show_expanders">False</property>
+                                <property name="tooltip_column">5</property>
+                                <child>
+                                  <object class="GtkTreeViewColumn" id="treeviewcolumn3">
+                                    <property name="sizing">autosize</property>
+                                    <property name="title">supported</property>
+                                    <property name="alignment">0.5</property>
+                                    <child>
+                                      <object class="GtkCellRendererPixbuf" id="cellrendererpixbuf1">
+                                        <property name="icon_name">emblem-system</property>
+                                      </object>
+                                      <attributes>
+                                        <attribute name="visible">3</attribute>
+                                      </attributes>
+                                    </child>
+                                  </object>
+                                </child>
                                 <child>
                                   <object class="GtkTreeViewColumn" id="treeviewcolumn1">
                                     <property name="sizing">autosize</property>
+                                    <property name="title">active</property>
+                                    <property name="alignment">0.5</property>
                                     <child>
                                       <object class="GtkCellRendererToggle" id="cellrenderertoggle1">
                                         <signal name="toggled" handler="on_plugin_state_toggled"/>
@@ -771,6 +796,8 @@
                                 </child>
                                 <child>
                                   <object class="GtkTreeViewColumn" id="treeviewcolumn2">
+                                    <property name="title">description</property>
+                                    <property name="expand">True</property>
                                     <child>
                                       <object class="GtkCellRendererText" id="cellrenderertext1">
                                         <property name="wrap_mode">word-char</property>

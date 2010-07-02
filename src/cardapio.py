@@ -119,6 +119,9 @@ class Cardapio(dbus.service.Object):
 
 	version = '0.9.120'
 
+	core_plugins = ['applications', 'places', 'tracker', 'tracker_fts', 'google', 'google_localized']
+	required_plugins = ['applications', 'places']
+
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
 		self.create_config_folder()
@@ -232,7 +235,7 @@ class Cardapio(dbus.service.Object):
 		Creates the dict self.plugin_database indexed by the plugin filename's base name.
 		"""
 
-		self.plugin_database = {None : None}
+		self.plugin_database = {}
 
 		plugin_dirs = [
 			os.path.join(cardapio_path, 'plugins'), 
@@ -275,7 +278,7 @@ class Cardapio(dbus.service.Object):
 
 		for basename in self.settings['active plugins']:
 
-			if basename is None or basename == 'places': continue
+			if basename == 'applications' or basename == 'places': continue
 
 			basename = str(basename)
 			plugin_class = self.get_plugin_class(basename)
@@ -455,7 +458,7 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'applet icon'                , 'start-here'             , override_empty_str = True) # string (either a path to the icon, or an icon name)
 		self.read_config_option(s, 'pinned items'               , []                       ) 
 		self.read_config_option(s, 'side pane items'            , default_side_pane_items  )
-		self.read_config_option(s, 'active plugins'             , ['places', None, 'tracker', 'google']) 
+		self.read_config_option(s, 'active plugins'             , ['places', 'applications', 'tracker', 'google']) 
 
 		# these are a bit of a hack:
 		self.read_config_option(s, 'handler for ftp paths'      , r"nautilus '%s'"         ) # a command line using %s
@@ -465,21 +468,25 @@ class Cardapio(dbus.service.Object):
 
 		self.settings['cardapio version'] = self.version
 
-		# clean up the config file whenever options are renamed between versions
+		# clean up the config file whenever options are changed between versions
 
 		if 'system pane' in self.settings:
 			self.settings['side pane'] = self.settings['system pane']
 			self.settings.pop('system pane')
 
-		special_names = [None, 'places']
+		if None in self.settings['active plugins']:
+			i = self.settings['active plugins'].index(None)
+			self.settings['active plugins'][i] = 'applications'
 
-		for special_name in special_names:
+		# make sure required plugins are in the plugin list
 
-			if special_name not in self.settings['active plugins']:
-				self.settings['active plugins'] = [special_name] + self.settings['active plugins']
+		for required_plugin in self.required_plugins:
 
-			if len([basename for basename in self.settings['active plugins'] if basename == special_name]):
-				self.settings['active plugins'] = [special_name] + [basename for basename in self.settings['active plugins'] if basename != special_name]
+			if required_plugin not in self.settings['active plugins']:
+				self.settings['active plugins'] = [required_plugin] + self.settings['active plugins']
+
+			if len([basename for basename in self.settings['active plugins'] if basename == required_plugin]):
+				self.settings['active plugins'] = [required_plugin] + [basename for basename in self.settings['active plugins'] if basename != required_plugin]
 
 
 	def read_config_option(self, user_settings, key, val, override_empty_str = False, force_update_from_version = None):
@@ -876,15 +883,18 @@ class Cardapio(dbus.service.Object):
 
 			active = (basename in self.settings['active plugins'])
 
-			if basename is None:
-				title = _('<b>Application menu</b>') + '\n' + _('(cannot be deactivated)')
+			if basename is 'applications':
+				name = _('Application menu')
+				title = '<b>%s</b>\n%s' % (name, _('(cannot be deactivated)'))
 
 			elif basename == 'places':
-				title = _('<b>Places menu</b>') + '\n' + _('(cannot be deactivated)')
+				name = _('Places menu')
+				title = '<b>%s</b>\n%s' % (name, _('(cannot be deactivated)'))
 
 			else:
 
 				plugin_info = self.plugin_database[basename]
+				name = plugin_info['name']
 
 				params = {
 						'plugin_name' : plugin_info['name'],
@@ -896,7 +906,14 @@ class Cardapio(dbus.service.Object):
 						( _('by %(plugin_author)s')      % params ) + \
 						( '</i>\n%(plugin_description)s' % params )
 
-			self.plugin_tree_model.append([basename, active, title])
+			is_core_plugin = (basename in self.core_plugins)
+
+			if is_core_plugin:
+				tooltip = _('This is a core plugin')
+			else: 
+				tooltip = _('This is a community-supported plugin')
+
+			self.plugin_tree_model.append([basename, active, title, is_core_plugin, name, tooltip])
 
 		self.options_dialog.show()
 
@@ -956,7 +973,7 @@ class Cardapio(dbus.service.Object):
 		iter_ = self.plugin_tree_model.get_iter(path)
 		basename = self.plugin_tree_model.get_value(iter_, 0)
 
-		if basename is None or basename == 'places': return
+		if basename == 'applications' or basename == 'places': return
 
 		self.plugin_tree_model.set_value(iter_, 1, not cell.get_active())	
 
@@ -2121,7 +2138,7 @@ class Cardapio(dbus.service.Object):
 
 		for basename in self.settings['active plugins']:
 
-			if basename is None:
+			if basename == 'applications':
 				self.build_applications_list()
 				self.add_session_slab()
 				self.add_system_slab()
