@@ -122,6 +122,11 @@ class Cardapio(dbus.service.Object):
 	core_plugins = ['applications', 'places', 'tracker', 'tracker_fts', 'google', 'google_localized']
 	required_plugins = ['applications', 'places']
 
+	APP_BUTTON = 0
+	CATEGORY_BUTTON = 1
+	SESSION_BUTTON = 2
+	SIDEPANE_BUTTON = 3
+
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
 		self.create_config_folder()
@@ -746,7 +751,7 @@ class Cardapio(dbus.service.Object):
 		self.app_list = []      # holds a list of all apps for searching purposes
 		self.section_list = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
 
-		button = self.add_sidebar_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'))
+		button = self.add_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_sections_sidebar_button = button 
 		self.set_sidebar_button_active(button, True)
@@ -1964,7 +1969,7 @@ class Cardapio(dbus.service.Object):
 			if slab == self.sidepane_section_slab:
 
 				app_info = button.app_info
-				button = self.add_sidebar_button(app['name'], app['icon name'], self.sidepane, tooltip = app['tooltip'], use_toggle_button = False)
+				button = self.add_button(app['name'], app['icon name'], self.sidepane, tooltip = app['tooltip'], button_type = Cardapio.SIDEPANE_BUTTON)
 				button.app_info = app_info
 				button.connect('clicked', self.on_app_button_clicked)
 				button.connect('button-press-event', self.on_app_button_button_pressed)
@@ -2012,7 +2017,7 @@ class Cardapio(dbus.service.Object):
 
 			button = self.add_app_button(item[0], item[2], self.session_section_contents, 'raw', item[3], tooltip = item[1], app_list = self.app_list)
 			app_info = button.app_info
-			button = self.add_button(item[0], item[2], item[4], tooltip = item[1], is_app_button = True)
+			button = self.add_button(item[0], item[2], item[4], tooltip = item[1], button_type = Cardapio.SESSION_BUTTON)
 			button.app_info = app_info
 			button.connect('clicked', self.on_app_button_clicked)
 
@@ -2037,7 +2042,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		# add category to category pane
-		sidebar_button = self.add_sidebar_button(title_str, icon_name, self.category_pane, tooltip = tooltip)
+		sidebar_button = self.add_button(title_str, icon_name, self.category_pane, tooltip = tooltip, button_type = Cardapio.CATEGORY_BUTTON)
 
 		# add category to application pane
 		section_slab, section_contents, dummy = self.add_application_section(title_str)
@@ -2172,21 +2177,12 @@ class Cardapio(dbus.service.Object):
 		self.search_entry.set_text('')
 
 
-	def add_sidebar_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = True):
-		"""
-		Adds a button to the sidebar. This could be either a section button or
-		one of the "left pane" buttons.
-		"""
-
-		return self.add_button(button_str, icon_name, parent_widget, tooltip, use_toggle_button = use_toggle_button, is_app_button = False)
-
-
 	def add_app_button(self, button_str, icon_name, parent_widget, command_type, command, tooltip = '', app_list = None):
 		"""
-		Adds a new button to the app bar.
+		Adds a new button to the app pane
 		"""
 
-		button = self.add_button(button_str, icon_name, parent_widget, tooltip, is_app_button = True)
+		button = self.add_button(button_str, icon_name, parent_widget, tooltip, button_type = Cardapio.APP_BUTTON)
 
 		if app_list is not None:
 
@@ -2224,12 +2220,12 @@ class Cardapio(dbus.service.Object):
 		return button
 
 
-	def add_button(self, button_str, icon_name, parent_widget, tooltip = '', use_toggle_button = None, is_app_button = True):
+	def add_button(self, button_str, icon_name, parent_widget, tooltip = '', button_type = APP_BUTTON):
 		"""
 		Adds a button to a parent container
 		"""
 
-		if is_app_button or use_toggle_button == False:
+		if button_type != Cardapio.CATEGORY_BUTTON:
 			button = gtk.Button()
 		else:
 			button = gtk.ToggleButton()
@@ -2238,15 +2234,20 @@ class Cardapio(dbus.service.Object):
 
 		label = gtk.Label(button_str)
 
-		if is_app_button:
+		if button_type == Cardapio.APP_BUTTON:
 			icon_size_pixels = self.icon_size_app
 			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
+
 			# TODO: figure out how to set max width so that it is the best for
 			# the window and font sizes
 			#label.set_ellipsize(pango.ELLIPSIZE_END)
 			#label.set_max_width_chars(20)
-		else:
+
+		elif button_type == Cardapio.CATEGORY_BUTTON:
 			icon_size_pixels = self.icon_size_category
+
+		else:
+			icon_size_pixels = self.icon_size_app
 
 		icon_pixbuf = self.get_icon_pixbuf(icon_name, icon_size_pixels)
 		icon = gtk.image_new_from_pixbuf(icon_pixbuf)
