@@ -5,7 +5,7 @@ from glib import GError
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = 'Thiago Teixeira'
-	name               = _('Google plugin')
+	name               = _('Google')
 	description        = _('Perform quick Google searches in <b>all</b> languages')
 
 	url                = ''
@@ -18,6 +18,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	category_name      = _('Web Results')
 	category_icon      = 'system-search'
+	category_tooltip   = _('Results found with Google')
 	hide_from_sidebar  = True
 
 

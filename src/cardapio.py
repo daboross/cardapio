@@ -585,6 +585,11 @@ class Cardapio(dbus.service.Object):
 				widget.set_name(gtk.Buildable.get_name(widget))
 
 		self.icon_theme = gtk.icon_theme_get_default()
+
+		uninstalled_icon_path = '/usr/share/app-install/icons/'
+		if os.path.exists(uninstalled_icon_path):
+			self.icon_theme.append_search_path(uninstalled_icon_path)
+
 		self.icon_theme.connect('changed', self.on_icon_theme_changed)
 		self.icon_size_app = gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
 		self.icon_size_category = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
@@ -2155,7 +2160,7 @@ class Cardapio(dbus.service.Object):
 			else:
 				plugin = self.plugin_database[basename]['instance']
 				if plugin is None: continue
-				section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, hide = plugin.hide_from_sidebar)
+				section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hide = plugin.hide_from_sidebar)
 				plugin.section_slab = section_slab
 				plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
 
@@ -2243,7 +2248,7 @@ class Cardapio(dbus.service.Object):
 			#label.set_ellipsize(pango.ELLIPSIZE_END)
 			#label.set_max_width_chars(20)
 
-		elif button_type == Cardapio.CATEGORY_BUTTON:
+		elif button_type == Cardapio.CATEGORY_BUTTON or button_type == Cardapio.SIDEPANE_BUTTON:
 			icon_size_pixels = self.icon_size_category
 
 		else:
@@ -3145,5 +3150,4 @@ __builtin__.dbus = dbus
 __builtin__.CardapioPluginInterface = CardapioPluginInterface
 __builtin__.logging = logging
 __builtin__.subprocess = subprocess
-
 

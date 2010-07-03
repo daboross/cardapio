@@ -3,7 +3,7 @@ import re
 class CardapioPlugin (CardapioPluginInterface):
 
 	author = 'Clifton Mulkey'
-	name = _('VirtualBox plugin')
+	name = _('VirtualBox')
 	description = _('Search for and start VirtualBox virtual machines from the menu')
 
 	# not used in the GUI yet:
@@ -15,8 +15,9 @@ class CardapioPlugin (CardapioPluginInterface):
 
 	search_delay_type = None
 
-	category_name = _('Virtual Machines')
-	category_icon = 'VBox'
+	category_name     = _('Virtual Machines')
+	category_icon     = 'VBox'
+	category_tooltip  = _('Your VirtualBox virtual machines')
 
 	hide_from_sidebar = False
 	# Set to "False" to show the "Virtual Machines" category all the time

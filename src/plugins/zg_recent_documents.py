@@ -13,7 +13,7 @@ except Exception, exception:
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = 'Thiago Teixeira'
-	name               = _('Recent documents plugin')
+	name               = _('Recent documents')
 	description        = _('Search for your most recently used files.')
 
 	url                = ''
@@ -26,6 +26,8 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	category_name      = _('Recent Documents')
 	category_icon      = 'document-open-recent'
+	category_tooltip   = _('Files that you have used recently')
+
 	hide_from_sidebar  = True
 
 	recency_in_days = 30

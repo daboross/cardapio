@@ -5,7 +5,7 @@ from glib import GError
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = 'Thiago Teixeira'
-	name               = _('Localized Google plugin')
+	name               = _('Google localized results')
 	description        = _("Perform quick Google searches <b>limited to</b> the system's default language")
 
 	url                = ''
@@ -18,6 +18,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	category_name      = _('Localized Web Results')
 	category_icon      = 'system-search'
+	category_tooltip  = _('Results found with Google in you system language')
 	hide_from_sidebar  = True
 
 

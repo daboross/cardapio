@@ -3,7 +3,7 @@ import urllib2, os
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = 'Thiago Teixeira'
-	name               = _('Tracker full text search plugin')
+	name               = _('Tracker full text search')
 	description        = _('Search <b>inside</b> local files and folders indexed with Tracker')
 
 	url                = ''
@@ -16,7 +16,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	category_name      = _('Results within files')
 	category_icon      = 'system-search'
-	category_position  = 'end'
+	category_tooltip   = _('Results found inside the files in your computer')
 	hide_from_sidebar  = True
 
 

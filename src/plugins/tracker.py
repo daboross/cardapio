@@ -3,7 +3,7 @@ import urllib2, os
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = 'Thiago Teixeira'
-	name               = _('Tracker plugin')
+	name               = _('Tracker')
 	description        = _('Search local files and folders indexed with Tracker')
 
 	url                = ''
@@ -16,6 +16,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	category_name      = _('Local Results')
 	category_icon      = 'system-search'
+	category_tooltip   = _('Results found in your computer')
 	hide_from_sidebar  = True
 
 
