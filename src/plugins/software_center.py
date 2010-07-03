@@ -1,3 +1,5 @@
+import_error = None
+
 try:
 	import xapian
 	import sys
