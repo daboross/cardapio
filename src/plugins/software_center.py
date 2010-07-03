@@ -122,24 +122,24 @@ class CardapioPlugin (CardapioPluginInterface):
 			if self.apps_filter.filter(doc, pkgname) and summary:
 				icon_name = os.path.splitext(doc.get_value(self.XAPIAN_VALUE_ICON))[0]
 
-			if not icon_name or icon_name[0] == '_':
-				icon_name = 'applications-other'
+				if not icon_name:
+					icon_name = 'applications-other'
 
-			tooltip = self.default_tooltip_str % name 
+				tooltip = self.default_tooltip_str % name 
 
-			if summary:
-				tooltip += '\n' + self.summary_str + ' ' + summary
+				if summary:
+					tooltip += '\n' + self.summary_str + ' ' + summary
 
-			item = {
-				'name'      : name,
-				'tooltip'   : tooltip,
-				'icon name' : icon_name ,
-				'type'      : 'raw',
-				'command'   : "software-center '%s'" % pkgname
-				}
+				item = {
+					'name'      : name,
+					'tooltip'   : tooltip,
+					'icon name' : icon_name ,
+					'type'      : 'raw',
+					'command'   : "software-center '%s'" % pkgname
+					}
 
-			results.append(item)
-			i += 1
+				results.append(item)
+				i += 1
 
 		if results:
 			results.append(self.action)
