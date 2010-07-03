@@ -18,7 +18,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '0.9'
+	version            = '0.9b'
 
 	plugin_api_version = 1.2
 

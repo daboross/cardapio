@@ -119,7 +119,17 @@ class Cardapio(dbus.service.Object):
 
 	version = '0.9.122'
 
-	core_plugins = ['applications', 'places', 'tracker', 'tracker_fts', 'google', 'google_localized', 'zg_recent_documents']
+	core_plugins = [
+			'applications', 
+			'google', 
+			'google_localized', 
+			'places', 
+			'software_center',
+			'tracker', 
+			'tracker_fts', 
+			'zg_recent_documents',
+			]
+
 	required_plugins = ['applications', 'places']
 
 	APP_BUTTON = 0
@@ -261,11 +271,12 @@ class Cardapio(dbus.service.Object):
 						if type(plugin_class) is str: continue
 
 						self.plugin_database[basename] = {
-							'name' : plugin_class.name,
-							'author' : plugin_class.author,
-							'description' : plugin_class.description,
-							'category name' : plugin_class.category_name,
-							'category icon' : plugin_class.category_icon,
+							'name'              : plugin_class.name,
+							'author'            : plugin_class.author,
+							'description'       : plugin_class.description,
+							'version'           : plugin_class.version,
+							'category name'     : plugin_class.category_name,
+							'category icon'     : plugin_class.category_icon,
 							'hide from sidebar' : plugin_class.hide_from_sidebar,
 							'instance' : None,
 							}
@@ -911,6 +922,9 @@ class Cardapio(dbus.service.Object):
 						'plugin_author': plugin_info['author'],
 						'plugin_description': plugin_info['description'],
 						}
+
+				if self.plugin_database[basename]['version'][-1] == 'b':
+					params['plugin_name'] += ' (beta)'
 
 				title = ( '<b>%(plugin_name)s</b>\n<i>'  % params ) + \
 						( _('by %(plugin_author)s')      % params ) + \
