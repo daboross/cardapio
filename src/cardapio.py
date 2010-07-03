@@ -1072,6 +1072,7 @@ class Cardapio(dbus.service.Object):
 
 		if not self.focus_out_blocked:
 			self.window.handler_block_by_func(self.on_mainwindow_focus_out)
+			self.window.handler_block_by_func(self.on_mainwindow_cursor_leave)
 			self.focus_out_blocked = True
 
 
@@ -1082,6 +1083,7 @@ class Cardapio(dbus.service.Object):
 
 		if self.focus_out_blocked:
 			self.window.handler_unblock_by_func(self.on_mainwindow_focus_out)
+			self.window.handler_unblock_by_func(self.on_mainwindow_cursor_leave)
 			self.focus_out_blocked = False
 
 
