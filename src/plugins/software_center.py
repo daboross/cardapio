@@ -26,6 +26,8 @@ class CardapioPlugin (CardapioPluginInterface):
 	category_icon     = 'softwarecenter'
 	category_tooltip  = _('Software available to install in your system')
 
+	fallback_icon     = 'applications-other'
+
 	hide_from_sidebar = True 		
 
 

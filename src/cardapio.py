@@ -1330,7 +1330,7 @@ class Cardapio(dbus.service.Object):
 		for result in results:
 
 			icon_name = result['icon name']
-			fallback_icon = 'text-x-generic'
+			fallback_icon = plugin.fallback_icon or 'text-x-generic'
 
 			if icon_name == 'inode/symlink':
 				icon_name = None
@@ -2997,6 +2997,8 @@ class CardapioPluginInterface:
 	category_name    = ''
 	category_icon    = ''
 	category_tooltip = ''
+
+	fallback_icon    = ''
 
 	hide_from_sidebar = True
 
