@@ -1,8 +1,11 @@
-import xapian
-import sys
-import apt
-import os
-#from gtk import icon_theme_get_default
+try:
+	import xapian
+	import sys
+	import apt
+	import os
+
+except Exception, exception:
+	import_error = exception
 
 class CardapioPlugin (CardapioPluginInterface):
 
@@ -37,6 +40,11 @@ class CardapioPlugin (CardapioPluginInterface):
 		self.handle_search_error = handle_search_error
 		self.num_search_results = settings['search results limit']
 		
+		if import_error:
+			self.write_to_log(self, 'Could not import certain modules', is_error = True)
+			self.write_to_log(self, import_error, is_error = True)
+			return
+
 		software_center_path = '/usr/share/software-center'
 
 		if not os.path.exists(software_center_path):
@@ -52,7 +60,7 @@ class CardapioPlugin (CardapioPluginInterface):
 
 		except Exception, exception:
 			self.write_to_log(self, 'Could not load the software center modules', is_error = True)
-			self.write_to_log(self, exception)
+			self.write_to_log(self, exception, is_error = True)
 			return
 
 		cache = apt.Cache()
