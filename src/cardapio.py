@@ -469,6 +469,7 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'search results limit'       , 5                        ) # results
 		self.read_config_option(s, 'local search update delay'  , 100                      , force_update_from_version = [0,9,96]) # msec
 		self.read_config_option(s, 'remote search update delay' , 250                      , force_update_from_version = [0,9,96]) # msec
+		self.read_config_option(s, 'autohide delay'             , 250                      ) # msec
 		self.read_config_option(s, 'keybinding'                 , '<Super>space'           ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
 		self.read_config_option(s, 'applet label'               , Cardapio.distro_name     ) # string
 		self.read_config_option(s, 'applet icon'                , 'start-here'             , override_empty_str = True) # string (either a path to the icon, or an icon name)
@@ -706,14 +707,17 @@ class Cardapio(dbus.service.Object):
 		if 'applet_press_handler' in dir(self):
 			self.panel_button.disconnect(self.applet_press_handler)
 			self.panel_button.disconnect(self.applet_enter_handler)
+			self.panel_button.disconnect(self.applet_leave_handler)
 
 		if self.settings['open on hover']:
 			self.applet_press_handler = self.panel_button.connect('button-press-event', self.hide)
 			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', self.show)
+			self.applet_leave_handler = self.panel_button.connect('leave-notify-event', self.on_mainwindow_cursor_leave)
 
 		else:
 			self.applet_press_handler = self.panel_button.connect('button-press-event', self.on_panel_button_toggled)
 			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', lambda x, y: True)
+			self.applet_leave_handler = self.panel_button.connect('leave-notify-event', lambda x, y: True)
 
 
 	def setup_ui_from_all_settings(self):
@@ -1116,7 +1120,7 @@ class Cardapio(dbus.service.Object):
 
 		if self.panel_applet is not None:
 
-			applet_x, applet_y, dummy = self.panel_applet.window.get_pointer()
+			cursor_x, cursor_y, dummy = self.panel_applet.window.get_pointer()
 			dummy, dummy, applet_w, applet_h = self.panel_applet.get_allocation()
 
 			# Make sure clicking the applet button doesn't cause a focus-out event.
@@ -1125,7 +1129,7 @@ class Cardapio(dbus.service.Object):
 			# So by ignoring this focus-out we actually make sure that Cardapio
 			# will be hidden after all. Silly.
 
-			if self.panel_applet is not None and (0 <= applet_x <= applet_w and 0 <= applet_y <= applet_h): 
+			if self.panel_applet is not None and (0 <= cursor_x <= applet_w and 0 <= cursor_y <= applet_h): 
 				return
 
 		# If the last app was opened in the background, make sure Cardapio
@@ -1138,6 +1142,16 @@ class Cardapio(dbus.service.Object):
 			return
 
 		self.hide()
+
+
+	def on_mainwindow_cursor_leave(self, widget, event):
+		"""
+		Handler for when the cursor leaves the Cardapio window.
+		If using 'open on hover', this hides the Cardapio window after a delay.
+		"""
+
+		if self.settings['open on hover']:
+			glib.timeout_add(self.settings['autohide delay'], self.hide_if_mouse_away)
 
 
 	def on_mainwindow_delete_event(self, widget, event):
@@ -1659,6 +1673,8 @@ class Cardapio(dbus.service.Object):
 			self.clear_search_entry()
 			self.untoggle_and_show_all_sections()
 
+		return False # used for when hide() is called from a timer
+
 
 	@dbus.service.method(dbus_interface = bus_name_str, in_signature = 'b', out_signature = None)
 	def show_hide(self, show_near_mouse = False):
@@ -1673,6 +1689,39 @@ class Cardapio(dbus.service.Object):
 
 		if self.visible: self.hide()
 		else: self.show(show_near_mouse = show_near_mouse)
+
+
+	def hide_if_mouse_away(self):
+		"""
+		Hide the window if the cursor is *not* on top of it
+		"""
+
+		root_window = gtk.gdk.get_default_root_window()
+		mouse_x, mouse_y, dummy = root_window.get_pointer()
+
+		dummy, dummy, window_width, window_height = self.window.get_allocation()
+		window_x, window_y = self.window.get_position()
+
+		cursor_in_window_x = (window_x <= mouse_x <= window_x + window_width)
+		cursor_in_window_y = (window_y <= mouse_y <= window_y + window_height)
+
+		if self.panel_button:
+
+			panel = self.panel_button.get_toplevel().window
+			panel_x, panel_y = panel.get_origin()
+			applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
+			applet_x += panel_x
+			applet_y += panel_y
+			cursor_in_applet_x = (applet_x <= mouse_x <= applet_x + applet_width)
+			cursor_in_applet_y = (applet_y <= mouse_y <= applet_y + applet_height)
+
+		else:
+			cursor_in_applet_x = cursor_in_applet_y = True
+
+		if (cursor_in_window_x and cursor_in_window_y) or (cursor_in_applet_x and cursor_in_applet_y):
+			return
+
+		self.hide()
 
 
 	def show_window_on_top(self, window):

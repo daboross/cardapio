@@ -11,22 +11,22 @@ except Exception, exception:
 
 class CardapioPlugin (CardapioPluginInterface):
 
-	author = 'Clifton Mulkey'
-	name = _('Software Center')
-	description = _('Search for new applications in the Software Center')
+	author             = 'Clifton Mulkey'
+	name               = _('Software Center')
+	description        = _('Search for new applications in the Software Center')
 
-	url = ''
-	help_text = ''
-	version = '1.0'
+	url                = ''
+	help_text          = ''
+	version            = '1.0'
 
-	plugin_api_version = 1.2 
+	plugin_api_version = 1.2
 
-	search_delay_type = 'local search update delay'
-	category_name     = _('Uninstalled Software')
-	category_icon     = 'softwarecenter'
-	category_tooltip  = _('Software available to install in your system')
+	search_delay_type  = 'local search update delay'
+	category_name      = _('Uninstalled Software')
+	category_icon      = 'softwarecenter'
+	category_tooltip   = _('Software available to install in your system')
 
-	fallback_icon     = 'applications-other'
+	fallback_icon      = 'applications-other'
 
 	hide_from_sidebar = True 		
 
