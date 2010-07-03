@@ -108,7 +108,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 			try:
 				fts_results, count = self.fts.Search(
-						self.search_query, 
+						self.search_query + '*', 
 						self.time_range, 
 						[], 0, self.num_search_results, 2)
 
