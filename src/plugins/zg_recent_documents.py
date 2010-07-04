@@ -1,3 +1,4 @@
+from commands import getoutput
 import urllib2, os
 
 plugin_exception = None
@@ -67,6 +68,17 @@ class CardapioPlugin(CardapioPluginInterface):
 			self.write_to_log(self, exception)
 			return 
 
+		self.have_sezen = (len(getoutput('which sezen')) != 0)
+
+		self.action_command = r"sezen '%s'"
+		self.action = {
+			'name'      : _('Show additional results'),
+			'tooltip'   : _('Show additional search results in Sezen'),
+			'icon name' : 'system-search',
+			'type'      : 'callback',
+			'command'   : self.more_results_action,
+			}
+
 		self.time_range = datamodel.TimeRange.always()
 
 		self.event_template = datamodel.Event()
@@ -125,14 +137,14 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		for event in all_events:
 
-			if len(urls_seen) > self.num_search_results: break
+			if len(urls_seen) >= self.num_search_results: break
 
 			for subject in event.get_subjects():
 
 				dummy, canonical_path = urllib2.splittype(subject.uri)
 				parent_name, child_name = os.path.split(canonical_path)
 
-				if len(urls_seen) > self.num_search_results: break
+				if len(urls_seen) >= self.num_search_results: break
 				if canonical_path in urls_seen: continue
 				urls_seen.add(canonical_path)
 
@@ -146,6 +158,21 @@ class CardapioPlugin(CardapioPluginInterface):
 
 				parsed_results.append(item)
 
+
+		# TODO: Waiting for Sezen to support command-line arguments...
+		#if parsed_results and self.have_sezen:
+		#	parsed_results.append(self.action)
+
 		self.cardapio_result_handler(self, parsed_results)
+
+
+	def more_results_action(self, text):
+
+		try:
+			subprocess.Popen(self.action_command % text, shell = True)
+
+		except OSError, e:
+			write_to_log(self, 'Error launching plugin action.', is_error = True)
+			write_to_log(self, e, is_error = True)
 
 

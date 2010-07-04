@@ -38,7 +38,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.cardapio_results_handler = handle_search_result
 		self.cardapio_error_handler = handle_search_error
 
-		self.action_command = r'tracker-search-tool %s'
+		self.action_command = r"tracker-search-tool '%s'"
 		self.action = {
 			'name'      : _('Show additional results'),
 			'tooltip'   : _('Show additional search results in the Tracker search tool'),
