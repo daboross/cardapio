@@ -69,8 +69,10 @@ class CardapioPlugin(CardapioPluginInterface):
 			return 
 
 		self.have_sezen = (len(getoutput('which sezen')) != 0)
+		if not self.have_sezen:
+			self.write_to_log(self, 'Sezen not found, so you will not see the "Show additional results" button.')
 
-		self.action_command = r"sezen '%s'"
+		self.action_command = r"sezen '%s'" # NOTE: Seif said he would add this capability into Sezen
 		self.action = {
 			'name'      : _('Show additional results'),
 			'tooltip'   : _('Show additional search results in Sezen'),
@@ -115,7 +117,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		all_events = []
 
 		# TODO: make this asynchronous somehow! (Need to talk to the developers
-		# of the FTS extensions to add this to the API)
+		# of the FTS extension to add this to the API)
 		if self.search_query:
 
 			try:
@@ -160,8 +162,8 @@ class CardapioPlugin(CardapioPluginInterface):
 
 
 		# TODO: Waiting for Sezen to support command-line arguments...
-		#if parsed_results and self.have_sezen:
-		#	parsed_results.append(self.action)
+		if parsed_results and self.have_sezen:
+			parsed_results.append(self.action)
 
 		self.cardapio_result_handler(self, parsed_results)
 
