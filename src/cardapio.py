@@ -2269,11 +2269,19 @@ class Cardapio(dbus.service.Object):
 		button.connect('button-press-event', self.on_app_button_button_pressed)
 		button.connect('focus-in-event', self.on_app_button_focused)
 
-		if command_type == 'app': action = gtk.gdk.ACTION_COPY
-		else: action = gtk.gdk.ACTION_LINK # TODO: for the panel, this should be ACTION_COPY. for nautilus, ACTION_LINK
-
 		if command_type != 'callback' and command_type != 'raw':
-			button.drag_source_set(gtk.gdk.BUTTON1_MASK, [("text/uri-list", 0, 0)], action)
+
+			if command_type == 'app': 
+				button.drag_source_set(
+						gtk.gdk.BUTTON1_MASK, 
+						[('text/uri-list', 0, 0)], 
+						gtk.gdk.ACTION_COPY)
+			else: 
+				button.drag_source_set(
+						gtk.gdk.BUTTON1_MASK, 
+						[('text/uri-list', 0, 0)], 
+						gtk.gdk.ACTION_LINK)
+
 			button.connect('drag-begin', self.on_app_button_drag_begin)
 			button.connect('drag-data-get', self.on_app_button_data_get)
 			# TODO: drag and drop to reorganize pinned items
