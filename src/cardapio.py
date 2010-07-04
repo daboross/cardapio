@@ -475,7 +475,7 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'applet icon'                , 'start-here'             , override_empty_str = True) # string (either a path to the icon, or an icon name)
 		self.read_config_option(s, 'pinned items'               , []                       ) 
 		self.read_config_option(s, 'side pane items'            , default_side_pane_items  )
-		self.read_config_option(s, 'active plugins'             , ['places', 'applications', 'tracker', 'google']) 
+		self.read_config_option(s, 'active plugins'             , ['places', 'applications', 'tracker', 'google', 'software_center']) 
 
 		# these are a bit of a hack:
 		self.read_config_option(s, 'handler for ftp paths'      , r"nautilus '%s'"         ) # a command line using %s

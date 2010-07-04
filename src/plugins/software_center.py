@@ -22,9 +22,9 @@ class CardapioPlugin (CardapioPluginInterface):
 	plugin_api_version = 1.2
 
 	search_delay_type  = 'local search update delay'
-	category_name      = _('Uninstalled Software')
+	category_name      = _('Available Software')
 	category_icon      = 'softwarecenter'
-	category_tooltip   = _('Software available to install in your system')
+	category_tooltip   = _('Software available to install on your system')
 
 	fallback_icon      = 'applications-other'
 
@@ -85,8 +85,8 @@ class CardapioPlugin (CardapioPluginInterface):
 		self.XAPIAN_VALUE_SUMMARY = 177
 
 		self.action = {
-			'name'      : _('Open software center'),
-			'tooltip'   : _('Search for more software with Software Center'),
+			'name'      : _('Open Software Center'),
+			'tooltip'   : _('Search for more software in the Software Center'),
 			'icon name' : 'system-search', # using this icon because otherwise it looks strange...
 			'type'      : 'raw',
 			'command'   : 'software-center',
