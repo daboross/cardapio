@@ -1,3 +1,10 @@
+cardapio (0.9.123-ubuntu1-lucid1) lucid; urgency=low
+
+  * Added software center plugin, and fixed minor bugs
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 3 Jul 2010 22:40:00 -0400
+
+
 cardapio (0.9.122-ubuntu1-lucid1) lucid; urgency=low
 
   * added zeitgeist plugin
