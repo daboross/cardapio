@@ -562,7 +562,7 @@ class Cardapio(dbus.service.Object):
 		self.builder.connect_signals(self)
 
 		self.get_object = self.builder.get_object
-		self.window                    = self.get_object('MainWindow')
+		self.window                    = self.get_object('CardapioWindow')
 		self.message_window            = self.get_object('MessageWindow')
 		self.about_dialog              = self.get_object('AboutDialog')
 		self.options_dialog            = self.get_object('OptionsDialog')
@@ -2505,6 +2505,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		dummy_window = gtk.Window()
+		dummy_window.set_name('ApplicationPane')
 		dummy_window.realize()
 		app_style = dummy_window.get_style()
 		self.style_app_button_bg = app_style.base[gtk.STATE_NORMAL]
