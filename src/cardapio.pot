@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-04 00:21-0400\n"
+"POT-Creation-Date: 2010-07-06 02:16-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -199,16 +199,16 @@ msgstr ""
 msgid "System"
 msgstr ""
 
-#: cardapio.py:2936
+#: cardapio.py:2937
 msgid "No results to show"
 msgstr ""
 
-#: cardapio.py:2968
+#: cardapio.py:2969
 #, python-format
 msgid "No results to show in \"%(category_name)s\""
 msgstr ""
 
-#: cardapio.py:3176
+#: cardapio.py:3177
 msgid "Access applications, folders, system settings, etc."
 msgstr ""
 
@@ -370,39 +370,6 @@ msgstr ""
 msgid "translators: just enter any text here"
 msgstr ""
 
-#: plugins/_software_center.py:15 plugins/software_center.py:15
-msgid "Software Center"
-msgstr ""
-
-#: plugins/_software_center.py:16 plugins/software_center.py:16
-msgid "Search for new applications in the Software Center"
-msgstr ""
-
-#: plugins/_software_center.py:25 plugins/software_center.py:25
-msgid "Uninstalled Software"
-msgstr ""
-
-#: plugins/_software_center.py:27 plugins/software_center.py:27
-msgid "Software available to install in your system"
-msgstr ""
-
-#: plugins/_software_center.py:88 plugins/software_center.py:88
-msgid "Open software center"
-msgstr ""
-
-#: plugins/_software_center.py:89 plugins/software_center.py:89
-msgid "Search for more software with Software Center"
-msgstr ""
-
-#: plugins/_software_center.py:95 plugins/software_center.py:95
-#, python-format
-msgid "Install %s"
-msgstr ""
-
-#: plugins/_software_center.py:96 plugins/software_center.py:96
-msgid "Description:"
-msgstr ""
-
 #: plugins/google.py:8
 msgid "Google"
 msgstr ""
@@ -420,7 +387,7 @@ msgid "Results found with Google"
 msgstr ""
 
 #: plugins/google.py:57 plugins/google_localized.py:62 plugins/tracker.py:43
-#: plugins/tracker_fts.py:42
+#: plugins/tracker_fts.py:42 plugins/zg_recent_documents.py:77
 msgid "Show additional results"
 msgstr ""
 
@@ -443,6 +410,39 @@ msgstr ""
 
 #: plugins/google_localized.py:21
 msgid "Results found with Google in you system language"
+msgstr ""
+
+#: plugins/software_center.py:15
+msgid "Software Center"
+msgstr ""
+
+#: plugins/software_center.py:16
+msgid "Search for new applications in the Software Center"
+msgstr ""
+
+#: plugins/software_center.py:25
+msgid "Available Software"
+msgstr ""
+
+#: plugins/software_center.py:27
+msgid "Software available to install on your system"
+msgstr ""
+
+#: plugins/software_center.py:88
+msgid "Open Software Center"
+msgstr ""
+
+#: plugins/software_center.py:89
+msgid "Search for more software in the Software Center"
+msgstr ""
+
+#: plugins/software_center.py:95
+#, python-format
+msgid "Install %s"
+msgstr ""
+
+#: plugins/software_center.py:96
+msgid "Description:"
 msgstr ""
 
 #: plugins/tracker.py:6
@@ -502,18 +502,22 @@ msgstr ""
 msgid "Start virtual machine %(name)s"
 msgstr ""
 
-#: plugins/zg_recent_documents.py:16
+#: plugins/zg_recent_documents.py:17
 msgid "Recent documents"
 msgstr ""
 
-#: plugins/zg_recent_documents.py:17
+#: plugins/zg_recent_documents.py:18
 msgid "Search for your most recently used files."
 msgstr ""
 
-#: plugins/zg_recent_documents.py:27
+#: plugins/zg_recent_documents.py:28
 msgid "Recent Documents"
 msgstr ""
 
-#: plugins/zg_recent_documents.py:29
+#: plugins/zg_recent_documents.py:30
 msgid "Files that you have used recently"
+msgstr ""
+
+#: plugins/zg_recent_documents.py:78
+msgid "Show additional search results in Sezen"
 msgstr ""
