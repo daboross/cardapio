@@ -1,3 +1,10 @@
+cardapio (0.9.124-ubuntu1-lucid1) lucid; urgency=low
+
+  * Fixed minor themeing bug, and updated translations
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 5 Jul 2010 23:50:00 -0400
+
+
 cardapio (0.9.123-ubuntu1-lucid1) lucid; urgency=low
 
   * Added software center plugin, and fixed minor bugs

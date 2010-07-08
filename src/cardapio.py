@@ -117,7 +117,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.123'
+	version = '0.9.124'
 
 	core_plugins = [
 			'applications', 
@@ -144,6 +144,8 @@ class Cardapio(dbus.service.Object):
 
 		logging.basicConfig(filename = log_file_path, level = logging.DEBUG)
 		logging.info('----------------- Cardapio launched -----------------')
+		logging.info('Cardapio version: %s' % Cardapio.version)
+		logging.info('Distribution: %s' % commands.getoutput('lsb_release -ds'))
 
 		self.home_folder_path = os.path.abspath(os.path.expanduser('~'))
 
@@ -930,9 +932,9 @@ class Cardapio(dbus.service.Object):
 				if self.plugin_database[basename]['version'][-1] == 'b':
 					params['plugin_name'] += ' (beta)'
 
-				title = ( '<b>%(plugin_name)s</b>\n<i>'  % params ) + \
+				title = ( '<b>%(plugin_name)s</b>\n<small><i>'  % params ) + \
 						( _('by %(plugin_author)s')      % params ) + \
-						( '</i>\n%(plugin_description)s' % params )
+						( '</i>\n%(plugin_description)s</small>' % params )
 
 			is_core_plugin = (basename in self.core_plugins)
 
