@@ -54,6 +54,7 @@ try:
 	from xdg import BaseDirectory, DesktopEntry
 	from dbus.mainloop.glib import DBusGMainLoop
 	from distutils.sysconfig import get_python_lib
+	from pango import ELLIPSIZE_END
 
 except Exception, exception:
 	print(exception)
@@ -170,6 +171,8 @@ class Cardapio(dbus.service.Object):
 		self.search_timer_remote           = None
 		self.plugin_database               = {}
 		self.active_plugin_instances       = {}
+
+		self.icon_extension_types = re.compile('.*\.(png|xpm|svg)$')
 
 		self.app_tree = gmenu.lookup_tree('applications.menu')
 		self.sys_tree = gmenu.lookup_tree('settings.menu')
@@ -2255,6 +2258,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		button = self.add_button(button_str, icon_name, parent_widget, tooltip, button_type = Cardapio.APP_BUTTON)
+		button.set_property
 
 		if app_list is not None:
 
@@ -2320,7 +2324,9 @@ class Cardapio(dbus.service.Object):
 
 			# TODO: figure out how to set max width so that it is the best for
 			# the window and font sizes
-			#label.set_ellipsize(pango.ELLIPSIZE_END)
+			#layout = label.get_layout()
+			#extents = layout.get_pixel_extents()
+			#label.set_ellipsize(ELLIPSIZE_END)
 			#label.set_max_width_chars(20)
 
 		elif button_type == Cardapio.CATEGORY_BUTTON or button_type == Cardapio.SIDEPANE_BUTTON:
@@ -2414,7 +2420,7 @@ class Cardapio(dbus.service.Object):
 				icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icon_value, icon_size, icon_size)
 			icon_name = os.path.basename(icon_value)
 
-		if re.match('.*\.(png|xpm|svg)$', icon_name) is not None:
+		if self.icon_extension_types.match(icon_name) is not None:
 			icon_name = icon_name[:-4]
 
 		if icon_pixbuf is None:
