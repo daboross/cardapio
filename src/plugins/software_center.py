@@ -67,7 +67,7 @@ class CardapioPlugin (CardapioPluginInterface):
 			self.write_to_log(self, exception, is_error = True)
 			return
 
-		cache = apt.Cache()
+		cache = apt.Cache() # this line is really slow! around 0.28s on my computer!
 		db_path = '/var/cache/software-center/xapian'
 
 		if not os.path.exists(db_path):

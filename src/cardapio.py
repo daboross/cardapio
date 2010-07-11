@@ -1738,6 +1738,7 @@ class Cardapio(dbus.service.Object):
 		Place the Cardapio window on top of all others
 		"""
 
+		window.stick()
 		window.show_now()
 
 		# for compiz, this must take place twice!!
@@ -2387,12 +2388,6 @@ class Cardapio(dbus.service.Object):
 		section_slab.set_label_widget(label)
 		section_slab.set_shadow_type(gtk.SHADOW_NONE)
 		section_slab.add(section_margin)
-
-		s = str(len(section_slab));
-		c = str(len(section_contents));
-
-		section_slab.set_name('SectionSlab' + s)
-		section_contents.set_name('SectionContents' + s + c)
 
 		self.application_pane.pack_start(section_slab, expand = False, fill = False)
 
