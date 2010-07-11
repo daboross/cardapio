@@ -611,6 +611,8 @@ class Cardapio(dbus.service.Object):
 		self.icon_size_app = gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
 		self.icon_size_category = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
 
+		self.section_label_attributes = self.get_object('SectionName').get_attributes()
+
 		# make sure buttons have icons!
 		self.gtk_settings = gtk.settings_get_default()
 		self.gtk_settings.set_property('gtk-button-images', True)
@@ -2366,12 +2368,25 @@ class Cardapio(dbus.service.Object):
 		Adds a new slab to the applications pane
 		"""
 
-		section_slab, section_contents = self.add_section()
+		section_contents = gtk.VBox(homogeneous = True, spacing = 0)
+
+		section_margin = gtk.Alignment()
+		section_margin.add(section_contents)
+		section_margin.set_padding(0, 0, 8, 0)
+
+		label = gtk.Label()
+		label.set_use_markup(True)
+		label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
+		label.set_padding(0, 4)
+		label.set_attributes(self.section_label_attributes)
 
 		if section_title is not None:
-			label = section_slab.get_label_widget()
 			label.set_text(section_title)
-			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
+
+		section_slab = gtk.Frame()
+		section_slab.set_label_widget(label)
+		section_slab.set_shadow_type(gtk.SHADOW_NONE)
+		section_slab.add(section_margin)
 
 		s = str(len(section_slab));
 		c = str(len(section_contents));
@@ -2381,26 +2396,9 @@ class Cardapio(dbus.service.Object):
 
 		self.application_pane.pack_start(section_slab, expand = False, fill = False)
 
+		section_slab.show_all()
+
 		return section_slab, section_contents, label
-
-
-	def add_section(self):
-		"""
-		Reads the UI file to return the Slab structure (this makes it easier to
-		design Cardapio, although it slows down the creation of new slabs in
-		this code)
-		"""
-
-		builder = gtk.Builder()
-		builder.add_from_file(self.uifile)
-		section_slab = builder.get_object('SectionSlab')
-		section_contents = builder.get_object('SectionContents')
-
-		if section_slab.parent is not None:
-			section_slab.parent.remove(section_slab)
-
-		del builder
-		return section_slab, section_contents
 
 
 	def get_icon_pixbuf(self, icon_value, icon_size, fallback_icon = 'application-x-executable'):
@@ -2408,6 +2406,8 @@ class Cardapio(dbus.service.Object):
 		Returns a GTK Image from a given icon name and size. The icon name can be
 		either a path or a named icon from the GTK theme.
 		"""
+
+		# TODO: speed this up!
 
 		if not icon_value: 
 			icon_value = fallback_icon
