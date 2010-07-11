@@ -19,9 +19,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '0.9b'
+	version            = '0.91b'
 
-	plugin_api_version = 1.2
+	plugin_api_version = 1.3
 
 	search_delay_type  = 'local search update delay'
 
@@ -33,44 +33,42 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	recency_in_days = 30
 
-	def __init__(self, settings, write_to_log, cardapio_result_handler, cardapio_error_handler):
+	def __init__(self, cardapio_proxy): 
+
+		self.c = cardapio_proxy
 
 		self.loaded = False
-
-		self.write_to_log = write_to_log
-		self.cardapio_result_handler = cardapio_result_handler
-		self.cardapio_error_handler = cardapio_error_handler
-		self.num_search_results = settings['search results limit']
+		self.num_search_results = self.c.settings['search results limit']
 
 		if 'ZeitgeistClient' not in globals():
-			self.write_to_log(self, 'Could not import Zeitgeist', is_error = True)
-			if plugin_exception: self.write_to_log(self, plugin_exception)
+			self.c.write_to_log(self, 'Could not import Zeitgeist', is_error = True)
+			if plugin_exception: self.c.write_to_log(self, plugin_exception)
 			return
 
 		try:
 			self.zg = ZeitgeistClient()
 		except Exception, exception:
-			self.write_to_log(self, 'Could not start Zeitgeist', is_error = True)
-			self.write_to_log(self, exception)
+			self.c.write_to_log(self, 'Could not start Zeitgeist', is_error = True)
+			self.c.write_to_log(self, exception)
 			return 
 
 		bus = dbus.SessionBus()
 
 		if bus.request_name('org.freedesktop.Tracker1') != dbus.bus.REQUEST_NAME_REPLY_IN_QUEUE:
-			self.write_to_log(self, 'Could not find Zeitgeist full-text-search', is_error = True)
+			self.c.write_to_log(self, 'Could not find Zeitgeist full-text-search', is_error = True)
 			return 
 
 		try:
 			fts_object = bus.get_object('org.gnome.zeitgeist.Engine', '/org/gnome/zeitgeist/index/activity')
 			self.fts = dbus.Interface(fts_object, 'org.gnome.zeitgeist.Index')
 		except Exception, exception:
-			self.write_to_log(self, 'Could not connect to Zeitgeist full-text-search', is_error = True)
-			self.write_to_log(self, exception)
+			self.c.write_to_log(self, 'Could not connect to Zeitgeist full-text-search', is_error = True)
+			self.c.write_to_log(self, exception)
 			return 
 
 		self.have_sezen = (len(getoutput('which sezen')) != 0)
 		if not self.have_sezen:
-			self.write_to_log(self, 'Sezen not found, so you will not see the "Show additional results" button.')
+			self.c.write_to_log(self, 'Sezen not found, so you will not see the "Show additional results" button.')
 
 		self.action_command = r"sezen '%s'" # NOTE: Seif said he would add this capability into Sezen
 		self.action = {
@@ -165,7 +163,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		if parsed_results and self.have_sezen:
 			parsed_results.append(self.action)
 
-		self.cardapio_result_handler(self, parsed_results)
+		self.c.handle_search_result(self, parsed_results)
 
 
 	def more_results_action(self, text):
@@ -174,7 +172,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			subprocess.Popen(self.action_command % text, shell = True)
 
 		except OSError, e:
-			write_to_log(self, 'Error launching plugin action.', is_error = True)
-			write_to_log(self, e, is_error = True)
+			self.c.write_to_log(self, 'Error launching plugin action.', is_error = True)
+			self.c.write_to_log(self, e, is_error = True)
 
 

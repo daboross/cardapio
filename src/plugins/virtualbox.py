@@ -9,9 +9,9 @@ class CardapioPlugin (CardapioPluginInterface):
 	# not used in the GUI yet:
 	url = ''
 	help_text = ''
-	version = '1.0'
+	version = '1.1'
 
-	plugin_api_version = 1.2 
+	plugin_api_version = 1.3 
 
 	search_delay_type = None
 
@@ -24,20 +24,18 @@ class CardapioPlugin (CardapioPluginInterface):
 	# Set to "True" to only show it when searching		
 
 
-	def __init__(self, settings, write_to_log, handle_search_result, handle_search_error):
+	def __init__(self, cardapio_proxy):
 		'''	
 		This method is called when the plugin is enabled.
 		Here the variables are initialized an the list of virtual machines is built.
 		'''
 		
-		self.write_to_log = write_to_log
-		self.handle_search_result = handle_search_result
-		self.handle_search_error = handle_search_error
-		self.num_search_results = settings['search results limit']
-		
+		self.c = cardapio_proxy
+
+		self.num_search_results = self.c.settings['search results limit']
 		self.vm_items = [] # List of virtual machine items 
 
-		self.write_to_log(self, "Loading virtual machine list...")
+		self.c.write_to_log(self, "Loading virtual machine list...")
 		
 		try:
 			vms = subprocess.Popen(['VBoxManage', 'list', 'vms'], stdout = subprocess.PIPE).communicate()[0]
@@ -65,7 +63,7 @@ class CardapioPlugin (CardapioPluginInterface):
 			
 		except OSError:
 
-			self.write_to_log(self, "VBoxManage command not recognized: Maybe VirtualBox is not installed...")
+			self.c.write_to_log(self, "VBoxManage command not recognized: Maybe VirtualBox is not installed...")
 			self.loaded = False
 
 
@@ -79,6 +77,6 @@ class CardapioPlugin (CardapioPluginInterface):
 			if item['name'].lower().find(text) != -1:
 				results.append(item)
 	  
-		self.handle_search_result(self, results)
+		self.c.handle_search_result(self, results)
 
 	

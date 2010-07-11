@@ -9,7 +9,7 @@ try:
 except Exception, exception:
 	import_error = exception
 
-class CardapioPlugin (CardapioPluginInterface):
+class CardapioPlugin(CardapioPluginInterface):
 
 	author             = 'Clifton Mulkey'
 	name               = _('Software Center')
@@ -17,9 +17,9 @@ class CardapioPlugin (CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.0'
+	version            = '1.1'
 
-	plugin_api_version = 1.2
+	plugin_api_version = 1.3
 
 	search_delay_type  = 'local search update delay'
 	category_name      = _('Available Software')
@@ -31,28 +31,26 @@ class CardapioPlugin (CardapioPluginInterface):
 	hide_from_sidebar = True 		
 
 
-	def __init__(self, settings, write_to_log, handle_search_result, handle_search_error):
+	def __init__(self, cardapio_proxy):
 		'''	
 		This method is called when the plugin is enabled.
 		Nothing much to be done here except initialize variables and set loaded to True
 		'''
 		
+		self.c = cardapio_proxy
 	   	self.loaded = False
 
-		self.write_to_log = write_to_log
-		self.handle_search_result = handle_search_result
-		self.handle_search_error = handle_search_error
-		self.num_search_results = settings['search results limit']
+		self.num_search_results = self.c.settings['search results limit']
 		
 		if import_error:
-			self.write_to_log(self, 'Could not import certain modules', is_error = True)
-			self.write_to_log(self, import_error, is_error = True)
+			self.c.write_to_log(self, 'Could not import certain modules', is_error = True)
+			self.c.write_to_log(self, import_error, is_error = True)
 			return
 
 		software_center_path = '/usr/share/software-center'
 
 		if not os.path.exists(software_center_path):
-			self.write_to_log(self, 'Could not find the software center path', is_error = True)
+			self.c.write_to_log(self, 'Could not find the software center path', is_error = True)
 			return
 
 		sys.path.append(software_center_path)
@@ -63,15 +61,15 @@ class CardapioPlugin (CardapioPluginInterface):
 			from softwarecenter.view.appview import AppViewFilter
 
 		except Exception, exception:
-			self.write_to_log(self, 'Could not load the software center modules', is_error = True)
-			self.write_to_log(self, exception, is_error = True)
+			self.c.write_to_log(self, 'Could not load the software center modules', is_error = True)
+			self.c.write_to_log(self, exception, is_error = True)
 			return
 
 		cache = apt.Cache() # this line is really slow! around 0.28s on my computer!
 		db_path = '/var/cache/software-center/xapian'
 
 		if not os.path.exists(db_path):
-			self.write_to_log(self, 'Could not find the database path', is_error = True)
+			self.c.write_to_log(self, 'Could not find the database path', is_error = True)
 			return
 
 		self.db = StoreDatabase(db_path, cache)
@@ -146,5 +144,5 @@ class CardapioPlugin (CardapioPluginInterface):
 		if results:
 			results.append(self.action)
 	
-		self.handle_search_result(self, results)
+		self.c.handle_search_result(self, results)
 

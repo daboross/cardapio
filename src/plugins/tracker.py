@@ -8,9 +8,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.2'
+	version            = '1.3'
 
-	plugin_api_version = 1.2
+	plugin_api_version = 1.3
 
 	search_delay_type  = 'local search update delay'
 
@@ -20,7 +20,9 @@ class CardapioPlugin(CardapioPluginInterface):
 	hide_from_sidebar  = True
 
 
-	def __init__(self, settings, write_to_log, handle_search_result, handle_search_error):
+	def __init__(self, cardapio_proxy):
+
+		self.c = cardapio_proxy
 
 		self.tracker = None
 		bus = dbus.SessionBus()
@@ -29,14 +31,11 @@ class CardapioPlugin(CardapioPluginInterface):
 			tracker_object = bus.get_object('org.freedesktop.Tracker1', '/org/freedesktop/Tracker1/Resources')
 			self.tracker = dbus.Interface(tracker_object, 'org.freedesktop.Tracker1.Resources') 
 		else:
-			write_to_log(self, 'Could not connect to Tracker', is_error = True)
+			self.c.write_to_log(self, 'Could not connect to Tracker', is_error = True)
 			self.loaded = False
 			return 
 
-		self.search_results_limit = settings['search results limit']
-
-		self.cardapio_results_handler = handle_search_result
-		self.cardapio_error_handler = handle_search_error
+		self.search_results_limit = self.c.settings['search results limit']
 
 		self.action_command = r"tracker-search-tool '%s'"
 		self.action = {
@@ -76,7 +75,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def handle_search_error(self, error):
 
-		self.cardapio_error_handler(self, error)
+		self.c.handle_search_error(self, error)
 
 
 	def prepare_and_handle_search_result(self, results):
@@ -102,7 +101,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		if results:
 			formatted_results.append(self.action)
 
-		self.cardapio_results_handler(self, formatted_results)
+		self.c.handle_search_result(self, formatted_results)
 
 
 	def more_results_action(self, text):
@@ -110,7 +109,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		try:
 			subprocess.Popen(self.action_command % text, shell = True)
 		except OSError, e:
-			write_to_log(self, 'Error launching plugin action.', is_error = True)
-			write_to_log(self, e, is_error = True)
+			self.c.write_to_log(self, 'Error launching plugin action.', is_error = True)
+			self.c.write_to_log(self, e, is_error = True)
 
 

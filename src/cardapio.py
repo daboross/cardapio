@@ -138,6 +138,9 @@ class Cardapio(dbus.service.Object):
 	SESSION_BUTTON = 2
 	SIDEPANE_BUTTON = 3
 
+	class SafeCardapioProxy:
+		pass
+
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
 
 		self.create_config_folder()
@@ -185,8 +188,7 @@ class Cardapio(dbus.service.Object):
 
 		self.setup_dbus()
 		self.setup_base_ui() # must be the first ui-related method to be called
-		self.build_plugin_database() 
-		self.activate_plugins_from_settings()
+		self.setup_plugins()
 		self.build_ui() 
 		self.setup_ui_from_all_settings() 
 
@@ -309,10 +311,10 @@ class Cardapio(dbus.service.Object):
 				self.settings['active plugins'].remove(basename)
 				continue
 
-			plugin = plugin_class(self.settings, self.write_to_plugin_log, self.handle_search_result, self.handle_search_error)
+			plugin = plugin_class(self.safe_cardapio_proxy)
 
 			if not plugin.loaded:
-				self.write_to_plugin_log(plugin, 'Plugin did not load properly')
+				self.plugin_write_to_log(plugin, 'Plugin did not load properly')
 				self.settings['active plugins'].remove(basename)
 				continue
 
@@ -323,7 +325,7 @@ class Cardapio(dbus.service.Object):
 			self.plugin_database[basename]['instance'] = plugin
 
 
-	def write_to_plugin_log(self, plugin, text, is_error = False, is_warning = False):
+	def plugin_write_to_log(self, plugin, text, is_error = False, is_warning = False):
 		"""
 		Writes 'text' to the log file, prefixing it with [plugin name].
 		"""
@@ -664,6 +666,23 @@ class Cardapio(dbus.service.Object):
 
 		if self.panel_applet is not None:
 			self.panel_applet.connect('destroy', self.quit)
+
+
+	def setup_plugins(self):
+		"""
+		Reads all plugins from the plugin folders and activates the ones that
+		have been specified in the settings file.
+		"""
+
+		self.safe_cardapio_proxy = Cardapio.SafeCardapioProxy()
+		self.safe_cardapio_proxy.settings = self.settings
+		self.safe_cardapio_proxy.write_to_log = self.plugin_write_to_log
+		self.safe_cardapio_proxy.handle_search_result = self.plugin_handle_search_result
+		self.safe_cardapio_proxy.handle_search_error = self.plugin_handle_search_error
+		self.safe_cardapio_proxy.ask_for_reload_permission = self.plugin_ask_for_reload_permission
+
+		self.build_plugin_database() 
+		self.activate_plugins_from_settings()
 
 
 	def get_best_icon_size(self):
@@ -1322,17 +1341,17 @@ class Cardapio(dbus.service.Object):
 		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
-	def handle_search_error(self, plugin, text):
+	def plugin_handle_search_error(self, plugin, text):
 		"""
 		Handler for when a plugin returns an error
 		"""
 
 		plugin.is_running = False
-		self.write_to_plugin_log(plugin, text, is_error = True)
-		self.handle_search_result(plugin, [])
+		self.plugin_write_to_log(plugin, text, is_error = True)
+		self.plugin_handle_search_result(plugin, [])
 
 
-	def handle_search_result(self, plugin, results):
+	def plugin_handle_search_result(self, plugin, results):
 		"""
 		Handler for when a plugin returns some search results
 		"""
@@ -1408,6 +1427,10 @@ class Cardapio(dbus.service.Object):
 			self.consider_showing_no_results_text()
 
 		gtk.gdk.threads_leave()
+
+
+	def plugin_ask_for_reload_permission(self, plugin):
+		pass
 
 
 	def is_searchentry_empty(self):
@@ -3067,7 +3090,7 @@ class CardapioPluginInterface:
 	help_text   = ''
 	version     = ''
 
-	plugin_api_version = 1.2
+	plugin_api_version = 1.3
 
 	search_delay_type = 'local search update delay'
 
@@ -3079,7 +3102,7 @@ class CardapioPluginInterface:
 
 	hide_from_sidebar = True
 
-	def __init__(self, settings, write_to_log, handle_search_result, handle_search_error):
+	def __init__(self, cardapio_proxy):
 		"""
 		REQUIRED
 
@@ -3090,7 +3113,8 @@ class CardapioPluginInterface:
 		For example, the Tracker plugin sets self.loaded to False if Tracker is not
 		installed in the system.
 
-		The constructor is given three parameters:
+		The constructor is given a single parameter, which is an object used to 
+		communicate with Cardapio. This object has the following members:
 
 		   - settings - this is a dict containing the same things that you will
 		     find in the config.ini
@@ -3167,6 +3191,29 @@ class CardapioPluginInterface:
 
 		This function should cancel the search operation. This is useful if the search is
 		done in a separate thread (which it should, as much as possible)
+		"""
+		pass
+
+
+	def on_reload_permission_granted(self):
+		"""
+		NOT REQUIRED
+		
+		Whenever a plugin wishes to rebuild some sort of internal database,
+		if this takes more than a couple of milliseconds it is advisable to 
+		first ask Cardapio for permission. This is how this works:
+
+		1) Plugin calls cardapio_proxy.ask_for_reload_permission(self)
+
+		Cardapio then decides at what time it is best to give the plugin the
+		reload permission. Usually this can take up to 10s, to allow several
+		plugins to reload at the same time. Then, Cardapio shows the "Data has
+		changed" window.  
+		
+		2) Cardapio calls on_reload_permission_granted to tell the plugin that
+		it can reload its database 
+		
+		When done, the "Data has changed" window is hidden.
 		"""
 		pass
 

@@ -10,9 +10,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.2'
+	version            = '1.3'
 
-	plugin_api_version = 1.2
+	plugin_api_version = 1.3
 
 	search_delay_type  = 'remote search update delay'
 
@@ -22,7 +22,9 @@ class CardapioPlugin(CardapioPluginInterface):
 	hide_from_sidebar  = True
 
 
-	def __init__(self, settings, write_to_log, cardapio_result_handler, cardapio_error_handler):
+	def __init__(self, cardapio_proxy): 
+
+		self.c = cardapio_proxy
 
 		language, encoding = getdefaultlocale()
 		google_results_language_format = language.split('_')[0]
@@ -48,13 +50,11 @@ class CardapioPlugin(CardapioPluginInterface):
 		# chooses the most appropriate given the 'search results limit' user
 		# preference.
 
-		if settings['search results limit'] >= 8:
+		if self.c.settings['search results limit'] >= 8:
 			self.query_url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=large&lr=lang_%s&q=%%s' % google_results_language_format
 		else:
 			self.query_url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=small&lr=lang_%s&q=%%s' % google_results_language_format
 
-		self.cardapio_result_handler = cardapio_result_handler
-		self.cardapio_error_handler = cardapio_error_handler
 		self.search_controller = gio.Cancellable()
 
 		self.action_command = "xdg-open 'http://www.google.com/search?q=%%s&hl=%s&lr=lang_%s'" % (google_interface_language_format, google_results_language_format)
@@ -101,7 +101,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		except GError, e:
 			# no need to worry if there's no response: maybe there's no internet
 			# connection...
-			self.cardapio_error_handler(self, 'no response')
+			self.c.handle_search_error(self, 'no response')
 			return
 
 		raw_results = simplejson.loads(response)
@@ -109,7 +109,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		parsed_results = [] 
 
 		if 'Error' in raw_results:
-			self.cardapio_error_handler(self, raw_results['Error'])
+			self.c.handle_search_error(self, raw_results['Error'])
 			return
 		
 		for raw_result in raw_results['responseData']['results']:
@@ -126,7 +126,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		if raw_results:
 			parsed_results.append(self.action)
 
-		self.cardapio_result_handler(self, parsed_results)
+		self.c.handle_search_result(self, parsed_results)
 
 
 	def more_results_action(self, text):
@@ -137,7 +137,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		try:
 			subprocess.Popen(self.action_command % text, shell = True)
 		except OSError, e:
-			write_to_log(self, 'Error launching plugin action.', is_error = True)
-			write_to_log(self, e, is_error = True)
+			self.c.write_to_log(self, 'Error launching plugin action.', is_error = True)
+			self.c.write_to_log(self, e, is_error = True)
 
 
