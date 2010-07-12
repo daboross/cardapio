@@ -59,11 +59,12 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.action_command = "xdg-open 'http://www.google.com/search?q=%%s&hl=%s&lr=lang_%s'" % (google_interface_language_format, google_results_language_format)
 		self.action = {
-			'name'      : _('Show additional results'),
-			'tooltip'   : _('Show additional search results in your web browser'),
-			'icon name' : 'system-search',
-			'type'      : 'callback',
-			'command'   : self.more_results_action,
+			'name'         : _('Show additional results'),
+			'tooltip'      : _('Show additional search results in your web browser'),
+			'icon name'    : 'system-search',
+			'type'         : 'callback',
+			'command'      : self.more_results_action,
+			'context menu' : None,
 			}
 
 		self.loaded = True
@@ -115,11 +116,12 @@ class CardapioPlugin(CardapioPluginInterface):
 		for raw_result in raw_results['responseData']['results']:
 
 			item = {
-				'name'      : raw_result['titleNoFormatting'],
-				'tooltip'   : raw_result['url'],
-				'icon name' : 'text-html',
-				'type'      : 'xdg',
-				'command'   : raw_result['url'],
+				'name'         : raw_result['titleNoFormatting'],
+				'tooltip'      : raw_result['url'],
+				'icon name'    : 'text-html',
+				'type'         : 'xdg',
+				'command'      : raw_result['url'],
+				'context menu' : None,
 				}
 			parsed_results.append(item)
 

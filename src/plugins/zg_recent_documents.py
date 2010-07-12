@@ -72,11 +72,12 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.action_command = r"sezen '%s'" # NOTE: Seif said he would add this capability into Sezen
 		self.action = {
-			'name'      : _('Show additional results'),
-			'tooltip'   : _('Show additional search results in Sezen'),
-			'icon name' : 'system-search',
-			'type'      : 'callback',
-			'command'   : self.more_results_action,
+			'name'         : _('Show additional results'),
+			'tooltip'      : _('Show additional search results in Sezen'),
+			'icon name'    : 'system-search',
+			'type'         : 'callback',
+			'command'      : self.more_results_action,
+			'context menu' : None,
 			}
 
 		self.time_range = datamodel.TimeRange.always()
@@ -149,11 +150,12 @@ class CardapioPlugin(CardapioPluginInterface):
 				urls_seen.add(canonical_path)
 
 				item = {
-					'name'      : subject.text,
-					'icon name' : subject.mimetype,
-					'tooltip'   : canonical_path,
-					'command'   : canonical_path,
-					'type'      : 'xdg',
+					'name'         : subject.text,
+					'icon name'    : subject.mimetype,
+					'tooltip'      : canonical_path,
+					'command'      : canonical_path,
+					'type'         : 'xdg',
+					'context menu' : None,
 					}
 
 				parsed_results.append(item)

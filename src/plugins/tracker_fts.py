@@ -38,11 +38,12 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.action_command = r'tracker-search-tool %s'
 		self.action = {
-			'name'      : _('Show additional results'),
-			'tooltip'   : _('Show additional search results in the Tracker search tool'),
-			'icon name' : 'system-search',
-			'type'      : 'callback',
-			'command'   : self.more_results_action,
+			'name'         : _('Show additional results'),
+			'tooltip'      : _('Show additional search results in the Tracker search tool'),
+			'icon name'    : 'system-search',
+			'type'         : 'callback',
+			'command'      : self.more_results_action,
+			'context menu' : None,
 			}
 
 		self.loaded = True
@@ -89,11 +90,12 @@ class CardapioPlugin(CardapioPluginInterface):
 			icon_name = result[1]
 
 			formatted_result = {
-				'name'      : child_name,
-				'icon name' : icon_name,
-				'tooltip'   : result[0],
-				'command'   : canonical_path,
-				'type'      : 'xdg',
+				'name'         : child_name,
+				'icon name'    : icon_name,
+				'tooltip'      : result[0],
+				'command'      : canonical_path,
+				'type'         : 'xdg',
+				'context menu' : None,
 				}
 
 			formatted_results.append(formatted_result)

@@ -83,14 +83,18 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.XAPIAN_VALUE_SUMMARY = 177
 
 		self.action = {
-			'name'      : _('Open Software Center'),
-			'tooltip'   : _('Search for more software in the Software Center'),
-			'icon name' : 'system-search', # using this icon because otherwise it looks strange...
-			'type'      : 'raw',
-			'command'   : 'software-center',
+			'name'         : _('Open Software Center'),
+			'tooltip'      : _('Search for more software in the Software Center'),
+			'icon name'    : 'system-search', # using this icon because otherwise it looks strange...
+			'type'         : 'raw',
+			'command'      : 'software-center',
+			'context menu' : None,
 			}
 
-		self.default_tooltip_str = _('Install %s')
+		self.context_menu_action_name = _('_Install %s')
+		self.context_menu_action_tooltip = _('Install this package without opening the Software Center')
+
+		self.default_tooltip_str = _('Show %s in the Software Center')
 		self.summary_str = _('Description:')
 		
 	   	self.loaded = True # set to true if everything goes well
@@ -133,9 +137,18 @@ class CardapioPlugin(CardapioPluginInterface):
 				item = {
 					'name'      : name,
 					'tooltip'   : tooltip,
-					'icon name' : icon_name ,
+					'icon name' : icon_name,
 					'type'      : 'raw',
-					'command'   : "software-center '%s'" % pkgname
+					'command'   : "software-center '%s'" % pkgname,
+					'context menu' : [
+							{
+								'name'      : self.context_menu_action_name % name,
+								'tooltip'   : self.context_menu_action_tooltip,
+								'icon name' : icon_name,
+								'type'      : 'xdg',
+								'command'   : "apt:%s" % pkgname,
+							},
+						]
 					}
 
 				results.append(item)

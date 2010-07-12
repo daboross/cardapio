@@ -50,11 +50,12 @@ class CardapioPlugin (CardapioPluginInterface):
 			for vm in vms:
 				name = vm.replace('\"','')
 				item = {
-					'name' : name,
-					'tooltip' : _('Start virtual machine %(name)s') % {'name' : name},
-					'icon name' : 'VBox',
-					'type' : 'raw',
-					'command' : 'VBoxManage startvm %s' % vm
+					'name'         : name,
+					'tooltip'      : _('Start virtual machine %(name)s') % {'name' : name},
+					'icon name'    : 'VBox',
+					'type'         : 'raw',
+					'command'      : 'VBoxManage startvm %s' % vm,
+					'context menu' : None,
 					}
 			 
 				self.vm_items.append(item)

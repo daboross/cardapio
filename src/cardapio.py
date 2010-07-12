@@ -241,7 +241,7 @@ class Cardapio(dbus.service.Object):
 		try:
 			plugin_module = __import__(package, fromlist = 'CardapioPlugin', level = -1)
 		except:
-			return 'Could not find the plugin module'
+			return 'Could not import the plugin module'
 
 		plugin_class = plugin_module.CardapioPlugin
 
@@ -612,6 +612,7 @@ class Cardapio(dbus.service.Object):
 		self.icon_theme.connect('changed', self.on_icon_theme_changed)
 		self.icon_size_app = gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
 		self.icon_size_category = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
+		self.icon_size_menu = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
 
 		self.section_label_attributes = self.get_object('SectionName').get_attributes()
 
@@ -1401,6 +1402,7 @@ class Cardapio(dbus.service.Object):
 				icon_name = fallback_icon
 
 			button = self.add_app_button(result['name'], icon_name, plugin.section_contents, result['type'], result['command'], tooltip = result['tooltip'])
+			button.app_info['context menu'] = result['context menu']
 
 
 		if results:
@@ -2320,11 +2322,12 @@ class Cardapio(dbus.service.Object):
 
 		# save some metadata for easy access
 		button.app_info = {
-			'name'       : self.unescape(button_str),
-			'tooltip'    : tooltip,
-			'icon name'  : icon_name,
-			'command'    : command,
-			'type'       : command_type,
+			'name'         : self.unescape(button_str),
+			'tooltip'      : tooltip,
+			'icon name'    : icon_name,
+			'command'      : command,
+			'type'         : command_type,
+			'context menu' : None,
 		}
 
 		return button
@@ -2412,7 +2415,7 @@ class Cardapio(dbus.service.Object):
 		section_slab.set_shadow_type(gtk.SHADOW_NONE)
 		section_slab.add(section_margin)
 
-		self.application_pane.pack_start(section_slab, expand = False, fill = False)
+		self.application_pane.pack_start(section_slab, expand = True, fill = True)
 
 		section_slab.show_all()
 
@@ -2643,6 +2646,7 @@ class Cardapio(dbus.service.Object):
 			self.remove_side_pane_menuitem.hide()
 			self.open_folder_menuitem.hide()
 			self.app_menu_separator.hide()
+			self.plugin_prepare_context_menu()
 			return
 
 		already_pinned = False
@@ -2689,6 +2693,50 @@ class Cardapio(dbus.service.Object):
 				# only show if path that exists
 				if os.path.exists(self.unescape(canonical_path)):
 					self.open_folder_menuitem.show()
+
+		self.plugin_prepare_context_menu()
+
+
+	def plugin_prepare_context_menu(self):
+		"""
+		Adds context menu items that have been setup by plugins
+		"""
+
+		self.plugin_clear_context_menu()
+		if 'context menu' not in self.clicked_app: return
+		if self.clicked_app['context menu'] is None: return
+		self.plugin_fill_context_menu()
+
+
+	def plugin_clear_context_menu(self):
+
+		for menu_item in self.app_context_menu:
+			if menu_item.name is not None and menu_item.name.startswith('PluginAction'):
+				self.app_context_menu.remove(menu_item)
+
+
+	def plugin_fill_context_menu(self):
+
+		i = 0
+
+		for item_info in self.clicked_app['context menu']:	
+
+			menu_item = gtk.ImageMenuItem(item_info['name'], True)
+			menu_item.set_tooltip_text(item_info['tooltip'])
+			menu_item.set_name('PluginAction' + str(i))
+			i += 1
+
+			if item_info['icon name'] is not None:
+				icon_pixbuf = self.get_icon_pixbuf(item_info['icon name'], self.icon_size_menu)
+				icon = gtk.image_new_from_pixbuf(icon_pixbuf)
+				menu_item.set_image(icon)
+
+			menu_item.app_info = item_info
+			menu_item.connect('activate', self.on_app_button_clicked)
+
+			menu_item.show_all()
+			self.app_context_menu.append(menu_item)
+
 
 
 	def on_app_button_focused(self, widget, event):
