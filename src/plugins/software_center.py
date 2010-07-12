@@ -5,6 +5,18 @@ try:
 	import sys
 	import apt
 	import os
+	import gio
+
+	software_center_path = '/usr/share/software-center'
+
+	if not os.path.exists(software_center_path):
+		raise Exception('Could not find the software center path')
+
+	sys.path.append(software_center_path)
+
+	from softwarecenter.enums import XAPIAN_VALUE_POPCON, XAPIAN_VALUE_ICON, XAPIAN_VALUE_SUMMARY 
+	from softwarecenter.db.database import StoreDatabase
+	from softwarecenter.view.appview import AppViewFilter
 
 except Exception, exception:
 	import_error = exception
@@ -38,7 +50,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		'''
 		
 		self.c = cardapio_proxy
-	   	self.loaded = False
+		self.loaded = False
 
 		self.num_search_results = self.c.settings['search results limit']
 		
@@ -47,40 +59,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			self.c.write_to_log(self, import_error, is_error = True)
 			return
 
-		software_center_path = '/usr/share/software-center'
-
-		if not os.path.exists(software_center_path):
-			self.c.write_to_log(self, 'Could not find the software center path', is_error = True)
-			return
-
-		sys.path.append(software_center_path)
-
-		try:
-			from softwarecenter.enums import XAPIAN_VALUE_POPCON
-			from softwarecenter.db.database import StoreDatabase
-			from softwarecenter.view.appview import AppViewFilter
-
-		except Exception, exception:
-			self.c.write_to_log(self, 'Could not load the software center modules', is_error = True)
-			self.c.write_to_log(self, exception, is_error = True)
-			return
-
-		cache = apt.Cache() # this line is really slow! around 0.28s on my computer!
-		db_path = '/var/cache/software-center/xapian'
-
-		if not os.path.exists(db_path):
-			self.c.write_to_log(self, 'Could not find the database path', is_error = True)
-			return
-
-		self.db = StoreDatabase(db_path, cache)
-		self.db.open()
-		self.apps_filter = AppViewFilter(self.db, cache)
-		self.apps_filter.set_not_installed_only(True)
-		self.apps_filter.set_only_packages_without_applications(True)
-
-		self.XAPIAN_VALUE_ICON = 172
-		self.XAPIAN_VALUE_POPCON = 176
-		self.XAPIAN_VALUE_SUMMARY = 177
+		self.setup_db(True)
 
 		self.action = {
 			'name'         : _('Open Software Center'),
@@ -97,18 +76,28 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.default_tooltip_str = _('Show %s in the Software Center')
 		self.summary_str = _('Description:')
 		
-	   	self.loaded = True # set to true if everything goes well
-		
+		self.loaded = True # set to true if everything goes well
+
+		dpkg_path = '/var/lib/dpkg/lock'
+
+		if os.path.exists(dpkg_path):
+			self.package_monitor = gio.File(dpkg_path).monitor_file()
+			self.package_monitor.connect('changed', self.on_packages_changed)
+
+		else:
+			self.c.write_to_log(self, 'Path does not exist:' + dpkg_path)
+			self.c.write_to_log(self, 'Will not be able to monitor for package changes')
+
 
 	def search(self, text):
-  
+ 
 		results = []
 		
 		query = self.db.get_query_list_from_search_entry(text)
 		
 		enquire = xapian.Enquire(self.db.xapiandb)
 		enquire.set_query(query[1])
-		enquire.set_sort_by_value_then_relevance(self.XAPIAN_VALUE_POPCON)
+		enquire.set_sort_by_value_then_relevance(XAPIAN_VALUE_POPCON)
 		matches = enquire.get_mset(0, len(self.db))
 
 		i = 0
@@ -117,14 +106,14 @@ class CardapioPlugin(CardapioPluginInterface):
 			
 			doc = m[xapian.MSET_DOCUMENT]
 			pkgname = self.db.get_pkgname(doc)
-			summary = doc.get_value(self.XAPIAN_VALUE_SUMMARY)
+			summary = doc.get_value(XAPIAN_VALUE_SUMMARY)
 
 			name = doc.get_data()
 
 			icon_name = 'applications-other'
 
 			if self.apps_filter.filter(doc, pkgname) and summary:
-				icon_name = os.path.splitext(doc.get_value(self.XAPIAN_VALUE_ICON))[0]
+				icon_name = os.path.splitext(doc.get_value(XAPIAN_VALUE_ICON))[0]
 
 				if not icon_name:
 					icon_name = 'applications-other'
@@ -158,4 +147,32 @@ class CardapioPlugin(CardapioPluginInterface):
 			results.append(self.action)
 	
 		self.c.handle_search_result(self, results)
+
+
+	def setup_db(self, import_packages = False):
+
+		cache = apt.Cache() # this line is really slow! around 0.28s on my computer!
+		db_path = '/var/cache/software-center/xapian'
+
+		if not os.path.exists(db_path):
+			self.c.write_to_log(self, 'Could not find the database path', is_error = True)
+			return
+
+		self.db = StoreDatabase(db_path, cache)
+		self.db.open()
+		self.apps_filter = AppViewFilter(self.db, cache)
+		self.apps_filter.set_not_installed_only(True)
+		self.apps_filter.set_only_packages_without_applications(True)
+
+
+	def on_reload_permission_granted(self):
+
+		self.setup_db()
+
+
+	def on_packages_changed(self, monitor, file, other_file, event):
+
+		if event == gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
+			self.c.ask_for_reload_permission(self)
+
 

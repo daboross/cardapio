@@ -836,6 +836,10 @@ class Cardapio(dbus.service.Object):
 			self.set_message_window_visible(True)
 
 		glib.idle_add(self.build_ui)
+
+		for plugin in self.active_plugin_instances:
+			glib.idle_add(plugin.on_reload_permission_granted)
+
 		self.schedule_search_with_plugins('')
 
 
@@ -1432,7 +1436,15 @@ class Cardapio(dbus.service.Object):
 
 
 	def plugin_ask_for_reload_permission(self, plugin):
-		pass
+		"""
+		Handler for when a plugin asks Cardapio whether it can reload its
+		database.
+		"""
+
+		if self.rebuild_timer is not None:
+			glib.source_remove(self.rebuild_timer)
+
+		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], plugin.on_reload_permission_granted)
 
 
 	def is_searchentry_empty(self):
@@ -2415,7 +2427,7 @@ class Cardapio(dbus.service.Object):
 		section_slab.set_shadow_type(gtk.SHADOW_NONE)
 		section_slab.add(section_margin)
 
-		self.application_pane.pack_start(section_slab, expand = True, fill = True)
+		self.application_pane.pack_start(section_slab, expand = False, fill = False)
 
 		section_slab.show_all()
 
