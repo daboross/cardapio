@@ -2646,7 +2646,7 @@ class Cardapio(dbus.service.Object):
 			self.remove_side_pane_menuitem.hide()
 			self.open_folder_menuitem.hide()
 			self.app_menu_separator.hide()
-			self.plugin_prepare_context_menu()
+			self.plugin_setup_context_menu()
 			return
 
 		already_pinned = False
@@ -2694,12 +2694,12 @@ class Cardapio(dbus.service.Object):
 				if os.path.exists(self.unescape(canonical_path)):
 					self.open_folder_menuitem.show()
 
-		self.plugin_prepare_context_menu()
+		self.plugin_setup_context_menu()
 
 
-	def plugin_prepare_context_menu(self):
+	def plugin_setup_context_menu(self):
 		"""
-		Adds context menu items that have been setup by plugins
+		Sets up context menu items as requested by individual plugins
 		"""
 
 		self.plugin_clear_context_menu()
@@ -2709,6 +2709,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def plugin_clear_context_menu(self):
+		"""
+		Remove all plugin-dependent actions from the context menu
+		"""
 
 		for menu_item in self.app_context_menu:
 			if menu_item.name is not None and menu_item.name.startswith('PluginAction'):
@@ -2716,6 +2719,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def plugin_fill_context_menu(self):
+		"""
+		Add plugin-related actions to the context menu
+		"""
 
 		i = 0
 
@@ -2736,7 +2742,6 @@ class Cardapio(dbus.service.Object):
 
 			menu_item.show_all()
 			self.app_context_menu.append(menu_item)
-
 
 
 	def on_app_button_focused(self, widget, event):
