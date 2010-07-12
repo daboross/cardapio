@@ -128,7 +128,7 @@ class CardapioPlugin(CardapioPluginInterface):
 							{
 								'name'      : self.context_menu_action_name % name,
 								'tooltip'   : self.context_menu_action_tooltip,
-								'icon name' : icon_name,
+								'icon name' : 'gtk-save',
 								'type'      : 'xdg',
 								'command'   : "apt:%s" % pkgname,
 							},
