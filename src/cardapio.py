@@ -3195,6 +3195,12 @@ class CardapioPluginInterface:
 		     message if the search fails (see more info below, in the 
 			 search() method)
 
+		   - ask_for_reload_permission - a function that should be used whenever
+			 the plugin wants to reload its database. Not all plugins have
+			 internal databases, though, so this is not always applicable. This
+			 is used, for example, with the software_center plugin. (see 
+ 		     on_reload_permission_granted below for more info)
+
 		Note: DO NOT WRITE ANYTHING IN THE settings DICT!!
 		"""
 		pass
@@ -3229,11 +3235,12 @@ class CardapioPluginInterface:
 		   * results - an array of dict items as described below.
 
 		item = {
-		  'name'      : _('Music'),
-		  'tooltip'   : _('Show your Music folder'),
-		  'icon name' : 'text-x-generic', 
-		  'type'      : 'xdg',
-		  'command'   : '~/Music'
+		  'name'         : _('Music'),
+		  'tooltip'      : _('Show your Music folder'),
+		  'icon name'    : 'text-x-generic', 
+		  'type'         : 'xdg',
+		  'command'      : '~/Music',
+		  'context menu' : None
 		  }
 
 		Where setting 'type' to 'xdg' means that 'command' should be opened
@@ -3245,6 +3252,10 @@ class CardapioPluginInterface:
 		Note that you can set item['file name'] to None if you want Cardapio
 		to guess the icon from the 'command'. This only works for 'xdg' commands,
 		though.
+
+		To change what is shown in the context menu for the search results, set
+		the 'context menu' field to a list [] of dictionary items exactly like
+		the ones above.
 		"""
 
 		pass

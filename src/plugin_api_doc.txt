@@ -1,0 +1,258 @@
+This document describes Cardapio's latest plugin API.
+
+Right now the plugin API is very basic and only allows for very simple plugins. The good news, though, is that it is also *really* easy to right your own plugin :)
+
+Here is all you need to know about Cardapio plugins:
+
+    ~
+
+1) Plugins are written in Python, and are placed at one of the locations below:
+  a) CARDAPIO_PATH/plugins (usually either /usr/lib/cardapio/plugins or /usr/local/lib/cardapio/plugins)
+  b) ~/.config/Cardapio/plugins
+
+    ~
+
+2) Every plugin must contain a class called CardapioPlugin, which inherits from CardapioPluginInterface. However, you should not load the cardapio module yourself. Instead, Cardapio adds a few things to Python's built-ins to make your life easier. These are:
+ a) the CardapioPluginInterface class
+ b) the gettext function _  (underscore) for translations
+ c) the dbus module
+ d) the subprocess module
+So you can just use these without ever loading them in any way.
+
+    ~
+
+3) Please follow these simple coding guidelines:
+ a) Use tabs, not spaces.
+ b) Use single quotes, except for strings that have single quotes in them, like "you're funny".
+ c) Use gettext's underscore function _('some text') for every string that is displayed in the GUI.
+ d) Do not use gettext for strings that are saved to the log. Also, these should be in English.
+ e) Catch all exceptions and save them to the log with the write_to_log method. Make sure exceptions do not crash Cardapio.
+
+    ~
+
+4) That said, to create a plugin, you can just follow the boilerplate code below. You can name the plugin file however you like, so long as it has a .py extension and does not start with _ (underscore), which is used to hide files from the plugin menu.
+
+    ~
+
+    ~    ~ 
+
+    ~    ~    ~
+
+class CardapioPlugin (CardapioPluginInterface):
+
+    author = 'plugin author'
+    name = _('plugin name')
+    description = _('plugin description')
+
+    # not yet used:
+    url = 'http://www.pluginurl.com'
+    help_text = 'a larger description of the plugin'
+    version = '0.1.2.3' # anything ending in a 'b' is marked as "beta"
+
+    plugin_api_version = 1.3 # must be 1.3 to work with the current version of Cardapio
+
+    search_delay_type = 'local search update delay'
+    # must be one of:
+    #
+    # - None - if there should be no delay between when the user types and when
+    # the plugin is called
+    #
+    # - 'local search update delay' - if the delay should be small (as set in
+    # the config.ini, in milliseconds)
+    #
+    # - 'remote search update delay' - if the delay should be slightly larger
+    # (as set in the config.ini, in milliseconds)
+
+    # the category name under which the plugin search results will appear
+    category_name = _('Plugin Category')
+
+    # the icon that will be shown next to the plugin category name
+    category_icon = '' 
+
+    # the icon that will be used for all search items for which Cardapio cannot
+    # find the assigned icon
+    fallback_icon = ''
+
+    # set to True if the plugin results should not show up when there is no text
+    # in the search field (like the tracker and google plugins, for example)
+    hide_from_sidebar = True
+
+    # Finally, Cardapio may add some variables to the plugin instance, and so you
+    # should not used these names in your plugin code. Right now, these are:
+    #    self.is_running
+    #    (more will possibly come, but not for plugin_api_version 1.2, which is frozen)
+
+#          ~
+
+    def __init__(self, cardapio_proxy):
+        """
+        REQUIRED
+
+        This constructor gets called whenever a plugin is activated.
+        (Typically once per session, unless the user is turning plugins on/off)
+
+        The constructor *must* set the instance variable self.loaded to True of False.
+        For example, the Tracker plugin sets self.loaded to False if Tracker is not
+        installed in the system.
+
+        The constructor is given a single parameter, which is an object used to 
+        communicate with Cardapio. This object has the following members:
+
+           - settings - this is a dict containing the same things that you will
+             find in the config.ini
+
+           - write_to_log - this is a function that lets you write to Cardapio's
+             log file, like this: write_to_log(self, 'hi there')
+
+           - handle_search_result - a function to which you should pass the
+             search results when you have them (see more info below, in the 
+             search() method)
+
+           - handle_search_error - a function to which you should pass an error
+             message if the search fails (see more info below, in the 
+             search() method)
+
+           - ask_for_reload_permission - a function that should be used whenever
+             the plugin wants to reload its database. Not all plugins have
+             internal databases, though, so this is not always applicable. This
+             is used, for example, with the software_center plugin. (see 
+              on_reload_permission_granted below for more info)
+
+        Note: DO NOT WRITE ANYTHING IN THE settings DICT!!
+        """
+
+        # Do stuff here. For example:
+
+        self.loaded = False
+        self.cardapio_proxy = cardapio_proxy
+
+        # Do some other initialization
+        
+        # If all goes well, set loaded to True:
+        self.loaded = True 
+
+        # For an example of how self.loaded is used, the tracker plugin will set
+        # self.loaded = False if the user does not have Tracker installed in
+        # his/her system. This way, Cardapio can just deactivate the plugin
+        # instead of crashing.
+
+#          ~
+
+    def __del__(self):
+        """
+        NOT REQUIRED
+
+        This destructor gets called whenever a plugin is deactivated
+        (Typically once per session, unless the user is turning plugins on/off)
+        """
+        pass
+
+#          ~
+
+    def search(self, text):
+        """
+        REQUIRED
+
+        This method gets called when a new text string is entered in the search
+        field. One of the following functions should be called from this method
+        (of from a thread spawned by this method):
+
+           * handle_search_result(plugin, results) - if the search goes well
+           * handle_search_error(plugin, text)     - if there is an error
+
+        The arguments to these functions are:
+
+           * plugin  - this plugin instance (that is, it should always be
+                       "self", without quotes)
+           * results - an array of dict items as described below.
+           * text    - some text to be inserted in Cardapio's log.
+
+        item = {
+          'name'         : _('Music'),
+          'tooltip'      : _('Show your Music folder'),
+          'icon name'    : 'text-x-generic', 
+          'type'         : 'xdg',
+          'command'      : '~/Music',
+          'context menu' : None
+          }
+
+        Where setting 'type' to 'xdg' means that 'command' should be opened
+        using xdg-open (you should give it a try it in the terminal, first!).
+        Meanwhile, setting 'type' to 'callback' means that 'command' is a
+        function that should be called when the item is clicked. This function
+        will receive as an argument the current search string.
+
+        Note that you can set item['file name'] to None if you want Cardapio
+        to guess the icon from the 'command'. This only works for 'xdg' commands,
+        though.
+
+        To change what is shown in the context menu for the search results, set
+        the 'context menu' field to a list [] of dictionary items exactly like
+        the ones above.
+        """
+
+        # Do stuff here
+        # Build an array full of items like the ones explained above
+
+        # Let's say that array is called my_items.
+
+        # Then, if the search worked (even if my_items == [])
+        if (search_worked_without_problems):
+
+            self.cardapio_proxy.handle_search_result(self, my_items)
+
+        else:
+            # or, if the search failed entirely for some reason (like when there is 
+            # no internet connection and we're doing a google search)
+
+            self.cardapio_proxy.handle_search_error(self, 'error message')
+            # all errors are automatically added to Cardapio's log file, by the way
+
+
+#          ~
+
+    def cancel(self):
+        """
+        NOT REQUIRED
+
+        This function should cancel the search operation. This is useful if the search is
+        done in a separate thread (which it should, as much as possible)
+        """
+        pass
+
+
+#          ~
+
+
+    def on_reload_permission_granted(self):
+        """
+        NOT REQUIRED
+        
+        Whenever a plugin wishes to rebuild some sort of internal database,
+        if this takes more than a couple of milliseconds it is advisable to 
+        first ask Cardapio for permission. This is how this works:
+
+        1) Plugin calls cardapio_proxy.ask_for_reload_permission(self)
+
+        Cardapio then decides at what time it is best to give the plugin the
+        reload permission. Usually this can take up to 10s, to allow several
+        plugins to reload at the same time. Then, Cardapio shows the "Data has
+        changed" window.  
+        
+        2) Cardapio calls on_reload_permission_granted to tell the plugin that
+        it can reload its database 
+        
+        When done, the "Data has changed" window is hidden.
+        """
+        pass
+
+
+
+    ~    ~    ~
+
+    ~    ~ 
+
+    ~
+
+
+That's it!
