@@ -110,13 +110,8 @@ class CardapioPlugin(CardapioPluginInterface):
 
 			name = doc.get_data()
 
-			icon_name = 'applications-other'
-
 			if self.apps_filter.filter(doc, pkgname) and summary:
 				icon_name = os.path.splitext(doc.get_value(XAPIAN_VALUE_ICON))[0]
-
-				if not icon_name:
-					icon_name = 'applications-other'
 
 				tooltip = self.default_tooltip_str % name 
 
