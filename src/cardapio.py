@@ -1444,7 +1444,19 @@ class Cardapio(dbus.service.Object):
 		if self.rebuild_timer is not None:
 			glib.source_remove(self.rebuild_timer)
 
-		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], plugin.on_reload_permission_granted)
+		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.plugin_on_reload_permission_granted, plugin)
+
+
+	def plugin_on_reload_permission_granted(self, plugin):
+		"""
+		Tell the plugin that it may rebuild its database now.
+		"""
+
+		self.rebuild_timer = None
+		plugin.on_reload_permission_granted()
+
+		return False
+		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
 	def is_searchentry_empty(self):
