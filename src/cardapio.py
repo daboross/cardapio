@@ -2407,9 +2407,9 @@ class Cardapio(dbus.service.Object):
 		Adds a new slab to the applications pane
 		"""
 
-		section_contents = gtk.VBox(homogeneous = True, spacing = 0)
+		section_contents = gtk.VBox(homogeneous = True)
 
-		section_margin = gtk.Alignment()
+		section_margin = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
 		section_margin.add(section_contents)
 		section_margin.set_padding(0, 0, 8, 0)
 
@@ -2427,9 +2427,9 @@ class Cardapio(dbus.service.Object):
 		section_slab.set_shadow_type(gtk.SHADOW_NONE)
 		section_slab.add(section_margin)
 
-		self.application_pane.pack_start(section_slab, expand = False, fill = False)
-
 		section_slab.show_all()
+
+		self.application_pane.pack_start(section_slab, expand = False, fill = False)
 
 		return section_slab, section_contents, label
 
