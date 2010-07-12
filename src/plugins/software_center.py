@@ -21,6 +21,7 @@ try:
 except Exception, exception:
 	import_error = exception
 
+
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = 'Clifton Mulkey'
@@ -59,7 +60,18 @@ class CardapioPlugin(CardapioPluginInterface):
 			self.c.write_to_log(self, import_error, is_error = True)
 			return
 
-		self.setup_db(True)
+		self.cache = apt.Cache() # this line is really slow! around 0.28s on my computer!
+		db_path = '/var/cache/software-center/xapian'
+
+		if not os.path.exists(db_path):
+			self.c.write_to_log(self, 'Could not find the database path', is_error = True)
+			return
+
+		self.db = StoreDatabase(db_path, self.cache)
+		self.db.open()
+		self.apps_filter = AppViewFilter(self.db, self.cache)
+		self.apps_filter.set_not_installed_only(True)
+		self.apps_filter.set_only_packages_without_applications(True)
 
 		self.action = {
 			'name'         : _('Open Software Center'),
@@ -75,8 +87,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.default_tooltip_str = _('Show %s in the Software Center')
 		self.summary_str = _('Description:')
-		
-		self.loaded = True # set to true if everything goes well
 
 		dpkg_path = '/var/lib/dpkg/lock'
 
@@ -87,6 +97,8 @@ class CardapioPlugin(CardapioPluginInterface):
 		else:
 			self.c.write_to_log(self, 'Path does not exist:' + dpkg_path)
 			self.c.write_to_log(self, 'Will not be able to monitor for package changes')
+		
+		self.loaded = True # set to true if everything goes well
 
 
 	def search(self, text):
@@ -144,25 +156,9 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.c.handle_search_result(self, results)
 
 
-	def setup_db(self, import_packages = False):
-
-		cache = apt.Cache() # this line is really slow! around 0.28s on my computer!
-		db_path = '/var/cache/software-center/xapian'
-
-		if not os.path.exists(db_path):
-			self.c.write_to_log(self, 'Could not find the database path', is_error = True)
-			return
-
-		self.db = StoreDatabase(db_path, cache)
-		self.db.open()
-		self.apps_filter = AppViewFilter(self.db, cache)
-		self.apps_filter.set_not_installed_only(True)
-		self.apps_filter.set_only_packages_without_applications(True)
-
-
 	def on_reload_permission_granted(self):
 
-		self.setup_db()
+		self.cache.open(None)
 
 
 	def on_packages_changed(self, monitor, file, other_file, event):
