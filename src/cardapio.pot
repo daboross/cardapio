@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-11 23:09-0400\n"
+"POT-Creation-Date: 2010-07-13 03:57-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -106,109 +106,109 @@ msgstr ""
 msgid "This is a community-supported plugin"
 msgstr ""
 
-#: cardapio.py:1941
+#: cardapio.py:1953
 msgid "Home"
 msgstr ""
 
-#: cardapio.py:1941
+#: cardapio.py:1953
 msgid "Open your personal folder"
 msgstr ""
 
-#: cardapio.py:1942
+#: cardapio.py:1954
 msgid "Computer"
 msgstr ""
 
-#: cardapio.py:1942
+#: cardapio.py:1954
 msgid ""
 "Browse all local and remote disks and folders accessible from this computer"
 msgstr ""
 
-#: cardapio.py:1960
+#: cardapio.py:1972
 msgid "Desktop"
 msgstr ""
 
-#: cardapio.py:1983
+#: cardapio.py:1995
 msgid "Trash"
 msgstr ""
 
-#: cardapio.py:1983
+#: cardapio.py:1995
 msgid "Open the trash"
 msgstr ""
 
-#: cardapio.py:2109
+#: cardapio.py:2121
 msgid "Lock Screen"
 msgstr ""
 
-#: cardapio.py:2110
+#: cardapio.py:2122
 msgid "Protect your computer from unauthorized use"
 msgstr ""
 
-#: cardapio.py:2116
+#: cardapio.py:2128
 msgid "Log Out..."
 msgstr ""
 
-#: cardapio.py:2117
+#: cardapio.py:2129
 msgid "Log out of this session to log in as a different user"
 msgstr ""
 
-#: cardapio.py:2123
+#: cardapio.py:2135
 msgid "Shut Down..."
 msgstr ""
 
-#: cardapio.py:2124
+#: cardapio.py:2136
 msgid "Shut down the system"
 msgstr ""
 
-#: cardapio.py:2197
+#: cardapio.py:2209
 msgid "Places"
 msgstr ""
 
-#: cardapio.py:2197
+#: cardapio.py:2209
 msgid "Access documents and folders"
 msgstr ""
 
-#: cardapio.py:2206
+#: cardapio.py:2218
 msgid "Pinned items"
 msgstr ""
 
-#: cardapio.py:2206
+#: cardapio.py:2218
 msgid "Your favorite applications"
 msgstr ""
 
-#: cardapio.py:2216
+#: cardapio.py:2228
 msgid "Side Pane"
 msgstr ""
 
-#: cardapio.py:2216
+#: cardapio.py:2228
 msgid "Items pinned to the side pane"
 msgstr ""
 
-#: cardapio.py:2226
+#: cardapio.py:2238
 msgid "Uncategorized"
 msgstr ""
 
-#: cardapio.py:2226
+#: cardapio.py:2238
 msgid "Items that are not under any menu category"
 msgstr ""
 
-#: cardapio.py:2236
+#: cardapio.py:2248
 msgid "Session"
 msgstr ""
 
-#: cardapio.py:2246
+#: cardapio.py:2258
 msgid "System"
 msgstr ""
 
-#: cardapio.py:3028
+#: cardapio.py:3040
 msgid "No results to show"
 msgstr ""
 
-#: cardapio.py:3060
+#: cardapio.py:3072
 #, python-format
 msgid "No results to show in \"%(category_name)s\""
 msgstr ""
 
-#: cardapio.py:3292
+#: cardapio.py:3315
 msgid "Access applications, folders, system settings, etc."
 msgstr ""
 
@@ -408,45 +408,45 @@ msgstr ""
 msgid "Results found with Google in you system language"
 msgstr ""
 
-#: plugins/software_center.py:27
+#: plugins/software_center.py:28
 msgid "Software Center"
 msgstr ""
 
-#: plugins/software_center.py:28
+#: plugins/software_center.py:29
 msgid "Search for new applications in the Software Center"
 msgstr ""
 
-#: plugins/software_center.py:37
+#: plugins/software_center.py:38
 msgid "Available Software"
 msgstr ""
 
-#: plugins/software_center.py:39
+#: plugins/software_center.py:40
 msgid "Software available to install on your system"
 msgstr ""
 
-#: plugins/software_center.py:65
+#: plugins/software_center.py:77
 msgid "Open Software Center"
 msgstr ""
 
-#: plugins/software_center.py:66
+#: plugins/software_center.py:78
 msgid "Search for more software in the Software Center"
 msgstr ""
 
-#: plugins/software_center.py:73
+#: plugins/software_center.py:85
 #, python-format
 msgid "_Install %s"
 msgstr ""
 
-#: plugins/software_center.py:74
+#: plugins/software_center.py:86
 msgid "Install this package without opening the Software Center"
 msgstr ""
 
-#: plugins/software_center.py:76
+#: plugins/software_center.py:88
 #, python-format
 msgid "Show %s in the Software Center"
 msgstr ""
 
-#: plugins/software_center.py:77
+#: plugins/software_center.py:89
 msgid "Description:"
 msgstr ""
 
