@@ -244,7 +244,7 @@
                                             <property name="visible">True</property>
                                             <property name="xalign">0</property>
                                             <property name="ypad">4</property>
-                                            <property name="label" translatable="no">Section Name</property>
+                                            <property name="label">Section Name</property>
                                             <property name="use_markup">True</property>
                                             <attributes>
                                               <attribute name="weight" value="bold"/>
@@ -486,12 +486,14 @@
       <column type="gboolean"/>
       <!-- column-name title -->
       <column type="gchararray"/>
-      <!-- column-name is -->
+      <!-- column-name is_core -->
       <column type="gboolean"/>
       <!-- column-name name -->
       <column type="gchararray"/>
       <!-- column-name tooltip -->
       <column type="gchararray"/>
+      <!-- column-name is_optional -->
+      <column type="gboolean"/>
     </columns>
   </object>
   <object class="GtkDialog" id="OptionsDialog">
@@ -765,18 +767,19 @@
                                 <property name="rules_hint">True</property>
                                 <property name="search_column">4</property>
                                 <property name="show_expanders">False</property>
-                                <property name="tooltip_column">5</property>
                                 <child>
-                                  <object class="GtkTreeViewColumn" id="treeviewcolumn3">
+                                  <object class="GtkTreeViewColumn" id="treeviewcolumn1">
                                     <property name="sizing">autosize</property>
-                                    <property name="title">supported</property>
+                                    <property name="title">active</property>
                                     <property name="alignment">0.5</property>
                                     <child>
-                                      <object class="GtkCellRendererPixbuf" id="cellrendererpixbuf1">
-                                        <property name="icon_name">emblem-system</property>
+                                      <object class="GtkCellRendererToggle" id="cellrenderertoggle1">
+                                        <property name="yalign">0</property>
+                                        <signal name="toggled" handler="on_plugin_state_toggled"/>
                                       </object>
                                       <attributes>
-                                        <attribute name="visible">3</attribute>
+                                        <attribute name="sensitive">6</attribute>
+                                        <attribute name="active">1</attribute>
                                       </attributes>
                                     </child>
                                   </object>
@@ -794,21 +797,6 @@
                                       </object>
                                       <attributes>
                                         <attribute name="markup">2</attribute>
-                                      </attributes>
-                                    </child>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkTreeViewColumn" id="treeviewcolumn1">
-                                    <property name="sizing">autosize</property>
-                                    <property name="title">active</property>
-                                    <property name="alignment">0.5</property>
-                                    <child>
-                                      <object class="GtkCellRendererToggle" id="cellrenderertoggle1">
-                                        <signal name="toggled" handler="on_plugin_state_toggled"/>
-                                      </object>
-                                      <attributes>
-                                        <attribute name="active">1</attribute>
                                       </attributes>
                                     </child>
                                   </object>
@@ -913,7 +901,7 @@
     <property name="type_hint">normal</property>
     <property name="has_separator">False</property>
     <property name="program_name">Cardapio</property>
-    <property name="version">0.9.126</property>
+    <property name="version">0.9.125</property>
     <property name="copyright" translatable="yes">&#xA9; Thiago Teixeira 2010</property>
     <property name="website">http://www.launchpad.net/cardapio</property>
     <property name="license" translatable="yes">GNU General Public License v3

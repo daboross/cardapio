@@ -124,6 +124,7 @@ class Cardapio(dbus.service.Object):
 			'applications', 
 			'google', 
 			'google_localized', 
+			'pinned',
 			'places', 
 			'software_center',
 			'tracker', 
@@ -131,7 +132,7 @@ class Cardapio(dbus.service.Object):
 			'zg_recent_documents',
 			]
 
-	required_plugins = ['applications', 'places']
+	required_plugins = ['applications', 'places', 'pinned']
 
 	APP_BUTTON = 0
 	CATEGORY_BUTTON = 1
@@ -301,7 +302,7 @@ class Cardapio(dbus.service.Object):
 
 		for basename in self.settings['active plugins']:
 
-			if basename == 'applications' or basename == 'places': continue
+			if basename in self.required_plugins: continue
 
 			basename = str(basename)
 			plugin_class = self.get_plugin_class(basename)
@@ -482,7 +483,7 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'applet icon'                , 'start-here'             , override_empty_str = True) # string (either a path to the icon, or an icon name)
 		self.read_config_option(s, 'pinned items'               , []                       ) 
 		self.read_config_option(s, 'side pane items'            , default_side_pane_items  )
-		self.read_config_option(s, 'active plugins'             , ['places', 'applications', 'tracker', 'google', 'software_center']) 
+		self.read_config_option(s, 'active plugins'             , ['pinned', 'places', 'applications', 'tracker', 'google', 'software_center']) 
 
 		# these are a bit of a hack:
 		self.read_config_option(s, 'handler for ftp paths'      , r"nautilus '%s'"         ) # a command line using %s
@@ -937,15 +938,13 @@ class Cardapio(dbus.service.Object):
 
 		for basename in plugin_list:
 
-			active = (basename in self.settings['active plugins'])
+			is_active   = (basename in self.settings['active plugins'])
+			is_core     = (basename in self.core_plugins)
+			is_required = (basename in self.required_plugins)
 
-			if basename == 'applications':
-				name = _('Application menu')
-				title = '<b>%s</b>\n%s' % (name, _('(cannot be deactivated)'))
-
-			elif basename == 'places':
-				name = _('Places menu')
-				title = '<b>%s</b>\n%s' % (name, _('(cannot be deactivated)'))
+			if   basename == 'applications' : name = _('Application menu')
+			elif basename == 'places'       : name = _('Places menu')
+			elif basename == 'pinned'       : name = _('Pinned items')
 
 			else:
 
@@ -953,26 +952,24 @@ class Cardapio(dbus.service.Object):
 				name = plugin_info['name']
 
 				params = {
-						'plugin_name' : plugin_info['name'],
-						'plugin_author': plugin_info['author'],
-						'plugin_description': plugin_info['description'],
+						'plugin_name'        : plugin_info['name'],
+						'plugin_author'      : plugin_info['author'],
+						'plugin_description' : plugin_info['description'],
 						}
 
-				if self.plugin_database[basename]['version'][-1] == 'b':
+				if plugin_info['version'][-1] == 'b':
 					params['plugin_name'] += ' (beta)'
 
-				title = ( '<b>%(plugin_name)s</b>\n<small><i>'  % params ) + \
-						( _('by %(plugin_author)s')      % params ) + \
-						( '</i>\n%(plugin_description)s</small>' % params )
+				title = (
+						'<b>%(plugin_name)s</b>\n<small><i>'   % params + 
+						_('by %(plugin_author)s')              % params + 
+						'</i>\n%(plugin_description)s</small>' % params )
 
-			is_core_plugin = (basename in self.core_plugins)
+				if not is_core : title += '\n<small>(' + _('This is a community-supported plugin') + ')</small>'
 
-			if is_core_plugin:
-				tooltip = _('This is a core plugin')
-			else: 
-				tooltip = _('This is a community-supported plugin')
+			if is_required : title = '<b>%s</b>' % name 
 
-			self.plugin_tree_model.append([basename, active, title, is_core_plugin, name, tooltip])
+			self.plugin_tree_model.append([basename, is_active, title, is_core, name, '', not is_required])
 
 		self.options_dialog.show()
 
@@ -1032,7 +1029,7 @@ class Cardapio(dbus.service.Object):
 		iter_ = self.plugin_tree_model.get_iter(path)
 		basename = self.plugin_tree_model.get_value(iter_, 0)
 
-		if basename == 'applications' or basename == 'places': return
+		if basename in self.required_plugins: return
 
 		self.plugin_tree_model.set_value(iter_, 1, not cell.get_active())	
 
@@ -2265,21 +2262,28 @@ class Cardapio(dbus.service.Object):
 		Add all the reorderable slabs to the app pane
 		"""
 
-		self.add_pinneditems_slab()
 		self.add_sidepane_slab()
 
 		for basename in self.settings['active plugins']:
 
 			if basename == 'applications':
 				self.build_applications_list()
+				self.add_uncategorized_slab()
 				self.add_session_slab()
 				self.add_system_slab()
-				self.add_uncategorized_slab()
 
 			elif basename == 'places':
 				self.add_places_slab()
 
+			elif basename == 'pinned':
+				self.add_pinneditems_slab()
+
 			else:
+
+				if basename not in self.plugin_database:
+					self.settings['active plugins'].remove(basename)
+					continue
+
 				plugin = self.plugin_database[basename]['instance']
 				if plugin is None: continue
 				section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hide = plugin.hide_from_sidebar)
