@@ -836,10 +836,11 @@ class Cardapio(dbus.service.Object):
 		if show_message:
 			self.set_message_window_visible(True)
 
-		glib.idle_add(self.build_ui)
+		self.build_ui()
 
-		for plugin in self.active_plugin_instances:
-			glib.idle_add(plugin.on_reload_permission_granted)
+		# NOTE: Why was this here at all? Makes no sense...
+		#for plugin in self.active_plugin_instances:
+		#	glib.idle_add(plugin.on_reload_permission_granted)
 
 		self.schedule_search_with_plugins('')
 
@@ -1232,19 +1233,19 @@ class Cardapio(dbus.service.Object):
 		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.rebuild_ui)
 
 
-	def on_searchentry_icon_pressed(self, widget, iconpos, event):
+	def on_search_entry_icon_pressed(self, widget, iconpos, event):
 		"""
 		Handler for when the "clear" icon of the search entry is pressed
 		"""
 
-		if self.is_searchentry_empty():
+		if self.is_search_entry_empty():
 			self.untoggle_and_show_all_sections()
 
 		else:
 			self.clear_search_entry()
 
 
-	def on_searchentry_changed(self, widget):
+	def on_search_entry_changed(self, widget):
 		"""
 		Handler for when the user types something in the search entry
 		"""
@@ -1257,7 +1258,6 @@ class Cardapio(dbus.service.Object):
 
 		if len(text) == 0:
 			#self.no_results_to_show = False
-
 			self.hide_all_transitory_sections(fully_hide = True)
 			return
 
@@ -1456,7 +1456,7 @@ class Cardapio(dbus.service.Object):
 		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
-	def is_searchentry_empty(self):
+	def is_search_entry_empty(self):
 		"""
 		Returns True if the search entry is empty.
 		"""
@@ -1464,7 +1464,7 @@ class Cardapio(dbus.service.Object):
 		return (len(self.search_entry.get_text().strip()) == 0)
 
 
-	def on_searchentry_activate(self, widget):
+	def on_search_entry_activate(self, widget):
 		"""
 		Handler for when the user presses Enter on the search entry
 		"""
@@ -1472,7 +1472,7 @@ class Cardapio(dbus.service.Object):
 		for plugin in self.active_plugin_instances:
 			if plugin.is_running: plugin.cancel()
 
-		if self.is_searchentry_empty():
+		if self.is_search_entry_empty():
 			self.hide_all_transitory_sections()
 			return 
 
@@ -1485,7 +1485,7 @@ class Cardapio(dbus.service.Object):
 			self.untoggle_and_show_all_sections()
 
 
-	def on_searchentry_key_pressed(self, widget, event):
+	def on_search_entry_key_pressed(self, widget, event):
 		"""
 		Handler for when the user presses Tab or Escape on the search entry
 		"""
@@ -1512,7 +1512,7 @@ class Cardapio(dbus.service.Object):
 			for plugin in self.active_plugin_instances:
 				if plugin.is_running: plugin.cancel()
 
-			if not self.is_searchentry_empty():
+			if not self.is_search_entry_empty():
 				self.clear_search_entry()
 
 			elif self.selected_section is not None:
@@ -2257,6 +2257,23 @@ class Cardapio(dbus.service.Object):
 		self.system_section_contents = section_contents
 
 
+	def add_plugin_slab(self, basename):
+		"""
+		Add the slab for a plugin (as identified by the basename)
+		"""
+
+		if basename not in self.plugin_database:
+			self.settings['active plugins'].remove(basename)
+			return
+
+		plugin = self.plugin_database[basename]['instance']
+		if plugin is None: return
+
+		section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hide = plugin.hide_from_sidebar)
+		plugin.section_slab = section_slab
+		plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
+
+
 	def add_all_reorderable_slabs(self):
 		"""
 		Add all the reorderable slabs to the app pane
@@ -2279,16 +2296,7 @@ class Cardapio(dbus.service.Object):
 				self.add_pinneditems_slab()
 
 			else:
-
-				if basename not in self.plugin_database:
-					self.settings['active plugins'].remove(basename)
-					continue
-
-				plugin = self.plugin_database[basename]['instance']
-				if plugin is None: continue
-				section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hide = plugin.hide_from_sidebar)
-				plugin.section_slab = section_slab
-				plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
+				self.add_plugin_slab(basename)
 
 
 	def clear_pane(self, container):
@@ -3008,7 +3016,7 @@ class Cardapio(dbus.service.Object):
 		widget = self.all_sections_sidebar_button
 		self.set_sidebar_button_active(widget, True) 
 
-		if self.is_searchentry_empty():
+		if self.is_search_entry_empty():
 			widget.set_sensitive(False)
 
 
@@ -3087,7 +3095,7 @@ class Cardapio(dbus.service.Object):
 		self.hide_section(self.sidepane_section_slab, fully_hide)
 		self.hide_section(self.uncategorized_section_slab, fully_hide)
 		
-		self.hide_plugin_sections(fully_hide)
+		self.hide_transitory_plugin_sections(fully_hide)
 
 
 	def hide_section(self, section_slab, fully_hide = False):
@@ -3101,7 +3109,7 @@ class Cardapio(dbus.service.Object):
 		section_slab.hide()
 
 
-	def hide_plugin_sections(self, fully_hide = False):
+	def hide_transitory_plugin_sections(self, fully_hide = False):
 		"""
 		Hide the section slabs for all plugins that are marked as transitory
 		"""

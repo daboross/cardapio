@@ -67,10 +67,10 @@
                                         <property name="secondary_icon_stock">gtk-clear</property>
                                         <property name="secondary_icon_activatable">True</property>
                                         <property name="secondary_icon_sensitive">True</property>
-                                        <signal name="changed" handler="on_searchentry_changed" after="yes"/>
-                                        <signal name="key_press_event" handler="on_searchentry_key_pressed"/>
-                                        <signal name="activate" handler="on_searchentry_activate"/>
-                                        <signal name="icon_press" handler="on_searchentry_icon_pressed"/>
+                                        <signal name="changed" handler="on_search_entry_changed" after="yes"/>
+                                        <signal name="key_press_event" handler="on_search_entry_key_pressed"/>
+                                        <signal name="activate" handler="on_search_entry_activate"/>
+                                        <signal name="icon_press" handler="on_search_entry_icon_pressed"/>
                                       </object>
                                     </child>
                                   </object>
