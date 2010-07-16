@@ -118,7 +118,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.126'
+	version = '0.9.127'
 
 	core_plugins = [
 			'applications', 
@@ -180,6 +180,7 @@ class Cardapio(dbus.service.Object):
 
 		self.app_tree = gmenu.lookup_tree('applications.menu')
 		self.sys_tree = gmenu.lookup_tree('settings.menu')
+		#self.sys_tree = gmenu.lookup_tree('gnomecc.menu') # TODO Control-Center
 		self.app_tree.add_monitor(self.on_menu_data_changed)
 		self.sys_tree.add_monitor(self.on_menu_data_changed)
 
@@ -815,7 +816,7 @@ class Cardapio(dbus.service.Object):
 
 		self.build_places_list()
 		self.build_session_list()
-		self.build_system_list()
+		self.build_system_list() # TODO: use gnomecc.menu
 		self.build_uncategorized_list()
 		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
@@ -1930,6 +1931,13 @@ class Cardapio(dbus.service.Object):
 		Populate the System section
 		"""
 
+		# TODO Control-Center
+		#for node in self.sys_tree.root.contents:
+
+		#	if isinstance(node, gmenu.Directory):
+
+		#		self.add_slab(node.name, node.icon, node.get_comment(), node = node, hide = True)
+
 		self.add_tree_to_app_list(self.sys_tree.root, self.system_section_contents)
 
 
@@ -2078,6 +2086,10 @@ class Cardapio(dbus.service.Object):
 			if 'icon_name' in app:
 				app['icon name'] = app['icon_name']
 				app.pop('icon_name')
+
+			# adding a new property that was not in the old config files...
+			if 'context menu' not in app:
+				app['context menu'] = None
 
 			button = self.add_app_button(app['name'], app['icon name'], self.section_list[slab]['contents'], app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
 
@@ -2287,8 +2299,9 @@ class Cardapio(dbus.service.Object):
 				self.build_applications_list()
 				self.add_uncategorized_slab()
 				self.add_session_slab()
-				self.add_system_slab()
-
+				self.add_system_slab() # TODO: use gnomecc.menu
+				#self.build_system_list() # TODO: use gnomecc.menu
+                                           
 			elif basename == 'places':
 				self.add_places_slab()
 
@@ -2322,7 +2335,6 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		button = self.add_button(button_str, icon_name, parent_widget, tooltip, button_type = Cardapio.APP_BUTTON)
-		button.set_property
 
 		if app_list is not None:
 
