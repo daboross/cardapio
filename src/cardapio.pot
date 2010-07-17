@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-15 01:11-0400\n"
+"POT-Creation-Date: 2010-07-17 14:23-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,191 +16,210 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: cardapio.py:443
+#: cardapio.py:265
+msgid "Application menu"
+msgstr ""
+
+#: cardapio.py:266 cardapio.py:277 cardapio.py:288
+msgid "Cardapio Team"
+msgstr ""
+
+#: cardapio.py:267
+msgid "Displays installed applications"
+msgstr ""
+
+#: cardapio.py:276
+msgid "Places menu"
+msgstr ""
+
+#: cardapio.py:278
+msgid "Displays a list of folders"
+msgstr ""
+
+#: cardapio.py:287 cardapio.py:2265
+msgid "Pinned items"
+msgstr ""
+
+#: cardapio.py:289
+msgid "Displays your favorite applications"
+msgstr ""
+
+#: cardapio.py:477
 msgid "Control Center"
 msgstr ""
 
-#: cardapio.py:445
+#: cardapio.py:479
 msgid "The Gnome configuration tool"
 msgstr ""
 
-#: cardapio.py:454
+#: cardapio.py:488
 msgid "Ubuntu Software Center"
 msgstr ""
 
-#: cardapio.py:456
+#: cardapio.py:490
 msgid ""
 "Lets you choose from thousands of free applications available for Ubuntu"
 msgstr ""
 
-#: cardapio.py:463
+#: cardapio.py:497
 msgid "Help and Support"
 msgstr ""
 
-#: cardapio.py:465
+#: cardapio.py:499
 #, python-format
 msgid "Get help with %(distro_name)s"
 msgstr ""
 
-#: cardapio.py:654
+#: cardapio.py:688
 msgid "_Properties"
 msgstr ""
 
-#: cardapio.py:655
+#: cardapio.py:689
 msgid "_Edit Menus"
 msgstr ""
 
-#: cardapio.py:656 cardapio.ui.h:34
+#: cardapio.py:690 cardapio.ui.h:30
 msgid "_About Cardapio"
 msgstr ""
 
-#: cardapio.py:657
+#: cardapio.py:691
 msgid "_About Gnome"
 msgstr ""
 
-#: cardapio.py:658
+#: cardapio.py:692
 #, python-format
 msgid "_About %(distro_name)s"
 msgstr ""
 
-#: cardapio.py:802
+#: cardapio.py:836
 msgid "All"
 msgstr ""
 
-#: cardapio.py:802
+#: cardapio.py:836
 msgid "Show all categories"
 msgstr ""
 
-#: cardapio.py:857
+#: cardapio.py:891
 #, python-format
 msgid "Do you want to run \"%(file_name)s\" or display its contents?"
 msgstr ""
 
-#: cardapio.py:858
+#: cardapio.py:892
 #, python-format
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr ""
 
-#: cardapio.py:946
-msgid "Application menu"
-msgstr ""
-
-#: cardapio.py:947
-msgid "Places menu"
-msgstr ""
-
-#: cardapio.py:948 cardapio.py:2215
-msgid "Pinned items"
-msgstr ""
-
-#: cardapio.py:966
+#: cardapio.py:1036
 #, python-format
-msgid "by %(plugin_author)s"
+msgid ""
+"<b>Plugin:</b> %(name)s %(version)s\n"
+"<b>Author:</b> %(author)s\n"
+"<b>Description:</b> %(description)s"
 msgstr ""
 
-#: cardapio.py:969
+#: cardapio.py:1037
 msgid "This is a community-supported plugin"
 msgstr ""
 
-#: cardapio.py:1950
+#: cardapio.py:1996
 msgid "Home"
 msgstr ""
 
-#: cardapio.py:1950
+#: cardapio.py:1996
 msgid "Open your personal folder"
 msgstr ""
 
-#: cardapio.py:1951
+#: cardapio.py:1997
 msgid "Computer"
 msgstr ""
 
-#: cardapio.py:1951
+#: cardapio.py:1997
 msgid ""
 "Browse all local and remote disks and folders accessible from this computer"
 msgstr ""
 
-#: cardapio.py:1969
+#: cardapio.py:2015
 msgid "Desktop"
 msgstr ""
 
-#: cardapio.py:1992
+#: cardapio.py:2038
 msgid "Trash"
 msgstr ""
 
-#: cardapio.py:1992
+#: cardapio.py:2038
 msgid "Open the trash"
 msgstr ""
 
-#: cardapio.py:2118
+#: cardapio.py:2168
 msgid "Lock Screen"
 msgstr ""
 
-#: cardapio.py:2119
+#: cardapio.py:2169
 msgid "Protect your computer from unauthorized use"
 msgstr ""
 
-#: cardapio.py:2125
+#: cardapio.py:2175
 msgid "Log Out..."
 msgstr ""
 
-#: cardapio.py:2126
+#: cardapio.py:2176
 msgid "Log out of this session to log in as a different user"
 msgstr ""
 
-#: cardapio.py:2132
+#: cardapio.py:2182
 msgid "Shut Down..."
 msgstr ""
 
-#: cardapio.py:2133
+#: cardapio.py:2183
 msgid "Shut down the system"
 msgstr ""
 
-#: cardapio.py:2206
+#: cardapio.py:2256
 msgid "Places"
 msgstr ""
 
-#: cardapio.py:2206
+#: cardapio.py:2256
 msgid "Access documents and folders"
 msgstr ""
 
-#: cardapio.py:2215
+#: cardapio.py:2265
 msgid "Your favorite applications"
 msgstr ""
 
-#: cardapio.py:2225
+#: cardapio.py:2275
 msgid "Side Pane"
 msgstr ""
 
-#: cardapio.py:2225
+#: cardapio.py:2275
 msgid "Items pinned to the side pane"
 msgstr ""
 
-#: cardapio.py:2235
+#: cardapio.py:2285
 msgid "Uncategorized"
 msgstr ""
 
-#: cardapio.py:2235
+#: cardapio.py:2285
 msgid "Items that are not under any menu category"
 msgstr ""
 
-#: cardapio.py:2245
+#: cardapio.py:2295
 msgid "Session"
 msgstr ""
 
-#: cardapio.py:2255
+#: cardapio.py:2305
 msgid "System"
 msgstr ""
 
-#: cardapio.py:3052
+#: cardapio.py:3102
 msgid "No results to show"
 msgstr ""
 
-#: cardapio.py:3084
+#: cardapio.py:3134
 #, python-format
 msgid "No results to show in \"%(category_name)s\""
 msgstr ""
 
-#: cardapio.py:3327
+#: cardapio.py:3377
 msgid "Access applications, folders, system settings, etc."
 msgstr ""
 
@@ -218,143 +237,135 @@ msgstr ""
 
 #: cardapio.ui.h:4
 msgid ""
-"<b>Usage:</b>\n"
-"&#x2022; Use the checkboxes to activate or deactivate plugins\n"
-"&#x2022; Drag plugins up or down to reorder them\n"
-"&#x2022; Click Apply when done"
-msgstr ""
-
-#: cardapio.ui.h:8
-msgid ""
 "<big>Data has recently changed.</big>\n"
 "Rebuilding&#x2026;"
 msgstr ""
 
-#: cardapio.ui.h:10
+#: cardapio.ui.h:6
 msgid "Applet icon:"
 msgstr ""
 
-#: cardapio.ui.h:11
+#: cardapio.ui.h:7
 msgid "Applet label:"
 msgstr ""
 
-#: cardapio.ui.h:12
+#: cardapio.ui.h:8
 msgid "Cardapio"
 msgstr ""
 
-#: cardapio.ui.h:13
+#: cardapio.ui.h:9
 msgid "Cardapio Properties"
 msgstr ""
 
-#: cardapio.ui.h:14
+#: cardapio.ui.h:10
 msgid "Edit Menus"
 msgstr ""
 
-#: cardapio.ui.h:15
+#: cardapio.ui.h:11
 msgid ""
 "GNU General Public License v3\n"
 "http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
 msgstr ""
 
-#: cardapio.ui.h:17
+#: cardapio.ui.h:13
 msgid "General"
 msgstr ""
 
-#: cardapio.ui.h:18
+#: cardapio.ui.h:14
 msgid "Keep search results when Cardapio is hidden"
 msgstr ""
 
-#: cardapio.ui.h:19
+#: cardapio.ui.h:15
 msgid ""
 "Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-"
 "Click)"
 msgstr ""
 
-#: cardapio.ui.h:20
+#: cardapio.ui.h:16
 msgid "Open menu when cursor hovers the applet"
 msgstr ""
 
-#: cardapio.ui.h:21
+#: cardapio.ui.h:17
 msgid "Open parent _folder"
 msgstr ""
 
-#: cardapio.ui.h:22
+#: cardapio.ui.h:18
 msgid "Open this item's parent folder in the file browser"
 msgstr ""
 
-#: cardapio.ui.h:23
+#: cardapio.ui.h:19
 msgid "Place this item in the side pane"
 msgstr ""
 
-#: cardapio.ui.h:24
+#: cardapio.ui.h:20
 msgid "Place this item into the \"Pinned Items\" list"
 msgstr ""
 
-#: cardapio.ui.h:25
+#: cardapio.ui.h:21
 msgid "Plugins"
 msgstr ""
 
-#: cardapio.ui.h:26
+#: cardapio.ui.h:22
 msgid "Remove this item from the \"Pinned Items\" list"
 msgstr ""
 
-#: cardapio.ui.h:27
+#: cardapio.ui.h:23
 msgid "Remove this item from the side pane"
 msgstr ""
 
-#: cardapio.ui.h:28
+#: cardapio.ui.h:24
 msgid "Run in _Terminal"
 msgstr ""
 
-#: cardapio.ui.h:29
+#: cardapio.ui.h:25
 msgid "Search"
 msgstr ""
 
-#: cardapio.ui.h:30
+#: cardapio.ui.h:26
 msgid "See https://translations.launchpad.net/cardapio"
 msgstr ""
 
-#: cardapio.ui.h:31
+#: cardapio.ui.h:27
 msgid "Shortcut key:"
 msgstr ""
 
-#: cardapio.ui.h:32
+#: cardapio.ui.h:28
 msgid "Show session buttons in bottom pane"
 msgstr ""
 
-#: cardapio.ui.h:33
+#: cardapio.ui.h:29
 msgid "View"
 msgstr ""
 
-#: cardapio.ui.h:35
+#: cardapio.ui.h:31
 msgid "_Add to side pane"
 msgstr ""
 
-#: cardapio.ui.h:36
+#: cardapio.ui.h:32
 msgid "_Display"
 msgstr ""
 
-#: cardapio.ui.h:37
+#: cardapio.ui.h:33
 msgid "_Launch in background"
 msgstr ""
 
-#: cardapio.ui.h:38
+#: cardapio.ui.h:34
 msgid "_Pin this item"
 msgstr ""
 
-#: cardapio.ui.h:39
+#: cardapio.ui.h:35
 msgid "_Remove from side pane"
 msgstr ""
 
-#: cardapio.ui.h:40
+#: cardapio.ui.h:36
 msgid "_Run"
 msgstr ""
 
-#: cardapio.ui.h:41
+#: cardapio.ui.h:37
 msgid "_Unpin this item"
 msgstr ""
 
-#: cardapio.ui.h:42
+#: cardapio.ui.h:38
 msgid "translators: just enter any text here"
 msgstr ""
 
@@ -478,25 +489,27 @@ msgstr ""
 msgid "Results found inside the files in your computer"
 msgstr ""
 
-#: plugins/virtualbox.py:6
+#: plugins/virtualbox.py:14
 msgid "VirtualBox"
 msgstr ""
 
-#: plugins/virtualbox.py:7
+#: plugins/virtualbox.py:15
 msgid "Search for and start VirtualBox virtual machines from the menu"
 msgstr ""
 
-#: plugins/virtualbox.py:18
+#: plugins/virtualbox.py:26
 msgid "Virtual Machines"
 msgstr ""
 
-#: plugins/virtualbox.py:20
+#: plugins/virtualbox.py:28
 msgid "Your VirtualBox virtual machines"
 msgstr ""
 
-#: plugins/virtualbox.py:54
+#: plugins/virtualbox.py:87
 #, python-format
-msgid "Start virtual machine %(name)s"
+msgid ""
+"Start virtual machine %(name)s\n"
+"OS Type: %(os)s"
 msgstr ""
 
 #: plugins/zg_recent_documents.py:17
@@ -504,7 +517,7 @@ msgid "Recent documents"
 msgstr ""
 
 #: plugins/zg_recent_documents.py:18
-msgid "Search for your most recently used files."
+msgid "Search for your most recently used files"
 msgstr ""
 
 #: plugins/zg_recent_documents.py:28

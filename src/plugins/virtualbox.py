@@ -84,12 +84,12 @@ class CardapioPlugin (CardapioPluginInterface):
 	def load_vm_items(self):
 		self.vm_items = []
 		vms = self.vboxmgr.getArray(self.vboxmgr.vbox, 'machines')
-		tooltip = _('Start virtual machine %s\nOS Type: %s')
+		tooltip = _('Start virtual machine %(name)s\nOS Type: %(os)s')
 		
 		for vm in vms:
 			item = {
 				'name'         : vm.name,
-				'tooltip'      : tooltip % (vm.name, vm.OSTypeId),
+				'tooltip'      : tooltip % {'name': vm.name, 'os': vm.OSTypeId},
 				'icon name'    : 'VBox',
 				'type'         : 'raw',
 				'command'      : 'VBoxManage startvm %s' % vm.name,
