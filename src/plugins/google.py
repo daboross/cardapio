@@ -4,7 +4,7 @@ from glib import GError
 
 class CardapioPlugin(CardapioPluginInterface):
 
-	author             = 'Thiago Teixeira'
+	author             = _('Cardapio Team')
 	name               = _('Google')
 	description        = _('Perform quick Google searches in <b>all</b> languages')
 

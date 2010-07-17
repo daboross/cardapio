@@ -822,7 +822,7 @@ class Cardapio(dbus.service.Object):
 		elements that support them.
 		"""
 
-		self.prepare_colors()
+		self.read_gtk_theme_info()
 
 		self.clear_pane(self.application_pane)
 		self.clear_pane(self.category_pane)
@@ -1036,7 +1036,16 @@ class Cardapio(dbus.service.Object):
 		description = _('<b>Plugin:</b> %(name)s %(version)s\n<b>Author:</b> %(author)s\n<b>Description:</b> %(description)s') % plugin_info
 		if not is_core  : description += '\n<small>(' + _('This is a community-supported plugin') + ')</small>'
 
-		self.get_object('OptionPluginInfo').set_markup(description)
+		label = self.get_object('OptionPluginInfo')
+		dummy, dummy, width, dummy = label.get_allocation()
+		label.set_markup(description)
+		label.set_line_wrap(True)
+
+		# make sure the label doesn't resize the window!
+		if width > 1:
+			label.set_size_request(width - self.scrollbar_width, -1) 
+		# The -20 is a hack that may not work for other Gtk themes
+		# TODO: find a better solution
 
 
 	def on_plugin_apply_clicked(self, widget):
@@ -1249,7 +1258,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if property_changed.name == 'gtk-color-scheme' or property_changed.name == 'gtk-theme-name':
-			self.prepare_colors()
+			self.read_gtk_theme_info()
 			self.schedule_rebuild()
 
 
@@ -2613,10 +2622,10 @@ class Cardapio(dbus.service.Object):
 				self.add_tree_to_app_list(node, parent_widget)
 
 
-	def prepare_colors(self):
+	def read_gtk_theme_info(self):
 		"""
-		Reads colors from the GTK theme so that the app pane can look like a
-		GTK treeview
+		Reads colors and other info from the GTK theme so that the app better 
+		adapt to any custom theme
 		"""
 
 		dummy_window = gtk.Window()
@@ -2626,6 +2635,9 @@ class Cardapio(dbus.service.Object):
 		self.style_app_button_bg = app_style.base[gtk.STATE_NORMAL]
 		self.style_app_button_fg = app_style.text[gtk.STATE_NORMAL]
 		self.get_object('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
+
+		scrollbar = gtk.VScrollbar()
+		self.scrollbar_width = scrollbar.style_get_property('slider-width')
 
 
 	def launch_edit_app(self, *dummy):

@@ -47,7 +47,7 @@ class CardapioPlugin (CardapioPluginInterface):
     # not yet used:
     url = 'http://www.pluginurl.com'
     help_text = 'a larger description of the plugin'
-    version = '0.1.2.3' # anything ending in a 'b' is marked as "beta"
+    version = '0.1.2.3'
 
     plugin_api_version = 1.3 # must be 1.3 to work with the current version of Cardapio
 

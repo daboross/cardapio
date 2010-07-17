@@ -13,7 +13,7 @@ except Exception, exception:
 
 class CardapioPlugin(CardapioPluginInterface):
 
-	author             = 'Thiago Teixeira'
+	author             = _('Cardapio Team')
 	name               = _('Recent documents')
 	description        = _('Search for your most recently used files')
 

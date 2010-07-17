@@ -2,7 +2,7 @@ import urllib2, os
 
 class CardapioPlugin(CardapioPluginInterface):
 
-	author             = 'Thiago Teixeira'
+	author             = _('Cardapio Team')
 	name               = _('Tracker')
 	description        = _('Search local files and folders indexed with Tracker')
 
