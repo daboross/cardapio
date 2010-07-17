@@ -261,6 +261,39 @@ class Cardapio(dbus.service.Object):
 
 		self.plugin_database = {}
 
+		self.plugin_database['applications'] = {
+				'name'              : _('Application menu'),
+				'author'            : _('Cardapio Team'),
+				'description'       : _('Displays installed applications'),
+				'version'           : self.version,
+				'category name'     : None,
+				'category icon'     : 'applications-other',
+				'hide from sidebar' : False,
+				'instance'          : None,
+				}
+
+		self.plugin_database['places'] = {
+				'name'              : _('Places menu'),
+				'author'            : _('Cardapio Team'),
+				'description'       : _('Displays a list of folders'),
+				'version'           : self.version,
+				'category name'     : None,
+				'category icon'     : 'folder',
+				'hide from sidebar' : False,
+				'instance'          : None,
+				}
+
+		self.plugin_database['pinned'] = {
+				'name'              : _('Pinned items'),
+				'author'            : _('Cardapio Team'),
+				'description'       : _('Displays your favorite applications'),
+				'version'           : self.version,
+				'category name'     : None,
+				'category icon'     : 'emblem-favorite',
+				'hide from sidebar' : False,
+				'instance'          : None,
+				}
+
 		plugin_dirs = [
 			os.path.join(cardapio_path, 'plugins'), 
 			os.path.join(DesktopEntry.xdg_config_home, 'Cardapio', 'plugins')
@@ -287,7 +320,7 @@ class Cardapio(dbus.service.Object):
 							'category name'     : plugin_class.category_name,
 							'category icon'     : plugin_class.category_icon,
 							'hide from sidebar' : plugin_class.hide_from_sidebar,
-							'instance' : None,
+							'instance'          : None,
 							}
 
 
@@ -931,6 +964,8 @@ class Cardapio(dbus.service.Object):
 		self.set_widget_from_option('OptionKeepResults', 'keep search results')
 		self.set_widget_from_option('OptionOpenOnHover', 'open on hover')
 
+		icon_size = gtk.icon_size_lookup(4)[0] # 4 because it's that same as in the UI file
+
 		self.plugin_tree_model.clear()
 
 		# place active plugins at the top of the list, in order
@@ -940,39 +975,20 @@ class Cardapio(dbus.service.Object):
 
 		for basename in plugin_list:
 
+			plugin_info = self.plugin_database[basename]
+			name = plugin_info['name']
+
 			is_active   = (basename in self.settings['active plugins'])
 			is_core     = (basename in self.core_plugins)
 			is_required = (basename in self.required_plugins)
 
-			if   basename == 'applications' : name = _('Application menu')
-			elif basename == 'places'       : name = _('Places menu')
-			elif basename == 'pinned'       : name = _('Pinned items')
-
-			else:
-
-				plugin_info = self.plugin_database[basename]
-				name = plugin_info['name']
-
-				params = {
-						'plugin_name'        : plugin_info['name'],
-						'plugin_author'      : plugin_info['author'],
-						'plugin_description' : plugin_info['description'],
-						}
-
-				if plugin_info['version'][-1] == 'b':
-					params['plugin_name'] += ' (beta)'
-
-				title = (
-						'<b>%(plugin_name)s</b>\n<small><i>'   % params + 
-						_('by %(plugin_author)s')              % params + 
-						'</i>\n%(plugin_description)s</small>' % params )
-
-				if not is_core : title += '\n<small>(' + _('This is a community-supported plugin') + ')</small>'
-
 			if is_required : title = '<b>%s</b>' % name 
 
-			self.plugin_tree_model.append([basename, is_active, title, is_core, name, '', not is_required])
+			icon_pixbuf = self.get_icon_pixbuf(plugin_info['category icon'], icon_size, 'package-x-generic')
 
+			self.plugin_tree_model.append([basename, name, name, is_active, is_core, not is_required, icon_pixbuf])
+
+		self.update_plugin_description()
 		self.options_dialog.show()
 
 	
@@ -1001,6 +1017,28 @@ class Cardapio(dbus.service.Object):
 		self.setup_ui_from_gui_settings()
 
 
+	def update_plugin_description(self, *dummy):
+		"""
+		Writes information about the currently-selected plugin on the GUI
+		"""
+
+		model, iter_ = self.get_object('PluginTreeView').get_selection().get_selected()
+
+		if iter_ is None: 
+			is_core = True
+			plugin_info = {'name': '', 'version': '', 'author': '', 'description': ''}
+
+		else:
+			is_core  = self.plugin_tree_model.get_value(iter_, 4)
+			basename = self.plugin_tree_model.get_value(iter_, 0)
+			plugin_info = self.plugin_database[basename]
+
+		description = _('<b>Plugin:</b> %(name)s %(version)s\n<b>Author:</b> %(author)s\n<b>Description:</b> %(description)s') % plugin_info
+		if not is_core  : description += '\n<small>(' + _('This is a community-supported plugin') + ')</small>'
+
+		self.get_object('OptionPluginInfo').set_markup(description)
+
+
 	def on_plugin_apply_clicked(self, widget):
 		"""
 		Handler for when the user clicks on "Apply" in the plugin tab of the
@@ -1012,7 +1050,7 @@ class Cardapio(dbus.service.Object):
 
 		while iter_ is not None:
 
-			if self.plugin_tree_model.get_value(iter_, 1):
+			if self.plugin_tree_model.get_value(iter_, 3):
 				self.settings['active plugins'].append(self.plugin_tree_model.get_value(iter_, 0))
 
 			iter_ = self.plugin_tree_model.iter_next(iter_)
@@ -1033,7 +1071,7 @@ class Cardapio(dbus.service.Object):
 
 		if basename in self.required_plugins: return
 
-		self.plugin_tree_model.set_value(iter_, 1, not cell.get_active())	
+		self.plugin_tree_model.set_value(iter_, 3, not cell.get_active())	
 
 
 	def on_mainwindow_button_pressed(self, widget, event):

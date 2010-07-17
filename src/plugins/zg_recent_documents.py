@@ -15,7 +15,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	author             = 'Thiago Teixeira'
 	name               = _('Recent documents')
-	description        = _('Search for your most recently used files.')
+	description        = _('Search for your most recently used files')
 
 	url                = ''
 	help_text          = ''

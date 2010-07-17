@@ -482,18 +482,18 @@
     <columns>
       <!-- column-name basename -->
       <column type="gchararray"/>
-      <!-- column-name active -->
-      <column type="gboolean"/>
       <!-- column-name title -->
       <column type="gchararray"/>
+      <!-- column-name name_for_search -->
+      <column type="gchararray"/>
+      <!-- column-name is_active -->
+      <column type="gboolean"/>
       <!-- column-name is_core -->
       <column type="gboolean"/>
-      <!-- column-name name -->
-      <column type="gchararray"/>
-      <!-- column-name tooltip -->
-      <column type="gchararray"/>
       <!-- column-name is_optional -->
       <column type="gboolean"/>
+      <!-- column-name icon -->
+      <column type="GdkPixbuf"/>
     </columns>
   </object>
   <object class="GtkDialog" id="OptionsDialog">
@@ -746,9 +746,11 @@
                     <property name="left_padding">5</property>
                     <property name="right_padding">5</property>
                     <child>
-                      <object class="GtkVBox" id="vbox1">
+                      <object class="GtkVPaned" id="vpaned1">
                         <property name="visible">True</property>
-                        <property name="spacing">5</property>
+                        <property name="can_focus">True</property>
+                        <property name="position">230</property>
+                        <property name="position_set">True</property>
                         <child>
                           <object class="GtkScrolledWindow" id="scrolledwindow2">
                             <property name="visible">True</property>
@@ -767,26 +769,25 @@
                                 <property name="rules_hint">True</property>
                                 <property name="search_column">4</property>
                                 <property name="show_expanders">False</property>
+                                <property name="tooltip_column">6</property>
+                                <signal name="button_release_event" handler="update_plugin_description" after="yes"/>
                                 <child>
-                                  <object class="GtkTreeViewColumn" id="treeviewcolumn1">
-                                    <property name="sizing">autosize</property>
-                                    <property name="title">active</property>
-                                    <property name="alignment">0.5</property>
+                                  <object class="GtkTreeViewColumn" id="treeviewcolumn3">
+                                    <property name="spacing">4</property>
+                                    <property name="title">type</property>
                                     <child>
-                                      <object class="GtkCellRendererToggle" id="cellrenderertoggle1">
-                                        <property name="yalign">0</property>
-                                        <signal name="toggled" handler="on_plugin_state_toggled"/>
+                                      <object class="GtkCellRendererPixbuf" id="cellrendererpixbuf1">
+                                        <property name="stock_size">4</property>
                                       </object>
                                       <attributes>
-                                        <attribute name="sensitive">6</attribute>
-                                        <attribute name="active">1</attribute>
+                                        <attribute name="pixbuf">6</attribute>
                                       </attributes>
                                     </child>
                                   </object>
                                 </child>
                                 <child>
                                   <object class="GtkTreeViewColumn" id="treeviewcolumn2">
-                                    <property name="spacing">3</property>
+                                    <property name="spacing">4</property>
                                     <property name="sizing">fixed</property>
                                     <property name="title">description</property>
                                     <property name="expand">True</property>
@@ -796,7 +797,25 @@
                                         <property name="wrap_width">200</property>
                                       </object>
                                       <attributes>
-                                        <attribute name="markup">2</attribute>
+                                        <attribute name="markup">1</attribute>
+                                      </attributes>
+                                    </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkTreeViewColumn" id="treeviewcolumn1">
+                                    <property name="spacing">4</property>
+                                    <property name="sizing">autosize</property>
+                                    <property name="title">active</property>
+                                    <property name="alignment">0.5</property>
+                                    <child>
+                                      <object class="GtkCellRendererToggle" id="cellrenderertoggle1">
+                                        <property name="yalign">0</property>
+                                        <signal name="toggled" handler="on_plugin_state_toggled"/>
+                                      </object>
+                                      <attributes>
+                                        <attribute name="sensitive">5</attribute>
+                                        <attribute name="active">3</attribute>
                                       </attributes>
                                     </child>
                                   </object>
@@ -805,39 +824,61 @@
                             </child>
                           </object>
                           <packing>
-                            <property name="position">0</property>
+                            <property name="resize">False</property>
+                            <property name="shrink">True</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel" id="label2">
+                          <object class="GtkVBox" id="vbox1">
                             <property name="visible">True</property>
-                            <property name="xpad">5</property>
-                            <property name="ypad">5</property>
-                            <property name="label" translatable="yes">&lt;b&gt;Usage:&lt;/b&gt;
-&#x2022; Use the checkboxes to activate or deactivate plugins
-&#x2022; Drag plugins up or down to reorder them
-&#x2022; Click Apply when done</property>
-                            <property name="use_markup">True</property>
-                            <property name="wrap">True</property>
+                            <property name="spacing">5</property>
+                            <child>
+                              <object class="GtkScrolledWindow" id="scrolledwindow4">
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="hscrollbar_policy">never</property>
+                                <property name="vscrollbar_policy">automatic</property>
+                                <child>
+                                  <object class="GtkViewport" id="viewport3">
+                                    <property name="visible">True</property>
+                                    <property name="resize_mode">queue</property>
+                                    <property name="shadow_type">none</property>
+                                    <child>
+                                      <object class="GtkLabel" id="OptionPluginInfo">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="yalign">0</property>
+                                        <property name="use_markup">True</property>
+                                        <property name="wrap">True</property>
+                                        <property name="wrap_mode">word-char</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkButton" id="button2">
+                                <property name="label">gtk-apply</property>
+                                <property name="visible">True</property>
+                                <property name="can_focus">True</property>
+                                <property name="receives_default">True</property>
+                                <property name="use_stock">True</property>
+                                <signal name="clicked" handler="on_plugin_apply_clicked"/>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">False</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
                           </object>
                           <packing>
-                            <property name="expand">False</property>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkButton" id="button2">
-                            <property name="label">gtk-apply</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                            <property name="use_stock">True</property>
-                            <signal name="clicked" handler="on_plugin_apply_clicked"/>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">False</property>
-                            <property name="position">2</property>
+                            <property name="resize">True</property>
+                            <property name="shrink">True</property>
                           </packing>
                         </child>
                       </object>
