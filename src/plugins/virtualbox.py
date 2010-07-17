@@ -1,4 +1,12 @@
-import re
+import_error = None
+
+try:
+	import os
+	import gio
+	from vboxapi import VirtualBoxManager
+	
+except Exception, exception:
+	import_error = exception
 
 class CardapioPlugin (CardapioPluginInterface):
 
@@ -9,7 +17,7 @@ class CardapioPlugin (CardapioPluginInterface):
 	# not used in the GUI yet:
 	url = ''
 	help_text = ''
-	version = '1.1'
+	version = '1.2'
 
 	plugin_api_version = 1.3 
 
@@ -31,41 +39,34 @@ class CardapioPlugin (CardapioPluginInterface):
 		'''
 		
 		self.c = cardapio_proxy
-
-		self.num_search_results = self.c.settings['search results limit']
-		self.vm_items = [] # List of virtual machine items 
-
-		self.c.write_to_log(self, "Loading virtual machine list...")
+		
+		if import_error:
+			self.c.write_to_log(self, "Error importing some modules: %s" % import_error, is_error = True)
+			self.loaded = False
+			return
 		
 		try:
-			vms = subprocess.Popen(['VBoxManage', 'list', 'vms'], stdout = subprocess.PIPE).communicate()[0]
-			
-			vms = re.findall('\".*\"', vms) 
-			# Virtual machines are listed in quotes, this extracts them
-			# and builds a list from the VBoxManage output
-			
-			# The list of virtual machine items is built when the plugin loads
-			# to save time when searching
-
-			for vm in vms:
-				name = vm.replace('\"','')
-				item = {
-					'name'         : name,
-					'tooltip'      : _('Start virtual machine %(name)s') % {'name' : name},
-					'icon name'    : 'VBox',
-					'type'         : 'raw',
-					'command'      : 'VBoxManage startvm %s' % vm,
-					'context menu' : None,
-					}
-			 
-				self.vm_items.append(item)
-
-			self.loaded = True
+			subprocess.Popen(['VBoxManage'], stdout = subprocess.PIPE)
 			
 		except OSError:
-
-			self.c.write_to_log(self, "VBoxManage command not recognized: Maybe VirtualBox is not installed...")
+			self.c.write_to_log(self, "VBoxManage command not recognized: Maybe virtualbox is not installed...", is_error = True)
 			self.loaded = False
+			return
+		
+		self.vboxmgr = VirtualBoxManager(None,None)
+		self.load_vm_items()
+		
+		machine_path = self.vboxmgr.vbox.systemProperties.defaultMachineFolder
+		
+		if os.path.exists(machine_path):
+			self.package_monitor = gio.File(machine_path).monitor_directory()
+			self.package_monitor.connect('changed', self.on_vms_changed)
+
+		else:
+			self.c.write_to_log(self, 'Path does not exist:' + machine_path)
+			self.c.write_to_log(self, 'Will not be able to monitor for virtual machine changes')
+			
+		self.loaded = True
 
 
 	def search(self, text):
@@ -79,5 +80,32 @@ class CardapioPlugin (CardapioPluginInterface):
 				results.append(item)
 	  
 		self.c.handle_search_result(self, results)
-
+		
+	def load_vm_items(self):
+		self.vm_items = []
+		vms = self.vboxmgr.getArray(self.vboxmgr.vbox, 'machines')
+		tooltip = _('Start virtual machine %s\nOS Type: %s')
+		
+		for vm in vms:
+			item = {
+				'name'         : vm.name,
+				'tooltip'      : tooltip % (vm.name, vm.OSTypeId),
+				'icon name'    : 'VBox',
+				'type'         : 'raw',
+				'command'      : 'VBoxManage startvm %s' % vm.name,
+				'context menu' : None,
+			}
+			
+			self.vm_items.append(item)
+			
+			
+	def on_vms_changed(self, monitor, file, other_file, event):
+		
+		if event in [gio.FILE_MONITOR_EVENT_CREATED, 
+					 gio.FILE_MONITOR_EVENT_DELETED]:
+			
+			self.c.ask_for_reload_permission(self)
+			
+	def on_reload_permission_granted(self):
+		self.load_vm_items()
 	
