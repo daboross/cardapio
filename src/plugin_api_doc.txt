@@ -1,8 +1,10 @@
 This document describes Cardapio's latest plugin API.
 
-Right now the plugin API is very basic and only allows for very simple plugins. The good news, though, is that it is also *really* easy to right your own plugin :)
+Right now the plugin API is very basic and only allows for very simple plugins. The good news, though, is that it is also *really* easy to write your own plugin :)
 
-Here is all you need to know about Cardapio plugins:
+If you'd like to submit a plugin to be distributed with Cardapio, see https://answers.launchpad.net/cardapio/+faq/1212 for information on how to do that.
+
+Anyways, here is all you need to know about Cardapio plugins:
 
     ~
 
@@ -32,22 +34,24 @@ So you can just use these without ever loading them in any way.
 
 4) That said, to create a plugin, you can just follow the boilerplate code below. You can name the plugin file however you like, so long as it has a .py extension and does not start with _ (underscore), which is used to hide files from the plugin menu.
 
+Note that since Launchpad does not like tabs I had to replace them with spaces below. But in your code you should replace them back with tabs (4 spaces = 1 tab).
+
     ~
 
     ~    ~ 
 
-    ~    ~    ~
+    ~
 
 class CardapioPlugin (CardapioPluginInterface):
 
     author = 'plugin author'
     name = _('plugin name')
     description = _('plugin description')
+    version = '0.1.2.3'
 
     # not yet used:
     url = 'http://www.pluginurl.com'
     help_text = 'a larger description of the plugin'
-    version = '0.1.2.3'
 
     plugin_api_version = 1.3 # must be 1.3 to work with the current version of Cardapio
 
@@ -68,6 +72,8 @@ class CardapioPlugin (CardapioPluginInterface):
 
     # the icon that will be shown next to the plugin category name
     category_icon = '' 
+    # (icons can be gtk icons, named icons from the icon theme, or even
+    # filesystem paths)
 
     # the icon that will be used for all search items for which Cardapio cannot
     # find the assigned icon
@@ -248,7 +254,7 @@ class CardapioPlugin (CardapioPluginInterface):
 
 
 
-    ~    ~    ~
+    ~
 
     ~    ~ 
 
@@ -256,3 +262,4 @@ class CardapioPlugin (CardapioPluginInterface):
 
 
 That's it!
+
