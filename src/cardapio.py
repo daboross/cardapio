@@ -118,7 +118,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.127'
+	version = '0.9.128'
 
 	core_plugins = [
 			'applications', 
@@ -346,7 +346,14 @@ class Cardapio(dbus.service.Object):
 				self.settings['active plugins'].remove(basename)
 				continue
 
-			plugin = plugin_class(self.safe_cardapio_proxy)
+			try:
+				plugin = plugin_class(self.safe_cardapio_proxy)
+
+			except Exception, exception:
+				logging.error('[plugin: %s] Plugin did not load properly: uncaught exception.' % basename)
+				logging.error(exception)
+				self.settings['active plugins'].remove(basename)
+				continue
 
 			if not plugin.loaded:
 				self.plugin_write_to_log(plugin, 'Plugin did not load properly')
@@ -1383,9 +1390,17 @@ class Cardapio(dbus.service.Object):
 		for plugin in self.active_plugin_instances:
 			if plugin.search_delay_type == delay_type:
 				if not plugin.hide_from_sidebar or len(text) >= self.settings['min search string length']:
+
 					#if plugin.is_running: plugin.cancel()
 					plugin.is_running = True
-					plugin.search(text)
+
+					try:
+						# TODO: make plugins run in a separate thread
+						plugin.search(text)
+
+					except Exception, exception:
+						self.plugin_write_to_log(plugin, 'Plugin search query failed to execute', is_error = True)
+						logging.error(exception)
 
 		return False
 		# Required! makes this a "one-shot" timer, rather than "periodic"
@@ -1483,7 +1498,7 @@ class Cardapio(dbus.service.Object):
 	def plugin_ask_for_reload_permission(self, plugin):
 		"""
 		Handler for when a plugin asks Cardapio whether it can reload its
-		database.
+		database
 		"""
 
 		if self.rebuild_timer is not None:
@@ -1494,7 +1509,7 @@ class Cardapio(dbus.service.Object):
 
 	def plugin_on_reload_permission_granted(self, plugin):
 		"""
-		Tell the plugin that it may rebuild its database now.
+		Tell the plugin that it may rebuild its database now
 		"""
 
 		self.rebuild_timer = None
@@ -1502,6 +1517,19 @@ class Cardapio(dbus.service.Object):
 
 		return False
 		# Required! makes this a "one-shot" timer, rather than "periodic"
+
+
+	def plugin_cancel_search(self, plugin):
+		"""
+		Tell the plugin to stop a possibly-time-consuming search
+		"""
+
+		try:
+			plugin.cancel()
+
+		except Exception, exception:
+			self.plugin_write_to_log(plugin, 'Plugin failed to cancel query', is_error = True)
+			logging.error(exception)
 
 
 	def is_search_entry_empty(self):
@@ -1518,7 +1546,8 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		for plugin in self.active_plugin_instances:
-			if plugin.is_running: plugin.cancel()
+			if plugin.is_running: 
+				self.plugin_cancel_search(plugin)
 
 		if self.is_search_entry_empty():
 			self.hide_all_transitory_sections()
@@ -1558,7 +1587,7 @@ class Cardapio(dbus.service.Object):
 		elif event.keyval == gtk.gdk.keyval_from_name('Escape'):
 
 			for plugin in self.active_plugin_instances:
-				if plugin.is_running: plugin.cancel()
+				if plugin.is_running: self.plugin_cancel_search(plugin)
 
 			if not self.is_search_entry_empty():
 				self.clear_search_entry()

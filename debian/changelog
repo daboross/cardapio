@@ -1,3 +1,11 @@
+cardapio (0.9.128-ubuntu1) lucid; urgency=low
+
+  * updated the plugin display, and included the new version of the virtual box
+    plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 14 Jul 2010 23:04:00 -0400
+
+
 cardapio (0.9.127-ubuntu1) lucid; urgency=low
 
   * trying to fix the ppa
