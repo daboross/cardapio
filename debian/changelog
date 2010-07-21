@@ -1,3 +1,11 @@
+cardapio (0.9.129-ubuntu1) lucid; urgency=low
+
+  * wrapped all plugin calls with exception handlers, so there are less
+    chances for a plugin to crash Cardapio
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 21 Jul 2010 13:25:00 -0400
+
+
 cardapio (0.9.128-ubuntu1) lucid; urgency=low
 
   * updated the plugin display, and included the new version of the virtual box

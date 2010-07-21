@@ -762,6 +762,7 @@
                               <object class="GtkTreeView" id="PluginTreeView">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
+                                <property name="events">GDK_POINTER_MOTION_MASK | GDK_STRUCTURE_MASK</property>
                                 <property name="model">PluginListstore</property>
                                 <property name="headers_visible">False</property>
                                 <property name="headers_clickable">False</property>
@@ -770,7 +771,9 @@
                                 <property name="search_column">4</property>
                                 <property name="show_expanders">False</property>
                                 <property name="tooltip_column">6</property>
-                                <signal name="button_release_event" handler="update_plugin_description" after="yes"/>
+                                <signal name="motion_notify_event" handler="on_plugintreeview_hover"/>
+                                <signal name="cursor_changed" handler="update_plugin_description"/>
+                                <signal name="drag_end" handler="apply_plugins_from_option_window"/>
                                 <child>
                                   <object class="GtkTreeViewColumn" id="treeviewcolumn3">
                                     <property name="spacing">4</property>
@@ -803,7 +806,7 @@
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkTreeViewColumn" id="treeviewcolumn1">
+                                  <object class="GtkTreeViewColumn" id="PluginCheckboxColumn">
                                     <property name="spacing">4</property>
                                     <property name="sizing">autosize</property>
                                     <property name="title">active</property>
@@ -829,51 +832,27 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkVBox" id="vbox1">
+                          <object class="GtkScrolledWindow" id="scrolledwindow4">
                             <property name="visible">True</property>
-                            <property name="spacing">5</property>
+                            <property name="can_focus">True</property>
+                            <property name="hscrollbar_policy">never</property>
+                            <property name="vscrollbar_policy">automatic</property>
                             <child>
-                              <object class="GtkScrolledWindow" id="scrolledwindow4">
+                              <object class="GtkViewport" id="viewport3">
                                 <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="hscrollbar_policy">never</property>
-                                <property name="vscrollbar_policy">automatic</property>
+                                <property name="resize_mode">queue</property>
+                                <property name="shadow_type">none</property>
                                 <child>
-                                  <object class="GtkViewport" id="viewport3">
+                                  <object class="GtkLabel" id="OptionPluginInfo">
                                     <property name="visible">True</property>
-                                    <property name="resize_mode">queue</property>
-                                    <property name="shadow_type">none</property>
-                                    <child>
-                                      <object class="GtkLabel" id="OptionPluginInfo">
-                                        <property name="visible">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="yalign">0</property>
-                                        <property name="use_markup">True</property>
-                                        <property name="wrap">True</property>
-                                        <property name="wrap_mode">word-char</property>
-                                      </object>
-                                    </child>
+                                    <property name="xalign">0</property>
+                                    <property name="yalign">0</property>
+                                    <property name="use_markup">True</property>
+                                    <property name="wrap">True</property>
+                                    <property name="wrap_mode">word-char</property>
                                   </object>
                                 </child>
                               </object>
-                              <packing>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkButton" id="button2">
-                                <property name="label">gtk-apply</property>
-                                <property name="visible">True</property>
-                                <property name="can_focus">True</property>
-                                <property name="receives_default">True</property>
-                                <property name="use_stock">True</property>
-                                <signal name="clicked" handler="on_plugin_apply_clicked"/>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">False</property>
-                                <property name="position">1</property>
-                              </packing>
                             </child>
                           </object>
                           <packing>
@@ -942,7 +921,7 @@
     <property name="type_hint">normal</property>
     <property name="has_separator">False</property>
     <property name="program_name">Cardapio</property>
-    <property name="version">0.9.128</property>
+    <property name="version">0.9.129</property>
     <property name="copyright" translatable="yes">&#xA9; Thiago Teixeira 2010</property>
     <property name="website">http://www.launchpad.net/cardapio</property>
     <property name="license" translatable="yes">GNU General Public License v3

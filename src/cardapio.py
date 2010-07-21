@@ -118,7 +118,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.128'
+	version = '0.9.129'
 
 	core_plugins = [
 			'applications', 
@@ -634,6 +634,7 @@ class Cardapio(dbus.service.Object):
 		self.remove_side_pane_menuitem = self.get_object('RemoveSidePaneMenuItem')
 		self.open_folder_menuitem      = self.get_object('OpenParentFolderMenuItem')
 		self.plugin_tree_model         = self.get_object('PluginListstore')
+		self.plugin_checkbox_column    = self.get_object('PluginCheckboxColumn')
 
 		# HACK: fix names of widgets to allow theming 
 		# (glade doesn't seem to properly add names to widgets anymore...)
@@ -655,6 +656,7 @@ class Cardapio(dbus.service.Object):
 		self.icon_size_app = gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
 		self.icon_size_category = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
 		self.icon_size_menu = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
+		self.drag_allowed_cursor = gtk.gdk.Cursor(gtk.gdk.FLEUR)
 
 		self.section_label_attributes = self.get_object('SectionName').get_attributes()
 
@@ -1055,7 +1057,7 @@ class Cardapio(dbus.service.Object):
 		# TODO: find a better solution
 
 
-	def on_plugin_apply_clicked(self, widget):
+	def apply_plugins_from_option_window(self, *dummy):
 		"""
 		Handler for when the user clicks on "Apply" in the plugin tab of the
 		Options Dialog
@@ -1075,6 +1077,22 @@ class Cardapio(dbus.service.Object):
 		self.schedule_rebuild()
 
 
+	def on_plugintreeview_hover(self, treeview, event):
+
+		pthinfo = treeview.get_path_at_pos(int(event.x), int(event.y))
+
+		if pthinfo is None: 
+			treeview.window.set_cursor(None)
+			return
+
+		path, col, cellx, celly = pthinfo
+
+		if col == self.plugin_checkbox_column: 
+			treeview.window.set_cursor(None)
+		else:
+			treeview.window.set_cursor(self.drag_allowed_cursor)
+
+
 	def on_plugin_state_toggled(self, cell, path):
 		"""
 		Believe it or not, GTK requires you to manually tell the checkbuttons
@@ -1088,6 +1106,7 @@ class Cardapio(dbus.service.Object):
 		if basename in self.required_plugins: return
 
 		self.plugin_tree_model.set_value(iter_, 3, not cell.get_active())	
+		self.apply_plugins_from_option_window()
 
 
 	def on_mainwindow_button_pressed(self, widget, event):
