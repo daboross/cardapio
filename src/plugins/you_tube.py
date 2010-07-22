@@ -6,17 +6,17 @@ from glib import GError
 
 class CardapioPlugin(CardapioPluginInterface):
 	"""
-	Plugin based on Microsoft's Bing API. Basics of the API are described in
-	this document:
-	http://www.bing.com/developers/s/API%20Basics.pdf
+	YouTube video searching plugin based on it's Data API.
+	Searching using the API is described here:
+	http://code.google.com/apis/youtube/2.0/developers_guide_protocol.html#Searching_for_Videos
 
 	All web requests are done in asynchronous and cancellable manner.
 	"""
 
 	# Cardapio's variables
 	author = 'Pawel Bara'
-	name = _('Bing')
-	description = _("Perform a search using Microsoft's Bing")
+	name = _('YouTube')
+	description = _('Search for results in YouTube')
 	version = '0.9b'
 
 	url = ''
@@ -26,8 +26,8 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	search_delay_type = 'remote search update delay'
 
-	category_name = _('Bing Results')
-	category_tooltip = _('Results found using Bing')
+	category_name = _('YouTube Results')
+	category_tooltip = _('Results found in YouTube')
 
 	category_icon = 'system-search'
 	fallback_icon = ''
@@ -35,23 +35,21 @@ class CardapioPlugin(CardapioPluginInterface):
 	hide_from_sidebar = True
 
 	def __init__(self, cardapio_proxy):
-		cardapio_proxy.write_to_log(self, 'initializing Bing plugin')
+		cardapio_proxy.write_to_log(self, 'initializing YouTube plugin')
 
 		self.cardapio = cardapio_proxy
 
 		self.cancellable = gio.Cancellable()
 
-		# Bing's API arguments (my AppID and a request for a web search with
-		# maximum four results)
+		# YouTube's API arguments (format and maximum result count)
 		self.api_base_args = {
-			'Appid'    : '237CBC82BB8C3F7F5F19F6A77B0D38A59E8F8C2C',
-			'sources'  : 'web',
-			'web.count': 4
+			'alt'        : 'json',
+			'max-results': 4
 		}
 
-		# Bing's base URLs (search and search more variations)
-		self.api_base_url = 'http://api.search.live.net/json.aspx?{0}'
-		self.web_base_url = 'http://www.bing.com/search?{0}'
+		# YouTube's base URLs (search and search more variations)
+		self.api_base_url = 'http://gdata.youtube.com/feeds/api/videos?{0}'
+		self.web_base_url = 'http://www.youtube.com/results?{0}'
 
 		self.loaded = True
 
@@ -59,13 +57,13 @@ class CardapioPlugin(CardapioPluginInterface):
 		if len(text) == 0:
 			return
 
-		self.cardapio.write_to_log(self, 'searching for {0} using Bing'.format(text))
+		self.cardapio.write_to_log(self, 'searching for {0} using YouTube'.format(text))
 
 		self.cancellable.reset()
 
 		# prepare final API URL
 		current_args = self.api_base_args.copy()
-		current_args['query'] = text
+		current_args['q'] = text
 		final_url = self.api_base_url.format(urllib.urlencode(current_args))
 
 		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url))
@@ -78,7 +76,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def show_search_results(self, gdaemonfile, result, text):
 		"""
-        Callback to asynchronous IO (Bing's API call).
+        Callback to asynchronous IO (YouTube's API call).
 		"""
 
 		# watch out for connection problems
@@ -98,24 +96,34 @@ class CardapioPlugin(CardapioPluginInterface):
 		try:
 			items = []
 
-			response_body = response['SearchResponse']['Web']
+			if response['feed']['openSearch$totalResults']['$t'] > 0:
 
-			# if we have any results...
-			if response_body['Total'] != 0:
-				# remember them all
-				for item in response_body['Results']:
+				response_body = response['feed']['entry']
+
+				for item in response_body:
+
+					# we need to find the correct URL type (text/html) among
+					# all that we are getting
+					href = ""
+					for link in item['link']:
+						if link['type'] == 'text/html':
+							href = link['href']
+							break
+
+					# ignore entries without the needed URL
+					if len(href) == 0:
+						continue
+
 					items.append({
-						'name'         : item['Title'],
-						'tooltip'      : item['Url'],
+						'name'         : item['title']['$t'],
+						'tooltip'      : href,
 						'icon name'    : 'text-html',
 						'type'         : 'xdg',
-						'command'      : item['Url'],
+						'command'      : href,
 						'context menu' : None
 					})
 
 			# always add 'Search more...' item
-			search_more_args = { 'q' : text }
-
 			items.append({
 				'name'         : _('Show additional results'),
 				'tooltip'      : _('Show additional search results in your web browser'),
@@ -123,7 +131,7 @@ class CardapioPlugin(CardapioPluginInterface):
 				'type'         : 'xdg',
 				# TODO: cardapio later unquotes this and then quotes it again;
 				# it's screwing my quotation
-				'command'      : self.web_base_url.format(urllib.urlencode(search_more_args)),
+				'command'      : self.web_base_url.format(urllib.urlencode({'search_query' : text})),
 				'context menu' : None
 			})
 
@@ -131,10 +139,10 @@ class CardapioPlugin(CardapioPluginInterface):
 			self.cardapio.handle_search_result(self, items)
 
 		except KeyError:
-			self.cardapio.handle_search_error(self, "Incorrect Bing's JSON structure")
+			self.cardapio.handle_search_error(self, "Incorrect YouTube's JSON structure")
 
 	def cancel(self):
-		self.cardapio.write_to_log(self, 'cancelling a recent Bing search (if any)')
+		self.cardapio.write_to_log(self, 'cancelling a recent YouTube search (if any)')
 
 		if not self.cancellable.is_cancelled():
 			self.cancellable.cancel()
