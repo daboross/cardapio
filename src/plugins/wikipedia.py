@@ -4,7 +4,14 @@ import urllib
 
 from glib import GError
 
-# TODO: search could be localized
+# TODO: it would be nice to localize this but it's hard; the Wikipedia's API
+# has no locale parameter and the only way to look for results in other
+# language is to change the URL from http://en.wikipedia.org/ to
+# for example http://pl.wikipedia.org/; because we cannot be sure about
+# existence of local Wikipedia versions we should look for them at runtime
+# and use English only as fallback strategy; this is really hard considering
+# asynchronous web requests and the lifecycle of plugin so I'm leaving this
+# unimplemented and waiting for somebody brave enough ;)
 class CardapioPlugin(CardapioPluginInterface):
 	"""
 	Wikipedia plugin based on it's "unofficial" API. Documentation can
@@ -77,7 +84,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def show_search_results(self, gdaemonfile, result):
 		"""
-        Callback to asynchronous IO (Wikipedia's API call).
+		Callback to asynchronous IO (Wikipedia's API call).
 		"""
 
 		# watch out for connection problems

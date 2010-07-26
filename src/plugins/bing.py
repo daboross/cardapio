@@ -78,7 +78,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def show_search_results(self, gdaemonfile, result, text):
 		"""
-        Callback to asynchronous IO (Bing's API call).
+		Callback to asynchronous IO (Bing's API call).
 		"""
 
 		# watch out for connection problems
