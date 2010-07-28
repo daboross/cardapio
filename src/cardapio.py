@@ -590,10 +590,12 @@ class Cardapio(dbus.service.Object):
 		config_file = self.get_config_file('w')
 
 		if config_file is None:
-			logging.error("Could not load config file for saving settings")
+			logging.error('Could not load config file for saving settings')
 			return
 
+		logging.info('Saving config file...')
 		json.dump(self.settings, config_file, sort_keys = True, indent = 4)
+		logging.info('...done saving config file!')
 
 
 	def setup_base_ui(self):
@@ -830,6 +832,8 @@ class Cardapio(dbus.service.Object):
 		Read the contents of all menus and plugins and build the UI
 		elements that support them.
 		"""
+
+		self.plugin_loading_text = _('Searching...')
 
 		self.read_gtk_theme_info()
 
@@ -1376,6 +1380,10 @@ class Cardapio(dbus.service.Object):
 		Start a plugin-based search, after some time-outs
 		"""
 
+		# TODO: figure out why this causes the web search plugin to not
+		# show up sometimes
+		#self.cancel_all_plugins()
+
 		if self.search_timer_local is not None:
 			glib.source_remove(self.search_timer_local)
 
@@ -1410,11 +1418,11 @@ class Cardapio(dbus.service.Object):
 			if plugin.search_delay_type == delay_type:
 				if not plugin.hide_from_sidebar or len(text) >= self.settings['min search string length']:
 
-					#if plugin.is_running: plugin.cancel()
 					plugin.is_running = True
 
 					try:
 						# TODO: make plugins run in a separate thread
+						self.show_plugin_loading_text(plugin)
 						plugin.search(text)
 
 					except Exception, exception:
@@ -1423,6 +1431,40 @@ class Cardapio(dbus.service.Object):
 
 		return False
 		# Required! makes this a "one-shot" timer, rather than "periodic"
+
+
+	def reset_plugin_section_contents(self, plugin):
+		"""
+		Clear the contents of a plugin's slab, usually to fill it with results later
+		"""
+
+		container = plugin.section_contents.parent
+
+		if container is None:
+			# plugin was deactivated while waiting for search result
+			return False
+
+		container.remove(plugin.section_contents)
+		plugin.section_contents = gtk.VBox()
+		container.add(plugin.section_contents)
+
+		return True
+
+
+	def show_plugin_loading_text(self, plugin):
+		"""
+		Write "Searching..." under the plugin slab title
+		"""
+
+		self.reset_plugin_section_contents(plugin)
+		label = gtk.Label(self.plugin_loading_text)
+		label.set_alignment(0, 0.5)
+		label.set_sensitive(False)
+		label.show()
+
+		plugin.section_contents.pack_start(label, expand = False, fill = False)
+		plugin.section_contents.show()
+		plugin.section_slab.show()
 
 
 	def plugin_handle_search_error(self, plugin, text):
@@ -1458,14 +1500,7 @@ class Cardapio(dbus.service.Object):
 
 		gtk.gdk.threads_enter()
 
-		container = plugin.section_contents.parent
-		if container is None:
-			# plugin was deactivated while waiting for search result
-			return
-
-		container.remove(plugin.section_contents)
-		plugin.section_contents = gtk.VBox()
-		container.add(plugin.section_contents)
+		self.reset_plugin_section_contents(plugin)
 
 		for result in results:
 
@@ -1538,17 +1573,21 @@ class Cardapio(dbus.service.Object):
 		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
-	def plugin_cancel_search(self, plugin):
+	def cancel_all_plugins(self):
 		"""
-		Tell the plugin to stop a possibly-time-consuming search
+		Tell all plugins to stop a possibly-time-consuming search
 		"""
 
-		try:
-			plugin.cancel()
+		for plugin in self.active_plugin_instances:
 
-		except Exception, exception:
-			self.plugin_write_to_log(plugin, 'Plugin failed to cancel query', is_error = True)
-			logging.error(exception)
+			if not plugin.is_running: continue
+
+			try:
+				plugin.cancel()
+
+			except Exception, exception:
+				self.plugin_write_to_log(plugin, 'Plugin failed to cancel query', is_error = True)
+				logging.error(exception)
 
 
 	def is_search_entry_empty(self):
@@ -1563,10 +1602,6 @@ class Cardapio(dbus.service.Object):
 		"""
 		Handler for when the user presses Enter on the search entry
 		"""
-
-		for plugin in self.active_plugin_instances:
-			if plugin.is_running: 
-				self.plugin_cancel_search(plugin)
 
 		if self.is_search_entry_empty():
 			self.hide_all_transitory_sections()
@@ -1605,8 +1640,7 @@ class Cardapio(dbus.service.Object):
 
 		elif event.keyval == gtk.gdk.keyval_from_name('Escape'):
 
-			for plugin in self.active_plugin_instances:
-				if plugin.is_running: self.plugin_cancel_search(plugin)
+			self.cancel_all_plugins()
 
 			if not self.is_search_entry_empty():
 				self.clear_search_entry()
@@ -1754,7 +1788,7 @@ class Cardapio(dbus.service.Object):
 
 		self.settings['window size'] = self.window.get_size()
 		self.settings['splitter position'] = self.get_object('MainSplitter').get_position()
-		self.save_config_file()
+		#self.save_config_file() # TODO save config file when quit
 
 
 	def set_message_window_visible(self, state = True):
@@ -1823,6 +1857,8 @@ class Cardapio(dbus.service.Object):
 		if not self.settings['keep search results']:
 			self.clear_search_entry()
 			self.untoggle_and_show_all_sections()
+
+		self.cancel_all_plugins()
 
 		return False # used for when hide() is called from a timer
 
@@ -2394,7 +2430,7 @@ class Cardapio(dbus.service.Object):
 				self.build_applications_list()
 				self.add_uncategorized_slab()
 				self.add_session_slab()
-				self.add_system_slab() # TODO: use gnomecc.menu
+				self.add_system_slab()
 				#self.build_system_list() # TODO: use gnomecc.menu
                                            
 			elif basename == 'places':
