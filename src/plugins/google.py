@@ -121,7 +121,7 @@ class CardapioPlugin(CardapioPluginInterface):
 				}
 			parsed_results.append(item)
 
-		if raw_results:
+		if parsed_results:
 			parsed_results.append(self.action)
 
 		self.c.handle_search_result(self, parsed_results, self.current_query)

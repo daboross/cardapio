@@ -13,7 +13,6 @@
     <property name="urgency_hint">True</property>
     <property name="decorated">False</property>
     <property name="mnemonics_visible">False</property>
-    <!--signal name="configure_event" handler="save_dimensions"/-->
     <signal name="destroy_event" handler="on_mainwindow_destroy"/>
     <signal name="destroy" handler="on_mainwindow_destroy"/>
     <signal name="size_allocate" handler="unblock_focus_out_event"/>
@@ -556,19 +555,6 @@
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkEntry" id="OptionKeybinding">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="invisible_char">&#x2022;</property>
-                                        <signal name="focus_out_event" handler="on_options_changed"/>
-                                      </object>
-                                      <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="right_attach">2</property>
-                                        <property name="y_options"></property>
-                                      </packing>
-                                    </child>
-                                    <child>
                                       <object class="GtkCheckButton" id="OptionSessionButtons">
                                         <property name="label" translatable="yes">Show session buttons in bottom pane</property>
                                         <property name="visible">True</property>
@@ -597,6 +583,19 @@
                                         <property name="right_attach">2</property>
                                         <property name="top_attach">2</property>
                                         <property name="bottom_attach">3</property>
+                                        <property name="y_options"></property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkEntry" id="OptionKeybinding">
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="invisible_char">&#x2022;</property>
+                                        <signal name="focus_out_event" handler="on_options_changed"/>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="right_attach">2</property>
                                         <property name="y_options"></property>
                                       </packing>
                                     </child>

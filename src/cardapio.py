@@ -173,6 +173,8 @@ class Cardapio(dbus.service.Object):
 		self.keybinding                    = None
 		self.search_timer_local            = None
 		self.search_timer_remote           = None
+		self.search_timeout_local          = None
+		self.search_timeout_remote         = None
 		self.plugin_database               = {}
 		self.active_plugin_instances       = {}
 
@@ -518,6 +520,8 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'search results limit'       , 5                        ) # results
 		self.read_config_option(s, 'local search update delay'  , 100                      , force_update_from_version = [0,9,96]) # msec
 		self.read_config_option(s, 'remote search update delay' , 250                      , force_update_from_version = [0,9,96]) # msec
+		self.read_config_option(s, 'local search timeout'       , 1000                     ) # msec
+		self.read_config_option(s, 'remote search timeout'      , 3000                     ) # msec
 		self.read_config_option(s, 'autohide delay'             , 250                      ) # msec
 		self.read_config_option(s, 'keybinding'                 , '<Super>space'           ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
 		self.read_config_option(s, 'applet label'               , Cardapio.distro_name     ) # string
@@ -836,6 +840,7 @@ class Cardapio(dbus.service.Object):
 		self.no_results_text             = _('No results to show')
 		self.no_results_in_category_text = _('No results to show in "%(category_name)s"')
 		self.plugin_loading_text         = _('Searching...')
+		self.plugin_timeout_text         = _('Search timed out')
 
 		self.read_gtk_theme_info()
 
@@ -1403,13 +1408,23 @@ class Cardapio(dbus.service.Object):
 		if self.search_timer_remote is not None:
 			glib.source_remove(self.search_timer_remote)
 
-		delay_type = 'local search update delay'
-		delay = self.settings[delay_type]
-		self.search_timer_local = glib.timeout_add(delay, self.search_with_plugins, text, delay_type)
+		if self.search_timeout_local is not None:
+			glib.source_remove(self.search_timeout_local)
 
-		delay_type = 'remote search update delay'
-		delay = self.settings[delay_type]
-		self.search_timer_remote = glib.timeout_add(delay, self.search_with_plugins, text, delay_type)
+		if self.search_timeout_remote is not None:
+			glib.source_remove(self.search_timeout_remote)
+
+		delay_type  = 'local search update delay'
+		timer_delay = self.settings[delay_type]
+		timeout     = self.settings['local search timeout']
+		self.search_timer_local   = glib.timeout_add(timer_delay, self.search_with_plugins, text, delay_type)
+		self.search_timeout_local = glib.timeout_add(timeout, self.show_all_plugin_timeout_text, delay_type)
+
+		delay_type  = 'remote search update delay'
+		timer_delay = self.settings[delay_type]
+		timeout     = self.settings['remote search timeout']
+		self.search_timer_remote   = glib.timeout_add(timer_delay, self.search_with_plugins, text, delay_type)
+		self.search_timeout_remote = glib.timeout_add(timeout, self.show_all_plugin_timeout_text, delay_type)
 
 		self.search_with_plugins(text, None)
 
@@ -1481,6 +1496,41 @@ class Cardapio(dbus.service.Object):
 
 		self.plugins_still_searching += 1
 		self.hide_no_results_text()
+
+
+	def show_all_plugin_timeout_text(self, delay_type):
+		"""
+		Write "Plugin timed out..." under the plugin slab title
+		"""
+
+		for plugin in self.active_plugin_instances:
+
+			if not plugin.is_running: continue
+			if plugin.search_delay_type != delay_type: continue
+
+			try:
+				plugin.cancel()
+
+			except Exception, exception:
+				self.plugin_write_to_log(plugin, 'Plugin failed to cancel query', is_error = True)
+				logging.error(exception)
+
+			self.reset_plugin_section_contents(plugin)
+			label = gtk.Label(self.plugin_timeout_text)
+			label.set_alignment(0, 0.5)
+			label.set_sensitive(False)
+			label.show()
+
+			plugin.section_contents.pack_start(label, expand = False, fill = False)
+			plugin.section_contents.show()
+			plugin.section_slab.show()
+
+			self.plugins_still_searching -= 1
+
+		self.consider_showing_no_results_text()
+
+		return False
+		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
 	def plugin_handle_search_error(self, plugin, text):
@@ -3525,7 +3575,6 @@ def applet_factory(applet, iid):
 
 		widget "*CardapioAppletMenu" style:highest "cardapio-applet-menu-style"
 		widget "*PanelApplet" style:highest "cardapio-applet-style"
-		#widget "*Cardapio.*" style:highest "cardapio-applet-style"
 		''')
 
 	applet.add(menu)
