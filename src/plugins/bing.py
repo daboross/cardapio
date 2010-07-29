@@ -17,12 +17,12 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('Bing')
 	description = _("Perform a search using Microsoft's Bing")
-	version = '0.9b'
+	version = '0.91b'
 
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.3
+	plugin_api_version = 1.35
 
 	search_delay_type = 'remote search update delay'
 
@@ -46,7 +46,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.api_base_args = {
 			'Appid'    : '237CBC82BB8C3F7F5F19F6A77B0D38A59E8F8C2C',
 			'sources'  : 'web',
-			'web.count': 4
+			'web.count': self.cardapio.settings['search results limit'],
 		}
 
 		# Bing's base URLs (search and search more variations)
@@ -56,10 +56,13 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.loaded = True
 
 	def search(self, text):
+
 		if len(text) == 0:
 			return
 
-		self.cardapio.write_to_log(self, 'searching for {0} using Bing'.format(text))
+		self.current_query = text
+
+		self.cardapio.write_to_log(self, 'searching for {0} using Bing'.format(text), is_debug = True)
 
 		self.cancellable.reset()
 
@@ -68,7 +71,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		current_args['query'] = text
 		final_url = self.api_base_url.format(urllib.urlencode(current_args))
 
-		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url))
+		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
 
 		# asynchronous and cancellable IO call
 		self.current_stream = gio.File(final_url)
@@ -128,13 +131,13 @@ class CardapioPlugin(CardapioPluginInterface):
 			})
 
 			# pass the results to Cardapio
-			self.cardapio.handle_search_result(self, items)
+			self.cardapio.handle_search_result(self, items, self.current_query)
 
 		except KeyError:
 			self.cardapio.handle_search_error(self, "Incorrect Bing's JSON structure")
 
 	def cancel(self):
-		self.cardapio.write_to_log(self, 'cancelling a recent Bing search (if any)')
+		self.cardapio.write_to_log(self, 'cancelling a recent Bing search (if any)', is_debug = True)
 
 		if not self.cancellable.is_cancelled():
 			self.cancellable.cancel()

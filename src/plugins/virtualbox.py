@@ -17,9 +17,9 @@ class CardapioPlugin (CardapioPluginInterface):
 	# not used in the GUI yet:
 	url = ''
 	help_text = ''
-	version = '1.2'
+	version = '1.21'
 
-	plugin_api_version = 1.3 
+	plugin_api_version = 1.35
 
 	search_delay_type = None
 
@@ -63,14 +63,16 @@ class CardapioPlugin (CardapioPluginInterface):
 			self.package_monitor.connect('changed', self.on_vms_changed)
 
 		else:
-			self.c.write_to_log(self, 'Path does not exist:' + machine_path)
-			self.c.write_to_log(self, 'Will not be able to monitor for virtual machine changes')
+			self.c.write_to_log(self, 'Path does not exist:' + machine_path, is_warning = True)
+			self.c.write_to_log(self, 'Will not be able to monitor for virtual machine changes', is_warning = True)
 			
 		self.loaded = True
 
 
 	def search(self, text):
   
+		self.current_query = text
+
 		results = []
 	
 		text = text.lower()
@@ -79,7 +81,8 @@ class CardapioPlugin (CardapioPluginInterface):
 			if item['name'].lower().find(text) != -1:
 				results.append(item)
 	  
-		self.c.handle_search_result(self, results)
+		self.c.handle_search_result(self, results, self.current_query)
+
 		
 	def load_vm_items(self):
 		self.vm_items = []

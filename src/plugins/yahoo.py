@@ -26,12 +26,12 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('Yahoo')
 	description = _("Perform a search using Yahoo")
-	version = '0.9b'
+	version = '0.91b'
 
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.3
+	plugin_api_version = 1.35
 
 	search_delay_type = 'remote search update delay'
 
@@ -64,7 +64,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			'appid'    : 'TuNKmOzV34GRC9mrBNZMgr.vY1xPMLMH9U3PsOYkg8WvYnFawnB5gKd4GsrUbqluzg--',
 			'format'   : 'json',
 			'style'    : 'raw',
-			'count'    : 4,
+			'count'    : self.cardapio.settings['search results limit'],
 			'lang'     : language,
 			'region'   : region
 		}
@@ -79,14 +79,16 @@ class CardapioPlugin(CardapioPluginInterface):
 		if len(text) == 0:
 			return
 
-		self.cardapio.write_to_log(self, 'searching for {0} using Yahoo'.format(text))
+		self.current_query = text
+
+		self.cardapio.write_to_log(self, 'searching for {0} using Yahoo'.format(text), is_debug = True)
 
 		self.cancellable.reset()
 
 		# prepare final API URL
 		final_url = self.api_base_url.format(urllib.quote(text, ''))
 
-		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url))
+		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
 
 		# asynchronous and cancellable IO call
 		self.current_stream = gio.File(final_url)
@@ -146,13 +148,13 @@ class CardapioPlugin(CardapioPluginInterface):
 			})
 
 			# pass the results to Cardapio
-			self.cardapio.handle_search_result(self, items)
+			self.cardapio.handle_search_result(self, items, self.current_query)
 
 		except KeyError:
 			self.cardapio.handle_search_error(self, "Incorrect Yahoo's JSON structure")
 
 	def cancel(self):
-		self.cardapio.write_to_log(self, 'cancelling a recent Yahoo search (if any)')
+		self.cardapio.write_to_log(self, 'cancelling a recent Yahoo search (if any)', is_debug = True)
 
 		if not self.cancellable.is_cancelled():
 			self.cancellable.cancel()

@@ -17,12 +17,12 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('YouTube')
 	description = _('Search for results in YouTube')
-	version = '0.9b'
+	version = '0.91b'
 
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.3
+	plugin_api_version = 1.35
 
 	search_delay_type = 'remote search update delay'
 
@@ -44,7 +44,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		# YouTube's API arguments (format and maximum result count)
 		self.api_base_args = {
 			'alt'        : 'json',
-			'max-results': 4
+			'max-results': self.cardapio.settings['search results limit'],
 		}
 
 		# YouTube's base URLs (search and search more variations)
@@ -54,10 +54,13 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.loaded = True
 
 	def search(self, text):
+
 		if len(text) == 0:
 			return
 
-		self.cardapio.write_to_log(self, 'searching for {0} using YouTube'.format(text))
+		self.current_query = text
+
+		self.cardapio.write_to_log(self, 'searching for {0} using YouTube'.format(text), is_debug = True)
 
 		self.cancellable.reset()
 
@@ -66,7 +69,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		current_args['q'] = text
 		final_url = self.api_base_url.format(urllib.urlencode(current_args))
 
-		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url))
+		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
 
 		# asynchronous and cancellable IO call
 		self.current_stream = gio.File(final_url)
@@ -136,13 +139,13 @@ class CardapioPlugin(CardapioPluginInterface):
 			})
 
 			# pass the results to Cardapio
-			self.cardapio.handle_search_result(self, items)
+			self.cardapio.handle_search_result(self, items, self.current_query)
 
 		except KeyError:
 			self.cardapio.handle_search_error(self, "Incorrect YouTube's JSON structure")
 
 	def cancel(self):
-		self.cardapio.write_to_log(self, 'cancelling a recent YouTube search (if any)')
+		self.cardapio.write_to_log(self, 'cancelling a recent YouTube search (if any)', is_debug = True)
 
 		if not self.cancellable.is_cancelled():
 			self.cancellable.cancel()

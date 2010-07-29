@@ -24,12 +24,12 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('Wikipedia')
 	description = _('Search for results in Wikipedia')
-	version = '0.9b'
+	version = '0.91b'
 
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.3
+	plugin_api_version = 1.35
 
 	search_delay_type = 'remote search update delay'
 
@@ -53,7 +53,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.api_base_args = {
 			'action': 'opensearch',
 			'format': 'json',
-			'limit' : '4'
+			'limit' : str(self.cardapio.settings['search results limit']),
 		}
 
 		# Wikipedia's base URLs (search and show details variations)
@@ -66,7 +66,9 @@ class CardapioPlugin(CardapioPluginInterface):
 		if len(text) == 0:
 			return
 
-		self.cardapio.write_to_log(self, 'searching for {0} in Wikipedia'.format(text))
+		self.current_query = text
+
+		self.cardapio.write_to_log(self, 'searching for {0} in Wikipedia'.format(text), is_debug = True)
 
 		self.cancellable.reset()
 
@@ -75,7 +77,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		current_args['search'] = text
 		final_url = self.api_base_url.format(urllib.urlencode(current_args))
 
-		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url))
+		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
 
 		# asynchronous and cancellable IO call
 		self.current_stream = gio.File(final_url)
@@ -118,13 +120,13 @@ class CardapioPlugin(CardapioPluginInterface):
 				})
 
 			# pass the results to Cardapio
-			self.cardapio.handle_search_result(self, items)
+			self.cardapio.handle_search_result(self, items, self.current_query)
 
 		except KeyError:
 			self.cardapio.handle_search_error(self, "Incorrect Wikipedia's JSON structure")
 
 	def cancel(self):
-		self.cardapio.write_to_log(self, 'cancelling a recent Wikipedia search (if any)')
+		self.cardapio.write_to_log(self, 'cancelling a recent Wikipedia search (if any)', is_debug = True)
 
 		if not self.cancellable.is_cancelled():
 			self.cancellable.cancel()

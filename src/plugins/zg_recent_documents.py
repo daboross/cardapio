@@ -19,9 +19,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '0.91b'
+	version            = '0.95b'
 
-	plugin_api_version = 1.3
+	plugin_api_version = 1.35
 
 	search_delay_type  = 'local search update delay'
 
@@ -42,14 +42,14 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		if 'ZeitgeistClient' not in globals():
 			self.c.write_to_log(self, 'Could not import Zeitgeist', is_error = True)
-			if plugin_exception: self.c.write_to_log(self, plugin_exception)
+			if plugin_exception: self.c.write_to_log(self, plugin_exception, is_error = True)
 			return
 
 		try:
 			self.zg = ZeitgeistClient()
 		except Exception, exception:
 			self.c.write_to_log(self, 'Could not start Zeitgeist', is_error = True)
-			self.c.write_to_log(self, exception)
+			self.c.write_to_log(self, exception, is_error = True)
 			return 
 
 		bus = dbus.SessionBus()
@@ -63,12 +63,12 @@ class CardapioPlugin(CardapioPluginInterface):
 			self.fts = dbus.Interface(fts_object, 'org.gnome.zeitgeist.Index')
 		except Exception, exception:
 			self.c.write_to_log(self, 'Could not connect to Zeitgeist full-text-search', is_error = True)
-			self.c.write_to_log(self, exception)
+			self.c.write_to_log(self, exception, is_error = True)
 			return 
 
 		self.have_sezen = (len(getoutput('which sezen')) != 0)
 		if not self.have_sezen:
-			self.c.write_to_log(self, 'Sezen not found, so you will not see the "Show additional results" button.')
+			self.c.write_to_log(self, 'Sezen not found, so you will not see the "Show additional results" button.', is_warning = True)
 
 		self.action_command = r"sezen '%s'" # NOTE: Seif said he would add this capability into Sezen
 		self.action = {
@@ -92,6 +92,8 @@ class CardapioPlugin(CardapioPluginInterface):
 
 
 	def search(self, text):
+
+		self.current_query = text
 
 		text = text.lower()
 		self.search_query = text
@@ -165,7 +167,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		if parsed_results and self.have_sezen:
 			parsed_results.append(self.action)
 
-		self.c.handle_search_result(self, parsed_results)
+		self.c.handle_search_result(self, parsed_results, self.current_query)
 
 
 	def more_results_action(self, text):
