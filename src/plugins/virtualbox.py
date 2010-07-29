@@ -63,8 +63,8 @@ class CardapioPlugin (CardapioPluginInterface):
 			self.package_monitor.connect('changed', self.on_vms_changed)
 
 		else:
-			self.c.write_to_log(self, 'Path does not exist:' + machine_path)
-			self.c.write_to_log(self, 'Will not be able to monitor for virtual machine changes')
+			self.c.write_to_log(self, 'Path does not exist:' + machine_path, is_warning = True)
+			self.c.write_to_log(self, 'Will not be able to monitor for virtual machine changes', is_warning = True)
 			
 		self.loaded = True
 

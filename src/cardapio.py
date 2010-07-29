@@ -118,7 +118,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.129'
+	version = '0.9.130'
 
 	core_plugins = [
 			'applications', 
@@ -134,20 +134,23 @@ class Cardapio(dbus.service.Object):
 
 	required_plugins = ['applications', 'places', 'pinned']
 
-	APP_BUTTON = 0
+	APP_BUTTON      = 0
 	CATEGORY_BUTTON = 1
-	SESSION_BUTTON = 2
+	SESSION_BUTTON  = 2
 	SIDEPANE_BUTTON = 3
 
 	class SafeCardapioProxy:
 		pass
 
-	def __init__(self, hidden = False, panel_applet = None, panel_button = None):
+	def __init__(self, hidden = False, panel_applet = None, panel_button = None, debug = False):
 
 		self.create_config_folder()
 		log_file_path = os.path.join(self.config_folder_path, 'cardapio.log')
 
-		logging.basicConfig(filename = log_file_path, level = logging.DEBUG)
+		if debug == True: logging_level = logging.DEBUG
+		else: logging_level = logging.INFO
+
+		logging.basicConfig(filename = log_file_path, level = logging_level)
 		logging.info('----------------- Cardapio launched -----------------')
 		logging.info('Cardapio version: %s' % Cardapio.version)
 		logging.info('Distribution: %s' % commands.getoutput('lsb_release -ds'))
@@ -204,8 +207,8 @@ class Cardapio(dbus.service.Object):
 		# without need to quit cardapio first:
 		self.save_config_file()
 
-		signal.signal(signal.SIGTERM, self.on_mainwindow_destroy)
-		signal.signal(signal.SIGQUIT, self.on_mainwindow_destroy)
+		signal.signal(signal.SIGTERM, self.quit)
+		signal.signal(signal.SIGQUIT, self.quit)
 
 
 	def on_mainwindow_destroy(self, *dummy):
@@ -223,6 +226,9 @@ class Cardapio(dbus.service.Object):
 
 		self.save_config_file()
 		gtk.main_quit()
+
+		logging.info('Exiting...')
+		sys.exit(0)
 
 
 	def setup_dbus(self):
@@ -369,9 +375,23 @@ class Cardapio(dbus.service.Object):
 			self.plugin_database[basename]['instance'] = plugin
 
 
-	def plugin_write_to_log(self, plugin, text, is_error = False, is_warning = False):
+	def plugin_write_to_log(self, plugin, text, is_debug = False, is_warning = False, is_error = False):
 		"""
-		Writes 'text' to the log file, prefixing it with [plugin name].
+		Writes 'text' to the log file, prefixing it with [plugin name]. Different
+		levels of messages can be used by setting one of is_debug, is_warning, is_error:
+
+		debug       - Used for any debugging message, including any messages that may
+		              be privacy sensitive. Messages set with the flag is_debug=True 
+		              will *not* be logged unless the user enters debug mode.
+
+		info        - This is the default level when you don't set any of the flags.
+		              Used for things that normal users should see in their logs.
+
+		warning     - Used for reporting things that have gone wrong, but that still
+		              allow the plugin to function, even if partially.
+
+		error       - Used for reporting things that have gone wrong, and which do not
+		              allow the plugin to function at all.
 		"""
 
 		if is_error: 
@@ -380,8 +400,11 @@ class Cardapio(dbus.service.Object):
 		elif is_warning: 
 			write = logging.warning
 
-		else:
+		elif is_debug: 
 			write = logging.debug
+
+		else:
+			write = logging.info
 
 		write('[%s] %s'  % (plugin.name, text))
 
@@ -540,23 +563,27 @@ class Cardapio(dbus.service.Object):
 
 		# clean up the config file whenever options are changed between versions
 
+		# 'side pane' used to be called 'system pane'
 		if 'system pane' in self.settings:
 			self.settings['side pane'] = self.settings['system pane']
 			self.settings.pop('system pane')
 
+		# 'None' used to be the 'applications' plugin
 		if None in self.settings['active plugins']:
 			i = self.settings['active plugins'].index(None)
 			self.settings['active plugins'][i] = 'applications'
 
 		# make sure required plugins are in the plugin list
-
 		for required_plugin in self.required_plugins:
 
 			if required_plugin not in self.settings['active plugins']:
 				self.settings['active plugins'] = [required_plugin] + self.settings['active plugins']
 
-			if len([basename for basename in self.settings['active plugins'] if basename == required_plugin]):
-				self.settings['active plugins'] = [required_plugin] + [basename for basename in self.settings['active plugins'] if basename != required_plugin]
+		# make sure plugins only appear once in the plugin list
+		for plugin_name in self.settings['active plugins']:
+
+			while len([basename for basename in self.settings['active plugins'] if basename == plugin_name]) > 1:
+				self.settings['active plugins'].remove(plugin_name)
 
 
 	def read_config_option(self, user_settings, key, val, override_empty_str = False, force_update_from_version = None):
@@ -803,10 +830,6 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.setup_ui_from_gui_settings()
-
-		if self.settings['splitter position'] > 0:
-			self.get_object('MainSplitter').set_position(self.settings['splitter position'])
-
 		self.restore_dimensions()
 
 
@@ -1012,7 +1035,7 @@ class Cardapio(dbus.service.Object):
 		self.options_dialog.show()
 
 	
-	def close_options_dialog(self, *args):
+	def close_options_dialog(self, *dummy):
 		"""
 		Hides the Options Dialog
 		"""
@@ -1246,6 +1269,8 @@ class Cardapio(dbus.service.Object):
 		Make Cardapio disappear when it loses focus
 		"""
 
+		self.save_dimensions()
+
 		if self.panel_applet is not None:
 
 			cursor_x, cursor_y, dummy = self.panel_applet.window.get_pointer()
@@ -1280,6 +1305,7 @@ class Cardapio(dbus.service.Object):
 
 		if self.settings['open on hover']:
 			glib.timeout_add(self.settings['autohide delay'], self.hide_if_mouse_away)
+			self.save_dimensions()
 
 
 	def on_mainwindow_delete_event(self, widget, event):
@@ -1852,6 +1878,9 @@ class Cardapio(dbus.service.Object):
 		if self.settings['window size'] is not None: 
 			self.window.resize(*self.settings['window size'])
 
+		if self.settings['splitter position'] > 0:
+			self.get_object('MainSplitter').set_position(self.settings['splitter position'])
+
 
 	def save_dimensions(self, *dummy):
 		"""
@@ -1923,7 +1952,6 @@ class Cardapio(dbus.service.Object):
 		self.visible = False
 		self.last_visibility_toggle = time.time()
 
-		self.save_dimensions()
 		self.window.hide()
 
 		if not self.settings['keep search results']:
@@ -3582,6 +3610,7 @@ def applet_factory(applet, iid):
 	applet.connect('size-allocate', cardapio.on_panel_size_changed)
 	applet.connect('change-orient', cardapio.panel_change_orientation)
 	applet.connect('change-background', cardapio.on_panel_change_background)
+	applet.connect('delete-event', cardapio.quit)
 
 	applet.set_applet_flags(gnomeapplet.EXPAND_MINOR)
 	applet.show_all()

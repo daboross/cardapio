@@ -1,3 +1,17 @@
+cardapio (0.9.130-ubuntu1) lucid; urgency=low
+
+  * Updated some pluging-handling code for less jumpy behavior
+  * Added "Searching..." and "Plugin timed out" inline messages
+  * And, last but not least, added FOUR (!) plugins by Pawel:
+    - Bing Search
+    - Yahoo Search
+    - Wikipedia Search
+    - Youtube Search
+    These are currently in beta but *very* stable 
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 29 Jul 2010 23:58:00 -0400
+
+
 cardapio (0.9.129-ubuntu1) lucid; urgency=low
 
   * wrapped all plugin calls with exception handlers, so there are less

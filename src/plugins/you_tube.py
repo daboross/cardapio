@@ -60,7 +60,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.current_query = text
 
-		self.cardapio.write_to_log(self, 'searching for {0} using YouTube'.format(text))
+		self.cardapio.write_to_log(self, 'searching for {0} using YouTube'.format(text), is_debug = True)
 
 		self.cancellable.reset()
 
@@ -69,7 +69,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		current_args['q'] = text
 		final_url = self.api_base_url.format(urllib.urlencode(current_args))
 
-		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url))
+		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
 
 		# asynchronous and cancellable IO call
 		self.current_stream = gio.File(final_url)
@@ -145,7 +145,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			self.cardapio.handle_search_error(self, "Incorrect YouTube's JSON structure")
 
 	def cancel(self):
-		self.cardapio.write_to_log(self, 'cancelling a recent YouTube search (if any)')
+		self.cardapio.write_to_log(self, 'cancelling a recent YouTube search (if any)', is_debug = True)
 
 		if not self.cancellable.is_cancelled():
 			self.cancellable.cancel()

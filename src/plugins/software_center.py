@@ -95,8 +95,8 @@ class CardapioPlugin(CardapioPluginInterface):
 			self.package_monitor.connect('changed', self.on_packages_changed)
 
 		else:
-			self.c.write_to_log(self, 'Path does not exist:' + dpkg_path)
-			self.c.write_to_log(self, 'Will not be able to monitor for package changes')
+			self.c.write_to_log(self, 'Path does not exist:' + dpkg_path, is_warning = True)
+			self.c.write_to_log(self, 'Will not be able to monitor for package changes', is_warning = True)
 		
 		self.loaded = True # set to true if everything goes well
 
