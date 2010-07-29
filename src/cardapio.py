@@ -1079,11 +1079,23 @@ class Cardapio(dbus.service.Object):
 
 			iter_ = self.plugin_tree_model.iter_next(iter_)
 
+		self.options_dialog.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+
+		# ensure cursor is rendered immediately
+		gtk.gdk.flush()
+		while gtk.events_pending():
+			gtk.main_iteration()
+
 		self.activate_plugins_from_settings()
+		self.options_dialog.window.set_cursor(None)
+
 		self.schedule_rebuild()
 
 
 	def on_plugintreeview_hover(self, treeview, event):
+		"""
+		Change the cursor to show that plugins are draggable.
+		"""
 
 		pthinfo = treeview.get_path_at_pos(int(event.x), int(event.y))
 
