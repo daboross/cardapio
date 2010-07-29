@@ -10,9 +10,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.3'
+	version            = '1.35'
 
-	plugin_api_version = 1.3
+	plugin_api_version = 1.35
 
 	search_delay_type  = 'remote search update delay'
 
@@ -74,8 +74,9 @@ class CardapioPlugin(CardapioPluginInterface):
 		# TODO: we should really check if there's an internet connection before
 		# proceeding...
 
-		text = urllib2.quote(text)
+		self.current_query = text
 
+		text = urllib2.quote(text)
 		query = self.query_url % text
 		self.stream = gio.File(query)
 
@@ -123,7 +124,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		if raw_results:
 			parsed_results.append(self.action)
 
-		self.c.handle_search_result(self, parsed_results)
+		self.c.handle_search_result(self, parsed_results, self.current_query)
 
 
 	def more_results_action(self, text):

@@ -8,9 +8,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.3'
+	version            = '1.35'
 
-	plugin_api_version = 1.3
+	plugin_api_version = 1.35
 
 	search_delay_type  = 'local search update delay'
 
@@ -51,6 +51,8 @@ class CardapioPlugin(CardapioPluginInterface):
 
 
 	def search(self, text):
+
+		self.current_query = text
 
 		text = urllib2.quote(text).lower()
 
@@ -103,7 +105,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		if results:
 			formatted_results.append(self.action)
 
-		self.c.handle_search_result(self, formatted_results)
+		self.c.handle_search_result(self, formatted_results, self.current_query)
 
 
 	def more_results_action(self, text):

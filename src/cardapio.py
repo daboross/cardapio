@@ -833,7 +833,9 @@ class Cardapio(dbus.service.Object):
 		elements that support them.
 		"""
 
-		self.plugin_loading_text = _('Searching...')
+		self.no_results_text             = _('No results to show')
+		self.no_results_in_category_text = _('No results to show in "%(category_name)s"')
+		self.plugin_loading_text         = _('Searching...')
 
 		self.read_gtk_theme_info()
 
@@ -1329,13 +1331,14 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.no_results_to_show = True
+		self.hide_no_results_text()
+
 		text = self.search_entry.get_text().strip()
 
 		self.search_menus(text)
 		self.schedule_search_with_plugins(text)
 
 		if len(text) == 0:
-			#self.no_results_to_show = False
 			self.hide_all_transitory_sections(fully_hide = True)
 			return
 
@@ -1380,9 +1383,7 @@ class Cardapio(dbus.service.Object):
 		Start a plugin-based search, after some time-outs
 		"""
 
-		# TODO: figure out why this causes the web search plugin to not
-		# show up sometimes
-		#self.cancel_all_plugins()
+		self.cancel_all_plugins()
 
 		if self.search_timer_local is not None:
 			glib.source_remove(self.search_timer_local)
@@ -1466,6 +1467,9 @@ class Cardapio(dbus.service.Object):
 		plugin.section_contents.show()
 		plugin.section_slab.show()
 
+		self.plugins_still_searching += 1
+		self.hide_no_results_text()
+
 
 	def plugin_handle_search_error(self, plugin, text):
 		"""
@@ -1474,17 +1478,20 @@ class Cardapio(dbus.service.Object):
 
 		plugin.is_running = False
 		self.plugin_write_to_log(plugin, text, is_error = True)
-		self.plugin_handle_search_result(plugin, [])
+		self.plugin_handle_search_result(plugin, [], '')
 
 
-	def plugin_handle_search_result(self, plugin, results):
+	def plugin_handle_search_result(self, plugin, results, original_query):
 		"""
 		Handler for when a plugin returns some search results
 		"""
 
 		plugin.is_running = False
+		self.plugins_still_searching -= 1
 
-		if plugin.hide_from_sidebar and len(self.search_entry.get_text()) < self.settings['min search string length']:
+		current_query = self.search_entry.get_text()
+
+		if plugin.hide_from_sidebar and len(current_query) < self.settings['min search string length']:
 
 			# Handle the case where user presses backspace *very* quickly, and the
 			# search starts when len(text) > min_search_string_length, but after
@@ -1494,9 +1501,10 @@ class Cardapio(dbus.service.Object):
 			# Anyways, it's hard to explain, but suffice to say it's a race
 			# condition and we handle it here.
 
-			self.set_section_is_empty(plugin.section_slab)
-			plugin.section_slab.hide()
-			return
+			results = []
+
+		if original_query != current_query:
+			results = []
 
 		gtk.gdk.threads_enter()
 
@@ -1577,6 +1585,8 @@ class Cardapio(dbus.service.Object):
 		"""
 		Tell all plugins to stop a possibly-time-consuming search
 		"""
+
+		self.plugins_still_searching = 0
 
 		for plugin in self.active_plugin_instances:
 
@@ -3148,11 +3158,6 @@ class Cardapio(dbus.service.Object):
 			else:
 				sec.hide()
 
-		if self.no_results_to_show:
-			self.show_no_results_text()
-		else:
-			self.hide_no_results_text()
-
 		if self.selected_section is not None:
 			widget = self.section_list[self.selected_section]['category']
 			self.set_sidebar_button_active(widget, False)
@@ -3195,7 +3200,7 @@ class Cardapio(dbus.service.Object):
 		Show the "No results to show" text
 		"""
 
-		if text is None: text = _('No results to show')
+		if text is None: text = self.no_results_text
 
 		self.no_results_label.set_text(text)
 		self.no_results_slab.show()
@@ -3216,7 +3221,10 @@ class Cardapio(dbus.service.Object):
 
 		if self.selected_section is None:
 
-			if self.no_results_to_show:
+			if self.plugins_still_searching > 0:
+				return
+
+			if self.no_results_to_show: 
 				self.show_no_results_text()
 
 			return 
@@ -3227,7 +3235,7 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			self.selected_section.hide()
-			self.show_no_results_text(_('No results to show in "%(category_name)s"') % {'category_name': self.section_list[self.selected_section]['name']})
+			self.show_no_results_text(self.no_results_in_category_text % {'category_name': self.section_list[self.selected_section]['name']})
 
 
 	def hide_all_transitory_sections(self, fully_hide = False):
@@ -3325,7 +3333,7 @@ class CardapioPluginInterface:
 	help_text   = ''
 	version     = ''
 
-	plugin_api_version = 1.3
+	plugin_api_version = 1.35
 
 	search_delay_type = 'local search update delay'
 
@@ -3394,15 +3402,21 @@ class CardapioPluginInterface:
 		field. One of the following functions should be called from this method
 		(of from a thread spawned by this method):
 
-		   * handle_search_result(plugin, results) - if the search goes well
-		   * handle_search_error(plugin, text)     - if there is an error
+		   * if all goes well:
+		   --> handle_search_result(plugin, results, original_query) 
+
+		   * if there is an error
+		   --> handle_search_error(plugin, text)     
 
 		The arguments to these functions are:
 
-		   * plugin  - this plugin instance (that is, it should always be
-		               "self", without quotes)
-		   * text    - some text to be inserted in Cardapio's log.
-		   * results - an array of dict items as described below.
+		   * plugin          - this plugin instance (that is, it should always 
+		                       be "self", without quotes)
+		   * text            - some text to be inserted in Cardapio's log.
+		   * results         - an array of dict items as described below.
+		   * original_query  - the search query that this corresponds to. The
+		                       plugin should save the query received by the 
+							   search() method and pass it back to Cardapio.
 
 		item = {
 		  'name'         : _('Music'),

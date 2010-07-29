@@ -19,9 +19,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '0.91b'
+	version            = '0.95b'
 
-	plugin_api_version = 1.3
+	plugin_api_version = 1.35
 
 	search_delay_type  = 'local search update delay'
 
@@ -92,6 +92,8 @@ class CardapioPlugin(CardapioPluginInterface):
 
 
 	def search(self, text):
+
+		self.current_query = text
 
 		text = text.lower()
 		self.search_query = text
@@ -165,7 +167,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		if parsed_results and self.have_sezen:
 			parsed_results.append(self.action)
 
-		self.c.handle_search_result(self, parsed_results)
+		self.c.handle_search_result(self, parsed_results, self.current_query)
 
 
 	def more_results_action(self, text):

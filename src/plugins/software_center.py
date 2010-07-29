@@ -30,9 +30,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.1'
+	version            = '1.11'
 
-	plugin_api_version = 1.3
+	plugin_api_version = 1.35
 
 	search_delay_type  = 'local search update delay'
 	category_name      = _('Available Software')
@@ -103,6 +103,8 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def search(self, text):
  
+		self.current_query = text
+
 		results = []
 		
 		query = self.db.get_query_list_from_search_entry(text)
@@ -153,7 +155,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		if results:
 			results.append(self.action)
 	
-		self.c.handle_search_result(self, results)
+		self.c.handle_search_result(self, results, self.current_query)
 
 
 	def on_reload_permission_granted(self):

@@ -17,9 +17,9 @@ class CardapioPlugin (CardapioPluginInterface):
 	# not used in the GUI yet:
 	url = ''
 	help_text = ''
-	version = '1.2'
+	version = '1.21'
 
-	plugin_api_version = 1.3 
+	plugin_api_version = 1.35
 
 	search_delay_type = None
 
@@ -71,6 +71,8 @@ class CardapioPlugin (CardapioPluginInterface):
 
 	def search(self, text):
   
+		self.current_query = text
+
 		results = []
 	
 		text = text.lower()
@@ -79,7 +81,8 @@ class CardapioPlugin (CardapioPluginInterface):
 			if item['name'].lower().find(text) != -1:
 				results.append(item)
 	  
-		self.c.handle_search_result(self, results)
+		self.c.handle_search_result(self, results, self.current_query)
+
 		
 	def load_vm_items(self):
 		self.vm_items = []
