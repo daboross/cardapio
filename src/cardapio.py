@@ -49,7 +49,6 @@ try:
 	import commands
 	import keybinder
 	import subprocess
-	import gnomeapplet
 	import dbus, dbus.service
 	from xdg import BaseDirectory, DesktopEntry
 	from dbus.mainloop.glib import DBusGMainLoop
@@ -61,11 +60,28 @@ except Exception, exception:
 	sys.exit(1)
 
 try:
-	from gnome import execute_terminal_shell
+	import gnomeapplet
+
+except:
+	# assume that if gnomeapplet is not found then the user is running Cardapio
+	# without Gnome (maybe with './cardapio show', for example). 
+	print('Info: gnomeapplet Python module not present')
+
+try:
+	from gnome import execute_terminal_shell as gnome_execute_terminal_shell
 
 except Exception, exception:
 	print('Warning: you will not be able to execute scripts in the terminal')
-	execute_terminal_shell = None
+	gnome_execute_terminal_shell = None
+
+try:
+	from gnome import program_init as gnome_program_init
+	from gnome.ui import master_client as gnome_ui_master_client
+
+except Exception, exception:
+	print('Warning: Cardapio will not be able to tell when the session is closed')
+	gnome_program_init     = None
+	gnome_ui_master_client = None
 
 
 if gtk.ver < (2, 14, 0):
@@ -207,8 +223,10 @@ class Cardapio(dbus.service.Object):
 		# without need to quit cardapio first:
 		self.save_config_file()
 
-		signal.signal(signal.SIGTERM, self.quit)
-		signal.signal(signal.SIGQUIT, self.quit)
+		if gnome_program_init is not None:
+			gnome_program_init('', self.version) # Prints a warning to the screen. Ignore it.
+			client = gnome_ui_master_client() 
+			client.connect('save-yourself', self.quit)
 
 
 	def on_mainwindow_destroy(self, *dummy):
@@ -225,9 +243,9 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.save_config_file()
-		gtk.main_quit()
 
 		logging.info('Exiting...')
+		gtk.main_quit()
 		sys.exit(0)
 
 
@@ -763,7 +781,7 @@ class Cardapio(dbus.service.Object):
 		self.activate_plugins_from_settings()
 
 
-	def get_best_icon_size(self):
+	def get_best_icon_size_for_panel(self):
 		"""
 		Returns the best icon size for the current panel size
 		"""
@@ -800,7 +818,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.panel_button.set_label(self.settings['applet label'])
-		button_icon_pixbuf = self.get_icon_pixbuf(self.settings['applet icon'], self.get_best_icon_size(), 'distributor-logo')
+		button_icon_pixbuf = self.get_icon_pixbuf(self.settings['applet icon'], self.get_best_icon_size_for_panel(), 'distributor-logo')
 		button_icon = gtk.image_new_from_pixbuf(button_icon_pixbuf)
 		self.panel_button.set_image(button_icon)
 
@@ -937,7 +955,7 @@ class Cardapio(dbus.service.Object):
 		self.get_object('ExecutableDialogPrimaryText').set_markup(primary_text)
 		self.get_object('ExecutableDialogSecondaryText').set_text(secondary_text)
 
-		if execute_terminal_shell is None:
+		if gnome_execute_terminal_shell is None:
 			self.get_object('ExecutableDialogRunInTerminal').hide()
 
 		self.executable_file_dialog.set_focus(self.get_object('ExecutableDialogCancel'))
@@ -3203,7 +3221,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		try:
-			execute_terminal_shell(self.home_folder_path, path)
+			gnome_execute_terminal_shell(self.home_folder_path, path)
 
 		except Exception, exception:
 			logging.error('Could not launch %s' % path)
@@ -3610,7 +3628,6 @@ def applet_factory(applet, iid):
 	applet.connect('size-allocate', cardapio.on_panel_size_changed)
 	applet.connect('change-orient', cardapio.panel_change_orientation)
 	applet.connect('change-background', cardapio.on_panel_change_background)
-	applet.connect('delete-event', cardapio.quit)
 
 	applet.set_applet_flags(gnomeapplet.EXPAND_MINOR)
 	applet.show_all()
