@@ -66,8 +66,6 @@ class CardapioPlugin(CardapioPluginInterface):
 		if len(text) == 0:
 			return
 
-		self.current_query = text
-
 		self.cardapio.write_to_log(self, 'searching for {0} in Wikipedia'.format(text), is_debug = True)
 
 		self.cancellable.reset()
@@ -82,9 +80,10 @@ class CardapioPlugin(CardapioPluginInterface):
 		# asynchronous and cancellable IO call
 		self.current_stream = gio.File(final_url)
 		self.current_stream.load_contents_async(self.show_search_results,
-			cancellable = self.cancellable)
+			cancellable = self.cancellable,
+			user_data = text)
 
-	def show_search_results(self, gdaemonfile, result):
+	def show_search_results(self, gdaemonfile, result, text):
 		"""
 		Callback to asynchronous IO (Wikipedia's API call).
 		"""
@@ -109,6 +108,11 @@ class CardapioPlugin(CardapioPluginInterface):
 			# response[1] because the response looks like: [text, [result_list]]
 			# append results (if any)
 			for item in response[1]:
+				# TODO: wikipedia sometimes returns item names encoded in unicode (try
+				# searching for 'aaaaaaaaaaaaa' for example); we use those names as part
+				# of a URL so we need to encode the special characters; unfortunately,
+				# Python's 2.* urllib.quote throws an exception when it's given unicode
+				# argument - what now?
 				item_url = self.web_base_url.format(urllib.quote(item))
 				items.append({
 					'name'         : item,
@@ -120,7 +124,7 @@ class CardapioPlugin(CardapioPluginInterface):
 				})
 
 			# pass the results to Cardapio
-			self.cardapio.handle_search_result(self, items, self.current_query)
+			self.cardapio.handle_search_result(self, items, text)
 
 		except KeyError:
 			self.cardapio.handle_search_error(self, "Incorrect Wikipedia's JSON structure")

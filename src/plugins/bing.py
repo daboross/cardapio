@@ -60,8 +60,6 @@ class CardapioPlugin(CardapioPluginInterface):
 		if len(text) == 0:
 			return
 
-		self.current_query = text
-
 		self.cardapio.write_to_log(self, 'searching for {0} using Bing'.format(text), is_debug = True)
 
 		self.cancellable.reset()
@@ -131,7 +129,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			})
 
 			# pass the results to Cardapio
-			self.cardapio.handle_search_result(self, items, self.current_query)
+			self.cardapio.handle_search_result(self, items, text)
 
 		except KeyError:
 			self.cardapio.handle_search_error(self, "Incorrect Bing's JSON structure")
