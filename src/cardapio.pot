@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-07-30 18:30-0400\n"
+"POT-Creation-Date: 2010-07-30 19:04-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,7 +72,7 @@ msgstr ""
 msgid "_Edit Menus"
 msgstr ""
 
-#: cardapio.py:746 cardapio.ui.h:31
+#: cardapio.py:746 cardapio.ui.h:30
 msgid "_About Cardapio"
 msgstr ""
 
@@ -221,7 +221,7 @@ msgstr ""
 msgid "Session"
 msgstr ""
 
-#: cardapio.py:2573 cardapio.ui.h:29
+#: cardapio.py:2573
 msgid "System"
 msgstr ""
 
@@ -339,32 +339,36 @@ msgstr ""
 msgid "Show session buttons in bottom pane"
 msgstr ""
 
-#: cardapio.ui.h:30
+#: cardapio.ui.h:29
 msgid "View"
 msgstr ""
 
-#: cardapio.ui.h:32
+#: cardapio.ui.h:31
 msgid "_Add to side pane"
 msgstr ""
 
-#: cardapio.ui.h:33
+#: cardapio.ui.h:32
 msgid "_Display"
 msgstr ""
 
-#: cardapio.ui.h:34
+#: cardapio.ui.h:33
 msgid "_Launch in background"
 msgstr ""
 
-#: cardapio.ui.h:35
+#: cardapio.ui.h:34
 msgid "_Pin this item"
 msgstr ""
 
-#: cardapio.ui.h:36
+#: cardapio.ui.h:35
 msgid "_Remove from side pane"
 msgstr ""
 
-#: cardapio.ui.h:37
+#: cardapio.ui.h:36
 msgid "_Run"
+msgstr ""
+
+#: cardapio.ui.h:37
+msgid "_System"
 msgstr ""
 
 #: cardapio.ui.h:38
