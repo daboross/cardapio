@@ -551,7 +551,7 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'keep search results'        , False                    ) # bool
 		self.read_config_option(s, 'open on hover'              , False                    ) # bool
 		self.read_config_option(s, 'min search string length'   , 3                        ) # characters
-		self.read_config_option(s, 'menu rebuild delay'         , 10                       , force_update_from_version = [0,9,96]) # seconds
+		self.read_config_option(s, 'menu rebuild delay'         , 5                        , force_update_from_version = [0,9,96]) # seconds
 		self.read_config_option(s, 'search results limit'       , 5                        ) # results
 		self.read_config_option(s, 'local search update delay'  , 100                      , force_update_from_version = [0,9,96]) # msec
 		self.read_config_option(s, 'remote search update delay' , 250                      , force_update_from_version = [0,9,96]) # msec
@@ -883,6 +883,7 @@ class Cardapio(dbus.service.Object):
 
 		self.clear_pane(self.application_pane)
 		self.clear_pane(self.category_pane)
+		self.clear_pane(self.system_category_pane)
 		self.clear_pane(self.sidepane)
 		self.clear_pane(self.left_session_pane)
 		self.clear_pane(self.right_session_pane)
@@ -936,9 +937,8 @@ class Cardapio(dbus.service.Object):
 
 		self.build_ui()
 
-		# NOTE: Why was this here at all? Makes no sense...
-		#for plugin in self.active_plugin_instances:
-		#	glib.idle_add(plugin.on_reload_permission_granted)
+		for plugin in self.active_plugin_instances:
+			glib.idle_add(plugin.on_reload_permission_granted)
 
 		self.schedule_search_with_plugins('')
 
@@ -1988,7 +1988,6 @@ class Cardapio(dbus.service.Object):
 			show_near_mouse = False
 
 		self.auto_toggle_panel_button(True)
-		self.switch_modes(show_system_menus = False, toggle_mode_button = True)
 
 		self.restore_dimensions()
 		self.reposition_window(show_near_mouse = show_near_mouse)
@@ -2006,6 +2005,8 @@ class Cardapio(dbus.service.Object):
 			# build the UI *after* showing the window, so the user gets the
 			# satisfaction of seeing the window pop up, even if it's incomplete...
 			self.rebuild_ui(show_message = True)
+
+		self.switch_modes(show_system_menus = False, toggle_mode_button = True)
 
 
 	def hide(self, *dummy):
