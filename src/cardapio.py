@@ -561,8 +561,8 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'search results limit'       , 5                        ) # results
 		self.read_config_option(s, 'local search update delay'  , 100                      , force_update_from_version = [0,9,96]) # msec
 		self.read_config_option(s, 'remote search update delay' , 250                      , force_update_from_version = [0,9,96]) # msec
-		self.read_config_option(s, 'local search timeout'       , 1000                     ) # msec
-		self.read_config_option(s, 'remote search timeout'      , 3000                     ) # msec
+		self.read_config_option(s, 'local search timeout'       , 3000                     ) # msec
+		self.read_config_option(s, 'remote search timeout'      , 5000                     ) # msec
 		self.read_config_option(s, 'autohide delay'             , 250                      ) # msec
 		self.read_config_option(s, 'keybinding'                 , '<Super>space'           ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
 		self.read_config_option(s, 'applet label'               , Cardapio.distro_name     ) # string
