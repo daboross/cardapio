@@ -19,7 +19,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '0.95b'
+	version            = '0.96b'
 
 	plugin_api_version = 1.35
 
@@ -29,7 +29,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	category_icon      = 'document-open-recent'
 	category_tooltip   = _('Files that you have used recently')
 
-	hide_from_sidebar  = True
+	hide_from_sidebar  = False
 
 	recency_in_days = 30
 

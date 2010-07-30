@@ -1,3 +1,11 @@
+cardapio (0.9.131-ubuntu1) lucid; urgency=low
+
+   * Fixed some small issues with the new plugins, and changed the code
+     to save the config file when the Gnome session closes.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 30 Jul 2010 21:51:00 -0400
+
+
 cardapio (0.9.130-ubuntu1) lucid; urgency=low
 
   * Updated some pluging-handling code for less jumpy behavior
