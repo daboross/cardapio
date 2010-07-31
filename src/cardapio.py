@@ -1107,9 +1107,12 @@ class Cardapio(dbus.service.Object):
 
 		# make sure the label doesn't resize the window!
 		if width > 1:
-			label.set_size_request(width - self.scrollbar_width, -1) 
-		# The -20 is a hack that may not work for other Gtk themes
-		# TODO: find a better solution
+			label.set_size_request(width - self.scrollbar_width - 20, -1) 
+
+		# The -20 is a hack because some themes add extra padding that I need to
+		# account for. Since I don't know where that padding is comming from, I
+		# just enter a value (20px) that is larger than I assume any theme would
+		# ever use.
 
 
 	def apply_plugins_from_option_window(self, *dummy):
