@@ -134,7 +134,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.130'
+	version = '0.9.132'
 
 	core_plugins = [
 			'applications', 
@@ -175,18 +175,20 @@ class Cardapio(dbus.service.Object):
 
 		self.read_config_file()
 
-		self.panel_applet = panel_applet
-		self.panel_button = panel_button
-		self.auto_toggled_sidebar_button = False
-		self.last_visibility_toggle = 0
+		self.panel_applet                  = panel_applet
+		self.panel_button                  = panel_button
+		self.last_visibility_toggle        = 0
 
 		self.visible                       = False
-		self.app_list                      = []    # used for searching the menu
+		self.app_list                      = []    # used for searching the regular menus
+		self.sys_list                      = []    # used for searching the system menu
 		self.section_list                  = {}
 		self.selected_section              = None
 		self.no_results_to_show            = False
 		self.previously_focused_widget     = None
 		self.opened_last_app_in_background = False
+		self.auto_toggled_sidebar_button   = False
+		self.auto_toggled_view_mode_button = False
 		self.focus_out_blocked             = False
 		self.clicked_app                   = None
 		self.keybinding                    = None
@@ -196,12 +198,13 @@ class Cardapio(dbus.service.Object):
 		self.search_timeout_remote         = None
 		self.plugin_database               = {}
 		self.active_plugin_instances       = {}
+		self.in_system_menu_mode           = False
 
 		self.icon_extension_types = re.compile('.*\.(png|xpm|svg)$')
 
 		self.app_tree = gmenu.lookup_tree('applications.menu')
-		self.sys_tree = gmenu.lookup_tree('settings.menu')
-		#self.sys_tree = gmenu.lookup_tree('gnomecc.menu') # TODO Control-Center
+		#self.sys_tree = gmenu.lookup_tree('settings.menu')
+		self.sys_tree = gmenu.lookup_tree('gnomecc.menu')
 		self.app_tree.add_monitor(self.on_menu_data_changed)
 		self.sys_tree.add_monitor(self.on_menu_data_changed)
 
@@ -522,15 +525,6 @@ class Cardapio(dbus.service.Object):
 			config_file.close()
 
 		default_side_pane_items = []
-		default_side_pane_items.append(
-			{
-				'name'      : _('Control Center'),
-				'icon name' : 'gnome-control-center',
-				'tooltip'   : _('The Gnome configuration tool'),
-				'type'      : 'raw',
-				'command'   : 'gnome-control-center',
-			})
-
 		path = commands.getoutput('which software-center')
 		if os.path.exists(path):
 			default_side_pane_items.append(
@@ -557,12 +551,12 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'keep search results'        , False                    ) # bool
 		self.read_config_option(s, 'open on hover'              , False                    ) # bool
 		self.read_config_option(s, 'min search string length'   , 3                        ) # characters
-		self.read_config_option(s, 'menu rebuild delay'         , 10                       , force_update_from_version = [0,9,96]) # seconds
+		self.read_config_option(s, 'menu rebuild delay'         , 5                        , force_update_from_version = [0,9,96]) # seconds
 		self.read_config_option(s, 'search results limit'       , 5                        ) # results
 		self.read_config_option(s, 'local search update delay'  , 100                      , force_update_from_version = [0,9,96]) # msec
 		self.read_config_option(s, 'remote search update delay' , 250                      , force_update_from_version = [0,9,96]) # msec
-		self.read_config_option(s, 'local search timeout'       , 1000                     ) # msec
-		self.read_config_option(s, 'remote search timeout'      , 3000                     ) # msec
+		self.read_config_option(s, 'local search timeout'       , 3000                     ) # msec
+		self.read_config_option(s, 'remote search timeout'      , 5000                     ) # msec
 		self.read_config_option(s, 'autohide delay'             , 250                      ) # msec
 		self.read_config_option(s, 'keybinding'                 , '<Super>space'           ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
 		self.read_config_option(s, 'applet label'               , Cardapio.distro_name     ) # string
@@ -669,6 +663,7 @@ class Cardapio(dbus.service.Object):
 		self.executable_file_dialog    = self.get_object('ExecutableFileDialog')
 		self.application_pane          = self.get_object('ApplicationPane')
 		self.category_pane             = self.get_object('CategoryPane')
+		self.system_category_pane      = self.get_object('SystemCategoryPane')
 		self.sidepane                  = self.get_object('SideappPane')
 		self.search_entry              = self.get_object('SearchEntry')
 		self.scrolled_window           = self.get_object('ScrolledWindow')
@@ -686,6 +681,7 @@ class Cardapio(dbus.service.Object):
 		self.open_folder_menuitem      = self.get_object('OpenParentFolderMenuItem')
 		self.plugin_tree_model         = self.get_object('PluginListstore')
 		self.plugin_checkbox_column    = self.get_object('PluginCheckboxColumn')
+		self.view_mode_button          = self.get_object('ViewModeButton')
 
 		# HACK: fix names of widgets to allow theming 
 		# (glade doesn't seem to properly add names to widgets anymore...)
@@ -887,18 +883,26 @@ class Cardapio(dbus.service.Object):
 
 		self.clear_pane(self.application_pane)
 		self.clear_pane(self.category_pane)
+		self.clear_pane(self.system_category_pane)
 		self.clear_pane(self.sidepane)
 		self.clear_pane(self.left_session_pane)
 		self.clear_pane(self.right_session_pane)
 
-		self.app_list = []      # holds a list of all apps for searching purposes
-		self.section_list = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
+		self.app_list      = []  # holds a list of all apps for searching purposes
+		self.sys_list      = []  # holds a list of all apps in the system menus
+		self.section_list  = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
 
 		button = self.add_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_sections_sidebar_button = button 
 		self.set_sidebar_button_active(button, True)
 		self.all_sections_sidebar_button.set_sensitive(False)
+
+		button = self.add_button(_('All'), None, self.system_category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
+		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
+		self.all_system_sections_sidebar_button = button 
+		self.set_sidebar_button_active(button, True)
+		self.all_system_sections_sidebar_button.set_sensitive(False)
 
 		self.no_results_slab, dummy, self.no_results_label = self.add_application_section('Dummy text')
 		self.hide_no_results_text()
@@ -910,7 +914,7 @@ class Cardapio(dbus.service.Object):
 
 		self.build_places_list()
 		self.build_session_list()
-		self.build_system_list() # TODO: use gnomecc.menu
+		self.build_system_list()
 		self.build_uncategorized_list()
 		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
@@ -933,9 +937,8 @@ class Cardapio(dbus.service.Object):
 
 		self.build_ui()
 
-		# NOTE: Why was this here at all? Makes no sense...
-		#for plugin in self.active_plugin_instances:
-		#	glib.idle_add(plugin.on_reload_permission_granted)
+		for plugin in self.active_plugin_instances:
+			glib.idle_add(plugin.on_reload_permission_granted)
 
 		self.schedule_search_with_plugins('')
 
@@ -1374,6 +1377,42 @@ class Cardapio(dbus.service.Object):
 		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.rebuild_ui)
 
 
+	def on_view_mode_toggled(self, widget):
+		"""
+		Handler for when the "system menu" button is toggled
+		"""
+
+		if self.auto_toggled_view_mode_button:
+			self.auto_toggled_view_mode_button = False
+			return True
+
+		self.switch_modes(show_system_menus = widget.get_active())
+
+
+	def switch_modes(self, show_system_menus, toggle_mode_button = False):
+		"""
+		Switched between "all menus" and "system menus" mode
+		"""
+
+		self.in_system_menu_mode = show_system_menus
+
+		if toggle_mode_button:
+			if self.view_mode_button.get_active() != show_system_menus:
+				self.auto_toggled_view_mode_button = True
+				self.view_mode_button.set_active(show_system_menus)
+
+		self.untoggle_and_show_all_sections()
+		self.on_search_entry_changed()
+
+		if show_system_menus:
+			self.category_pane.hide()
+			self.system_category_pane.show()
+
+		else:
+			self.system_category_pane.hide()
+			self.category_pane.show()
+
+
 	def on_search_entry_icon_pressed(self, widget, iconpos, event):
 		"""
 		Handler for when the "clear" icon of the search entry is pressed
@@ -1386,7 +1425,7 @@ class Cardapio(dbus.service.Object):
 			self.clear_search_entry()
 
 
-	def on_search_entry_changed(self, widget):
+	def on_search_entry_changed(self, *dummy):
 		"""
 		Handler for when the user types something in the search entry
 		"""
@@ -1396,25 +1435,28 @@ class Cardapio(dbus.service.Object):
 
 		text = self.search_entry.get_text().strip()
 
-		self.search_menus(text)
-		self.schedule_search_with_plugins(text)
+		if self.in_system_menu_mode:
+			self.search_menus(text, self.sys_list)
+
+		else:
+			self.search_menus(text, self.app_list)
+			self.schedule_search_with_plugins(text)
+
+			if len(text) < self.settings['min search string length']:
+				for plugin in self.active_plugin_instances:
+					if plugin.hide_from_sidebar:
+						self.set_section_is_empty(plugin.section_slab)
+						plugin.section_slab.hide()
 
 		if len(text) == 0:
 			self.hide_all_transitory_sections(fully_hide = True)
-			return
 
 		else:
 			self.all_sections_sidebar_button.set_sensitive(True)
-
-		if len(text) < self.settings['min search string length']:
-
-			for plugin in self.active_plugin_instances:
-				if plugin.hide_from_sidebar:
-					self.set_section_is_empty(plugin.section_slab)
-					plugin.section_slab.hide()
+			self.all_system_sections_sidebar_button.set_sensitive(True)
 
 
-	def search_menus(self, text):
+	def search_menus(self, text, app_list):
 		"""
 		Start a menu search
 		"""
@@ -1424,7 +1466,7 @@ class Cardapio(dbus.service.Object):
 		for sec in self.section_list:
 			self.set_section_is_empty(sec)
 
-		for app in self.app_list:
+		for app in app_list:
 
 			if app['name'].find(text) == -1 and app['basename'].find(text) == -1:
 				app['button'].hide()
@@ -1536,10 +1578,12 @@ class Cardapio(dbus.service.Object):
 
 		plugin.section_contents.pack_start(label, expand = False, fill = False)
 		plugin.section_contents.show()
-		plugin.section_slab.show()
+
+		if self.selected_section is None or plugin.section_slab == self.selected_section:
+			plugin.section_slab.show()
+			self.hide_no_results_text()
 
 		self.plugins_still_searching += 1
-		self.hide_no_results_text()
 
 
 	def show_all_plugin_timeout_text(self, delay_type):
@@ -1764,6 +1808,9 @@ class Cardapio(dbus.service.Object):
 			elif self.selected_section is not None:
 				self.untoggle_and_show_all_sections()
 
+			elif self.in_system_menu_mode:
+				self.switch_modes(show_system_menus = False, toggle_mode_button = True)
+
 			else:
 				self.hide()
 
@@ -1958,6 +2005,8 @@ class Cardapio(dbus.service.Object):
 			# build the UI *after* showing the window, so the user gets the
 			# satisfaction of seeing the window pop up, even if it's incomplete...
 			self.rebuild_ui(show_message = True)
+
+		self.switch_modes(show_system_menus = False, toggle_mode_button = True)
 
 
 	def hide(self, *dummy):
@@ -2180,14 +2229,16 @@ class Cardapio(dbus.service.Object):
 		Populate the System section
 		"""
 
-		# TODO Control-Center
-		#for node in self.sys_tree.root.contents:
+		for node in self.sys_tree.root.contents:
+			if isinstance(node, gmenu.Directory):
+				self.add_slab(node.name, node.icon, node.get_comment(), node = node, system_menu = True)
 
-		#	if isinstance(node, gmenu.Directory):
+		self.system_category_pane.hide()
 
-		#		self.add_slab(node.name, node.icon, node.get_comment(), node = node, hide = True)
+		section_slab, section_contents = self.add_slab(_('Uncategorized'), 'applications-other', tooltip = _('Other configuration tools'), hide = False, system_menu = True)
+		self.add_tree_to_app_list(self.sys_tree.root, section_contents, self.sys_list, recursive = False)
 
-		self.add_tree_to_app_list(self.sys_tree.root, self.system_section_contents)
+		self.add_tree_to_app_list(self.sys_tree.root, self.system_section_contents, self.app_list)
 
 
 	def build_uncategorized_list(self):
@@ -2195,8 +2246,7 @@ class Cardapio(dbus.service.Object):
 		Populate the Uncategorized section
 		"""
 
-		self.add_tree_to_app_list(self.app_tree.root, self.uncategorized_section_contents, recursive = False)
-		self.add_tree_to_app_list(self.sys_tree.root, self.uncategorized_section_contents, recursive = False)
+		self.add_tree_to_app_list(self.app_tree.root, self.uncategorized_section_contents, self.app_list, recursive = False)
 
 
 	def build_places_list(self):
@@ -2204,8 +2254,8 @@ class Cardapio(dbus.service.Object):
 		Populate the places list
 		"""
 
-		button = self.add_app_button(_('Home'), 'user-home', self.places_section_contents, 'xdg', self.home_folder_path, tooltip = _('Open your personal folder'), app_list = self.app_list)
-		button = self.add_app_button(_('Computer'), 'computer', self.places_section_contents, 'xdg', 'computer:///', tooltip = _('Browse all local and remote disks and folders accessible from this computer'), app_list = self.app_list)
+		self.add_app_button(_('Home'), 'user-home', self.places_section_contents, 'xdg', self.home_folder_path, tooltip = _('Open your personal folder'), app_list = self.app_list)
+		self.add_app_button(_('Computer'), 'computer', self.places_section_contents, 'xdg', 'computer:///', tooltip = _('Browse all local and remote disks and folders accessible from this computer'), app_list = self.app_list)
 
 		# TODO network:// ?
 
@@ -2246,7 +2296,7 @@ class Cardapio(dbus.service.Object):
 		self.bookmark_monitor = gio.File(bookmark_file_path).monitor_file() # keep a reference to avoid getting it garbage-collected
 		self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed)
 
-		button = self.add_app_button(_('Trash'), 'user-trash', self.places_section_contents, 'xdg', 'trash:///', tooltip = _('Open the trash'), app_list = self.app_list)
+		self.add_app_button(_('Trash'), 'user-trash', self.places_section_contents, 'xdg', 'trash:///', tooltip = _('Open the trash'), app_list = self.app_list)
 
 
 	def on_bookmark_monitor_changed(self, monitor, file, other_file, event):
@@ -2317,7 +2367,7 @@ class Cardapio(dbus.service.Object):
 
 		icon_name = self.get_icon_name_from_path(folder_path)
 		if icon_name is None: icon_name = folder_icon
-		button = self.add_app_button(folder_name, icon_name, self.places_section_contents, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
+		self.add_app_button(folder_name, icon_name, self.places_section_contents, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
 
 
 	def build_favorites_list(self, slab, list_name):
@@ -2413,28 +2463,33 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		for node in self.app_tree.root.contents:
-
 			if isinstance(node, gmenu.Directory):
-
 				self.add_slab(node.name, node.icon, node.get_comment(), node = node, hide = False)
 
 
-	def add_slab(self, title_str, icon_name = None, tooltip = '', hide = False, node = None):
+	def add_slab(self, title_str, icon_name = None, tooltip = '', hide = False, node = None, system_menu = False):
 		"""
 		Add to the app pane a new section slab (i.e. a container holding a title
 		label and a hbox to be filled with apps). This also adds the section
 		name to the left pane, under the View label.
 		"""
 
+		if system_menu:
+			category_pane = self.system_category_pane
+			app_list = self.sys_list
+		else:
+			category_pane = self.category_pane
+			app_list = self.app_list
+
 		# add category to category pane
-		sidebar_button = self.add_button(title_str, icon_name, self.category_pane, tooltip = tooltip, button_type = Cardapio.CATEGORY_BUTTON)
+		sidebar_button = self.add_button(title_str, icon_name, category_pane, tooltip = tooltip, button_type = Cardapio.CATEGORY_BUTTON)
 
 		# add category to application pane
 		section_slab, section_contents, dummy = self.add_application_section(title_str)
 
 		if node is not None:
 			# add all apps in this category to application pane
-			self.add_tree_to_app_list(node, section_contents)
+			self.add_tree_to_app_list(node, section_contents, app_list)
 
 		sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section_slab)
 
@@ -2446,6 +2501,7 @@ class Cardapio(dbus.service.Object):
 					'category': sidebar_button, 
 					'contents': section_contents, 
 					'name': title_str,
+					'is system section': system_menu,
 					}
 
 		else:
@@ -2454,6 +2510,7 @@ class Cardapio(dbus.service.Object):
 					'category': sidebar_button, 
 					'contents': section_contents, 
 					'name': title_str,
+					'is system section': system_menu,
 					}
 
 		return section_slab, section_contents
@@ -2807,7 +2864,7 @@ class Cardapio(dbus.service.Object):
 		return None
 
 
-	def add_tree_to_app_list(self, tree, parent_widget, recursive = True):
+	def add_tree_to_app_list(self, tree, parent_widget, app_list, recursive = True):
 		"""
 		Adds all the apps in a subtree of Gnome's menu as buttons in a given
 		parent widget
@@ -2817,11 +2874,11 @@ class Cardapio(dbus.service.Object):
 
 			if isinstance(node, gmenu.Entry):
 
-				button = self.add_app_button(node.name, node.icon, parent_widget, 'app', node.desktop_file_path, tooltip = node.get_comment(), app_list = self.app_list)
+				self.add_app_button(node.name, node.icon, parent_widget, 'app', node.desktop_file_path, tooltip = node.get_comment(), app_list = app_list)
 
 			elif isinstance(node, gmenu.Directory) and recursive:
 
-				self.add_tree_to_app_list(node, parent_widget)
+				self.add_tree_to_app_list(node, parent_widget, app_list)
 
 
 	def read_gtk_theme_info(self):
@@ -2883,6 +2940,7 @@ class Cardapio(dbus.service.Object):
 		self.settings['side pane items'].append(self.clicked_app)
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 		self.sidepane.queue_resize() # required! or sidepane's allocation will be x,y,width,0 when first item is added
+		self.get_object('SideappSubdivider').queue_resize() # required! or sidepane will obscure the mode switcher button
 
 
 	def on_remove_from_side_pane_clicked(self, widget):
@@ -2895,6 +2953,7 @@ class Cardapio(dbus.service.Object):
  		self.clear_pane(self.sidepane)
 		self.settings['side pane items'].remove(self.clicked_app)
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
+		self.get_object('SideappSubdivider').queue_resize() # required! or an extra space will show up where but button used to be
 
 
 	def on_open_parent_folder_pressed(self, widget):
@@ -3260,7 +3319,7 @@ class Cardapio(dbus.service.Object):
 		self.no_results_to_show = True
 
 		for sec in self.section_list:
-			if self.section_list[sec]['has entries']:
+			if self.section_list[sec]['has entries'] and self.section_list[sec]['is system section'] == self.in_system_menu_mode:
 				sec.show()
 				self.no_results_to_show = False
 			else:
@@ -3272,7 +3331,11 @@ class Cardapio(dbus.service.Object):
 
 		self.selected_section = None
 
-		widget = self.all_sections_sidebar_button
+		if self.in_system_menu_mode:
+			widget = self.all_system_sections_sidebar_button
+		else:
+			widget = self.all_sections_sidebar_button
+
 		self.set_sidebar_button_active(widget, True) 
 
 		if self.is_search_entry_empty():
@@ -3292,11 +3355,16 @@ class Cardapio(dbus.service.Object):
 			widget = self.section_list[self.selected_section]['category']
 			self.set_sidebar_button_active(widget, False)
 
+		elif self.in_system_menu_mode and self.all_system_sections_sidebar_button.get_active():
+			widget = self.all_system_sections_sidebar_button
+			self.set_sidebar_button_active(widget, False)
+
 		elif self.all_sections_sidebar_button.get_active():
 			widget = self.all_sections_sidebar_button
 			self.set_sidebar_button_active(widget, False)
 
 		self.all_sections_sidebar_button.set_sensitive(True)
+		self.all_system_sections_sidebar_button.set_sensitive(True)
 		self.selected_section = section_slab
 
 		self.consider_showing_no_results_text()

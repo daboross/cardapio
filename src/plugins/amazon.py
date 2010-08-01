@@ -9,6 +9,8 @@ import time
 
 from xml.etree import ElementTree
 
+from locale import getdefaultlocale
+
 class CardapioPlugin(CardapioPluginInterface):
 
 	"""
@@ -18,9 +20,11 @@ class CardapioPlugin(CardapioPluginInterface):
 	API's documentation can be found at:
 	http://docs.amazonwebservices.com/AWSECommerceService/2009-11-01/DG/
 
-	All of the plugin's web requests are asynchronous and cancellable.
+	If there's a localized API version, the plugin will use it. Amazon includes
+	CA, GB, JP, FR and DE versions.
+	As a fallback strategy, we use the United States version.
 
-	TODO: localize
+	All of the plugin's web requests are asynchronous and cancellable.
 	"""
 
 	# Cardapio's variables
@@ -65,14 +69,60 @@ class CardapioPlugin(CardapioPluginInterface):
  			'AWSAccessKeyId': self.aws_access_key
 		}
 
-		# remember the maximum number of results
+		# take the maximum number of results into account
 		self.results_limit = self.cardapio.settings['search results limit']
 
+		# try to get a locale specific URL for Amazon
+		self.locale_url = self.get_locale_url()
+
 		# Amazon's base URLs (search and search more variations)
-		self.api_base_url = 'http://ecs.amazonaws.com/onca/xml?{0}'
+		self.api_base_url = 'http://' + self.locale_url + '/onca/xml?{0}'
 		self.web_base_url = 'http://www.amazon.com/s?url=search-alias%3Daps&{0}'
 
 		self.loaded = True
+
+	def get_locale_url(self):
+		"""
+		Tries to get a locale specific base URL for Amazon's API according to
+		http://docs.amazonwebservices.com/AWSECommerceService/2009-11-01/DG/
+
+		If there's none, uses ".com" as a fallback strategy.
+		"""
+
+		locale_dict = {
+			'ca' : 'ecs.amazonaws.ca',
+			'de' : 'ecs.amazonaws.de',
+			'fr' : 'ecs.amazonaws.fr',
+			'jp' : 'ecs.amazonaws.jp',
+			'uk' : 'ecs.amazonaws.co.uk'
+		}
+
+		default = 'ecs.amazonaws.com'
+
+		# get and parse the language code
+		lang_code = getdefaultlocale()[0]
+
+		if lang_code is None:
+			return default
+
+		lang = lang_code[:2].lower()
+		dialect = lang_code[3:].lower()
+
+		# try to find a mapping...
+		key = None
+		if lang == 'en':
+			if dialect == 'gb':
+				key = 'uk'
+			elif dialect == 'ca':
+				key = 'ca'
+		elif lang == 'fr':
+			key = 'fr'
+		elif lang == 'de':
+			key = 'de'
+		elif lang == 'ja':
+			key = 'jp'
+
+		return locale_dict.get(key, default)
 
 	def search(self, text):
 		if len(text) == 0:
@@ -118,9 +168,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		# prepare a string on which we will base the AWS signature
 		string_to_sign = """GET
-ecs.amazonaws.com
+{0}
 /onca/xml
-{0}""".format(query_string)
+{1}""".format(self.locale_url, query_string)
 
 		# create HMAC for the string (using SHA-256 and our secret API key)
 		hm = hmac.new(key = self.aws_secret_access_key,
