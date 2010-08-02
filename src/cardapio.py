@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #
 #    Cardapio is an alternative Gnome menu applet, launcher, and much more!
 #    Copyright (C) 2010 Thiago Teixeira
@@ -134,7 +133,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.132'
+	version = '0.9.133'
 
 	core_plugins = [
 			'applications', 
@@ -197,7 +196,8 @@ class Cardapio(dbus.service.Object):
 		self.search_timeout_local          = None
 		self.search_timeout_remote         = None
 		self.plugin_database               = {}
-		self.active_plugin_instances       = {}
+		self.keyword_to_plugin_mapping     = {}
+		self.active_plugin_instances       = []
 		self.in_system_menu_mode           = False
 
 		self.icon_extension_types = re.compile('.*\.(png|xpm|svg)$')
@@ -362,6 +362,7 @@ class Cardapio(dbus.service.Object):
 			del(plugin)
 
 		self.active_plugin_instances = []
+		self.keyword_to_plugin_mapping = {}
 
 		for basename in self.settings['active plugins']:
 
@@ -394,6 +395,12 @@ class Cardapio(dbus.service.Object):
 
 			self.active_plugin_instances.append(plugin)
 			self.plugin_database[basename]['instance'] = plugin
+
+			keyword = basename
+			if basename in self.settings['plugin settings']:
+				if 'keyword' in self.settings['plugin settings'][basename]:
+					keyword = self.settings['plugin settings'][basename]['keyword']
+			self.keyword_to_plugin_mapping[keyword] = plugin
 
 
 	def plugin_write_to_log(self, plugin, text, is_debug = False, is_warning = False, is_error = False):
@@ -564,6 +571,7 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'pinned items'               , []                       ) 
 		self.read_config_option(s, 'side pane items'            , default_side_pane_items  )
 		self.read_config_option(s, 'active plugins'             , ['pinned', 'places', 'applications', 'tracker', 'google', 'software_center']) 
+		self.read_config_option(s, 'plugin settings'            , {}                       ) 
 
 		# these are a bit of a hack:
 		self.read_config_option(s, 'handler for ftp paths'      , r"nautilus '%s'"         ) # a command line using %s
@@ -572,6 +580,7 @@ class Cardapio(dbus.service.Object):
 		# (see https://bugs.launchpad.net/bugs/593141)
 
 		self.settings['cardapio version'] = self.version
+
 
 		# clean up the config file whenever options are changed between versions
 
@@ -1441,6 +1450,12 @@ class Cardapio(dbus.service.Object):
 		if self.in_system_menu_mode:
 			self.search_menus(text, self.sys_list)
 
+		#elif len(text) >= 2 and text[0] == '?':
+
+		#	keyword, dummy, query = text.partition(' ')
+		#	if len(keyword) >= 2:
+		#		self.search_with_plugin_keyword(keyword[1:], query)
+
 		else:
 			self.search_menus(text, self.app_list)
 			self.schedule_search_with_plugins(text)
@@ -1457,6 +1472,7 @@ class Cardapio(dbus.service.Object):
 		else:
 			self.all_sections_sidebar_button.set_sensitive(True)
 			self.all_system_sections_sidebar_button.set_sensitive(True)
+			self.consider_showing_no_results_text()
 
 
 	def search_menus(self, text, app_list):
@@ -1480,16 +1496,12 @@ class Cardapio(dbus.service.Object):
 
 		if self.selected_section is None:
 			self.untoggle_and_show_all_sections()
-		else:
-			self.consider_showing_no_results_text()
 
 
-	def schedule_search_with_plugins(self, text):
+	def cancel_all_plugin_timers(self):
 		"""
-		Start a plugin-based search, after some time-outs
+		Cancels both the "search start"-type timers and the "search timeout"-type ones
 		"""
-
-		self.cancel_all_plugins()
 
 		if self.search_timer_local is not None:
 			glib.source_remove(self.search_timer_local)
@@ -1503,33 +1515,81 @@ class Cardapio(dbus.service.Object):
 		if self.search_timeout_remote is not None:
 			glib.source_remove(self.search_timeout_remote)
 
-		delay_type  = 'local search update delay'
-		timer_delay = self.settings[delay_type]
-		timeout     = self.settings['local search timeout']
-		self.search_timer_local   = glib.timeout_add(timer_delay, self.search_with_plugins, text, delay_type)
-		self.search_timeout_local = glib.timeout_add(timeout, self.show_all_plugin_timeout_text, delay_type)
 
-		delay_type  = 'remote search update delay'
+	def search_with_plugin_keyword(self, keyword, text):
+		"""
+		Search using the plugin that matches the given keyword
+		"""
+		if keyword not in self.keyword_to_plugin_mapping: return
+
+		plugin = self.keyword_to_plugin_mapping[keyword]
+		print plugin
+
+		self.cancel_all_plugins()
+		self.cancel_all_plugin_timers()
+
+		self.prepare_and_schedule_search_with_plugins(text, plugin.search_delay_type, plugin)
+
+
+	def prepare_and_schedule_search_with_plugins(self, text, delay_type = None, specific_plugin = None):
+		"""
+		Setup timers to start searching with plugins
+		"""
+
+		if delay_type is None:
+			self.search_with_plugins(text, None, specific_plugin)
+			return
+
 		timer_delay = self.settings[delay_type]
 		timeout     = self.settings['remote search timeout']
-		self.search_timer_remote   = glib.timeout_add(timer_delay, self.search_with_plugins, text, delay_type)
+		self.search_timer_remote   = glib.timeout_add(timer_delay, self.search_with_plugins, text, delay_type, specific_plugin)
 		self.search_timeout_remote = glib.timeout_add(timeout, self.show_all_plugin_timeout_text, delay_type)
 
-		self.search_with_plugins(text, None)
+
+	def schedule_search_with_plugins(self, text):
+		"""
+		Start a plugin-based search, after some time-outs
+		"""
+
+		self.cancel_all_plugins()
+		self.cancel_all_plugin_timers()
+
+		self.prepare_and_schedule_search_with_plugins(text, 'local search update delay')
+		self.prepare_and_schedule_search_with_plugins(text, 'remote search update delay')
+		self.prepare_and_schedule_search_with_plugins(text, None)
 
 
-	def search_with_plugins(self, text, delay_type):
+	def search_with_plugins(self, text, delay_type, specific_plugin = None):
 		"""
 		Start a plugin-based search
 		"""
 
 		if delay_type == 'local search update delay':
-			glib.source_remove(self.search_timer_local)
-			self.search_timer_local = None
+			if self.search_timer_local is not None:
+				glib.source_remove(self.search_timer_local)
+				self.search_timer_local = None
 
 		elif delay_type == 'remote search update delay':
-			glib.source_remove(self.search_timer_remote)
-			self.search_timer_remote = None
+			if self.search_timer_remote is not None:
+				glib.source_remove(self.search_timer_remote)
+				self.search_timer_remote = None
+
+		if specific_plugin:
+			plugin = specific_plugin
+			if not plugin.hide_from_sidebar or len(text) >= self.settings['min search string length']:
+
+				plugin.is_running = True
+
+				try:
+					# TODO: make plugins run in a separate thread
+					self.show_plugin_loading_text(plugin)
+					plugin.search(text)
+
+				except Exception, exception:
+					self.plugin_write_to_log(plugin, 'Plugin search query failed to execute', is_error = True)
+					logging.error(exception)
+
+			return False
 
 		for plugin in self.active_plugin_instances:
 			if plugin.search_delay_type == delay_type:
