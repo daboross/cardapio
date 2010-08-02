@@ -17,14 +17,16 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('Bing')
 	description = _("Perform a search using Microsoft's Bing")
-	version = '0.91b'
+	version = '0.92b'
 
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.35
+	plugin_api_version = 1.37
 
 	search_delay_type = 'remote search update delay'
+
+	default_keyword = 'bing'
 
 	category_name = _('Bing Results')
 	category_tooltip = _('Results found using Bing')
@@ -49,13 +51,19 @@ class CardapioPlugin(CardapioPluginInterface):
 			'web.count': self.cardapio.settings['search results limit'],
 		}
 
+		self.api_base_args_long = {
+			'Appid'    : '237CBC82BB8C3F7F5F19F6A77B0D38A59E8F8C2C',
+			'sources'  : 'web',
+			'web.count': self.cardapio.settings['long search results limit'],
+		}
+
 		# Bing's base URLs (search and search more variations)
 		self.api_base_url = 'http://api.search.live.net/json.aspx?{0}'
 		self.web_base_url = 'http://www.bing.com/search?{0}'
 
 		self.loaded = True
 
-	def search(self, text):
+	def search(self, text, long_results = False):
 
 		if len(text) == 0:
 			return
@@ -67,7 +75,11 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.cancellable.reset()
 
 		# prepare final API URL
-		current_args = self.api_base_args.copy()
+		if long_results:
+			current_args = self.api_base_args_long.copy()
+		else:
+			current_args = self.api_base_args.copy()
+
 		current_args['query'] = text
 		final_url = self.api_base_url.format(urllib.urlencode(current_args))
 

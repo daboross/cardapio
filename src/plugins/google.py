@@ -10,11 +10,13 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.35'
+	version            = '1.37'
 
-	plugin_api_version = 1.35
+	plugin_api_version = 1.37
 
 	search_delay_type  = 'remote search update delay'
+
+	default_keyword    = 'google'
 
 	category_name      = _('Web Results')
 	category_icon      = 'system-search'
@@ -50,6 +52,11 @@ class CardapioPlugin(CardapioPluginInterface):
 		else:
 			self.query_url = r'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=small&q=%s'
 
+		if self.c.settings['long search results limit'] >= 8:
+			self.query_url_long = r'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=large&q=%s'
+		else:
+			self.query_url_long = r'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=small&q=%s'
+
 		self.search_controller = gio.Cancellable()
 
 		self.action_command = "xdg-open 'http://www.google.com/search?q=%%s&hl=%s'" % google_interface_language_format
@@ -65,7 +72,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.loaded = True
 
 
-	def search(self, text):
+	def search(self, text, long_results = False):
 
 		# TODO: I'm sure this is not the best way of doing remote procedure
 		# calls, but I can't seem to find anything that is this easy to use and
@@ -75,9 +82,13 @@ class CardapioPlugin(CardapioPluginInterface):
 		# proceeding...
 
 		self.current_query = text
-
 		text = urllib2.quote(text)
-		query = self.query_url % text
+
+		if long_results:
+			query = self.query_url_long % text
+		else:
+			query = self.query_url % text
+
 		self.stream = gio.File(query)
 
 		self.search_controller.reset()

@@ -17,14 +17,16 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('YouTube')
 	description = _('Search for results in YouTube')
-	version = '0.91b'
+	version = '0.92b'
 
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.35
+	plugin_api_version = 1.37
 
 	search_delay_type = 'remote search update delay'
+
+	default_keyword = 'youtube'
 
 	category_name = _('YouTube Results')
 	category_tooltip = _('Results found in YouTube')
@@ -46,6 +48,10 @@ class CardapioPlugin(CardapioPluginInterface):
 			'alt'        : 'json',
 			'max-results': self.cardapio.settings['search results limit'],
 		}
+		self.api_base_args_long = {
+			'alt'        : 'json',
+			'max-results': self.cardapio.settings['long search results limit'],
+		}
 
 		# YouTube's base URLs (search and search more variations)
 		self.api_base_url = 'http://gdata.youtube.com/feeds/api/videos?{0}'
@@ -53,7 +59,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.loaded = True
 
-	def search(self, text):
+	def search(self, text, long_search = False):
 
 		if len(text) == 0:
 			return
@@ -65,7 +71,12 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.cancellable.reset()
 
 		# prepare final API URL
-		current_args = self.api_base_args.copy()
+		if long_search:
+			api_base_args = self.api_base_args_long
+		else:
+			api_base_args = self.api_base_args
+
+		current_args = api_base_args.copy()
 		current_args['q'] = text
 		final_url = self.api_base_url.format(urllib.urlencode(current_args))
 

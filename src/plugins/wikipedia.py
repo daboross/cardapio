@@ -24,14 +24,16 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('Wikipedia')
 	description = _('Search for results in Wikipedia')
-	version = '0.91b'
+	version = '0.92b'
 
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.35
+	plugin_api_version = 1.37
 
 	search_delay_type = 'remote search update delay'
+
+	default_keyword = 'wikipedia'
 
 	category_name = _('Wikipedia Results')
 	category_tooltip = _('Results found in Wikipedia')
@@ -55,6 +57,11 @@ class CardapioPlugin(CardapioPluginInterface):
 			'format': 'json',
 			'limit' : str(self.cardapio.settings['search results limit']),
 		}
+		self.api_base_args_long = {
+			'action': 'opensearch',
+			'format': 'json',
+			'limit' : str(self.cardapio.settings['long search results limit']),
+		}
 
 		# Wikipedia's base URLs (search and show details variations)
 		self.api_base_url = 'http://en.wikipedia.org/w/api.php?{0}'
@@ -62,7 +69,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.loaded = True
 
-	def search(self, text):
+	def search(self, text, long_search = False):
 		if len(text) == 0:
 			return
 
@@ -73,7 +80,11 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.cancellable.reset()
 
 		# prepare final API URL
-		current_args = self.api_base_args.copy()
+		if long_search:
+			current_args = self.api_base_args_long.copy()
+		else:
+			current_args = self.api_base_args.copy()
+
 		current_args['search'] = text
 		final_url = self.api_base_url.format(urllib.urlencode(current_args))
 

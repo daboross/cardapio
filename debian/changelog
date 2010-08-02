@@ -1,5 +1,20 @@
 cardapio (0.9.134-ubuntu1) lucid; urgency=low
 
+   * Small bugfixes, and trying to get Launchpad to compile this already!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 1 Aug 2010 23:37:00 -0400
+
+
+cardapio (0.9.133-ubuntu1) lucid; urgency=low
+
+   * A coupld of small bugfixes, and updated translations
+   * Let's see if Launchpad builds this one quickly, at least
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 1 Aug 2010 13:37:00 -0400
+
+
+cardapio (0.9.134-ubuntu1) lucid; urgency=low
+
    * A coupld of small bugfixes, and updated translations
    * Let's see if Launchpad builds this one quickly, at least
 
