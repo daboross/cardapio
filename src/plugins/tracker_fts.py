@@ -8,11 +8,13 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.35'
+	version            = '1.37'
 
-	plugin_api_version = 1.35
+	plugin_api_version = 1.37
 
 	search_delay_type  = 'local search update delay'
+
+	default_keyword    = 'ftstracker'
 
 	category_name      = _('Results within files')
 	category_icon      = 'system-search'
@@ -35,6 +37,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			return 
 
 		self.search_results_limit = self.c.settings['search results limit']
+		self.search_results_limit_long = self.c.settings['long search results limit']
 
 		self.action_command = r'tracker-search-tool %s'
 		self.action = {
@@ -49,11 +52,15 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.loaded = True
 
 
-	def search(self, text):
+	def search(self, text, long_search):
 
 		self.current_query = text
-
 		text = urllib2.quote(text).lower()
+
+		if long_search:
+			search_results_limit = self.search_results_limit_long
+		else:
+			search_results_limit = self.search_results_limit
 
 		self.tracker.SparqlQuery(
 			"""
@@ -67,7 +74,7 @@ class CardapioPlugin(CardapioPluginInterface):
 					}
 				LIMIT %d
 			""" 
-			% (text, self.search_results_limit),
+			% (text, search_results_limit),
 			dbus_interface='org.freedesktop.Tracker1.Resources',
 			reply_handler=self.prepare_and_handle_search_result,
 			error_handler=self.handle_search_error

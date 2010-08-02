@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 #
 #    Cardapio is an alternative Gnome menu applet, launcher, and much more!
 #    Copyright (C) 2010 Thiago Teixeira
@@ -134,7 +133,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.132'
+	version = '0.9.134'
 
 	core_plugins = [
 			'applications', 
@@ -183,6 +182,8 @@ class Cardapio(dbus.service.Object):
 		self.app_list                      = []    # used for searching the regular menus
 		self.sys_list                      = []    # used for searching the system menu
 		self.section_list                  = {}
+		self.current_query                 = ''
+		self.previous_query                = ''
 		self.selected_section              = None
 		self.no_results_to_show            = False
 		self.previously_focused_widget     = None
@@ -197,13 +198,13 @@ class Cardapio(dbus.service.Object):
 		self.search_timeout_local          = None
 		self.search_timeout_remote         = None
 		self.plugin_database               = {}
-		self.active_plugin_instances       = {}
+		self.keyword_to_plugin_mapping     = {}
+		self.active_plugin_instances       = []
 		self.in_system_menu_mode           = False
 
 		self.icon_extension_types = re.compile('.*\.(png|xpm|svg)$')
 
 		self.app_tree = gmenu.lookup_tree('applications.menu')
-		#self.sys_tree = gmenu.lookup_tree('settings.menu')
 		self.sys_tree = gmenu.lookup_tree('gnomecc.menu')
 		self.app_tree.add_monitor(self.on_menu_data_changed)
 		self.sys_tree.add_monitor(self.on_menu_data_changed)
@@ -218,7 +219,7 @@ class Cardapio(dbus.service.Object):
 		self.build_ui() 
 		self.setup_ui_from_all_settings() 
 
-		self.schedule_search_with_plugins('')
+		self.schedule_search_with_all_plugins('')
 
 		if not hidden: self.show()
 
@@ -362,6 +363,9 @@ class Cardapio(dbus.service.Object):
 			del(plugin)
 
 		self.active_plugin_instances = []
+		self.keyword_to_plugin_mapping = {}
+
+		all_plugin_settings = self.settings['plugin settings']
 
 		for basename in self.settings['active plugins']:
 
@@ -389,11 +393,30 @@ class Cardapio(dbus.service.Object):
 				self.settings['active plugins'].remove(basename)
 				continue
 
-			plugin.basename         = basename
-			plugin.is_running       = False
+			keyword = plugin.default_keyword
+			show_only_with_keyword = False
+
+			if basename in all_plugin_settings:
+
+				plugin_settings = all_plugin_settings[basename]
+
+				if 'keyword' in plugin_settings:
+					keyword = plugin_settings['keyword']
+
+				if 'show only with keyword' in plugin_settings:
+					show_only_with_keyword = plugin_settings['show only with keyword']
+
+			all_plugin_settings[basename] = {}
+			all_plugin_settings[basename]['keyword'] = keyword
+			all_plugin_settings[basename]['show only with keyword'] = show_only_with_keyword
+
+			plugin.basename               = basename
+			plugin.is_running             = False
+			plugin.show_only_with_keyword = show_only_with_keyword
 
 			self.active_plugin_instances.append(plugin)
 			self.plugin_database[basename]['instance'] = plugin
+			self.keyword_to_plugin_mapping[keyword] = plugin
 
 
 	def plugin_write_to_log(self, plugin, text, is_debug = False, is_warning = False, is_error = False):
@@ -553,6 +576,7 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'min search string length'   , 3                        ) # characters
 		self.read_config_option(s, 'menu rebuild delay'         , 5                        , force_update_from_version = [0,9,96]) # seconds
 		self.read_config_option(s, 'search results limit'       , 5                        ) # results
+		self.read_config_option(s, 'long search results limit'  , 15                       ) # results
 		self.read_config_option(s, 'local search update delay'  , 100                      , force_update_from_version = [0,9,96]) # msec
 		self.read_config_option(s, 'remote search update delay' , 250                      , force_update_from_version = [0,9,96]) # msec
 		self.read_config_option(s, 'local search timeout'       , 3000                     ) # msec
@@ -564,6 +588,7 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'pinned items'               , []                       ) 
 		self.read_config_option(s, 'side pane items'            , default_side_pane_items  )
 		self.read_config_option(s, 'active plugins'             , ['pinned', 'places', 'applications', 'tracker', 'google', 'software_center']) 
+		self.read_config_option(s, 'plugin settings'            , {}                       ) 
 
 		# these are a bit of a hack:
 		self.read_config_option(s, 'handler for ftp paths'      , r"nautilus '%s'"         ) # a command line using %s
@@ -572,6 +597,7 @@ class Cardapio(dbus.service.Object):
 		# (see https://bugs.launchpad.net/bugs/593141)
 
 		self.settings['cardapio version'] = self.version
+
 
 		# clean up the config file whenever options are changed between versions
 
@@ -940,7 +966,7 @@ class Cardapio(dbus.service.Object):
 		for plugin in self.active_plugin_instances:
 			glib.idle_add(plugin.on_reload_permission_granted)
 
-		self.schedule_search_with_plugins('')
+		self.schedule_search_with_all_plugins('')
 
 
 	def show_executable_file_dialog(self, path):
@@ -1107,9 +1133,12 @@ class Cardapio(dbus.service.Object):
 
 		# make sure the label doesn't resize the window!
 		if width > 1:
-			label.set_size_request(width - self.scrollbar_width, -1) 
-		# The -20 is a hack that may not work for other Gtk themes
-		# TODO: find a better solution
+			label.set_size_request(width - self.scrollbar_width - 20, -1) 
+
+		# The -20 is a hack because some themes add extra padding that I need to
+		# account for. Since I don't know where that padding is comming from, I
+		# just enter a value (20px) that is larger than I assume any theme would
+		# ever use.
 
 
 	def apply_plugins_from_option_window(self, *dummy):
@@ -1430,17 +1459,36 @@ class Cardapio(dbus.service.Object):
 		Handler for when the user types something in the search entry
 		"""
 
+		text = self.search_entry.get_text().strip()
+
+		if text == self.previous_query: return
+		self.previous_query = text
+
 		self.no_results_to_show = True
 		self.hide_no_results_text()
 
-		text = self.search_entry.get_text().strip()
+		is_keyword_search = False
 
 		if self.in_system_menu_mode:
+			self.current_query = text
 			self.search_menus(text, self.sys_list)
 
+		elif len(text) > 0 and text[0] == '?':
+			is_keyword_search = True
+			keyword, dummy, text = text.partition(' ')
+			self.current_query = text
+
+			self.fully_hide_all_sections()
+
+			if len(keyword) >= 1 and text:
+				self.search_with_plugin_keyword(keyword[1:], text)
+
+			self.consider_showing_no_results_text()
+
 		else:
+			self.current_query = text
 			self.search_menus(text, self.app_list)
-			self.schedule_search_with_plugins(text)
+			self.schedule_search_with_all_plugins(text)
 
 			if len(text) < self.settings['min search string length']:
 				for plugin in self.active_plugin_instances:
@@ -1454,6 +1502,7 @@ class Cardapio(dbus.service.Object):
 		else:
 			self.all_sections_sidebar_button.set_sensitive(True)
 			self.all_system_sections_sidebar_button.set_sensitive(True)
+			self.consider_showing_no_results_text()
 
 
 	def search_menus(self, text, app_list):
@@ -1477,16 +1526,12 @@ class Cardapio(dbus.service.Object):
 
 		if self.selected_section is None:
 			self.untoggle_and_show_all_sections()
-		else:
-			self.consider_showing_no_results_text()
 
 
-	def schedule_search_with_plugins(self, text):
+	def cancel_all_plugin_timers(self):
 		"""
-		Start a plugin-based search, after some time-outs
+		Cancels both the "search start"-type timers and the "search timeout"-type ones
 		"""
-
-		self.cancel_all_plugins()
 
 		if self.search_timer_local is not None:
 			glib.source_remove(self.search_timer_local)
@@ -1500,48 +1545,111 @@ class Cardapio(dbus.service.Object):
 		if self.search_timeout_remote is not None:
 			glib.source_remove(self.search_timeout_remote)
 
-		delay_type  = 'local search update delay'
-		timer_delay = self.settings[delay_type]
-		timeout     = self.settings['local search timeout']
-		self.search_timer_local   = glib.timeout_add(timer_delay, self.search_with_plugins, text, delay_type)
-		self.search_timeout_local = glib.timeout_add(timeout, self.show_all_plugin_timeout_text, delay_type)
 
-		delay_type  = 'remote search update delay'
+	def search_with_plugin_keyword(self, keyword, text):
+		"""
+		Search using the plugin that matches the given keyword
+		"""
+
+		if not keyword: return
+
+		keyword_exists = False
+
+		for plugin_keyword in self.keyword_to_plugin_mapping:
+			if plugin_keyword.find(keyword) == 0:
+				keyword_exists = True	
+				keyword = plugin_keyword
+				break
+
+		if not keyword_exists: return
+
+		plugin = self.keyword_to_plugin_mapping[keyword]
+
+		self.cancel_all_plugins()
+		self.cancel_all_plugin_timers()
+
+		self.schedule_search_with_plugin_type(text, plugin.search_delay_type, plugin)
+
+
+	def schedule_search_with_all_plugins(self, text):
+		"""
+		Cleans up plugins and timers, and creates new timers to search with all
+		plugins
+		"""
+
+		self.cancel_all_plugins()
+		self.cancel_all_plugin_timers()
+
+		self.schedule_search_with_plugin_type(text, 'local search update delay')
+		self.schedule_search_with_plugin_type(text, 'remote search update delay')
+		self.schedule_search_with_plugin_type(text, None)
+
+
+	def schedule_search_with_plugin_type(self, text, delay_type = None, specific_plugin = None):
+		"""
+		Sets up timers to start searching with the plugins specified by the
+		delay_type and possibly by "specific_plugin"
+		"""
+
+		if delay_type is None:
+			self.search_with_plugins(text, None, specific_plugin)
+			return
+
 		timer_delay = self.settings[delay_type]
 		timeout     = self.settings['remote search timeout']
-		self.search_timer_remote   = glib.timeout_add(timer_delay, self.search_with_plugins, text, delay_type)
+		self.search_timer_remote   = glib.timeout_add(timer_delay, self.search_with_plugins, text, delay_type, specific_plugin)
 		self.search_timeout_remote = glib.timeout_add(timeout, self.show_all_plugin_timeout_text, delay_type)
 
-		self.search_with_plugins(text, None)
 
-
-	def search_with_plugins(self, text, delay_type):
+	def search_with_plugins(self, text, delay_type, specific_plugin = None):
 		"""
 		Start a plugin-based search
 		"""
 
 		if delay_type == 'local search update delay':
-			glib.source_remove(self.search_timer_local)
-			self.search_timer_local = None
+			if self.search_timer_local is not None:
+				glib.source_remove(self.search_timer_local)
+				self.search_timer_local = None
 
 		elif delay_type == 'remote search update delay':
-			glib.source_remove(self.search_timer_remote)
-			self.search_timer_remote = None
+			if self.search_timer_remote is not None:
+				glib.source_remove(self.search_timer_remote)
+				self.search_timer_remote = None
+
+		if specific_plugin is not None:
+
+			plugin = specific_plugin
+			plugin.is_running = True
+
+			try:
+				# TODO: make plugins run in a separate thread
+				self.show_plugin_loading_text(plugin)
+				plugin.search(text, long_search = True)
+
+			except Exception, exception:
+				self.plugin_write_to_log(plugin, 'Plugin search query failed to execute', is_error = True)
+				logging.error(exception)
+
+			return False # Required!
 
 		for plugin in self.active_plugin_instances:
-			if plugin.search_delay_type == delay_type:
-				if not plugin.hide_from_sidebar or len(text) >= self.settings['min search string length']:
 
-					plugin.is_running = True
+			if plugin.search_delay_type != delay_type or plugin.show_only_with_keyword: 
+				continue
 
-					try:
-						# TODO: make plugins run in a separate thread
-						self.show_plugin_loading_text(plugin)
-						plugin.search(text)
+			if plugin.hide_from_sidebar and len(text) < self.settings['min search string length']:
+				continue
 
-					except Exception, exception:
-						self.plugin_write_to_log(plugin, 'Plugin search query failed to execute', is_error = True)
-						logging.error(exception)
+			plugin.is_running = True
+
+			try:
+				# TODO: make plugins run in a separate thread
+				self.show_plugin_loading_text(plugin)
+				plugin.search(text)
+
+			except Exception, exception:
+				self.plugin_write_to_log(plugin, 'Plugin search query failed to execute', is_error = True)
+				logging.error(exception)
 
 		return False
 		# Required! makes this a "one-shot" timer, rather than "periodic"
@@ -1639,9 +1747,7 @@ class Cardapio(dbus.service.Object):
 		plugin.is_running = False
 		self.plugins_still_searching -= 1
 
-		current_query = self.search_entry.get_text()
-
-		if plugin.hide_from_sidebar and len(current_query) < self.settings['min search string length']:
+		if plugin.hide_from_sidebar and len(self.current_query) < self.settings['min search string length']:
 
 			# Handle the case where user presses backspace *very* quickly, and the
 			# search starts when len(text) > min_search_string_length, but after
@@ -1653,7 +1759,7 @@ class Cardapio(dbus.service.Object):
 
 			results = []
 
-		if original_query != current_query:
+		if original_query != self.current_query:
 			results = []
 
 		gtk.gdk.threads_enter()
@@ -3439,6 +3545,16 @@ class Cardapio(dbus.service.Object):
 		section_slab.hide()
 
 
+	def fully_hide_all_sections(self):
+		"""
+		Hide all sections, including plugins and non-plugins
+		"""
+
+		for section_slab in self.section_list:
+			self.set_section_is_empty(section_slab)
+			section_slab.hide()
+
+
 	def hide_transitory_plugin_sections(self, fully_hide = False):
 		"""
 		Hide the section slabs for all plugins that are marked as transitory
@@ -3509,9 +3625,11 @@ class CardapioPluginInterface:
 	help_text   = ''
 	version     = ''
 
-	plugin_api_version = 1.35
+	plugin_api_version = 1.37
 
 	search_delay_type = 'local search update delay'
+
+	default_keyword  = ''
 
 	category_name    = ''
 	category_icon    = ''
@@ -3570,12 +3688,22 @@ class CardapioPluginInterface:
 		pass
 
 
-	def search(self, text):
+	def search(self, text, long_search = False):
 		"""
 		REQUIRED
 
 		This method gets called when a new text string is entered in the search
-		field. One of the following functions should be called from this method
+		field. It also takes an argument indicating whether this is a "long search" or
+		not. This indicates the amount of items that the plugin should return to 
+		Cardapio:
+
+		   * if long_search == True:
+		   --> # of items = cardapio_proxy.settings['search results limit']
+		
+		   * if long_search == False:
+		   --> # of items = cardapio_proxy.settings['long search results limit']
+		
+		One of the following functions should be called from this method
 		(of from a thread spawned by this method):
 
 		   * if all goes well:
@@ -3617,7 +3745,6 @@ class CardapioPluginInterface:
 		the 'context menu' field to a list [] of dictionary items exactly like
 		the ones above.
 		"""
-
 		pass
 
 

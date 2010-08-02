@@ -19,11 +19,13 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '0.96b'
+	version            = '0.97b'
 
-	plugin_api_version = 1.35
+	plugin_api_version = 1.37
 
 	search_delay_type  = 'local search update delay'
+
+	default_keyword    = 'zgeist'
 
 	category_name      = _('Recent Documents')
 	category_icon      = 'document-open-recent'
@@ -39,6 +41,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.loaded = False
 		self.num_search_results = self.c.settings['search results limit']
+		self.num_search_results_long = self.c.settings['long search results limit']
 
 		if 'ZeitgeistClient' not in globals():
 			self.c.write_to_log(self, 'Could not import Zeitgeist', is_error = True)
@@ -91,7 +94,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		pass
 
 
-	def search(self, text):
+	def search(self, text, long_search = False):
 
 		self.current_query = text
 
@@ -103,11 +106,16 @@ class CardapioPlugin(CardapioPluginInterface):
 		else:
 			self.event_template.actor = ''
 
+		if long_search:
+			num_search_results = self.num_search_results_long
+		else:
+			num_search_results = self.num_search_results
+
 		self.zg.find_events_for_templates(
 				[self.event_template],
 				self.handle_search_result, 
 				timerange = self.time_range, 
-				num_events = self.num_search_results, 
+				num_events = num_search_results, 
 				result_type = datamodel.ResultType.MostRecentSubjects
 				)
 

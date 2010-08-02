@@ -36,7 +36,9 @@ class CardapioPlugin(CardapioPluginInterface):
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.35
+	default_keyword = 'amazon'
+
+	plugin_api_version = 1.37
 
 	search_delay_type = 'remote search update delay'
 
@@ -124,7 +126,8 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		return locale_dict.get(key, default)
 
-	def search(self, text):
+	# TODO: respect long_search
+	def search(self, text, long_search = False):
 		if len(text) == 0:
 			return
 

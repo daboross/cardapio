@@ -30,18 +30,19 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.11'
+	version            = '1.12'
 
-	plugin_api_version = 1.35
+	plugin_api_version = 1.37
 
 	search_delay_type  = 'local search update delay'
+	default_keyword    = 'softwarecenter'
 	category_name      = _('Available Software')
 	category_icon      = 'softwarecenter'
 	category_tooltip   = _('Software available to install on your system')
 
 	fallback_icon      = 'applications-other'
 
-	hide_from_sidebar = True 		
+	hide_from_sidebar = True 
 
 
 	def __init__(self, cardapio_proxy):
@@ -54,6 +55,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.loaded = False
 
 		self.num_search_results = self.c.settings['search results limit']
+		self.num_search_results_long = self.c.settings['long search results limit']
 		
 		if import_error:
 			self.c.write_to_log(self, 'Could not import certain modules', is_error = True)
@@ -101,7 +103,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.loaded = True # set to true if everything goes well
 
 
-	def search(self, text):
+	def search(self, text, long_search = False):
  
 		self.current_query = text
 
@@ -114,9 +116,14 @@ class CardapioPlugin(CardapioPluginInterface):
 		enquire.set_sort_by_value_then_relevance(XAPIAN_VALUE_POPCON)
 		matches = enquire.get_mset(0, len(self.db))
 
+		if long_search:
+			num_search_results = self.num_search_results_long
+		else:
+			num_search_results = self.num_search_results
+
 		i = 0
 		for m in matches:
-			if not i < self.num_search_results : break
+			if not i < num_search_results : break
 			
 			doc = m[xapian.MSET_DOCUMENT]
 			pkgname = self.db.get_pkgname(doc)

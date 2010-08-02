@@ -17,11 +17,13 @@ class CardapioPlugin (CardapioPluginInterface):
 	# not used in the GUI yet:
 	url = ''
 	help_text = ''
-	version = '1.21'
+	version = '1.22'
 
-	plugin_api_version = 1.35
+	plugin_api_version = 1.37
 
 	search_delay_type = None
+
+	default_keyword   = 'vbox'
 
 	category_name     = _('Virtual Machines')
 	category_icon     = 'VBox'
@@ -69,7 +71,7 @@ class CardapioPlugin (CardapioPluginInterface):
 		self.loaded = True
 
 
-	def search(self, text):
+	def search(self, text, long_search = False):
   
 		self.current_query = text
 
