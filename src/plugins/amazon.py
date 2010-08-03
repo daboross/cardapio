@@ -24,6 +24,12 @@ class CardapioPlugin(CardapioPluginInterface):
 	CA, GB, JP, FR and DE versions.
 	As a fallback strategy, we use the United States version.
 
+	The Cardapio's result limit is not fully respected. Amazon always
+	returns paginated results with 10 elements per page. Because of the
+	asynchronous nature of Cardapio's searching, we cannot use the
+	pagination feature. We need to stick to the first page of results
+	and that's why this plugin will always return at most 10 items.
+
 	All of the plugin's web requests are asynchronous and cancellable.
 	"""
 
@@ -73,6 +79,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		# take the maximum number of results into account
 		self.results_limit = self.cardapio.settings['search results limit']
+		self.long_results_limit = self.cardapio.settings['long search results limit']
 
 		# try to get a locale specific URL for Amazon
 		self.locale_url = self.get_locale_url()
@@ -126,7 +133,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		return locale_dict.get(key, default)
 
-	# TODO: respect long_search
 	def search(self, text, long_search = False):
 		if len(text) == 0:
 			return
@@ -144,7 +150,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.current_stream = gio.File(final_url)
 		self.current_stream.load_contents_async(self.show_search_results,
 			cancellable = self.cancellable,
-			user_data = text)
+			user_data = (text, long_search))
 
 	def prepare_amazon_rest_url(self, text):
 		"""
@@ -184,10 +190,13 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		return query_string + '&Signature=' + signature
 
-	def show_search_results(self, gdaemonfile, result, text):
+	def show_search_results(self, gdaemonfile, result, user_data):
 		"""
 		Callback to asynchronous IO (Amazon's API call).
 		"""
+
+		text = user_data[0]
+		long_search = user_data[1]
 
 		# watch out for connection problems
 		try:
@@ -215,13 +224,15 @@ class CardapioPlugin(CardapioPluginInterface):
 			is_valid = root.find('Items/Request/IsValid')
 			total_results = root.find('Items/TotalResults')
 
+			current_results_limit = self.long_results_limit if long_search else self.results_limit
+
 			# if we have a valid response with any results...
 			if (not is_valid is None) and is_valid != 'False' and (not total_results is None) and total_results != '0':
 				# remember them all
 				for i, item in enumerate(root.findall('Items/Item')):
 
 					# the number of results cannot be limited using Amazon's API...
-					if i == self.results_limit:
+					if i == current_results_limit:
 						break
 
 					i_attributes = item.find('ItemAttributes')
