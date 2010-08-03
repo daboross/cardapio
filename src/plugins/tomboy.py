@@ -28,7 +28,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	category_name = _('Tomboy Results')
 	category_tooltip = _('Your Tomboy notes')
 
-	category_icon = 'system-search'
+	category_icon = 'tomboy'
 	fallback_icon = ''
 
 	hide_from_sidebar = True
