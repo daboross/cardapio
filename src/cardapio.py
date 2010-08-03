@@ -1461,7 +1461,7 @@ class Cardapio(dbus.service.Object):
 
 		text = self.search_entry.get_text().strip()
 
-		if text == self.previous_query: return
+		if len(text) > 0 and text == self.previous_query: return
 		self.previous_query = text
 
 		self.no_results_to_show = True
