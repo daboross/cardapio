@@ -1,6 +1,5 @@
 from dbus.exceptions import DBusException
 
-# TODO: respect result limit (including long_search)
 class CardapioPlugin(CardapioPluginInterface):
 
 	"""
@@ -39,6 +38,10 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.cardapio = cardapio_proxy
 
+		# take the maximum number of results into account
+		self.results_limit = self.cardapio.settings['search results limit']
+		self.long_results_limit = self.cardapio.settings['long search results limit']
+
 		try:
 			# initialization of the Tomboy's D-Bus interface
 			bus = dbus.SessionBus()
@@ -49,7 +52,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		except DBusException as ex:
 			self.cardapio.write_to_log(self, 'Tomboy plugin initialization error: {0}'.format(str(ex)), is_error = True)
-
 			self.loaded = False
 
 	def search(self, text, long_search = False):
@@ -61,24 +63,35 @@ class CardapioPlugin(CardapioPluginInterface):
 		# TODO: this is not thread-safe but I couldn't find any way to pass the current search text
 		# into D-Bus' callback
 		self.current_query = text
+		self.long_search = long_search
 
 		# we ask for all notes (it's either that or a single note...)
 		self.tomboy.ListAllNotes(reply_handler = self.handle_search_result,
 			error_handler = self.handle_search_error)
 
-	def handle_search_result(self ,result):
+	def handle_search_result(self, result):
 		"""
 		Callback to asynchronous Tomboy's D-Bus call.
 		"""
 
 		items = []
 
+		current_results_limit = self.long_results_limit if self.long_search else self.results_limit
+
 		# looking for notes with titles containing (case insensitive) the given
 		# query text
+		i = 0
 		for note in result:
+
 			note_title = self.tomboy.GetNoteTitle(note)
 
 			if note_title.lower().count(self.current_query.lower()) > 0:
+
+				# exit after gathering enough results
+				if i == current_results_limit:
+					break
+				i += 1
+
 				# add 'open this note' search item
 				items.append({
 					'name'         : note_title,
