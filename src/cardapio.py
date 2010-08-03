@@ -133,7 +133,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.134'
+	version = '0.9.135'
 
 	core_plugins = [
 			'applications', 
@@ -1461,7 +1461,7 @@ class Cardapio(dbus.service.Object):
 
 		text = self.search_entry.get_text().strip()
 
-		if text == self.previous_query: return
+		if len(text) > 0 and text == self.previous_query: return
 		self.previous_query = text
 
 		self.no_results_to_show = True
