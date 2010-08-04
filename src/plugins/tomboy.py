@@ -6,8 +6,9 @@ class CardapioPlugin(CardapioPluginInterface):
 	Tomboy plugin based on it's D-Bus interface. Documentation:
 	http://arstechnica.com/open-source/news/2007/09/using-the-tomboy-d-bus-interface.ars
 
-	The plugin looks for notes with titles similar to the search string. If it can't
-	find any, it provides user with the handy 'Create note with this title' link.
+	The plugin looks for notes with titles and contents similar to the search string.
+	If it can't find any, it provides user with the handy 'create note with this title'
+	link.
 	"""
 
 	# Cardapio's variables
@@ -65,8 +66,8 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.current_query = text
 		self.long_search = long_search
 
-		# we ask for all notes (it's either that or a single note...)
-		self.tomboy.ListAllNotes(reply_handler = self.handle_search_result,
+		# we ask for a case insensitive search
+		self.tomboy.SearchNotes(text.lower(), False, reply_handler = self.handle_search_result,
 			error_handler = self.handle_search_error)
 
 	def handle_search_result(self, result):
@@ -83,24 +84,20 @@ class CardapioPlugin(CardapioPluginInterface):
 		i = 0
 		for note in result:
 
-			note_title = self.tomboy.GetNoteTitle(note)
+			# exit after gathering enough results
+			if i == current_results_limit:
+				break
+			i += 1
 
-			if note_title.lower().count(self.current_query.lower()) > 0:
-
-				# exit after gathering enough results
-				if i == current_results_limit:
-					break
-				i += 1
-
-				# add 'open this note' search item
-				items.append({
-					'name'         : note_title,
-					'tooltip'      : _('Open this note'),
-					'icon name'    : 'tomboy',
-					'type'         : 'xdg',
-					'command'      : note,
-					'context menu' : None
-				})
+			# add 'open this note' search item
+			items.append({
+				'name'         : self.tomboy.GetNoteTitle(note),
+				'tooltip'      : _('Open this note'),
+				'icon name'    : 'tomboy',
+				'type'         : 'xdg',
+				'command'      : note,
+				'context menu' : None
+			})
 
 		# if there are no results, we'll add the 'create a note with this
 		# title' link
