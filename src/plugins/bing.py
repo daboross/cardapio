@@ -63,7 +63,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.loaded = True
 
-	def search(self, text, long_results = False):
+	def search(self, text, long_search = False):
 
 		if len(text) == 0:
 			return
@@ -75,7 +75,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.cancellable.reset()
 
 		# prepare final API URL
-		if long_results:
+		if long_search:
 			current_args = self.api_base_args_long.copy()
 		else:
 			current_args = self.api_base_args.copy()
