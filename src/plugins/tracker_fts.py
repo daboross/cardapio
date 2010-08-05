@@ -8,7 +8,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.37'
+	version            = '1.371'
 
 	plugin_api_version = 1.37
 
@@ -52,7 +52,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.loaded = True
 
 
-	def search(self, text, long_search):
+	def search(self, text, long_search = False):
 
 		self.current_query = text
 		text = urllib2.quote(text).lower()

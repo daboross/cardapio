@@ -1,3 +1,10 @@
+cardapio (0.9.136-ubuntu1) lucid; urgency=low
+
+   * New feature: subfolder browsing by appending a slash
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 4 Aug 2010 23:01:00 -0400
+
+
 cardapio (0.9.135-ubuntu1) lucid; urgency=low
 
    * Bugfix release

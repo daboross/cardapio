@@ -77,7 +77,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.loaded = True
 
 
-	def search(self, text, long_results = False):
+	def search(self, text, long_search = False):
 
 		# TODO: I'm sure this is not the best way of doing remote procedure
 		# calls, but I can't seem to find anything that is this easy to use and
@@ -89,7 +89,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.current_query = text
 		text = urllib2.quote(text)
 
-		if long_results:
+		if long_search:
 			query = self.query_url_long % text
 		else:
 			query = self.query_url % text

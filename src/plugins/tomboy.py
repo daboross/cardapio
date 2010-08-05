@@ -1,5 +1,6 @@
 from dbus.exceptions import DBusException
 
+# TODO: tomboy on-off problems
 class CardapioPlugin(CardapioPluginInterface):
 
 	"""
