@@ -183,7 +183,7 @@ class Cardapio(dbus.service.Object):
 		self.sys_list                      = []    # used for searching the system menu
 		self.section_list                  = {}
 		self.current_query                 = ''
-		self.previous_query                = ''
+		self.subfolder_stack               = {}
 		self.selected_section              = None
 		self.no_results_to_show            = False
 		self.previously_focused_widget     = None
@@ -914,9 +914,12 @@ class Cardapio(dbus.service.Object):
 		self.clear_pane(self.left_session_pane)
 		self.clear_pane(self.right_session_pane)
 
-		self.app_list      = []  # holds a list of all apps for searching purposes
-		self.sys_list      = []  # holds a list of all apps in the system menus
-		self.section_list  = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
+		self.app_list              = []  # holds a list of all apps for searching purposes
+		self.sys_list              = []  # holds a list of all apps in the system menus
+		self.section_list          = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
+
+		self.current_query         = ''
+		self.subfolder_stack       = {}
 
 		button = self.add_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
@@ -936,6 +939,7 @@ class Cardapio(dbus.service.Object):
 		if self.panel_applet is None:
 			self.get_object('AppletOptionPane').hide()
 
+		self.add_subfolders_slab()
 		self.add_all_reorderable_slabs()
 
 		self.build_places_list()
@@ -1461,8 +1465,7 @@ class Cardapio(dbus.service.Object):
 
 		text = self.search_entry.get_text().strip()
 
-		if len(text) > 0 and text == self.previous_query: return
-		self.previous_query = text
+		if text and text == self.current_query: return
 
 		self.no_results_to_show = True
 		self.hide_no_results_text()
@@ -1470,15 +1473,23 @@ class Cardapio(dbus.service.Object):
 		is_keyword_search = False
 
 		if self.in_system_menu_mode:
-			self.current_query = text
+			self.fully_hide_all_sections()
+			self.subfolder_stack = {}
 			self.search_menus(text, self.sys_list)
+			self.current_query = text
 
-		elif len(text) > 0 and text[0] == '?':
+		elif text.find('/') != -1:
+			first_app_widget = self.get_first_visible_app()
+			self.fully_hide_all_sections()
+			self.search_subfolders(text, first_app_widget)
+			self.current_query = text
+
+		elif text and text[0] == '?':
+			self.fully_hide_all_sections()
+			self.subfolder_stack = {}
 			is_keyword_search = True
 			keyword, dummy, text = text.partition(' ')
 			self.current_query = text
-
-			self.fully_hide_all_sections()
 
 			if len(keyword) >= 1 and text:
 				self.search_with_plugin_keyword(keyword[1:], text)
@@ -1486,9 +1497,11 @@ class Cardapio(dbus.service.Object):
 			self.consider_showing_no_results_text()
 
 		else:
-			self.current_query = text
+			self.fully_hide_all_sections()
+			self.subfolder_stack = {}
 			self.search_menus(text, self.app_list)
 			self.schedule_search_with_all_plugins(text)
+			self.current_query = text
 
 			if len(text) < self.settings['min search string length']:
 				for plugin in self.active_plugin_instances:
@@ -1511,21 +1524,79 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		text = text.lower()
-
-		for sec in self.section_list:
-			self.set_section_is_empty(sec)
+		first_app = None
 
 		for app in app_list:
 
 			if app['name'].find(text) == -1 and app['basename'].find(text) == -1:
 				app['button'].hide()
 			else:
+				if first_app is None: first_app = app
 				app['button'].show()
 				self.set_section_has_entries(app['section'])
 				self.no_results_to_show = False
 
 		if self.selected_section is None:
 			self.untoggle_and_show_all_sections()
+
+		return first_app
+
+
+	def search_subfolders(self, text, first_app_widget):
+
+		text = text.lower()
+		search_inside = (text[-1] == '/' and len(text) != 1)
+
+		parent_text, base_text = os.path.split(text)
+		if search_inside: text = text[:-1]
+
+		if first_app_widget is None:
+			path = self.subfolder_stack[parent_text]
+
+		else:
+			if first_app_widget.app_info['type'] != 'xdg': return
+			path = self.escape_quotes(self.unescape(first_app_widget.app_info['command']))
+
+		self.subfolders_section_slab.hide() # for added performance
+		self.clear_pane(self.subfolders_section_contents)
+
+		path_type, path = urllib2.splittype(path)
+		if path_type and path_type != 'file': return
+
+		if search_inside and parent_text not in self.subfolder_stack:
+			if not os.path.isdir(path): return
+			self.subfolder_stack[parent_text] = path
+
+		else:
+			path = self.subfolder_stack[parent_text]
+
+		count = 0
+		limit = self.settings['long search results limit']
+
+		for filename in os.listdir(path):
+
+			# ignore hidden files
+			if filename[0] == '.': continue
+
+			if base_text and filename.lower().find(base_text) == -1: continue
+
+			if count >= limit: break
+			count += 1
+
+			command = os.path.join(path, filename)
+			icon_name = self.get_icon_name_from_path(command)
+			if icon_name is None: icon_name = 'folder'
+
+			basename, dummy = os.path.splitext(filename)
+			button = self.add_app_button(filename, icon_name, self.subfolders_section_contents, 'xdg', command, tooltip = command, app_list = None)
+
+		if count:
+			self.subfolders_section_slab.show() 
+			self.set_section_has_entries(self.subfolders_section_slab)
+			self.no_results_to_show = False
+
+		else:
+			self.no_results_to_show = True
 
 
 	def cancel_all_plugin_timers(self):
@@ -1744,6 +1815,8 @@ class Cardapio(dbus.service.Object):
 		Handler for when a plugin returns some search results
 		"""
 
+		plugin.section_slab.hide() # for added performance
+
 		plugin.is_running = False
 		self.plugins_still_searching -= 1
 
@@ -1908,7 +1981,16 @@ class Cardapio(dbus.service.Object):
 
 			self.cancel_all_plugins()
 
-			if not self.is_search_entry_empty():
+			text = self.search_entry.get_text()
+			slash_pos = text.rfind('/')
+
+			if slash_pos != -1:
+				if text[-1] == '/': slash_pos = text[:-1].rfind('/')
+				text = text[:slash_pos+1]
+				self.search_entry.set_text(text)
+				self.search_entry.set_position(-1)
+
+			elif not self.is_search_entry_empty():
 				self.clear_search_entry()
 
 			elif self.selected_section is not None:
@@ -1932,10 +2014,13 @@ class Cardapio(dbus.service.Object):
 		for slab in self.application_pane.get_children():
 			if not slab.get_visible(): continue
 
-			for app in slab.get_children()[0].get_children()[0].get_children():
-				if not app.get_visible(): continue
+			# NOTE: the following line depends on the UI file. If the file is
+			# changed, this may raise an exception:
 
-				return app
+			for child in slab.get_children()[0].get_children()[0].get_children():
+				if not child.get_visible(): continue
+
+				return child
 
 		return None
 
@@ -2628,7 +2713,18 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		section_slab, section_contents = self.add_slab(_('Places'), 'folder', tooltip = _('Access documents and folders'), hide = False)
+		self.places_section_slab = section_slab
 		self.places_section_contents = section_contents
+
+
+	def add_subfolders_slab(self):
+		"""
+		Add the Folder Contents slab to the app pane
+		"""
+
+		section_slab, section_contents = self.add_slab(_('Folder Contents'), 'system-file-manager', tooltip = _('Look inside folders'), hide = True)
+		self.subfolders_section_slab = section_slab
+		self.subfolders_section_contents = section_contents
 
 
 	def add_pinneditems_slab(self):
@@ -3526,6 +3622,7 @@ class Cardapio(dbus.service.Object):
 		there is no text in the search entry
 		"""
 
+		self.hide_section(self.subfolders_section_slab, fully_hide)
 		self.hide_section(self.session_section_slab, fully_hide)
 		self.hide_section(self.system_section_slab, fully_hide)
 		self.hide_section(self.sidepane_section_slab, fully_hide)
