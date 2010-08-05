@@ -1470,8 +1470,6 @@ class Cardapio(dbus.service.Object):
 		self.no_results_to_show = True
 		self.hide_no_results_text()
 
-		is_keyword_search = False
-
 		if self.in_system_menu_mode:
 			self.fully_hide_all_sections()
 			self.subfolder_stack = {}
@@ -1487,7 +1485,6 @@ class Cardapio(dbus.service.Object):
 		elif text and text[0] == '?':
 			self.fully_hide_all_sections()
 			self.subfolder_stack = {}
-			is_keyword_search = True
 			keyword, dummy, text = text.partition(' ')
 			self.current_query = text
 
@@ -3387,7 +3384,7 @@ class Cardapio(dbus.service.Object):
 			self.launch_xdg(command, hide)
 
 		elif command_type == 'callback':
-			text = self.search_entry.get_text().strip()
+			text = self.current_query
 			if hide: self.hide()
 			command(text)
 
