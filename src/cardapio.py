@@ -1570,6 +1570,9 @@ class Cardapio(dbus.service.Object):
 		else:
 			path = self.subfolder_stack[parent_text]
 
+		dummy, parent_name = os.path.split(path)
+		self.subfolders_label.set_text(parent_name)
+
 		count = 0
 		limit = self.settings['long search results limit']
 
@@ -2426,7 +2429,7 @@ class Cardapio(dbus.service.Object):
 
 		self.system_category_pane.hide()
 
-		section_slab, section_contents = self.add_slab(_('Uncategorized'), 'applications-other', tooltip = _('Other configuration tools'), hide = False, system_menu = True)
+		section_slab, section_contents, dummy = self.add_slab(_('Uncategorized'), 'applications-other', tooltip = _('Other configuration tools'), hide = False, system_menu = True)
 		self.add_tree_to_app_list(self.sys_tree.root, section_contents, self.sys_list, recursive = False)
 
 		self.add_tree_to_app_list(self.sys_tree.root, self.system_section_contents, self.app_list)
@@ -2676,7 +2679,7 @@ class Cardapio(dbus.service.Object):
 		sidebar_button = self.add_button(title_str, icon_name, category_pane, tooltip = tooltip, button_type = Cardapio.CATEGORY_BUTTON)
 
 		# add category to application pane
-		section_slab, section_contents, dummy = self.add_application_section(title_str)
+		section_slab, section_contents, label = self.add_application_section(title_str)
 
 		if node is not None:
 			# add all apps in this category to application pane
@@ -2704,7 +2707,7 @@ class Cardapio(dbus.service.Object):
 					'is system section': system_menu,
 					}
 
-		return section_slab, section_contents
+		return section_slab, section_contents, label
 
 
 	def add_places_slab(self):
@@ -2712,7 +2715,7 @@ class Cardapio(dbus.service.Object):
 		Add the Places slab to the app pane
 		"""
 
-		section_slab, section_contents = self.add_slab(_('Places'), 'folder', tooltip = _('Access documents and folders'), hide = False)
+		section_slab, section_contents, dummy = self.add_slab(_('Places'), 'folder', tooltip = _('Access documents and folders'), hide = False)
 		self.places_section_slab = section_slab
 		self.places_section_contents = section_contents
 
@@ -2722,9 +2725,10 @@ class Cardapio(dbus.service.Object):
 		Add the Folder Contents slab to the app pane
 		"""
 
-		section_slab, section_contents = self.add_slab(_('Folder Contents'), 'system-file-manager', tooltip = _('Look inside folders'), hide = True)
+		section_slab, section_contents, label = self.add_slab(_('Folder Contents'), 'system-file-manager', tooltip = _('Look inside folders'), hide = True)
 		self.subfolders_section_slab = section_slab
 		self.subfolders_section_contents = section_contents
+		self.subfolders_label = label
 
 
 	def add_pinneditems_slab(self):
@@ -2732,7 +2736,7 @@ class Cardapio(dbus.service.Object):
 		Add the Pinned Items slab to the app pane
 		"""
 
-		section_slab, section_contents = self.add_slab(_('Pinned items'), 'emblem-favorite', tooltip = _('Your favorite applications'), hide = False)
+		section_slab, section_contents, dummy = self.add_slab(_('Pinned items'), 'emblem-favorite', tooltip = _('Your favorite applications'), hide = False)
 		self.favorites_section_slab = section_slab
 		self.favorites_section_contents = section_contents
 
@@ -2742,7 +2746,7 @@ class Cardapio(dbus.service.Object):
 		Add the Side Pane slab to the app pane
 		"""
 
-		section_slab, section_contents = self.add_slab(_('Side Pane'), 'emblem-favorite', tooltip = _('Items pinned to the side pane'), hide = True)
+		section_slab, section_contents, dummy = self.add_slab(_('Side Pane'), 'emblem-favorite', tooltip = _('Items pinned to the side pane'), hide = True)
 		self.sidepane_section_slab = section_slab
 		self.sidepane_section_contents = section_contents
 
@@ -2752,7 +2756,7 @@ class Cardapio(dbus.service.Object):
 		Add the Uncategorized slab to the app pane
 		"""
 
-		section_slab, section_contents = self.add_slab(_('Uncategorized'), 'applications-other', tooltip = _('Items that are not under any menu category'), hide = True)
+		section_slab, section_contents, dummy = self.add_slab(_('Uncategorized'), 'applications-other', tooltip = _('Items that are not under any menu category'), hide = True)
 		self.uncategorized_section_slab = section_slab
 		self.uncategorized_section_contents = section_contents
 
@@ -2762,7 +2766,7 @@ class Cardapio(dbus.service.Object):
 		Add the Session slab to the app pane
 		"""
 
-		section_slab, section_contents = self.add_slab(_('Session'), 'session-properties', hide = True)
+		section_slab, section_contents, dummy = self.add_slab(_('Session'), 'session-properties', hide = True)
 		self.session_section_slab = section_slab
 		self.session_section_contents = section_contents
 
@@ -2772,7 +2776,7 @@ class Cardapio(dbus.service.Object):
 		Add the System slab to the app pane
 		"""
 
-		section_slab, section_contents = self.add_slab(_('System'), 'applications-system', hide = True)
+		section_slab, section_contents, dummy = self.add_slab(_('System'), 'applications-system', hide = True)
 		self.system_section_slab = section_slab
 		self.system_section_contents = section_contents
 
@@ -2789,7 +2793,7 @@ class Cardapio(dbus.service.Object):
 		plugin = self.plugin_database[basename]['instance']
 		if plugin is None: return
 
-		section_slab, section_contents = self.add_slab(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hide = plugin.hide_from_sidebar)
+		section_slab, section_contents, dummy = self.add_slab(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hide = plugin.hide_from_sidebar)
 		plugin.section_slab = section_slab
 		plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
 
