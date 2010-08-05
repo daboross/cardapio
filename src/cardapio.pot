@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-08-01 00:44-0400\n"
+"POT-Creation-Date: 2010-08-05 04:31-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,111 +16,111 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: cardapio.py:294
+#: cardapio.py:295
 msgid "Application menu"
 msgstr ""
 
-#: cardapio.py:295 cardapio.py:306 cardapio.py:317 plugins/google.py:7
+#: cardapio.py:296 cardapio.py:307 cardapio.py:318 plugins/google.py:7
 #: plugins/google_localized.py:7 plugins/tracker.py:5 plugins/tracker_fts.py:5
 #: plugins/zg_recent_documents.py:16
 msgid "Cardapio Team"
 msgstr ""
 
-#: cardapio.py:296
+#: cardapio.py:297
 msgid "Displays installed applications"
 msgstr ""
 
-#: cardapio.py:305
+#: cardapio.py:306
 msgid "Places menu"
 msgstr ""
 
-#: cardapio.py:307
+#: cardapio.py:308
 msgid "Displays a list of folders"
 msgstr ""
 
-#: cardapio.py:316 cardapio.py:2533
+#: cardapio.py:317 cardapio.py:2739
 msgid "Pinned items"
 msgstr ""
 
-#: cardapio.py:318
+#: cardapio.py:319
 msgid "Displays your favorite applications"
 msgstr ""
 
-#: cardapio.py:532
+#: cardapio.py:555
 msgid "Ubuntu Software Center"
 msgstr ""
 
-#: cardapio.py:534
+#: cardapio.py:557
 msgid ""
 "Lets you choose from thousands of free applications available for Ubuntu"
 msgstr ""
 
-#: cardapio.py:541
+#: cardapio.py:564
 msgid "Help and Support"
 msgstr ""
 
-#: cardapio.py:543
+#: cardapio.py:566
 #, python-format
 msgid "Get help with %(distro_name)s"
 msgstr ""
 
-#: cardapio.py:744
+#: cardapio.py:770
 msgid "_Properties"
 msgstr ""
 
-#: cardapio.py:745
+#: cardapio.py:771
 msgid "_Edit Menus"
 msgstr ""
 
-#: cardapio.py:746 cardapio.ui.h:30
+#: cardapio.py:772 cardapio.ui.h:30
 msgid "_About Cardapio"
 msgstr ""
 
-#: cardapio.py:747
+#: cardapio.py:773
 msgid "_About Gnome"
 msgstr ""
 
-#: cardapio.py:748
+#: cardapio.py:774
 #, python-format
 msgid "_About %(distro_name)s"
 msgstr ""
 
-#: cardapio.py:877
+#: cardapio.py:903
 msgid "No results to show"
 msgstr ""
 
-#: cardapio.py:878
+#: cardapio.py:904
 #, python-format
 msgid "No results to show in \"%(category_name)s\""
 msgstr ""
 
-#: cardapio.py:879
+#: cardapio.py:905
 msgid "Searching..."
 msgstr ""
 
-#: cardapio.py:880
+#: cardapio.py:906
 msgid "Search timed out"
 msgstr ""
 
-#: cardapio.py:895 cardapio.py:901
+#: cardapio.py:924 cardapio.py:930
 msgid "All"
 msgstr ""
 
-#: cardapio.py:895 cardapio.py:901
+#: cardapio.py:924 cardapio.py:930
 msgid "Show all categories"
 msgstr ""
 
-#: cardapio.py:955
+#: cardapio.py:985
 #, python-format
 msgid "Do you want to run \"%(file_name)s\" or display its contents?"
 msgstr ""
 
-#: cardapio.py:956
+#: cardapio.py:986
 #, python-format
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr ""
 
-#: cardapio.py:1100
+#: cardapio.py:1130
 #, python-format
 msgid ""
 "<b>Plugin:</b> %(name)s %(version)s\n"
@@ -128,104 +128,112 @@ msgid ""
 "<b>Description:</b> %(description)s"
 msgstr ""
 
-#: cardapio.py:1101
+#: cardapio.py:1131
 msgid "This is a community-supported plugin"
 msgstr ""
 
-#: cardapio.py:2238 cardapio.py:2553
+#: cardapio.py:2432 cardapio.py:2759
 msgid "Uncategorized"
 msgstr ""
 
-#: cardapio.py:2238
+#: cardapio.py:2432
 msgid "Other configuration tools"
 msgstr ""
 
-#: cardapio.py:2257
+#: cardapio.py:2451
 msgid "Home"
 msgstr ""
 
-#: cardapio.py:2257
+#: cardapio.py:2451
 msgid "Open your personal folder"
 msgstr ""
 
-#: cardapio.py:2258
+#: cardapio.py:2452
 msgid "Computer"
 msgstr ""
 
-#: cardapio.py:2258
+#: cardapio.py:2452
 msgid ""
 "Browse all local and remote disks and folders accessible from this computer"
 msgstr ""
 
-#: cardapio.py:2276
+#: cardapio.py:2470
 msgid "Desktop"
 msgstr ""
 
-#: cardapio.py:2299
+#: cardapio.py:2493
 msgid "Trash"
 msgstr ""
 
-#: cardapio.py:2299
+#: cardapio.py:2493
 msgid "Open the trash"
 msgstr ""
 
-#: cardapio.py:2429
+#: cardapio.py:2623
 msgid "Lock Screen"
 msgstr ""
 
-#: cardapio.py:2430
+#: cardapio.py:2624
 msgid "Protect your computer from unauthorized use"
 msgstr ""
 
-#: cardapio.py:2436
+#: cardapio.py:2630
 msgid "Log Out..."
 msgstr ""
 
-#: cardapio.py:2437
+#: cardapio.py:2631
 msgid "Log out of this session to log in as a different user"
 msgstr ""
 
-#: cardapio.py:2443
+#: cardapio.py:2637
 msgid "Shut Down..."
 msgstr ""
 
-#: cardapio.py:2444
+#: cardapio.py:2638
 msgid "Shut down the system"
 msgstr ""
 
-#: cardapio.py:2524
+#: cardapio.py:2718
 msgid "Places"
 msgstr ""
 
-#: cardapio.py:2524
+#: cardapio.py:2718
 msgid "Access documents and folders"
 msgstr ""
 
-#: cardapio.py:2533
+#: cardapio.py:2728
+msgid "Folder Contents"
+msgstr ""
+
+#: cardapio.py:2728
+msgid "Look inside folders"
+msgstr ""
+
+#: cardapio.py:2739
 msgid "Your favorite applications"
 msgstr ""
 
-#: cardapio.py:2543
+#: cardapio.py:2749
 msgid "Side Pane"
 msgstr ""
 
-#: cardapio.py:2543
+#: cardapio.py:2749
 msgid "Items pinned to the side pane"
 msgstr ""
 
-#: cardapio.py:2553
+#: cardapio.py:2759
 msgid "Items that are not under any menu category"
 msgstr ""
 
-#: cardapio.py:2563
+#: cardapio.py:2769
 msgid "Session"
 msgstr ""
 
-#: cardapio.py:2573
+#: cardapio.py:2779
 msgid "System"
 msgstr ""
 
-#: cardapio.py:3663
+#: cardapio.py:3891
 msgid "Access applications, folders, system settings, etc."
 msgstr ""
 
@@ -348,27 +356,27 @@ msgid "_Add to side pane"
 msgstr ""
 
 #: cardapio.ui.h:32
-msgid "_Display"
+msgid "_Control Center"
 msgstr ""
 
 #: cardapio.ui.h:33
-msgid "_Launch in background"
+msgid "_Display"
 msgstr ""
 
 #: cardapio.ui.h:34
-msgid "_Pin this item"
+msgid "_Launch in background"
 msgstr ""
 
 #: cardapio.ui.h:35
-msgid "_Remove from side pane"
+msgid "_Pin this item"
 msgstr ""
 
 #: cardapio.ui.h:36
-msgid "_Run"
+msgid "_Remove from side pane"
 msgstr ""
 
 #: cardapio.ui.h:37
-msgid "_System"
+msgid "_Run"
 msgstr ""
 
 #: cardapio.ui.h:38
@@ -387,22 +395,22 @@ msgstr ""
 msgid "Perform a search using Microsoft's Bing"
 msgstr ""
 
-#: plugins/bing.py:29
+#: plugins/bing.py:31
 msgid "Bing Results"
 msgstr ""
 
-#: plugins/bing.py:30
+#: plugins/bing.py:32
 msgid "Results found using Bing"
 msgstr ""
 
-#: plugins/bing.py:123 plugins/google.py:57 plugins/google_localized.py:62
-#: plugins/tracker.py:42 plugins/tracker_fts.py:41 plugins/yahoo.py:140
-#: plugins/you_tube.py:131 plugins/zg_recent_documents.py:75
+#: plugins/bing.py:135 plugins/google.py:64 plugins/google_localized.py:69
+#: plugins/tracker.py:45 plugins/tracker_fts.py:44 plugins/yahoo.py:156
+#: plugins/you_tube.py:142 plugins/zg_recent_documents.py:78
 msgid "Show additional results"
 msgstr ""
 
-#: plugins/bing.py:124 plugins/google.py:58 plugins/google_localized.py:63
-#: plugins/yahoo.py:141 plugins/you_tube.py:132
+#: plugins/bing.py:136 plugins/google.py:65 plugins/google_localized.py:70
+#: plugins/yahoo.py:157 plugins/you_tube.py:143
 msgid "Show additional search results in your web browser"
 msgstr ""
 
@@ -414,11 +422,11 @@ msgstr ""
 msgid "Perform quick Google searches in <b>all</b> languages"
 msgstr ""
 
-#: plugins/google.py:19
+#: plugins/google.py:21
 msgid "Web Results"
 msgstr ""
 
-#: plugins/google.py:21
+#: plugins/google.py:23
 msgid "Results found with Google"
 msgstr ""
 
@@ -431,11 +439,11 @@ msgid ""
 "Perform quick Google searches <b>limited to</b> the system's default language"
 msgstr ""
 
-#: plugins/google_localized.py:19
+#: plugins/google_localized.py:21
 msgid "Localized Web Results"
 msgstr ""
 
-#: plugins/google_localized.py:21
+#: plugins/google_localized.py:23
 msgid "Results found with Google in you system language"
 msgstr ""
 
@@ -447,37 +455,37 @@ msgstr ""
 msgid "Search for new applications in the Software Center"
 msgstr ""
 
-#: plugins/software_center.py:38
+#: plugins/software_center.py:39
 msgid "Available Software"
 msgstr ""
 
-#: plugins/software_center.py:40
+#: plugins/software_center.py:41
 msgid "Software available to install on your system"
 msgstr ""
 
-#: plugins/software_center.py:77
+#: plugins/software_center.py:79
 msgid "Open Software Center"
 msgstr ""
 
-#: plugins/software_center.py:78
+#: plugins/software_center.py:80
 msgid "Search for more software in the Software Center"
 msgstr ""
 
-#: plugins/software_center.py:85
+#: plugins/software_center.py:87
 #, python-format
 msgid "_Install %s"
 msgstr ""
 
-#: plugins/software_center.py:86
+#: plugins/software_center.py:88
 msgid "Install this package without opening the Software Center"
 msgstr ""
 
-#: plugins/software_center.py:88
+#: plugins/software_center.py:90
 #, python-format
 msgid "Show %s in the Software Center"
 msgstr ""
 
-#: plugins/software_center.py:89
+#: plugins/software_center.py:91
 msgid "Description:"
 msgstr ""
 
@@ -489,15 +497,15 @@ msgstr ""
 msgid "Search local files and folders indexed with Tracker"
 msgstr ""
 
-#: plugins/tracker.py:17
+#: plugins/tracker.py:19
 msgid "Local Results"
 msgstr ""
 
-#: plugins/tracker.py:19
+#: plugins/tracker.py:21
 msgid "Results found in your computer"
 msgstr ""
 
-#: plugins/tracker.py:43 plugins/tracker_fts.py:42
+#: plugins/tracker.py:46 plugins/tracker_fts.py:45
 msgid "Show additional search results in the Tracker search tool"
 msgstr ""
 
@@ -509,11 +517,11 @@ msgstr ""
 msgid "Search <b>inside</b> local files and folders indexed with Tracker"
 msgstr ""
 
-#: plugins/tracker_fts.py:17
+#: plugins/tracker_fts.py:19
 msgid "Results within files"
 msgstr ""
 
-#: plugins/tracker_fts.py:19
+#: plugins/tracker_fts.py:21
 msgid "Results found inside the files in your computer"
 msgstr ""
 
@@ -525,15 +533,15 @@ msgstr ""
 msgid "Search for and start VirtualBox virtual machines from the menu"
 msgstr ""
 
-#: plugins/virtualbox.py:26
+#: plugins/virtualbox.py:28
 msgid "Virtual Machines"
 msgstr ""
 
-#: plugins/virtualbox.py:28
+#: plugins/virtualbox.py:30
 msgid "Your VirtualBox virtual machines"
 msgstr ""
 
-#: plugins/virtualbox.py:90
+#: plugins/virtualbox.py:92
 #, python-format
 msgid ""
 "Start virtual machine %(name)s\n"
@@ -548,11 +556,11 @@ msgstr ""
 msgid "Search for results in Wikipedia"
 msgstr ""
 
-#: plugins/wikipedia.py:36
+#: plugins/wikipedia.py:38
 msgid "Wikipedia Results"
 msgstr ""
 
-#: plugins/wikipedia.py:37
+#: plugins/wikipedia.py:39
 msgid "Results found in Wikipedia"
 msgstr ""
 
@@ -564,11 +572,11 @@ msgstr ""
 msgid "Perform a search using Yahoo"
 msgstr ""
 
-#: plugins/yahoo.py:38
+#: plugins/yahoo.py:40
 msgid "Yahoo Results"
 msgstr ""
 
-#: plugins/yahoo.py:39
+#: plugins/yahoo.py:41
 msgid "Results found using Yahoo"
 msgstr ""
 
@@ -580,11 +588,11 @@ msgstr ""
 msgid "Search for results in YouTube"
 msgstr ""
 
-#: plugins/you_tube.py:29
+#: plugins/you_tube.py:31
 msgid "YouTube Results"
 msgstr ""
 
-#: plugins/you_tube.py:30
+#: plugins/you_tube.py:32
 msgid "Results found in YouTube"
 msgstr ""
 
@@ -596,14 +604,14 @@ msgstr ""
 msgid "Search for your most recently used files"
 msgstr ""
 
-#: plugins/zg_recent_documents.py:28
+#: plugins/zg_recent_documents.py:30
 msgid "Recent Documents"
 msgstr ""
 
-#: plugins/zg_recent_documents.py:30
+#: plugins/zg_recent_documents.py:32
 msgid "Files that you have used recently"
 msgstr ""
 
-#: plugins/zg_recent_documents.py:76
+#: plugins/zg_recent_documents.py:79
 msgid "Show additional search results in Sezen"
 msgstr ""
