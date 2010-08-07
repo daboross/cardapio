@@ -84,6 +84,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		# send empty results to Cardapio if Tomboy's off
 		if self.tomboy is None:
 			self.cardapio.handle_search_result(self, [], text)
+			return
 
 		self.cardapio.write_to_log(self, 'searching for Tomboy notes with topic like {0}'.format(text), is_debug = True)
 
@@ -186,6 +187,7 @@ class DBusParametrizedCallback:
 		# pass empty results to main class if Tomboy's off
 		if self.tomboy is None:
 			self.result_callback([], self.text)
+			return
 
 		items = []
 
