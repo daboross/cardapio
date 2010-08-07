@@ -2836,6 +2836,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.search_entry.set_text('')
+		self.subfolder_stack = {}
 
 
 	def add_app_button(self, button_str, icon_name, parent_widget, command_type, command, tooltip = '', app_list = None):

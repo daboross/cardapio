@@ -3,8 +3,8 @@ import gio
 import urllib
 
 from glib import GError
+from locale import getdefaultlocale
 
-# TODO: localize
 class CardapioPlugin(CardapioPluginInterface):
 	"""
 	eBay search plugin based on it's Finding API documented at:
@@ -12,6 +12,16 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	Please note, that this API limits the number of calls to 5000 per IP
 	and day.
+
+	All calls are localized, meaning that they are using eBay version local
+	to the user. The specific version being used is derived from the user's
+	computer locale.
+
+	For a list of locale supported by eBay check:
+	http://developer.ebay.com/DevZone/finding/Concepts/SiteIDToGlobalID.html
+	The listing there means that the plugin is localized for more than 20
+	countries. :) Nevertheless, we must have a fallback strategy and we use
+	the US version in this role.
 
 	All of the plugin's web requests are asynchronous and cancellable.
 	"""
@@ -50,17 +60,91 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.cancellable = gio.Cancellable()
 
-		# eBay's API arguments (my API key, 'find' operation, JSON response format)
+		# eBay's API arguments (my API key, 'find' operation, JSON response format,
+		# and locale information)
 		self.api_base_args = {
 			'SECURITY-APPNAME'     : 'Cardapio-9704-40b3-8e17-cfad62dd6c45',
 			'OPERATION-NAME'       : 'findItemsByKeywords',
-			'RESPONSE-DATA-FORMAT' : 'JSON'
+			'RESPONSE-DATA-FORMAT' : 'JSON',
+			'GLOBAL-ID'            : self.get_global_id()
 		}
 
 		# eBay's base search URL
 		self.api_base_url = 'http://svcs.ebay.com/services/search/FindingService/v1?{0}'
 
 		self.loaded = True
+
+	def get_global_id(self):
+		"""
+		Tries to get a locale specific GLOBAL-ID argument for eBay's API.
+		For more information check those two websites:
+		http://developer.ebay.com/DevZone/finding/Concepts/SiteIDToGlobalID.html
+		http://developer.ebay.com/DevZone/finding/CallRef/Enums/GlobalIdList.html
+
+		We use 'EBAY-US' as a fallback strategy.
+		"""
+
+		default = 'EBAY-US'
+
+		# get and parse the language code
+		lang_code = getdefaultlocale()[0]
+
+		if lang_code is None:
+			return default
+
+		lang = lang_code[:2].lower()
+		dialect = lang_code[3:].lower()
+
+		# try to find a mapping...
+		result = None
+		if lang == 'en':
+			if dialect == 'gb':
+				result = 'EBAY-GB'
+			elif dialect == 'ca':
+				result = 'EBAY-ENCA'
+			elif dialect == 'ie':
+				result = 'EBAY-IE'
+			elif dialect == 'in':
+				result = 'EBAY-IN'
+			elif dialect == 'my':
+				result = 'EBAY-MY'
+			elif dialect == 'ph':
+				result = 'EBAY-PH'
+			elif dialect == 'sg':
+				result = 'EBAY-SG'
+			elif dialect == 'au':
+				result = 'EBAY-AU'
+		elif lang == 'fr':
+			if dialect == 'be':
+				result = 'EBAY-FRBE'
+			elif dialect == 'ca':
+				result = 'EBAY-FRCA'
+			else:
+				result = 'EBAY-FR'
+		elif lang == 'de':
+			if dialect == 'at':
+				result = 'EBAY-AT'
+			elif dialect == 'ch':
+				result = 'EBAY-CH'
+			else:
+				result = 'EBAY-DE'
+		elif lang == 'it':
+			result = 'EBAY-IT'
+		elif lang == 'pl':
+			result = 'EBAY-PL'
+		elif lang == 'es':
+			result = 'EBAY-ES'
+		elif lang == 'nl':
+			if dialect == 'be':
+				result = 'EBAY-NLBE'
+			else:
+				result = 'EBAY-NL'
+		elif lang == 'zh':
+			result = 'EBAY-HK'
+		elif lang == 'sv':
+			result = 'EBAY-SE'
+
+		return default if result is None else result
 
 	def search(self, text, long_search = False):
 		if len(text) == 0:
