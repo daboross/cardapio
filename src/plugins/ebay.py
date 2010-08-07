@@ -69,8 +69,9 @@ class CardapioPlugin(CardapioPluginInterface):
 			'GLOBAL-ID'            : self.get_global_id()
 		}
 
-		# eBay's base search URL
+		# eBay's base URLs (search and a fallback search more variations)
 		self.api_base_url = 'http://svcs.ebay.com/services/search/FindingService/v1?{0}'
+		self.web_base_url = 'http://shop.ebay.com/?{0}'
 
 		self.loaded = True
 
@@ -220,6 +221,24 @@ class CardapioPlugin(CardapioPluginInterface):
 					'icon name'    : 'system-search',
 					'type'         : 'xdg',
 					'command'      : response_body['itemSearchURL'][0],
+					'context menu' : None
+				})
+
+			# if the API call failed, add the generic 'search more' item
+			if len(items) == 0:
+				search_more_args = {
+					'_nkw'   : text,
+					'_sacat' : 'See-All-Categories'
+				}
+
+				items.append({
+					'name'	       : _('Show additional results'),
+					'tooltip'      : _('Show additional search results in your web browser'),
+					'icon name'    : 'system-search',
+					'type'         : 'xdg',
+					# TODO: cardapio later unquotes this and then quotes it again;
+					# it's screwing my quotation
+					'command'      : self.web_base_url.format(urllib.urlencode(search_more_args)),
 					'context menu' : None
 				})
 
