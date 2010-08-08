@@ -11,8 +11,8 @@ class CardapioPlugin(CardapioPluginInterface):
 	title' link.
 
 	Please note that the plugin only works when Tomboy is on. You don't need to
-	turn it on before starting Cardapio or before initializing the plugin. You
-	just need to turn it on before performing a Cardapio search.
+	turn Tomboy on before starting Cardapio or before initializing the plugin.
+	You just need to turn it on before performing a Cardapio search.
 	"""
 
 	# Cardapio's variables
@@ -67,8 +67,8 @@ class CardapioPlugin(CardapioPluginInterface):
 		"""
 		This method effectively tracks down the events of Tomboy app starting
 		and shutting down. When the app shuts down, this callback nullifies our
-		Tomboy's proxy. When the app starts, the callback sets the valid proxy
-		again.
+		Tomboy's proxy and when the app starts, the callback sets the valid
+		proxy again.
 		"""
 
 		if len(connection_name) == 0:
@@ -92,7 +92,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		# prepare a parametrized callback that remembers the current search text and
 		# the result limit
-		callback = DBusParametrizedCallback(self.tomboy, self.finalize_search,
+		callback = DBusSearchNotesCallback(self.tomboy, self.finalize_search,
 			text, current_results_limit)
 
 		# we ask for a case insensitive search
@@ -101,9 +101,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def finalize_search(self, items, text):
 		"""
-		DBusParametrizedCallback invokes this when it finishes gathering
+		DBusSearchNotesCallback invokes this when it finishes gathering
 		single search results. This method finalizes the search, then
-		passes the result to Cardapio.
+		passes the results to Cardapio.
 		"""
 
 		# if there are no results, we'll add the 'create a note with this
@@ -161,13 +161,10 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.tomboy.DisplaySearchWithText(text)
 
-class DBusParametrizedCallback:
+class DBusSearchNotesCallback:
 	"""
-	This class resolves a problem with D-Bus, namely it's callbacks,
-	which don't take some kind of a user data argument.
-
-	DBusParametrizedCallback serves as a parametrized wrapper over
-	the asynchronous callback.
+	DBusSearchNotesCallback serves as a parametrized wrapper over
+	the asynchronous callback to Tomboy's SearchNotes call.
 	"""
 
 	def __init__(self, tomboy, result_callback, text, result_limit):
@@ -179,12 +176,12 @@ class DBusParametrizedCallback:
 
 	def handle_search_result(self, result):
 		"""
-		Callback to asynchronous Tomboy's D-Bus call. It gathers
+		Callback to asynchronous Tomboy's SearchNotes call. It gathers
 		results and then passes those back to the main plugin class
 		through the result_callback method.
 		"""
 
-		# pass empty results to main class if Tomboy's off
+		# pass empty results to the main class if Tomboy's off
 		if self.tomboy is None:
 			self.result_callback([], self.text)
 			return
