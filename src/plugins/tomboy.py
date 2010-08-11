@@ -26,7 +26,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	default_keyword = 'tomboy'
 
-	plugin_api_version = 1.37
+	plugin_api_version = 1.38
 
 	search_delay_type = 'local search update delay'
 
@@ -47,10 +47,6 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.dtomboy_bus_name = 'org.gnome.Tomboy'
 		self.dtomboy_object_path = '/org/gnome/Tomboy/RemoteControl'
 		self.dtomboy_iface_name = 'org.gnome.Tomboy.RemoteControl'
-
-		# take the maximum number of results into account
-		self.results_limit = self.cardapio.settings['search results limit']
-		self.long_results_limit = self.cardapio.settings['long search results limit']
 
 		try:
 			self.bus = dbus.SessionBus()
@@ -77,7 +73,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			bus_object = self.bus.get_object(connection_name, self.dtomboy_object_path)
 			self.tomboy = dbus.Interface(bus_object, self.dtomboy_iface_name)
 
-	def search(self, text, long_search = False):
+	def search(self, text, result_limit):
 		if len(text) == 0:
 			return
 
@@ -88,12 +84,10 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.cardapio.write_to_log(self, 'searching for Tomboy notes with topic like {0}'.format(text), is_debug = True)
 
-		current_results_limit = self.long_results_limit if long_search else self.results_limit
-
 		# prepare a parametrized callback that remembers the current search text and
 		# the result limit
 		callback = DBusSearchNotesCallback(self.tomboy, self.finalize_search,
-			text, current_results_limit)
+			text, result_limit)
 
 		# we ask for a case insensitive search
 		self.tomboy.SearchNotes(text.lower(), False, reply_handler = callback.handle_search_result,

@@ -19,7 +19,7 @@ class CardapioPlugin (CardapioPluginInterface):
 	help_text = ''
 	version = '1.22'
 
-	plugin_api_version = 1.37
+	plugin_api_version = 1.38
 
 	search_delay_type = None
 
@@ -70,8 +70,8 @@ class CardapioPlugin (CardapioPluginInterface):
 			
 		self.loaded = True
 
-
-	def search(self, text, long_search = False):
+	# TODO: DOES NOT RESPECT result_limit's AUTHORITA'!
+	def search(self, text, result_limit):
   
 		self.current_query = text
 

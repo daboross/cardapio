@@ -28,7 +28,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	default_keyword = 'pidgin'
 
-	plugin_api_version = 1.37
+	plugin_api_version = 1.38
 
 	search_delay_type = 'local search update delay'
 
@@ -49,10 +49,6 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.dpidgin_bus_name = 'im.pidgin.purple.PurpleService'
 		self.dpidgin_object_path = '/im/pidgin/purple/PurpleObject'
 		self.dpidgin_iface_name = 'im.pidgin.purple.PurpleInterface'
-
-		# take the maximum number of results into account
-		self.results_limit = self.cardapio.settings['search results limit']
-		self.long_results_limit = self.cardapio.settings['long search results limit']
 
 		try:
 			self.bus = dbus.SessionBus()
@@ -79,7 +75,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			bus_object = self.bus.get_object(connection_name, self.dpidgin_object_path)
 			self.pidgin = dbus.Interface(bus_object, self.dpidgin_iface_name)
 
-	def search(self, text, long_search = False):
+	def search(self, text, result_limit):
 		if len(text) == 0:
 			return
 
@@ -90,12 +86,10 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.cardapio.write_to_log(self, 'searching for Pidgin buddies with name like {0}'.format(text), is_debug = True)
 
-		current_results_limit = self.long_results_limit if long_search else self.results_limit
-
 		# prepare a parametrized callback that remembers the current search text and
 		# the result limit
 		callback = DBusGatherBuddiesCallback(self.pidgin, self.finalize_search,
-			text, current_results_limit)
+			text, result_limit)
 
 		# let's start by getting all of the user's active accounts
 		self.pidgin.PurpleAccountsGetAllActive(reply_handler = callback.handle_search_result,

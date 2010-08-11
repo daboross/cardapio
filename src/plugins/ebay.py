@@ -35,7 +35,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.37
+	plugin_api_version = 1.38
 
 	search_delay_type = 'remote search update delay'
 
@@ -53,10 +53,6 @@ class CardapioPlugin(CardapioPluginInterface):
 		cardapio_proxy.write_to_log(self, 'initializing eBay plugin')
 
 		self.cardapio = cardapio_proxy
-
-		# take the maximum number of results into account
-		self.results_limit = self.cardapio.settings['search results limit']
-		self.long_results_limit = self.cardapio.settings['long search results limit']
 
 		self.cancellable = gio.Cancellable()
 
@@ -147,7 +143,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		return default if result is None else result
 
-	def search(self, text, long_search = False):
+	def search(self, text, result_limit):
 		if len(text) == 0:
 			return
 
@@ -157,7 +153,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		# prepare final API URL (items per page and search keyword)
 		current_args = self.api_base_args.copy()
-		current_args['paginationInput.entriesPerPage'] = self.long_results_limit if long_search else self.results_limit
+		current_args['paginationInput.entriesPerPage'] = result_limit
 		current_args['keywords'] = text
 
 		final_url = self.api_base_url.format(urllib.urlencode(current_args))

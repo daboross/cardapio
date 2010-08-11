@@ -44,7 +44,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	default_keyword = 'amazon'
 
-	plugin_api_version = 1.37
+	plugin_api_version = 1.38
 
 	search_delay_type = 'remote search update delay'
 
@@ -76,10 +76,6 @@ class CardapioPlugin(CardapioPluginInterface):
 			'ResponseGroup' : 'Small',
  			'AWSAccessKeyId': self.aws_access_key
 		}
-
-		# take the maximum number of results into account
-		self.results_limit = self.cardapio.settings['search results limit']
-		self.long_results_limit = self.cardapio.settings['long search results limit']
 
 		# try to get a locale specific URL for Amazon
 		self.locale_url = self.get_locale_url()
@@ -133,7 +129,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		return locale_dict.get(key, default)
 
-	def search(self, text, long_search = False):
+	def search(self, text, result_limit):
 		if len(text) == 0:
 			return
 
@@ -150,7 +146,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.current_stream = gio.File(final_url)
 		self.current_stream.load_contents_async(self.show_search_results,
 			cancellable = self.cancellable,
-			user_data = (text, long_search))
+			user_data = (text, result_limit))
 
 	def prepare_amazon_rest_url(self, text):
 		"""
@@ -196,7 +192,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		"""
 
 		text = user_data[0]
-		long_search = user_data[1]
+		result_limit = user_data[1]
 
 		# watch out for connection problems
 		try:
@@ -224,15 +220,13 @@ class CardapioPlugin(CardapioPluginInterface):
 			is_valid = root.find('Items/Request/IsValid')
 			total_results = root.find('Items/TotalResults')
 
-			current_results_limit = self.long_results_limit if long_search else self.results_limit
-
 			# if we have a valid response with any results...
 			if (not is_valid is None) and is_valid != 'False' and (not total_results is None) and total_results != '0':
 				# remember them all
 				for i, item in enumerate(root.findall('Items/Item')):
 
 					# the number of results cannot be limited using Amazon's API...
-					if i == current_results_limit:
+					if i == result_limit:
 						break
 
 					i_attributes = item.find('ItemAttributes')

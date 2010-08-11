@@ -31,7 +31,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.37
+	plugin_api_version = 1.38
 
 	search_delay_type = 'remote search update delay'
 
@@ -66,28 +66,17 @@ class CardapioPlugin(CardapioPluginInterface):
 			'appid'    : 'TuNKmOzV34GRC9mrBNZMgr.vY1xPMLMH9U3PsOYkg8WvYnFawnB5gKd4GsrUbqluzg--',
 			'format'   : 'json',
 			'style'    : 'raw',
-			'count'    : self.cardapio.settings['search results limit'],
-			'lang'     : language,
-			'region'   : region
-		}
-
-		self.api_base_args_long = {
-			'appid'    : 'TuNKmOzV34GRC9mrBNZMgr.vY1xPMLMH9U3PsOYkg8WvYnFawnB5gKd4GsrUbqluzg--',
-			'format'   : 'json',
-			'style'    : 'raw',
-			'count'    : self.cardapio.settings['long search results limit'],
 			'lang'     : language,
 			'region'   : region
 		}
 
 		# Yahoo's base URLs (search and search more variations)
-		self.api_base_url = 'http://boss.yahooapis.com/ysearch/web/v1/{0}?' + urllib.urlencode(self.api_base_args)
-		self.api_base_url_long = 'http://boss.yahooapis.com/ysearch/web/v1/{0}?' + urllib.urlencode(self.api_base_args_long)
+		self.api_base_url = 'http://boss.yahooapis.com/ysearch/web/v1/{0}?{1}'
 		self.web_base_url = 'http://search.yahoo.com/search?{0}'
 
 		self.loaded = True
 
-	def search(self, text, long_search = False):
+	def search(self, text, result_limit):
 		if len(text) == 0:
 			return
 
@@ -96,12 +85,11 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.cancellable.reset()
 
 		# prepare final API URL
-		if long_search:
-			api_base_url = self.api_base_url_long
-		else:
-			api_base_url = self.api_base_url
+		current_args = self.api_base_args.copy()
+		current_args['count'] = result_limit
 
-		final_url = api_base_url.format(urllib.quote(text, ''))
+		final_url = self.api_base_url.format(urllib.quote(text, ''), urllib.urlencode(current_args))
+
 		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
 
 		# asynchronous and cancellable IO call

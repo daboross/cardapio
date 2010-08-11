@@ -12,7 +12,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	help_text          = ''
 	version            = '1.37'
 
-	plugin_api_version = 1.37
+	plugin_api_version = 1.38
 
 	search_delay_type  = 'remote search update delay'
 
@@ -46,21 +46,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		if google_interface_language_format[:2] == 'zh':
 			google_results_language_format = google_interface_language_format
 
-
-		# The google search API only supports two sizes for the result list,
-		# that is: small (4 results) or large (8 results). So this plugin
-		# chooses the most appropriate given the 'search results limit' user
-		# preference.
-
-		if self.c.settings['search results limit'] >= 8:
-			self.query_url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=large&lr=lang_%s&q=%%s' % google_results_language_format
-		else:
-			self.query_url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=small&lr=lang_%s&q=%%s' % google_results_language_format
-
-		if self.c.settings['long search results limit'] >= 8:
-			self.query_url_long = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=large&lr=lang_%s&q=%%s' % google_results_language_format
-		else:
-			self.query_url_long = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=small&lr=lang_%s&q=%%s' % google_results_language_format
+		self.query_url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz={0}&lr=lang_%s&q={1}' % google_results_language_format
 
 		self.search_controller = gio.Cancellable()
 
@@ -77,7 +63,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.loaded = True
 
 
-	def search(self, text, long_search = False):
+	def search(self, text, result_limit):
 
 		# TODO: I'm sure this is not the best way of doing remote procedure
 		# calls, but I can't seem to find anything that is this easy to use and
@@ -89,10 +75,14 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.current_query = text
 		text = urllib2.quote(text)
 
-		if long_search:
-			query = self.query_url_long % text
-		else:
-			query = self.query_url % text
+		# The google search API only supports two sizes for the result list,
+		# that is: small (4 results) or large (8 results). So this plugin
+		# chooses the most appropriate given the 'search results limit' user
+		# preference.
+
+		query = self.query_url.format('large' if result_limit >= 8 else 'small', text)
+
+		print query
 
 		self.stream = gio.File(query)
 

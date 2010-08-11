@@ -22,7 +22,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.37
+	plugin_api_version = 1.38
 
 	search_delay_type = 'remote search update delay'
 
@@ -43,18 +43,10 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.cancellable = gio.Cancellable()
 
-		# Bing's API arguments (my AppID and a request for a web search with
-		# maximum four results)
+		# Bing's API arguments (my AppID and a request for a web search)
 		self.api_base_args = {
 			'Appid'    : '237CBC82BB8C3F7F5F19F6A77B0D38A59E8F8C2C',
-			'sources'  : 'web',
-			'web.count': self.cardapio.settings['search results limit'],
-		}
-
-		self.api_base_args_long = {
-			'Appid'    : '237CBC82BB8C3F7F5F19F6A77B0D38A59E8F8C2C',
-			'sources'  : 'web',
-			'web.count': self.cardapio.settings['long search results limit'],
+			'sources'  : 'web'
 		}
 
 		# Bing's base URLs (search and search more variations)
@@ -63,7 +55,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.loaded = True
 
-	def search(self, text, long_search = False):
+	def search(self, text, result_limit):
 
 		if len(text) == 0:
 			return
@@ -73,10 +65,8 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.cancellable.reset()
 
 		# prepare final API URL
-		if long_search:
-			current_args = self.api_base_args_long.copy()
-		else:
-			current_args = self.api_base_args.copy()
+		current_args = self.api_base_args.copy()
+		current_args['web.count'] = result_limit
 
 		current_args['query'] = text
 		final_url = self.api_base_url.format(urllib.urlencode(current_args))
