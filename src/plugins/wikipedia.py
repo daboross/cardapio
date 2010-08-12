@@ -54,8 +54,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		# maximum four results, formatted as json)
 		self.api_base_args = {
 			'action': 'opensearch',
-			'format': 'json',
-			'limit' : str(self.cardapio.settings['search results limit']),
+			'format': 'json'
 		}
 
 		# Wikipedia's base URLs (search and show details variations)

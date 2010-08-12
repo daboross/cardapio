@@ -82,8 +82,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		query = self.query_url.format('large' if result_limit >= 8 else 'small', text)
 
-		print query
-
 		self.stream = gio.File(query)
 
 		self.search_controller.reset()
