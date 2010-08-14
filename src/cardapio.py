@@ -40,7 +40,6 @@ try:
 	import json
 	import time
 	import gmenu
-	import signal
 	import locale
 	import urllib2
 	import gettext
@@ -180,7 +179,7 @@ class Cardapio(dbus.service.Object):
 
 		self.visible                       = False
 		self.app_list                      = []    # used for searching the regular menus
-		self.sys_list                      = []    # used for searching the system menu
+		self.sys_list                      = []    # used for searching the system menus
 		self.section_list                  = {}
 		self.current_query                 = ''
 		self.subfolder_stack               = {}
