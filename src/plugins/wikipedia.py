@@ -29,7 +29,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.37
+	plugin_api_version = 1.38
 
 	search_delay_type = 'remote search update delay'
 
@@ -54,13 +54,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		# maximum four results, formatted as json)
 		self.api_base_args = {
 			'action': 'opensearch',
-			'format': 'json',
-			'limit' : str(self.cardapio.settings['search results limit']),
-		}
-		self.api_base_args_long = {
-			'action': 'opensearch',
-			'format': 'json',
-			'limit' : str(self.cardapio.settings['long search results limit']),
+			'format': 'json'
 		}
 
 		# Wikipedia's base URLs (search and show details variations)
@@ -69,23 +63,19 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.loaded = True
 
-	def search(self, text, long_search = False):
+	def search(self, text, result_limit):
 		if len(text) == 0:
 			return
-
-		self.current_query = text
 
 		self.cardapio.write_to_log(self, 'searching for {0} in Wikipedia'.format(text), is_debug = True)
 
 		self.cancellable.reset()
 
 		# prepare final API URL
-		if long_search:
-			current_args = self.api_base_args_long.copy()
-		else:
-			current_args = self.api_base_args.copy()
-
+		current_args = self.api_base_args.copy()
+		current_args['limit'] = result_limit
 		current_args['search'] = text
+
 		final_url = self.api_base_url.format(urllib.urlencode(current_args))
 
 		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
@@ -93,9 +83,10 @@ class CardapioPlugin(CardapioPluginInterface):
 		# asynchronous and cancellable IO call
 		self.current_stream = gio.File(final_url)
 		self.current_stream.load_contents_async(self.show_search_results,
-			cancellable = self.cancellable)
+			cancellable = self.cancellable,
+			user_data = text)
 
-	def show_search_results(self, gdaemonfile, result):
+	def show_search_results(self, gdaemonfile, result, text):
 		"""
 		Callback to asynchronous IO (Wikipedia's API call).
 		"""
@@ -120,6 +111,11 @@ class CardapioPlugin(CardapioPluginInterface):
 			# response[1] because the response looks like: [text, [result_list]]
 			# append results (if any)
 			for item in response[1]:
+				# TODO: wikipedia sometimes returns item names encoded in unicode (try
+				# searching for 'aaaaaaaaaaaaa' for example); we use those names as part
+				# of a URL so we need to encode the special characters; unfortunately,
+				# Python's 2.* urllib.quote throws an exception when it's given unicode
+				# argument - what now?
 				item_url = self.web_base_url.format(urllib.quote(item))
 				items.append({
 					'name'         : item,
@@ -131,7 +127,7 @@ class CardapioPlugin(CardapioPluginInterface):
 				})
 
 			# pass the results to Cardapio
-			self.cardapio.handle_search_result(self, items, self.current_query)
+			self.cardapio.handle_search_result(self, items, text)
 
 		except KeyError:
 			self.cardapio.handle_search_error(self, "Incorrect Wikipedia's JSON structure")

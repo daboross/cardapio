@@ -12,7 +12,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	help_text          = ''
 	version            = '1.37'
 
-	plugin_api_version = 1.37
+	plugin_api_version = 1.38
 
 	search_delay_type  = 'remote search update delay'
 
@@ -42,20 +42,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		if google_interface_language_format == 'zh-HK':
 			google_interface_language_format = 'zh-CN'
 
-		# The google search API only supports two sizes for the result list,
-		# that is: small (4 results) or large (8 results). So this plugin
-		# chooses the most appropriate given the 'search results limit' user
-		# preference.
-
-		if self.c.settings['search results limit'] >= 8:
-			self.query_url = r'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=large&q=%s'
-		else:
-			self.query_url = r'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=small&q=%s'
-
-		if self.c.settings['long search results limit'] >= 8:
-			self.query_url_long = r'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=large&q=%s'
-		else:
-			self.query_url_long = r'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz=small&q=%s'
+		self.query_url = r'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz={0}&q={1}'
 
 		self.search_controller = gio.Cancellable()
 
@@ -72,7 +59,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.loaded = True
 
 
-	def search(self, text, long_search = False):
+	def search(self, text, result_limit):
 
 		# TODO: I'm sure this is not the best way of doing remote procedure
 		# calls, but I can't seem to find anything that is this easy to use and
@@ -84,10 +71,12 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.current_query = text
 		text = urllib2.quote(text)
 
-		if long_search:
-			query = self.query_url_long % text
-		else:
-			query = self.query_url % text
+		# The google search API only supports two sizes for the result list,
+		# that is: small (4 results) or large (8 results). So this plugin
+		# chooses the most appropriate given the 'search results limit' user
+		# preference.
+
+		query = self.query_url.format('large' if result_limit >= 8 else 'small', text)
 
 		self.stream = gio.File(query)
 

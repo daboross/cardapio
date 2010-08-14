@@ -21,7 +21,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	help_text          = ''
 	version            = '0.97b'
 
-	plugin_api_version = 1.37
+	plugin_api_version = 1.38
 
 	search_delay_type  = 'local search update delay'
 
@@ -40,8 +40,6 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.c = cardapio_proxy
 
 		self.loaded = False
-		self.num_search_results = self.c.settings['search results limit']
-		self.num_search_results_long = self.c.settings['long search results limit']
 
 		if 'ZeitgeistClient' not in globals():
 			self.c.write_to_log(self, 'Could not import Zeitgeist', is_error = True)
@@ -89,33 +87,26 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.loaded = True
 
 
-	def __del__(self):
-
-		pass
-
-
-	def search(self, text, long_search = False):
+	def search(self, text, result_limit):
 
 		self.current_query = text
 
 		text = text.lower()
 		self.search_query = text
+		# TODO: this is thread unsafe. correct this using a wrapper like
+		# for example Tomboy's plugin does
+		self.result_limit = result_limit
 
 		if text:
 			self.event_template.actor = 'application://' + text + '*'
 		else:
 			self.event_template.actor = ''
 
-		if long_search:
-			num_search_results = self.num_search_results_long
-		else:
-			num_search_results = self.num_search_results
-
 		self.zg.find_events_for_templates(
 				[self.event_template],
 				self.handle_search_result, 
 				timerange = self.time_range, 
-				num_events = num_search_results, 
+				num_events = result_limit,
 				result_type = datamodel.ResultType.MostRecentSubjects
 				)
 
@@ -133,7 +124,7 @@ class CardapioPlugin(CardapioPluginInterface):
 				fts_results, count = self.fts.Search(
 						self.search_query + '*', 
 						self.time_range, 
-						[], 0, self.num_search_results, 2)
+						[], 0, self.result_limit, 2)
 
 			except Exception, exception:
 				print exception
@@ -148,14 +139,14 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		for event in all_events:
 
-			if len(urls_seen) >= self.num_search_results: break
+			if len(urls_seen) >= self.result_limit: break
 
 			for subject in event.get_subjects():
 
 				dummy, canonical_path = urllib2.splittype(subject.uri)
 				parent_name, child_name = os.path.split(canonical_path)
 
-				if len(urls_seen) >= self.num_search_results: break
+				if len(urls_seen) >= self.result_limit: break
 				if canonical_path in urls_seen: continue
 				urls_seen.add(canonical_path)
 

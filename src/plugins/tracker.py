@@ -10,7 +10,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	help_text          = ''
 	version            = '1.37'
 
-	plugin_api_version = 1.37
+	plugin_api_version = 1.38
 
 	search_delay_type  = 'local search update delay'
 
@@ -37,9 +37,6 @@ class CardapioPlugin(CardapioPluginInterface):
 			self.loaded = False
 			return 
 
-		self.search_results_limit = self.c.settings['search results limit']
-		self.search_results_limit_long = self.c.settings['long search results limit']
-
 		self.action_command = r"tracker-search-tool '%s'"
 		self.action = {
 			'name'         : _('Show additional results'),
@@ -53,15 +50,10 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.loaded = True
 
 
-	def search(self, text, long_search = False):
+	def search(self, text, result_limit):
 
 		self.current_query = text
 		text = urllib2.quote(text).lower()
-
-		if long_search:
-			search_results_limit = self.search_results_limit_long
-		else:
-			search_results_limit = self.search_results_limit
 
 		self.tracker.SparqlQuery(
 			"""
@@ -76,7 +68,7 @@ class CardapioPlugin(CardapioPluginInterface):
 				ORDER BY ASC(?uri)
 				LIMIT %d
 			""" 
-			% (text, search_results_limit),
+			% (text, result_limit),
 			dbus_interface='org.freedesktop.Tracker1.Resources',
 			reply_handler=self.prepare_and_handle_search_result,
 			error_handler=self.handle_search_error

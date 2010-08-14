@@ -22,7 +22,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.37
+	plugin_api_version = 1.38
 
 	search_delay_type = 'remote search update delay'
 
@@ -45,12 +45,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		# YouTube's API arguments (format and maximum result count)
 		self.api_base_args = {
-			'alt'        : 'json',
-			'max-results': self.cardapio.settings['search results limit'],
-		}
-		self.api_base_args_long = {
-			'alt'        : 'json',
-			'max-results': self.cardapio.settings['long search results limit'],
+			'alt'        : 'json'
 		}
 
 		# YouTube's base URLs (search and search more variations)
@@ -59,25 +54,20 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.loaded = True
 
-	def search(self, text, long_search = False):
+	def search(self, text, result_limit):
 
 		if len(text) == 0:
 			return
-
-		self.current_query = text
 
 		self.cardapio.write_to_log(self, 'searching for {0} using YouTube'.format(text), is_debug = True)
 
 		self.cancellable.reset()
 
 		# prepare final API URL
-		if long_search:
-			api_base_args = self.api_base_args_long
-		else:
-			api_base_args = self.api_base_args
-
-		current_args = api_base_args.copy()
+		current_args = self.api_base_args.copy()
+		current_args['max-results'] = result_limit
 		current_args['q'] = text
+		
 		final_url = self.api_base_url.format(urllib.urlencode(current_args))
 
 		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
@@ -150,7 +140,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			})
 
 			# pass the results to Cardapio
-			self.cardapio.handle_search_result(self, items, self.current_query)
+			self.cardapio.handle_search_result(self, items, text)
 
 		except KeyError:
 			self.cardapio.handle_search_error(self, "Incorrect YouTube's JSON structure")
