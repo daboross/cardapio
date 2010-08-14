@@ -204,8 +204,14 @@ class Cardapio(dbus.service.Object):
 
 		self.icon_extension_types = re.compile('.*\.(png|xpm|svg)$')
 
+		self.sys_tree = gmenu.lookup_tree('gnomescc.menu')
+		self.have_control_center = (self.sys_tree.root is not None)
+
+		if not self.have_control_center:
+			self.sys_tree = gmenu.lookup_tree('settings.menu')
+			logging.warn('Could not find Control Center menu file. Deactivating Control Center button.')
+
 		self.app_tree = gmenu.lookup_tree('applications.menu')
-		self.sys_tree = gmenu.lookup_tree('gnomecc.menu')
 		self.app_tree.add_monitor(self.on_menu_data_changed)
 		self.sys_tree.add_monitor(self.on_menu_data_changed)
 
@@ -938,6 +944,9 @@ class Cardapio(dbus.service.Object):
 
 		if self.panel_applet is None:
 			self.get_object('AppletOptionPane').hide()
+
+		if not self.have_control_center:
+			self.view_mode_button.hide()
 
 		self.add_subfolders_slab()
 		self.add_all_reorderable_slabs()
@@ -2957,7 +2966,7 @@ class Cardapio(dbus.service.Object):
 
 		section_margin = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
 		section_margin.add(section_contents)
-		section_margin.set_padding(0, 0, 8, 0)
+		section_margin.set_padding(0, 0, 4, 0)
 
 		label = gtk.Label()
 		label.set_use_markup(True)
@@ -3412,7 +3421,7 @@ class Cardapio(dbus.service.Object):
 			return self.launch_raw(path, hide)
 
 		else:
-			logging.warn('Warning: Tried launching an app that does not exist: %s' % desktop_path)
+			logging.warn('Tried launching an app that does not exist: %s' % desktop_path)
 
 
 	def launch_xdg(self, path, hide = True):
