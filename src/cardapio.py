@@ -203,7 +203,7 @@ class Cardapio(dbus.service.Object):
 
 		self.icon_extension_types = re.compile('.*\.(png|xpm|svg)$')
 
-		self.sys_tree = gmenu.lookup_tree('gnomescc.menu')
+		self.sys_tree = gmenu.lookup_tree('gnomecc.menu')
 		self.have_control_center = (self.sys_tree.root is not None)
 
 		if not self.have_control_center:
