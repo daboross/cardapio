@@ -492,6 +492,14 @@ class Cardapio(dbus.service.Object):
 		self.toggle_and_show_section(section_slab)
 
 
+	def on_sidebar_button_hovered(self, widget):
+		"""
+		Handler for when the user hovers over a category in the sidebar
+		"""
+
+		widget.set_active(True)
+
+
 	def create_config_folder(self):
 		"""
 		Creates Cardapio's config folder (usually at ~/.config/Cardapio)
@@ -574,14 +582,15 @@ class Cardapio(dbus.service.Object):
 			})
 
 		self.read_config_option(s, 'window size'                , None                     ) # format: [px, px]
-		self.read_config_option(s, 'splitter position'          , 0                        ) # int in pixels
+		self.read_config_option(s, 'splitter position'          , 0                        ) # int, position in pixels
 		self.read_config_option(s, 'show session buttons'       , False                    ) # bool
 		self.read_config_option(s, 'keep search results'        , False                    ) # bool
 		self.read_config_option(s, 'open on hover'              , False                    ) # bool
-		self.read_config_option(s, 'min search string length'   , 3                        ) # characters
+		self.read_config_option(s, 'open categories on hover'   , False                    ) # bool
+		self.read_config_option(s, 'min search string length'   , 3                        ) # int, number of characters
 		self.read_config_option(s, 'menu rebuild delay'         , 5                        , force_update_from_version = [0,9,96]) # seconds
-		self.read_config_option(s, 'search results limit'       , 5                        ) # results
-		self.read_config_option(s, 'long search results limit'  , 15                       ) # results
+		self.read_config_option(s, 'search results limit'       , 5                        ) # int, number of results
+		self.read_config_option(s, 'long search results limit'  , 15                       ) # int, number of results
 		self.read_config_option(s, 'local search update delay'  , 100                      , force_update_from_version = [0,9,96]) # msec
 		self.read_config_option(s, 'remote search update delay' , 250                      , force_update_from_version = [0,9,96]) # msec
 		self.read_config_option(s, 'local search timeout'       , 3000                     ) # msec
@@ -898,6 +907,21 @@ class Cardapio(dbus.service.Object):
 		else:
 			self.session_pane.hide()
 
+		# set up open-on-hover for categories
+
+		if self.settings['open categories on hover']:
+			for sidebar_button in self.category_pane.get_children():
+
+				if 'has_hover_handler' in dir(sidebar_button): # is there a better way to check this?
+					sidebar_button.handler_unblock_by_func(self.on_sidebar_button_hovered)
+				else: 
+					sidebar_button.connect('enter', self.on_sidebar_button_hovered)
+					sidebar_button.has_hover_handler = True 
+
+		else:
+			for sidebar_button in self.category_pane.get_children():
+				sidebar_button.handler_block_by_func(self.on_sidebar_button_hovered)
+
 
 	def build_ui(self):
 		"""
@@ -926,12 +950,14 @@ class Cardapio(dbus.service.Object):
 		self.current_query         = ''
 		self.subfolder_stack       = {}
 
+		# "All" button for the regular menu
 		button = self.add_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_sections_sidebar_button = button
 		self.set_sidebar_button_active(button, True)
 		self.all_sections_sidebar_button.set_sensitive(False)
 
+		# "All" button for the system menu
 		button = self.add_button(_('All'), None, self.system_category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_system_sections_sidebar_button = button
@@ -1065,6 +1091,7 @@ class Cardapio(dbus.service.Object):
 		self.set_widget_from_option('OptionSessionButtons', 'show session buttons')
 		self.set_widget_from_option('OptionKeepResults', 'keep search results')
 		self.set_widget_from_option('OptionOpenOnHover', 'open on hover')
+		self.set_widget_from_option('OptionOpenCategoriesOnHover', 'open categories on hover')
 
 		icon_size = gtk.icon_size_lookup(4)[0] # 4 because it's that same as in the UI file
 
@@ -1116,6 +1143,7 @@ class Cardapio(dbus.service.Object):
 		self.settings['show session buttons'] = self.get_object('OptionSessionButtons').get_active()
 		self.settings['keep search results'] = self.get_object('OptionKeepResults').get_active()
 		self.settings['open on hover'] = self.get_object('OptionOpenOnHover').get_active()
+		self.settings['open categories on hover'] = self.get_object('OptionOpenCategoriesOnHover').get_active()
 		self.setup_ui_from_gui_settings()
 
 
