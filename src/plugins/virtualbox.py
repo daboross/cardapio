@@ -70,17 +70,23 @@ class CardapioPlugin (CardapioPluginInterface):
 			
 		self.loaded = True
 
-	# TODO: DOES NOT RESPECT result_limit's AUTHORITA'!
+	
 	def search(self, text, result_limit):
   
 		self.current_query = text
 
 		results = []
+		
+		#This may not be the best way to do this, but the idea is that the 
+		#result limit should not be applied to the VirtualBox category 
+		#unless a search is taking place
+		if text == '':
+			result_limit = 1000
 	
 		text = text.lower()
 		for item in self.vm_items:
 			
-			if item['name'].lower().find(text) != -1:
+			if item['name'].lower().find(text) != -1 and len(results) < result_limit:
 				results.append(item)
 	  
 		self.c.handle_search_result(self, results, self.current_query)
