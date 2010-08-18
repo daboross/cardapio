@@ -45,6 +45,7 @@ try:
 	import gettext
 	import logging
 	import commands
+	import threading
 	import keybinder
 	import subprocess
 	import dbus, dbus.service
@@ -200,6 +201,8 @@ class Cardapio(dbus.service.Object):
 		self.keyword_to_plugin_mapping     = {}
 		self.active_plugin_instances       = []
 		self.in_system_menu_mode           = False
+		self.plugin_thread                 = None
+		self.plugin_thread_lock            = threading.Lock()
 
 		self.icon_extension_types = re.compile('.*\.(png|xpm|svg)$')
 
@@ -224,7 +227,7 @@ class Cardapio(dbus.service.Object):
 		self.build_ui()
 		self.setup_ui_from_all_settings()
 
-		self.schedule_search_with_all_plugins('')
+		self.run_in_plugin_thread(self.schedule_search_with_all_plugins, '')
 
 		if not hidden: self.show()
 
@@ -357,6 +360,26 @@ class Cardapio(dbus.service.Object):
 							'hide from sidebar' : plugin_class.hide_from_sidebar,
 							'instance'          : None,
 							}
+
+
+	def run_in_plugin_thread(self, func, *args):
+		"""
+		Wrapper for executing functions in the parallel "plugin thread"
+		"""
+
+		func(*args)
+		return
+
+		def wrapped_func():
+			self.plugin_thread_lock.acquire()
+			func(*args)
+			self.plugin_thread_lock.release()
+
+		self.plugin_thread_lock.acquire()
+		self.plugin_thread = threading.Thread()
+		self.plugin_thread_lock.release()
+		self.plugin_thread.run = wrapped_func
+		self.plugin_thread.start()
 
 
 	def activate_plugins_from_settings(self):
@@ -814,7 +837,7 @@ class Cardapio(dbus.service.Object):
 		self.safe_cardapio_proxy.ask_for_reload_permission = self.plugin_ask_for_reload_permission
 
 		self.build_plugin_database()
-		self.activate_plugins_from_settings()
+		self.run_in_plugin_thread(self.activate_plugins_from_settings)
 
 
 	def get_best_icon_size_for_panel(self):
@@ -920,7 +943,8 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			for sidebar_button in self.category_pane.get_children():
-				sidebar_button.handler_block_by_func(self.on_sidebar_button_hovered)
+				if 'has_hover_handler' in dir(sidebar_button):
+					sidebar_button.handler_block_by_func(self.on_sidebar_button_hovered)
 
 
 	def build_ui(self):
@@ -1004,7 +1028,7 @@ class Cardapio(dbus.service.Object):
 		for plugin in self.active_plugin_instances:
 			glib.idle_add(plugin.on_reload_permission_granted)
 
-		self.schedule_search_with_all_plugins('')
+		self.run_in_plugin_thread(self.schedule_search_with_all_plugins, '')
 
 
 	def show_executable_file_dialog(self, path):
@@ -1204,7 +1228,7 @@ class Cardapio(dbus.service.Object):
 		while gtk.events_pending():
 			gtk.main_iteration()
 
-		self.activate_plugins_from_settings()
+		self.run_in_plugin_thread(self.activate_plugins_from_settings)
 		self.options_dialog.window.set_cursor(None)
 
 		self.schedule_rebuild()
@@ -1533,14 +1557,16 @@ class Cardapio(dbus.service.Object):
 			self.fully_hide_all_sections()
 			self.subfolder_stack = {}
 			self.search_menus(text, self.app_list)
-			self.schedule_search_with_all_plugins(text)
+			self.run_in_plugin_thread(self.schedule_search_with_all_plugins, text)
 			self.current_query = text
 
+			self.plugin_thread_lock.acquire()
 			if len(text) < self.settings['min search string length']:
 				for plugin in self.active_plugin_instances:
 					if plugin.hide_from_sidebar:
 						self.set_section_is_empty(plugin.section_slab)
 						plugin.section_slab.hide()
+			self.plugin_thread_lock.release()
 
 		if len(text) == 0:
 			self.hide_all_transitory_sections(fully_hide = True)
