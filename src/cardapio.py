@@ -3004,7 +3004,8 @@ class Cardapio(dbus.service.Object):
 
 		if os.path.isabs(icon_value):
 			if os.path.isfile(icon_value):
-				icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icon_value, icon_size, icon_size)
+				try: icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icon_value, icon_size, icon_size)
+				except: pass
 			icon_name = os.path.basename(icon_value)
 
 		if self.icon_extension_types.match(icon_name) is not None:
