@@ -930,19 +930,21 @@ class Cardapio(dbus.service.Object):
 
 		# set up open-on-hover for categories
 
-		if self.settings['open categories on hover']:
-			for sidebar_button in self.category_pane.get_children():
+		category_buttons = self.category_pane.get_children() + self.system_category_pane.get_children()
 
-				if 'has_hover_handler' in dir(sidebar_button): # is there a better way to check this?
-					sidebar_button.handler_unblock_by_func(self.on_sidebar_button_hovered)
+		if self.settings['open categories on hover']:
+			for category_button in category_buttons:
+
+				if 'has_hover_handler' in dir(category_button): # is there a better way to check this?
+					category_button.handler_unblock_by_func(self.on_sidebar_button_hovered)
 				else: 
-					sidebar_button.connect('enter', self.on_sidebar_button_hovered)
-					sidebar_button.has_hover_handler = True 
+					category_button.connect('enter', self.on_sidebar_button_hovered)
+					category_button.has_hover_handler = True 
 
 		else:
-			for sidebar_button in self.category_pane.get_children():
-				if 'has_hover_handler' in dir(sidebar_button):
-					sidebar_button.handler_block_by_func(self.on_sidebar_button_hovered)
+			for category_button in category_buttons:
+				if 'has_hover_handler' in dir(category_button):
+					category_button.handler_block_by_func(self.on_sidebar_button_hovered)
 
 
 	def build_ui(self):
