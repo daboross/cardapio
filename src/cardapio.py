@@ -371,15 +371,13 @@ class Cardapio(dbus.service.Object):
 		return
 
 		def wrapped_func():
-			self.plugin_thread_lock.acquire()
-			func(*args)
-			self.plugin_thread_lock.release()
+			with self.plugin_thread_lock:
+				func(*args)
 
-		self.plugin_thread_lock.acquire()
-		self.plugin_thread = threading.Thread()
-		self.plugin_thread_lock.release()
-		self.plugin_thread.run = wrapped_func
-		self.plugin_thread.start()
+		with self.plugin_thread_lock:
+			self.plugin_thread = threading.Thread()
+			self.plugin_thread.run = wrapped_func
+			self.plugin_thread.start()
 
 
 	def activate_plugins_from_settings(self):
@@ -837,7 +835,7 @@ class Cardapio(dbus.service.Object):
 		self.safe_cardapio_proxy.ask_for_reload_permission = self.plugin_ask_for_reload_permission
 
 		self.build_plugin_database()
-		self.run_in_plugin_thread(self.activate_plugins_from_settings)
+		self.activate_plugins_from_settings()
 
 
 	def get_best_icon_size_for_panel(self):
@@ -1228,7 +1226,7 @@ class Cardapio(dbus.service.Object):
 		while gtk.events_pending():
 			gtk.main_iteration()
 
-		self.run_in_plugin_thread(self.activate_plugins_from_settings)
+		self.activate_plugins_from_settings()
 		self.options_dialog.window.set_cursor(None)
 
 		self.schedule_rebuild()
@@ -1560,13 +1558,11 @@ class Cardapio(dbus.service.Object):
 			self.run_in_plugin_thread(self.schedule_search_with_all_plugins, text)
 			self.current_query = text
 
-			self.plugin_thread_lock.acquire()
 			if len(text) < self.settings['min search string length']:
 				for plugin in self.active_plugin_instances:
 					if plugin.hide_from_sidebar:
 						self.set_section_is_empty(plugin.section_slab)
 						plugin.section_slab.hide()
-			self.plugin_thread_lock.release()
 
 		if len(text) == 0:
 			self.hide_all_transitory_sections(fully_hide = True)
@@ -3076,7 +3072,8 @@ class Cardapio(dbus.service.Object):
 				for subdir in ('pixmaps', 'icons'):
 					path = os.path.join(dir_, subdir, icon_value)
 					if os.path.isfile(path):
-						icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, icon_size, icon_size)
+						try: icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, icon_size, icon_size)
+						except: pass
 
 		if icon_pixbuf is None:
 			icon_pixbuf = self.icon_theme.load_icon(fallback_icon, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
