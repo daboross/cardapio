@@ -1,3 +1,12 @@
+cardapio (0.9.137-ubuntu1) lucid; urgency=low
+
+   * New option to open categories on hover
+   * First working implementation of threaded plugins (this will probably evolve 
+   in the next few days, but it's already very usable as it is)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 19 Aug 2010 23:01:00 -0400
+
+
 cardapio (0.9.136-ubuntu1) lucid; urgency=low
 
    * New feature: subfolder browsing by appending a slash
