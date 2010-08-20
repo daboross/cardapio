@@ -31,6 +31,7 @@
 
 
 try:
+
 	import os
 	import re
 	import sys
@@ -38,21 +39,22 @@ try:
 	import gio
 	import glib
 	import json
-	import time
 	import gmenu
-	import locale
 	import urllib2
 	import gettext
 	import logging
-	import commands
-	import threading
 	import keybinder
 	import subprocess
 	import dbus, dbus.service
+
+	from time import time
+	from commands import getoutput
+	from pango import ELLIPSIZE_END
+	from threading import Lock, Thread
+	from locale import setlocale, LC_ALL
 	from xdg import BaseDirectory, DesktopEntry
 	from dbus.mainloop.glib import DBusGMainLoop
 	from distutils.sysconfig import get_python_lib
-	from pango import ELLIPSIZE_END
 
 except Exception, exception:
 	print(exception)
@@ -105,7 +107,7 @@ if not os.path.exists(prefix_path):
 DIR = prefix_path
 APP = 'cardapio'
 
-locale.setlocale(locale.LC_ALL, '')
+setlocale(LC_ALL, '')
 gettext.bindtextdomain(APP, DIR)
 
 if hasattr(gettext, 'bind_textdomain_codeset'):
@@ -126,7 +128,7 @@ gtk.glade.textdomain(APP)
 
 class Cardapio(dbus.service.Object):
 
-	distro_name = commands.getoutput('lsb_release -is')
+	distro_name = getoutput('lsb_release -is')
 
 	min_visibility_toggle_interval = 0.010 # seconds (this is a bit of a hack to fix some focus problems)
 
@@ -168,7 +170,7 @@ class Cardapio(dbus.service.Object):
 		logging.basicConfig(filename = log_file_path, level = logging_level)
 		logging.info('----------------- Cardapio launched -----------------')
 		logging.info('Cardapio version: %s' % Cardapio.version)
-		logging.info('Distribution: %s' % commands.getoutput('lsb_release -ds'))
+		logging.info('Distribution: %s' % getoutput('lsb_release -ds'))
 
 		self.home_folder_path = os.path.abspath(os.path.expanduser('~'))
 
@@ -201,8 +203,12 @@ class Cardapio(dbus.service.Object):
 		self.keyword_to_plugin_mapping     = {}
 		self.active_plugin_instances       = []
 		self.in_system_menu_mode           = False
+
 		self.plugin_thread                 = None
-		self.plugin_thread_lock            = threading.Lock()
+		self.plugin_thread_arg             = None
+		self.plugin_thread_lock            = Lock()
+		self.plugin_thread_arg_lock        = Lock()
+		self.plugins_still_searching       = 0
 
 		self.icon_extension_types = re.compile('.*\.(png|xpm|svg)$')
 
@@ -227,7 +233,7 @@ class Cardapio(dbus.service.Object):
 		self.build_ui()
 		self.setup_ui_from_all_settings()
 
-		self.run_in_plugin_thread(self.schedule_search_with_all_plugins, '')
+		self.setup_and_start_plugin_thread('')
 
 		if not hidden: self.show()
 
@@ -362,22 +368,38 @@ class Cardapio(dbus.service.Object):
 							}
 
 
-	def run_in_plugin_thread(self, func, *args):
+	def setup_and_start_plugin_thread(self, text):
 		"""
 		Wrapper for executing functions in the parallel "plugin thread"
 		"""
 
-		func(*args)
-		return
+		#self.schedule_search_with_all_plugins(text)
+		#return
 
-		def wrapped_func():
-			with self.plugin_thread_lock:
-				func(*args)
+		with self.plugin_thread_arg_lock:
+			self.plugin_thread_arg = text 
+
+		if not self.plugin_thread_lock.locked():
+			self.plugin_thread = Thread()
+			self.plugin_thread.run = self.plugin_thread_loop
+			self.plugin_thread.start()
+
+
+	def plugin_thread_loop(self):
+		"""
+		Starts a loop where the current search is executed in the plugin thread,
+		and then, if the user has typed any more text, the new search is
+		immediately executed in the same thread, and so on. This way we don't
+		have to span several threads, only one.
+		"""
 
 		with self.plugin_thread_lock:
-			self.plugin_thread = threading.Thread()
-			self.plugin_thread.run = wrapped_func
-			self.plugin_thread.start()
+			while self.plugin_thread_arg is not None:
+
+				self.schedule_search_with_all_plugins(self.plugin_thread_arg)
+
+				with self.plugin_thread_arg_lock:
+					self.plugin_thread_arg = None
 
 
 	def activate_plugins_from_settings(self):
@@ -582,7 +604,7 @@ class Cardapio(dbus.service.Object):
 			config_file.close()
 
 		default_side_pane_items = []
-		path = commands.getoutput('which software-center')
+		path = getoutput('which software-center')
 		if os.path.exists(path):
 			default_side_pane_items.append(
 				{
@@ -1028,7 +1050,7 @@ class Cardapio(dbus.service.Object):
 		for plugin in self.active_plugin_instances:
 			glib.idle_add(plugin.on_reload_permission_granted)
 
-		self.run_in_plugin_thread(self.schedule_search_with_all_plugins, '')
+		self.setup_and_start_plugin_thread('')
 
 
 	def show_executable_file_dialog(self, path):
@@ -1557,7 +1579,7 @@ class Cardapio(dbus.service.Object):
 			self.fully_hide_all_sections()
 			self.subfolder_stack = {}
 			self.search_menus(text, self.app_list)
-			self.run_in_plugin_thread(self.schedule_search_with_all_plugins, text)
+			self.setup_and_start_plugin_thread(text)
 			self.current_query = text
 
 			if len(text) < self.settings['min search string length']:
@@ -2248,7 +2270,7 @@ class Cardapio(dbus.service.Object):
  		self.scroll_to_top()
 
 		self.visible = True
-		self.last_visibility_toggle = time.time()
+		self.last_visibility_toggle = time()
 
 		self.opened_last_app_in_background = False
 
@@ -2268,7 +2290,7 @@ class Cardapio(dbus.service.Object):
 		self.auto_toggle_panel_button(False)
 
 		self.visible = False
-		self.last_visibility_toggle = time.time()
+		self.last_visibility_toggle = time()
 
 		self.window.hide()
 
@@ -2287,7 +2309,7 @@ class Cardapio(dbus.service.Object):
 		Toggle Show/Hide the Cardapio window. This function is dbus-accessible.
 		"""
 
-		if time.time() - self.last_visibility_toggle < Cardapio.min_visibility_toggle_interval:
+		if time() - self.last_visibility_toggle < Cardapio.min_visibility_toggle_interval:
 			return
 
 		show_near_mouse = bool(show_near_mouse)
@@ -2338,8 +2360,8 @@ class Cardapio(dbus.service.Object):
 		window.show_now()
 
 		# for compiz, this must take place twice!!
-		window.present_with_time(int(time.time()))
-		window.present_with_time(int(time.time()))
+		window.present_with_time(int(time()))
+		window.present_with_time(int(time()))
 
 		# for metacity, this is required!!
 		window.window.focus()
