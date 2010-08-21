@@ -373,8 +373,8 @@ class Cardapio(dbus.service.Object):
 		Wrapper for executing functions in the parallel "plugin thread"
 		"""
 
-		#self.schedule_search_with_all_plugins(text)
-		#return
+		self.schedule_search_with_all_plugins(text)
+		return # don't use threads just yet
 
 		with self.plugin_thread_arg_lock:
 			self.plugin_thread_arg = text 
@@ -461,6 +461,9 @@ class Cardapio(dbus.service.Object):
 			plugin.basename               = basename
 			plugin.is_running             = False
 			plugin.show_only_with_keyword = show_only_with_keyword
+
+			if plugin.search_delay_type is not None:
+				plugin.search_delay_type = plugin.search_delay_type.partition(' search update delay')[0]
 
 			self.active_plugin_instances.append(plugin)
 			self.plugin_database[basename]['instance'] = plugin
@@ -1548,6 +1551,7 @@ class Cardapio(dbus.service.Object):
 		text = self.search_entry.get_text().strip()
 
 		if text and text == self.current_query: return
+		self.current_query = text
 
 		self.no_results_to_show = True
 		self.hide_no_results_text()
@@ -1556,19 +1560,16 @@ class Cardapio(dbus.service.Object):
 			self.fully_hide_all_sections()
 			self.subfolder_stack = {}
 			self.search_menus(text, self.sys_list)
-			self.current_query = text
 
 		elif text.find('/') != -1:
 			first_app_widget = self.get_first_visible_app()
 			self.fully_hide_all_sections()
 			self.search_subfolders(text, first_app_widget)
-			self.current_query = text
 
 		elif text and text[0] == '?':
 			self.fully_hide_all_sections()
 			self.subfolder_stack = {}
 			keyword, dummy, text = text.partition(' ')
-			self.current_query = text
 
 			if len(keyword) >= 1 and text:
 				self.search_with_plugin_keyword(keyword[1:], text)
@@ -1580,7 +1581,6 @@ class Cardapio(dbus.service.Object):
 			self.subfolder_stack = {}
 			self.search_menus(text, self.app_list)
 			self.setup_and_start_plugin_thread(text)
-			self.current_query = text
 
 			if len(text) < self.settings['min search string length']:
 				for plugin in self.active_plugin_instances:
@@ -1733,9 +1733,9 @@ class Cardapio(dbus.service.Object):
 		self.cancel_all_plugins()
 		self.cancel_all_plugin_timers()
 
-		self.schedule_search_with_plugin_type(text, 'local search update delay')
-		self.schedule_search_with_plugin_type(text, 'remote search update delay')
 		self.schedule_search_with_plugin_type(text, None)
+		self.schedule_search_with_plugin_type(text, 'local')
+		self.schedule_search_with_plugin_type(text, 'remote')
 
 
 	def schedule_search_with_plugin_type(self, text, delay_type = None, specific_plugin = None):
@@ -1746,12 +1746,18 @@ class Cardapio(dbus.service.Object):
 
 		if delay_type is None:
 			self.search_with_plugins(text, None, specific_plugin)
-			return
 
-		timer_delay = self.settings[delay_type]
-		timeout     = self.settings['remote search timeout']
-		self.search_timer_remote   = glib.timeout_add(timer_delay, self.search_with_plugins, text, delay_type, specific_plugin)
-		self.search_timeout_remote = glib.timeout_add(timeout, self.show_all_plugin_timeout_text, delay_type)
+		elif delay_type == 'local':
+			timer_delay = self.settings['local search update delay']
+			timeout     = self.settings['local search timeout']
+			self.search_timer_local   = glib.timeout_add(timer_delay, self.search_with_plugins, text, delay_type, specific_plugin)
+			self.search_timeout_local = glib.timeout_add(timeout, self.show_all_plugin_timeout_text, delay_type)
+		
+		else:
+			timer_delay = self.settings['remote search update delay']
+			timeout     = self.settings['remote search timeout']
+			self.search_timer_remote   = glib.timeout_add(timer_delay, self.search_with_plugins, text, delay_type, specific_plugin)
+			self.search_timeout_remote = glib.timeout_add(timeout, self.show_all_plugin_timeout_text, delay_type)
 
 
 	def search_with_plugins(self, text, delay_type, specific_plugin = None):
@@ -1759,12 +1765,12 @@ class Cardapio(dbus.service.Object):
 		Start a plugin-based search
 		"""
 
-		if delay_type == 'local search update delay':
+		if delay_type == 'local':
 			if self.search_timer_local is not None:
 				glib.source_remove(self.search_timer_local)
 				self.search_timer_local = None
 
-		elif delay_type == 'remote search update delay':
+		elif delay_type == 'remote':
 			if self.search_timer_remote is not None:
 				glib.source_remove(self.search_timer_remote)
 				self.search_timer_remote = None
@@ -1785,18 +1791,20 @@ class Cardapio(dbus.service.Object):
 
 			return False # Required!
 
+
+		too_small = (len(text) < self.settings['min search string length'])
+
 		for plugin in self.active_plugin_instances:
 
 			if plugin.search_delay_type != delay_type or plugin.show_only_with_keyword:
 				continue
 
-			if plugin.hide_from_sidebar and len(text) < self.settings['min search string length']:
+			if plugin.hide_from_sidebar and too_small:
 				continue
 
 			plugin.is_running = True
 
 			try:
-				# TODO: make plugins run in a separate thread
 				self.show_plugin_loading_text(plugin)
 				plugin.search(text, self.settings['search results limit'])
 
@@ -3810,7 +3818,7 @@ class CardapioPluginInterface:
 
 	plugin_api_version = 1.38
 
-	search_delay_type = 'local search update delay'
+	search_delay_type = 'local'
 
 	default_keyword  = ''
 

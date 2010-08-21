@@ -46,7 +46,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	plugin_api_version = 1.38
 
-	search_delay_type = 'remote search update delay'
+	search_delay_type = 'remote'
 
 	category_name = _('Amazon Results')
 	category_tooltip = _('Results found in Amazon')

@@ -24,7 +24,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	plugin_api_version = 1.38
 
-	search_delay_type = 'remote search update delay'
+	search_delay_type = 'remote'
 
 	default_keyword = 'bing'
 

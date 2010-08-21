@@ -28,7 +28,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	plugin_api_version = 1.38
 
-	search_delay_type = 'local search update delay'
+	search_delay_type = 'local'
 
 	category_name = _('Tomboy Results')
 	category_tooltip = _('Your Tomboy notes')
