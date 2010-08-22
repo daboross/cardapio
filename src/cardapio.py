@@ -188,7 +188,7 @@ class Cardapio(dbus.service.Object):
 		self.sys_list                      = []    # used for searching the system menus
 		self.section_list                  = {}
 		self.current_query                 = ''
-		self.subfolder_aliases             = []
+		self.subfolder_stack               = []
 		self.selected_section              = None
 		self.no_results_to_show            = False
 		self.previously_focused_widget     = None
@@ -965,7 +965,7 @@ class Cardapio(dbus.service.Object):
 		self.section_list          = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
 
 		self.current_query         = ''
-		self.subfolder_aliases     = []
+		self.subfolder_stack       = []
 
 		# "All" button for the regular menu
 		button = self.add_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
@@ -1537,12 +1537,12 @@ class Cardapio(dbus.service.Object):
 
 		if self.in_system_menu_mode:
 			self.fully_hide_all_sections()
-			self.subfolder_aliases = []
+			self.subfolder_stack = []
 			self.search_menus(text, self.sys_list)
 
 		elif text and text[0] == '?':
 			self.fully_hide_all_sections()
-			self.subfolder_aliases = []
+			self.subfolder_stack = []
 			keyword, dummy, text = text.partition(' ')
 			self.current_query = text
 
@@ -1560,7 +1560,7 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			self.fully_hide_all_sections()
-			self.subfolder_aliases = []
+			self.subfolder_stack = []
 			self.search_menus(text, self.app_list)
 			self.schedule_search_with_all_plugins(text)
 
@@ -1616,15 +1616,15 @@ class Cardapio(dbus.service.Object):
 		self.clear_pane(self.subfolders_section_contents)
 
 		if not search_inside:
-			path = self.subfolder_aliases[-1][1]
+			path = self.subfolder_stack[-1][1]
 
 		else:
 			text = text[:-1]
 			curr_level = text.count('/')
 
-			if len(self.subfolder_aliases) > 0:
-				prev_level = self.subfolder_aliases[-1][0].count('/')
-				parent_text, path = self.subfolder_aliases[-1] 
+			if len(self.subfolder_stack) > 0:
+				prev_level = self.subfolder_stack[-1][0].count('/')
+				parent_text, path = self.subfolder_stack[-1] 
 
 			else:
 				prev_level = -1
@@ -1634,7 +1634,7 @@ class Cardapio(dbus.service.Object):
 				path        = '/'
 				parent_text = ''
 				base_text   = ''
-				self.subfolder_aliases = [('','/')]
+				self.subfolder_stack = [('','/')]
 
 			# if pushing into a folder
 			elif prev_level < curr_level:
@@ -1649,14 +1649,12 @@ class Cardapio(dbus.service.Object):
 					path_type, path = urllib2.splittype(path)
 					if path_type and path_type != 'file': return
 					if not os.path.isdir(path): return
-					self.subfolder_aliases.append((text,path))
+					self.subfolder_stack.append((text,path))
 
 			# if popping out of a folder
 			else:
-				if prev_level > curr_level:
-					self.subfolder_aliases.pop()
-
-				path = self.subfolder_aliases[-1][1]
+				if prev_level > curr_level: self.subfolder_stack.pop()
+				path = self.subfolder_stack[-1][1]
 
 		if path == '/': parent_name = _('Filesystem Root')
 		else: dummy, parent_name = os.path.split(path)
@@ -2953,7 +2951,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.search_entry.set_text('')
-		self.subfolder_aliases = []
+		self.subfolder_stack = []
 
 
 	def add_app_button(self, button_str, icon_name, parent_widget, command_type, command, tooltip = '', app_list = None):
