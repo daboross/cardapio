@@ -188,7 +188,7 @@ class Cardapio(dbus.service.Object):
 		self.sys_list                      = []    # used for searching the system menus
 		self.section_list                  = {}
 		self.current_query                 = ''
-		self.subfolder_stack               = {}
+		self.subfolder_aliases             = []
 		self.selected_section              = None
 		self.no_results_to_show            = False
 		self.previously_focused_widget     = None
@@ -965,7 +965,7 @@ class Cardapio(dbus.service.Object):
 		self.section_list          = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
 
 		self.current_query         = ''
-		self.subfolder_stack       = {}
+		self.subfolder_aliases     = []
 
 		# "All" button for the regular menu
 		button = self.add_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
@@ -1537,12 +1537,12 @@ class Cardapio(dbus.service.Object):
 
 		if self.in_system_menu_mode:
 			self.fully_hide_all_sections()
-			self.subfolder_stack = {}
+			self.subfolder_aliases = []
 			self.search_menus(text, self.sys_list)
 
 		elif text and text[0] == '?':
 			self.fully_hide_all_sections()
-			self.subfolder_stack = {}
+			self.subfolder_aliases = []
 			keyword, dummy, text = text.partition(' ')
 			self.current_query = text
 
@@ -1555,11 +1555,12 @@ class Cardapio(dbus.service.Object):
 			first_app_widget = self.get_first_visible_app()
 			selected_app_widget = self.get_selected_app()
 			self.fully_hide_all_sections()
+			self.previously_focused_widget = None
 			self.search_subfolders(text, first_app_widget, selected_app_widget)
 
 		else:
 			self.fully_hide_all_sections()
-			self.subfolder_stack = {}
+			self.subfolder_aliases = []
 			self.search_menus(text, self.app_list)
 			self.schedule_search_with_all_plugins(text)
 
@@ -1605,43 +1606,57 @@ class Cardapio(dbus.service.Object):
 	def search_subfolders(self, text, first_app_widget, selected_app_widget):
 
 		text = text.lower()
-		search_inside = (text[-1] == '/' and len(text) != 1)
 
-		slash_pos = text.rfind('/')
-		parent_text = text[:slash_pos]
-		base_text = text[slash_pos+1:]
-
-		if search_inside: text = text[:-1]
-
-		if text == '/': 
-			path = '/'
-			parent_text = '/'
-			base_text = ''
-			self.subfolder_stack[parent_text] = path
-
-		elif selected_app_widget is None and first_app_widget is None:
-			path = self.subfolder_stack[parent_text]
-
-		elif selected_app_widget is None:
-			if first_app_widget.app_info['type'] != 'xdg': return
-			path = self.escape_quotes(self.unescape(first_app_widget.app_info['command']))
-
-		else:
-			if selected_app_widget.app_info['type'] != 'xdg': return
-			path = self.escape_quotes(self.unescape(selected_app_widget.app_info['command']))
+		search_inside = (text[-1] == '/')
+		slash_pos     = text.rfind('/')
+		parent_text   = text[:slash_pos]
+		base_text     = text[slash_pos+1:]
 
 		self.subfolders_section_slab.hide() # for added performance
 		self.clear_pane(self.subfolders_section_contents)
 
-		path_type, path = urllib2.splittype(path)
-		if path_type and path_type != 'file': return
-
-		if search_inside and parent_text not in self.subfolder_stack:
-			if not os.path.isdir(path): return
-			self.subfolder_stack[parent_text] = path
+		if not search_inside:
+			path = self.subfolder_aliases[-1][1]
 
 		else:
-			path = self.subfolder_stack[parent_text]
+			text = text[:-1]
+			curr_level = text.count('/')
+
+			if len(self.subfolder_aliases) > 0:
+				prev_level = self.subfolder_aliases[-1][0].count('/')
+				parent_text, path = self.subfolder_aliases[-1] 
+
+			else:
+				prev_level = -1
+
+			# if typed root folder
+			if text == '': 
+				path        = '/'
+				parent_text = ''
+				base_text   = ''
+				self.subfolder_aliases = [('','/')]
+
+			# if pushing into a folder
+			elif prev_level < curr_level:
+
+				if first_app_widget is not None:
+					if selected_app_widget is not None: widget = selected_app_widget
+					else: widget = first_app_widget
+
+					if widget.app_info['type'] != 'xdg': return
+					path = self.escape_quotes(self.unescape(widget.app_info['command']))
+
+					path_type, path = urllib2.splittype(path)
+					if path_type and path_type != 'file': return
+					if not os.path.isdir(path): return
+					self.subfolder_aliases.append((text,path))
+
+			# if popping out of a folder
+			else:
+				if prev_level > curr_level:
+					self.subfolder_aliases.pop()
+
+				path = self.subfolder_aliases[-1][1]
 
 		if path == '/': parent_name = _('Filesystem Root')
 		else: dummy, parent_name = os.path.split(path)
@@ -2938,7 +2953,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.search_entry.set_text('')
-		self.subfolder_stack = {}
+		self.subfolder_aliases = []
 
 
 	def add_app_button(self, button_str, icon_name, parent_widget, command_type, command, tooltip = '', app_list = None):
