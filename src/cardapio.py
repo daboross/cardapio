@@ -1533,6 +1533,7 @@ class Cardapio(dbus.service.Object):
 			self.fully_hide_all_sections()
 			self.subfolder_stack = {}
 			keyword, dummy, text = text.partition(' ')
+			self.current_query = text
 
 			if len(keyword) >= 1 and text:
 				self.search_with_plugin_keyword(keyword[1:], text)
@@ -1676,6 +1677,7 @@ class Cardapio(dbus.service.Object):
 
 		keyword_exists = False
 
+		# search for a registered keyword that has this keyword as a substring
 		for plugin_keyword in self.keyword_to_plugin_mapping:
 			if plugin_keyword.find(keyword) == 0:
 				keyword_exists = True
