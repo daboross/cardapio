@@ -135,7 +135,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.139'
+	version = '0.9.140'
 
 	core_plugins = [
 			'applications',
@@ -883,7 +883,7 @@ class Cardapio(dbus.service.Object):
 
 		if self.settings['open on hover']:
 			self.applet_press_handler = self.panel_button.connect('button-press-event', self.hide)
-			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', self.show)
+			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', self.on_applet_cursor_enter)
 			self.applet_leave_handler = self.panel_button.connect('leave-notify-event', self.on_mainwindow_cursor_leave)
 
 		else:
@@ -1402,6 +1402,14 @@ class Cardapio(dbus.service.Object):
 			return
 
 		self.hide()
+
+
+	def on_applet_cursor_enter(self, widget, event):
+		"""
+		Handler for when the cursor enters the panel applet.
+		"""
+
+		if not self.visible: self.show()
 
 
 	def on_mainwindow_cursor_leave(self, widget, event):

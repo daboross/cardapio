@@ -1,3 +1,10 @@
+cardapio (0.9.140-ubuntu1) lucid; urgency=low
+
+   * "Ooops edition". Fixed some bugs introduced 30 minutes ago. Ooops.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 22 Aug 2010 23:01:00 -0400
+
+
 cardapio (0.9.139-ubuntu1) lucid; urgency=low
 
    * Bugfixes, code cleanup, small changes to plugin api
