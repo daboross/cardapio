@@ -1355,9 +1355,12 @@ class Cardapio(dbus.service.Object):
 
 			if event.is_modifier: return
 
-			self.previously_focused_widget = None
 			self.window.set_focus(self.search_entry)
+			self.search_entry.set_position(len(self.search_entry.get_text()))
 			self.search_entry.emit('key-press-event', event)
+
+		else:
+			self.previously_focused_widget = None
 
 
 	def on_mainwindow_key_pressed(self, widget, event):
@@ -1550,8 +1553,9 @@ class Cardapio(dbus.service.Object):
 
 		elif text and text.find('/') != -1:
 			first_app_widget = self.get_first_visible_app()
+			selected_app_widget = self.get_selected_app()
 			self.fully_hide_all_sections()
-			self.search_subfolders(text, first_app_widget)
+			self.search_subfolders(text, first_app_widget, selected_app_widget)
 
 		else:
 			self.fully_hide_all_sections()
@@ -1598,20 +1602,33 @@ class Cardapio(dbus.service.Object):
 		return first_app
 
 
-	def search_subfolders(self, text, first_app_widget):
+	def search_subfolders(self, text, first_app_widget, selected_app_widget):
 
 		text = text.lower()
 		search_inside = (text[-1] == '/' and len(text) != 1)
 
-		parent_text, base_text = os.path.split(text)
+		slash_pos = text.rfind('/')
+		parent_text = text[:slash_pos]
+		base_text = text[slash_pos+1:]
+
 		if search_inside: text = text[:-1]
 
-		if first_app_widget is None:
+		if text == '/': 
+			path = '/'
+			parent_text = '/'
+			base_text = ''
+			self.subfolder_stack[parent_text] = path
+
+		elif selected_app_widget is None and first_app_widget is None:
 			path = self.subfolder_stack[parent_text]
 
-		else:
+		elif selected_app_widget is None:
 			if first_app_widget.app_info['type'] != 'xdg': return
 			path = self.escape_quotes(self.unescape(first_app_widget.app_info['command']))
+
+		else:
+			if selected_app_widget.app_info['type'] != 'xdg': return
+			path = self.escape_quotes(self.unescape(selected_app_widget.app_info['command']))
 
 		self.subfolders_section_slab.hide() # for added performance
 		self.clear_pane(self.subfolders_section_contents)
@@ -1626,7 +1643,8 @@ class Cardapio(dbus.service.Object):
 		else:
 			path = self.subfolder_stack[parent_text]
 
-		dummy, parent_name = os.path.split(path)
+		if path == '/': parent_name = _('Filesystem Root')
+		else: dummy, parent_name = os.path.split(path)
 		self.subfolders_label.set_text(parent_name)
 
 		count = 0
@@ -2077,7 +2095,7 @@ class Cardapio(dbus.service.Object):
 
 	def get_first_visible_app(self):
 		"""
-		Returns the first app in the right pane
+		Returns the first app in the right pane, if any.
 		"""
 
 		for slab in self.application_pane.get_children():
@@ -2090,6 +2108,20 @@ class Cardapio(dbus.service.Object):
 				if not child.get_visible(): continue
 
 				return child
+
+		return None
+
+
+	def get_selected_app(self):
+		"""
+		Returns the button for the selected app (that is, the one that has
+		keyboard focus) if any.
+		"""
+
+		widget = self.previously_focused_widget
+
+		if (type(widget) is gtk.Button and 'app_info' in dir(widget)):
+			return widget
 
 		return None
 
