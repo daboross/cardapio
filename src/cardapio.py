@@ -135,7 +135,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.138'
+	version = '0.9.139'
 
 	core_plugins = [
 			'applications',
@@ -1529,11 +1529,6 @@ class Cardapio(dbus.service.Object):
 			self.subfolder_stack = {}
 			self.search_menus(text, self.sys_list)
 
-		elif text.find('/') != -1:
-			first_app_widget = self.get_first_visible_app()
-			self.fully_hide_all_sections()
-			self.search_subfolders(text, first_app_widget)
-
 		elif text and text[0] == '?':
 			self.fully_hide_all_sections()
 			self.subfolder_stack = {}
@@ -1543,6 +1538,11 @@ class Cardapio(dbus.service.Object):
 				self.search_with_plugin_keyword(keyword[1:], text)
 
 			self.consider_showing_no_results_text()
+
+		elif text and text.find('/') != -1:
+			first_app_widget = self.get_first_visible_app()
+			self.fully_hide_all_sections()
+			self.search_subfolders(text, first_app_widget)
 
 		else:
 			self.fully_hide_all_sections()
@@ -1558,11 +1558,11 @@ class Cardapio(dbus.service.Object):
 
 		if len(text) == 0:
 			self.hide_all_transitory_sections(fully_hide = True)
-
 		else:
 			self.all_sections_sidebar_button.set_sensitive(True)
 			self.all_system_sections_sidebar_button.set_sensitive(True)
-			self.consider_showing_no_results_text()
+
+		self.consider_showing_no_results_text()
 
 
 	def search_menus(self, text, app_list):
@@ -2256,7 +2256,8 @@ class Cardapio(dbus.service.Object):
 			# satisfaction of seeing the window pop up, even if it's incomplete...
 			self.rebuild_ui(show_message = True)
 
-		self.switch_modes(show_system_menus = False, toggle_mode_button = True)
+		if not self.settings['keep search results']:
+			self.switch_modes(show_system_menus = False, toggle_mode_button = True)
 
 
 	def hide(self, *dummy):

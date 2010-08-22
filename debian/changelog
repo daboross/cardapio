@@ -1,3 +1,11 @@
+cardapio (0.9.139-ubuntu1) lucid; urgency=low
+
+   * Bugfixes, code cleanup, small changes to plugin api
+   * Also reverted back to non-threaded version
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 22 Aug 2010 23:01:00 -0400
+
+
 cardapio (0.9.138-ubuntu1) lucid; urgency=low
 
    * New option to open categories on hover
