@@ -34,7 +34,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	plugin_api_version = 1.38
 
-	search_delay_type  = None
+	search_delay_type  = 'local'
 	default_keyword    = 'softwarecenter'
 	category_name      = _('Available Software')
 	category_icon      = 'softwarecenter'

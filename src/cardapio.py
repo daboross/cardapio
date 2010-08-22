@@ -203,11 +203,6 @@ class Cardapio(dbus.service.Object):
 		self.keyword_to_plugin_mapping     = {}
 		self.active_plugin_instances       = []
 		self.in_system_menu_mode           = False
-
-		self.plugin_thread                 = None
-		self.plugin_thread_arg             = None
-		self.plugin_thread_lock            = Lock()
-		self.plugin_thread_arg_lock        = Lock()
 		self.plugins_still_searching       = 0
 
 		self.icon_extension_types = re.compile('.*\.(png|xpm|svg)$')
@@ -233,7 +228,7 @@ class Cardapio(dbus.service.Object):
 		self.build_ui()
 		self.setup_ui_from_all_settings()
 
-		self.setup_and_start_plugin_thread('')
+		self.schedule_search_with_all_plugins('')
 
 		if not hidden: self.show()
 
@@ -366,40 +361,6 @@ class Cardapio(dbus.service.Object):
 							'hide from sidebar' : plugin_class.hide_from_sidebar,
 							'instance'          : None,
 							}
-
-
-	def setup_and_start_plugin_thread(self, text):
-		"""
-		Wrapper for executing functions in the parallel "plugin thread"
-		"""
-
-		self.schedule_search_with_all_plugins(text)
-		return # don't use threads just yet
-
-		with self.plugin_thread_arg_lock:
-			self.plugin_thread_arg = text 
-
-		if not self.plugin_thread_lock.locked():
-			self.plugin_thread = Thread()
-			self.plugin_thread.run = self.plugin_thread_loop
-			self.plugin_thread.start()
-
-
-	def plugin_thread_loop(self):
-		"""
-		Starts a loop where the current search is executed in the plugin thread,
-		and then, if the user has typed any more text, the new search is
-		immediately executed in the same thread, and so on. This way we don't
-		have to span several threads, only one.
-		"""
-
-		with self.plugin_thread_lock:
-			while self.plugin_thread_arg is not None:
-
-				self.schedule_search_with_all_plugins(self.plugin_thread_arg)
-
-				with self.plugin_thread_arg_lock:
-					self.plugin_thread_arg = None
 
 
 	def activate_plugins_from_settings(self):
@@ -1053,7 +1014,7 @@ class Cardapio(dbus.service.Object):
 		for plugin in self.active_plugin_instances:
 			glib.idle_add(plugin.on_reload_permission_granted)
 
-		self.setup_and_start_plugin_thread('')
+		self.schedule_search_with_all_plugins('')
 
 
 	def show_executable_file_dialog(self, path):
@@ -1580,7 +1541,7 @@ class Cardapio(dbus.service.Object):
 			self.fully_hide_all_sections()
 			self.subfolder_stack = {}
 			self.search_menus(text, self.app_list)
-			self.setup_and_start_plugin_thread(text)
+			self.schedule_search_with_all_plugins(text)
 
 			if len(text) < self.settings['min search string length']:
 				for plugin in self.active_plugin_instances:
@@ -1721,7 +1682,7 @@ class Cardapio(dbus.service.Object):
 		self.cancel_all_plugins()
 		self.cancel_all_plugin_timers()
 
-		self.schedule_search_with_plugin_type(text, plugin.search_delay_type, plugin)
+		self.schedule_search_with_specific_plugin(text, plugin.search_delay_type, plugin)
 
 
 	def schedule_search_with_all_plugins(self, text):
@@ -1733,34 +1694,34 @@ class Cardapio(dbus.service.Object):
 		self.cancel_all_plugins()
 		self.cancel_all_plugin_timers()
 
-		self.schedule_search_with_plugin_type(text, None)
-		self.schedule_search_with_plugin_type(text, 'local')
-		self.schedule_search_with_plugin_type(text, 'remote')
+		self.schedule_search_with_specific_plugin(text, None)
+		self.schedule_search_with_specific_plugin(text, 'local')
+		self.schedule_search_with_specific_plugin(text, 'remote')
 
 
-	def schedule_search_with_plugin_type(self, text, delay_type = None, specific_plugin = None):
+	def schedule_search_with_specific_plugin(self, text, delay_type = None, specific_plugin = None):
 		"""
 		Sets up timers to start searching with the plugins specified by the
 		delay_type and possibly by "specific_plugin"
 		"""
 
 		if delay_type is None:
-			self.search_with_plugins(text, None, specific_plugin)
+			self.search_with_specific_plugin(text, None, specific_plugin)
 
 		elif delay_type == 'local':
 			timer_delay = self.settings['local search update delay']
 			timeout     = self.settings['local search timeout']
-			self.search_timer_local   = glib.timeout_add(timer_delay, self.search_with_plugins, text, delay_type, specific_plugin)
+			self.search_timer_local   = glib.timeout_add(timer_delay, self.search_with_specific_plugin, text, delay_type, specific_plugin)
 			self.search_timeout_local = glib.timeout_add(timeout, self.show_all_plugin_timeout_text, delay_type)
 		
 		else:
 			timer_delay = self.settings['remote search update delay']
 			timeout     = self.settings['remote search timeout']
-			self.search_timer_remote   = glib.timeout_add(timer_delay, self.search_with_plugins, text, delay_type, specific_plugin)
+			self.search_timer_remote   = glib.timeout_add(timer_delay, self.search_with_specific_plugin, text, delay_type, specific_plugin)
 			self.search_timeout_remote = glib.timeout_add(timeout, self.show_all_plugin_timeout_text, delay_type)
 
 
-	def search_with_plugins(self, text, delay_type, specific_plugin = None):
+	def search_with_specific_plugin(self, text, delay_type, specific_plugin = None):
 		"""
 		Start a plugin-based search
 		"""
@@ -1781,7 +1742,6 @@ class Cardapio(dbus.service.Object):
 			plugin.is_running = True
 
 			try:
-				# TODO: make plugins run in a separate thread
 				self.show_plugin_loading_text(plugin)
 				plugin.search(text, self.settings['long search results limit'])
 
@@ -1791,22 +1751,22 @@ class Cardapio(dbus.service.Object):
 
 			return False # Required!
 
-
-		too_small = (len(text) < self.settings['min search string length'])
+		text_is_too_small = (len(text) < self.settings['min search string length'])
+		number_of_results = self.settings['search results limit']
 
 		for plugin in self.active_plugin_instances:
 
 			if plugin.search_delay_type != delay_type or plugin.show_only_with_keyword:
 				continue
 
-			if plugin.hide_from_sidebar and too_small:
+			if plugin.hide_from_sidebar and text_is_too_small:
 				continue
 
 			plugin.is_running = True
 
 			try:
 				self.show_plugin_loading_text(plugin)
-				plugin.search(text, self.settings['search results limit'])
+				plugin.search(text, number_of_results)
 
 			except Exception, exception:
 				self.plugin_write_to_log(plugin, 'Plugin search query failed to execute', is_error = True)
@@ -1897,6 +1857,8 @@ class Cardapio(dbus.service.Object):
 
 		plugin.is_running = False
 		self.plugin_write_to_log(plugin, text, is_error = True)
+
+		# must be outside the lock!
 		self.plugin_handle_search_result(plugin, [], '')
 
 
