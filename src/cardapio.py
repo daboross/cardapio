@@ -162,12 +162,15 @@ class Cardapio(dbus.service.Object):
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None, debug = False):
 
 		self.create_config_folder()
-		log_file_path = os.path.join(self.config_folder_path, 'cardapio.log')
+		logging_filename = os.path.join(self.config_folder_path, 'cardapio.log')
 
 		if debug == True: logging_level = logging.DEBUG
 		else: logging_level = logging.INFO
 
-		logging.basicConfig(filename = log_file_path, level = logging_level)
+		logging_format = r'%(relativeCreated)- 10d %(levelname)- 10s %(message)s'
+
+		logging.basicConfig(filename = logging_filename, level = logging_level, format = logging_format)
+
 		logging.info('----------------- Cardapio launched -----------------')
 		logging.info('Cardapio version: %s' % Cardapio.version)
 		logging.info('Distribution: %s' % getoutput('lsb_release -ds'))
@@ -384,15 +387,17 @@ class Cardapio(dbus.service.Object):
 			plugin_class = self.get_plugin_class(basename)
 
 			if type(plugin_class) is str:
-				logging.error('[plugin: %s] %s' % (basename, plugin_class))
+				logging.error('[%s] %s' % (basename, plugin_class))
 				self.settings['active plugins'].remove(basename)
 				continue
+
+			logging.info('[%s] Initializing...' % basename)
 
 			try:
 				plugin = plugin_class(self.safe_cardapio_proxy)
 
 			except Exception, exception:
-				logging.error('[plugin: %s] Plugin did not load properly: uncaught exception.' % basename)
+				logging.error('[%s] Plugin did not load properly: uncaught exception.' % basename)
 				logging.error(exception)
 				self.settings['active plugins'].remove(basename)
 				continue
@@ -401,6 +406,8 @@ class Cardapio(dbus.service.Object):
 				self.plugin_write_to_log(plugin, 'Plugin did not load properly')
 				self.settings['active plugins'].remove(basename)
 				continue
+
+			logging.info('[%s]             ...done!' % basename)
 
 			keyword = plugin.default_keyword
 			show_only_with_keyword = False
@@ -685,7 +692,7 @@ class Cardapio(dbus.service.Object):
 
 		logging.info('Saving config file...')
 		json.dump(self.settings, config_file, sort_keys = True, indent = 4)
-		logging.info('...done saving config file!')
+		logging.info('                  ...done!')
 
 
 	def setup_base_ui(self):
@@ -3778,7 +3785,7 @@ class CardapioPluginInterface:
 	help_text   = ''
 	version     = ''
 
-	plugin_api_version = 1.38
+	plugin_api_version = 1.39
 
 	search_delay_type = 'local'
 

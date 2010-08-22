@@ -21,14 +21,14 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('Pidgin')
 	description = _('Search for online Pidgin buddies')
-	version = '0.9b'
+	version = '0.91b'
 
 	url = ''
 	help_text = ''
 
 	default_keyword = 'pidgin'
 
-	plugin_api_version = 1.38
+	plugin_api_version = 1.39
 
 	search_delay_type = 'local'
 
@@ -41,7 +41,6 @@ class CardapioPlugin(CardapioPluginInterface):
 	hide_from_sidebar = True
 
 	def __init__(self, cardapio_proxy):
-		cardapio_proxy.write_to_log(self, 'initializing Pidgin plugin')
 
 		self.cardapio = cardapio_proxy
 

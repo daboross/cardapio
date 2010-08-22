@@ -17,9 +17,9 @@ class CardapioPlugin (CardapioPluginInterface):
 	# not used in the GUI yet:
 	url = ''
 	help_text = ''
-	version = '1.22'
+	version = '1.23'
 
-	plugin_api_version = 1.38
+	plugin_api_version = 1.39
 
 	search_delay_type = None
 

@@ -17,12 +17,12 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('YouTube')
 	description = _('Search for results in YouTube')
-	version = '0.92b'
+	version = '0.93b'
 
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.38
+	plugin_api_version = 1.39
 
 	search_delay_type = 'remote'
 
@@ -37,7 +37,6 @@ class CardapioPlugin(CardapioPluginInterface):
 	hide_from_sidebar = True
 
 	def __init__(self, cardapio_proxy):
-		cardapio_proxy.write_to_log(self, 'initializing YouTube plugin')
 
 		self.cardapio = cardapio_proxy
 

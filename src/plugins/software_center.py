@@ -30,9 +30,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.12'
+	version            = '1.13'
 
-	plugin_api_version = 1.38
+	plugin_api_version = 1.39
 
 	search_delay_type  = 'local'
 	default_keyword    = 'softwarecenter'

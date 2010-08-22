@@ -38,7 +38,7 @@ Note that since Launchpad does not like tabs I had to replace them with spaces b
 
     ~
 
-    ~    ~ 
+    ~ 
 
     ~
 
@@ -53,19 +53,19 @@ class CardapioPlugin (CardapioPluginInterface):
     url = 'http://www.pluginurl.com'
     help_text = 'a larger description of the plugin'
 
-    plugin_api_version = 1.35 # must be 1.35 to work with the current version of Cardapio
+    plugin_api_version = 1.39 # must be 1.39 to work with the current version of Cardapio
 
-    search_delay_type = 'local search update delay'
+    search_delay_type = 'local'
     # must be one of:
     #
     # - None - if there should be no delay between when the user types and when
-    # the plugin is called
+    # the plugin is called. Use only for VERY lightweight and fast plugins.
     #
-    # - 'local search update delay' - if the delay should be small (as set in
-    # the config.ini, in milliseconds)
+    # - 'local' - if the delay should be small (as set in the config.ini, in 
+    # milliseconds)
     #
-    # - 'remote search update delay' - if the delay should be slightly larger
-    # (as set in the config.ini, in milliseconds)
+    # - 'remote' - if the delay should be slightly larger (as set in the config.ini, 
+    # in milliseconds)
 
     # the category name under which the plugin search results will appear
     category_name = _('Plugin Category')
@@ -91,41 +91,41 @@ class CardapioPlugin (CardapioPluginInterface):
 #          ~
 
     def __init__(self, cardapio_proxy):
-        """
-        REQUIRED
+		"""
+		REQUIRED
 
-        This constructor gets called whenever a plugin is activated.
-        (Typically once per session, unless the user is turning plugins on/off)
+		This constructor gets called whenever a plugin is activated.
+		(Typically once per session, unless the user is turning plugins on/off)
 
-        The constructor *must* set the instance variable self.loaded to True of False.
-        For example, the Tracker plugin sets self.loaded to False if Tracker is not
-        installed in the system.
+		The constructor *must* set the instance variable self.loaded to True of False.
+		For example, the Tracker plugin sets self.loaded to False if Tracker is not
+		installed in the system.
 
-        The constructor is given a single parameter, which is an object used to 
-        communicate with Cardapio. This object has the following members:
+		The constructor is given a single parameter, which is an object used to
+		communicate with Cardapio. This object has the following members:
 
-           - settings - this is a dict containing the same things that you will
-             find in the config.ini
+		   - settings - this is a dict containing the same things that you will
+		     find in the config.ini
 
-           - write_to_log - this is a function that lets you write to Cardapio's
-             log file, like this: write_to_log(self, 'hi there')
+		   - write_to_log - this is a function that lets you write to Cardapio's
+		     log file, like this: write_to_log(self, 'hi there')
 
-           - handle_search_result - a function to which you should pass the
-             search results when you have them (see more info below, in the 
-             search() method)
+		   - handle_search_result - a function to which you should pass the
+		     search results when you have them (see more info below, in the
+			 search() method)
 
-           - handle_search_error - a function to which you should pass an error
-             message if the search fails (see more info below, in the 
-             search() method)
+		   - handle_search_error - a function to which you should pass an error
+		     message if the search fails (see more info below, in the
+			 search() method)
 
-           - ask_for_reload_permission - a function that should be used whenever
-             the plugin wants to reload its database. Not all plugins have
-             internal databases, though, so this is not always applicable. This
-             is used, for example, with the software_center plugin. (see 
-              on_reload_permission_granted below for more info)
+		   - ask_for_reload_permission - a function that should be used whenever
+			 the plugin wants to reload its database. Not all plugins have
+			 internal databases, though, so this is not always applicable. This
+			 is used, for example, with the software_center plugin. (see
+ 		     on_reload_permission_granted below for more info)
 
-        Note: DO NOT WRITE ANYTHING IN THE settings DICT!!
-        """
+		Note: DO NOT WRITE ANYTHING IN THE settings DICT!!
+		"""
 
         # Do stuff here. For example:
 
@@ -155,53 +155,57 @@ class CardapioPlugin (CardapioPluginInterface):
 
 #          ~
 
-    def search(self, text):
-        """
-        REQUIRED
+    def search(self, text, result_limit):
+		"""
+		REQUIRED
 
-        This method gets called when a new text string is entered in the search
-        field. One of the following functions should be called from this method
-        (of from a thread spawned by this method):
+		This method gets called when a new text string is entered in the search
+		field. It also takes an argument indicating the maximum number of
+		results Cardapio's expecting. The plugin should always provide as many
+		results as it can but their number cannot exceed the given limit!
 
-           * if all goes well:
-           --> handle_search_result(plugin, results, original_query) 
+		One of the following functions should be called from this method
+		(of from a thread spawned by this method):
 
-           * if there is an error
-           --> handle_search_error(plugin, text)     
+		   * if all goes well:
+		   --> handle_search_result(plugin, results, original_query)
 
-        The arguments to these functions are:
+		   * if there is an error
+		   --> handle_search_error(plugin, text)
 
-           * plugin          - this plugin instance (that is, it should always 
-                               be "self", without quotes)
-           * text            - some text to be inserted in Cardapio's log.
-           * results         - an array of dict items as described below.
-           * original_query  - the search query that this corresponds to. The
-                               plugin should save the query received by the 
-                               search() method and pass it back to Cardapio.
+		The arguments to these functions are:
 
-        item = {
-          'name'         : _('Music'),
-          'tooltip'      : _('Show your Music folder'),
-          'icon name'    : 'text-x-generic', 
-          'type'         : 'xdg',
-          'command'      : '~/Music',
-          'context menu' : None
-          }
+		   * plugin          - this plugin instance (that is, it should always
+		                       be "self", without quotes)
+		   * text            - some text to be inserted in Cardapio's log.
+		   * results         - an array of dict items as described below.
+		   * original_query  - the search query that this corresponds to. The
+		                       plugin should save the query received by the
+							   search() method and pass it back to Cardapio.
 
-        Where setting 'type' to 'xdg' means that 'command' should be opened
-        using xdg-open (you should give it a try it in the terminal, first!).
-        Meanwhile, setting 'type' to 'callback' means that 'command' is a
-        function that should be called when the item is clicked. This function
-        will receive as an argument the current search string.
+		item = {
+		  'name'         : _('Music'),
+		  'tooltip'      : _('Show your Music folder'),
+		  'icon name'    : 'text-x-generic',
+		  'type'         : 'xdg',
+		  'command'      : '~/Music',
+		  'context menu' : None
+		  }
 
-        Note that you can set item['file name'] to None if you want Cardapio
-        to guess the icon from the 'command'. This only works for 'xdg' commands,
-        though.
+		Where setting 'type' to 'xdg' means that 'command' should be opened
+		using xdg-open (you should give it a try it in the terminal, first!).
+		Meanwhile, setting 'type' to 'callback' means that 'command' is a
+		function that should be called when the item is clicked. This function
+		will receive as an argument the current search string.
 
-        To change what is shown in the context menu for the search results, set
-        the 'context menu' field to a list [] of dictionary items exactly like
-        the ones above.
-        """
+		Note that you can set item['file name'] to None if you want Cardapio
+		to guess the icon from the 'command'. This only works for 'xdg' commands,
+		though.
+
+		To change what is shown in the context menu for the search results, set
+		the 'context menu' field to a list [] of dictionary items exactly like
+		the ones above.
+		"""
 
         self.current_query = text
 
@@ -209,8 +213,9 @@ class CardapioPlugin (CardapioPluginInterface):
         # Build an array full of items like the ones explained above
 
         # Let's say that array is called my_items.
+		# You should make sure that len(my_items) <= result_limit
 
-        # Then, if the search worked (even if my_items == [])
+        # Then, if the search worked (even if len(my_items) == 0)
         if (search_worked_without_problems):
 
             self.cardapio_proxy.handle_search_result(self, my_items, self.current_query)
@@ -264,7 +269,7 @@ class CardapioPlugin (CardapioPluginInterface):
 
     ~
 
-    ~    ~ 
+    ~ 
 
     ~
 
