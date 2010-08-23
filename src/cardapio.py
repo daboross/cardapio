@@ -135,7 +135,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.140'
+	version = '0.9.141'
 
 	core_plugins = [
 			'applications',
@@ -3584,7 +3584,12 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		try:
+			if self.panel_applet:
+				# allow launched apps to use Ubuntu's AppMenu
+				os.environ['UBUNTU_MENUPROXY'] = 'libappmenu.so'
+
 			subprocess.Popen(path, shell = True, cwd = self.home_folder_path)
+
 		except Exception, exception:
 			logging.error('Could not launch %s' % path)
 			logging.error(exception)

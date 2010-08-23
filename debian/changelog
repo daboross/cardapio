@@ -1,3 +1,45 @@
+cardapio (0.9.141-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fixed bugs in subfolder browser, and trying out Maverick PPA
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 23 Aug 2010 10:01:00 -0400
+
+
+cardapio (0.9.141-ubuntu1-lucid1) lucid; urgency=low
+
+   * Fixed bugs in subfolder browser, and trying out Maverick PPA
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 23 Aug 2010 10:01:00 -0400
+
+
+cardapio (0.9.141-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fixed bugs in subfolder browser, and trying out Maverick PPA
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 23 Aug 2010 10:01:00 -0400
+
+
+cardapio (0.9.141-ubuntu1-lucid1) lucid; urgency=low
+
+   * Fixed bugs in subfolder browser, and trying out Maverick PPA
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 23 Aug 2010 10:01:00 -0400
+
+
+cardapio (0.9.141-ubuntu1) maverick; urgency=low
+
+   * Fixed bugs in subfolder browser, and trying out Maverick PPA
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 23 Aug 2010 10:01:00 -0400
+
+
+cardapio (0.9.141-ubuntu1) lucid; urgency=low
+
+   * Fixed bugs in subfolder browser, and trying out Maverick PPA
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 23 Aug 2010 10:01:00 -0400
+
+
 cardapio (0.9.140-ubuntu1) lucid; urgency=low
 
    * "Ooops edition". Fixed some bugs introduced 30 minutes ago. Ooops.
