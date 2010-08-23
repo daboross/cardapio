@@ -1,3 +1,19 @@
+cardapio (0.9.142-ubuntu1-maverick1) maverick; urgency=low
+
+   * Cardapio now plays nice with Ubuntu's new AppMenu
+   * Plus other bugfixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 22 Aug 2010 23:01:00 -0400
+
+
+cardapio (0.9.142-ubuntu1-lucid1) lucid; urgency=low
+
+   * Cardapio now plays nice with Ubuntu's new AppMenu
+   * Plus other bugfixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 22 Aug 2010 23:01:00 -0400
+
+
 cardapio (0.9.141-ubuntu1-maverick1) maverick; urgency=low
 
    * Fixed bugs in subfolder browser, and trying out Maverick PPA

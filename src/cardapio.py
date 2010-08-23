@@ -135,7 +135,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.141'
+	version = '0.9.142'
 
 	core_plugins = [
 			'applications',
@@ -1587,6 +1587,8 @@ class Cardapio(dbus.service.Object):
 		text = text.lower()
 		first_app = None
 
+		self.application_pane.hide() # for speed
+
 		for app in app_list:
 
 			if app['name'].find(text) == -1 and app['basename'].find(text) == -1:
@@ -1599,6 +1601,8 @@ class Cardapio(dbus.service.Object):
 
 		if self.selected_section is None:
 			self.untoggle_and_show_all_sections()
+
+		self.application_pane.show() # restore application_pane
 
 		return first_app
 
