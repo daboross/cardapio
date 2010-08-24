@@ -16,19 +16,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Before version 1.0:
-# TODO: make apps draggable to make shortcuts elsewhere, such as desktop or docky
-
-# After version 1.0:
 # TODO: fix shift-tab from first app widget
-# TODO: alt-1, alt-2, ..., alt-9, alt-0 should activate categories
+# TODO: alt-1, ..., alt-9, alt-0 should activate 1st, ..., 9th, 10th results
+# TODO: ctrl-1, ..., ctrl-9, ctrl-0 should activate categories
 # TODO: add mount points to "places", allow ejecting from context menu
 # TODO: multiple columns when window is wide enough (like gnome-control-center)
-# TODO: slash "/" should navigate inside folders, Esc pops out
 # TODO: add "most recent" and "most frequent" with a zeitgeist plugin
-# TODO: search results have context menu with "Open with...", "Show parent folder", and so on.
+# TODO: search results could have context menu with "Open with...", and so on.
 # plus other TODO's elsewhere in the code...
-
 
 try:
 
@@ -2263,7 +2258,6 @@ class Cardapio(dbus.service.Object):
 
 		self.settings['window size'] = self.window.get_size()
 		self.settings['splitter position'] = self.get_object('MainSplitter').get_position()
-		#self.save_config_file() # TODO save config file when quit
 
 
 	def set_message_window_visible(self, state = True):
@@ -2567,7 +2561,7 @@ class Cardapio(dbus.service.Object):
 		self.add_app_button(_('Home'), 'user-home', self.places_section_contents, 'xdg', self.home_folder_path, tooltip = _('Open your personal folder'), app_list = self.app_list)
 		self.add_app_button(_('Computer'), 'computer', self.places_section_contents, 'xdg', 'computer:///', tooltip = _('Browse all local and remote disks and folders accessible from this computer'), app_list = self.app_list)
 
-		# TODO network:// ?
+		# TODO Add a button for "Network connections"? (network://)
 
 		xdg_folders_file_path = os.path.join(DesktopEntry.xdg_config_home, 'user-dirs.dirs')
 		xdg_folders_file = file(xdg_folders_file_path, 'r')
@@ -2642,7 +2636,7 @@ class Cardapio(dbus.service.Object):
 			name = res[-1].strip(' \n\r\t').replace('%20', ' ')
 			if name: return name, path
 
-		# TODO: handle remote folders like nautilus does (i.e. '/home on ftp.myserver.net')
+		# TODO: name remote folders like nautilus does (i.e. '/home on ftp.myserver.net')
 		name = path.replace('%20', ' ')
 		return name, path
 
@@ -2671,9 +2665,6 @@ class Cardapio(dbus.service.Object):
 
 		dummy, canonical_path = urllib2.splittype(folder_path)
 		canonical_path = self.unescape(canonical_path)
-
-		# TODO: figure out why this line was here -- doesn't make sense
-		#if not urllib2.posixpath.exists(canonical_path): return
 
 		icon_name = self.get_icon_name_from_path(folder_path)
 		if icon_name is None: icon_name = folder_icon
@@ -3105,7 +3096,7 @@ class Cardapio(dbus.service.Object):
 		either a path or a named icon from the GTK theme.
 		"""
 
-		# TODO: speed this up!
+		# TODO: speed this up as much as possible!
 
 		if not icon_value:
 			icon_value = fallback_icon
@@ -3470,8 +3461,8 @@ class Cardapio(dbus.service.Object):
 			path_type, dummy = urllib2.splittype(command)
 			if path_type is None: command = 'file://' + command
 
-			# TODO: figure out how to handle 'computer://' and 'trash://' (it
-			# seems that nautilus has the same problems...)
+			# TODO: figure out how to handle drag-and-drop for 'computer://' and
+			# 'trash://' (it seems that nautilus has the same problems...)
 
 		# TODO: handle command_type == 'raw' by creating a new desktop file and link?
 		selection_data.set_uris([command])
@@ -3545,7 +3536,6 @@ class Cardapio(dbus.service.Object):
 		path_type, dummy = urllib2.splittype(path)
 
 		# if the file is executable, ask what to do
-		# TODO: make sure this is for NON-binary files
 		if os.path.isfile(path) and os.access(path, os.X_OK):
 
 			dummy, extension = os.path.splitext(path)
