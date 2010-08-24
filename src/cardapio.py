@@ -862,14 +862,48 @@ class Cardapio(dbus.service.Object):
 		Sets up the look and feel of the Cardapio applet button
 		"""
 
-		self.panel_button.set_label(self.settings['applet label'])
+		label_text = self.settings['applet label']
+		self.panel_button.set_label(label_text)
 		button_icon_pixbuf = self.get_icon_pixbuf(self.settings['applet icon'], self.get_best_icon_size_for_panel(), 'distributor-logo')
 		button_icon = gtk.image_new_from_pixbuf(button_icon_pixbuf)
 		self.panel_button.set_image(button_icon)
 
+		if label_text:
+			clean_imagemenuitem = gtk.ImageMenuItem()
+			default_spacing = clean_imagemenuitem.style_get_property('toggle-spacing')
+
+			gtk.rc_parse_string('''
+				style "cardapio-applet-style"
+				{
+					xthickness = 0
+					ythickness = 0
+					GtkWidget::focus-line-width = 0
+					GtkWidget::focus-padding    = 0
+					GtkImageMenuItem::toggle-spacing = %d
+				}
+				widget "*CardapioApplet" style:application "cardapio-applet-style"
+				''' % default_spacing)
+		else:
+			gtk.rc_parse_string('''
+				style "cardapio-applet-style-no-space"
+				{
+					xthickness = 0
+					ythickness = 0
+					GtkWidget::focus-line-width = 0
+					GtkWidget::focus-padding    = 0
+					GtkImageMenuItem::toggle-spacing = 0
+				}
+				widget "*CardapioApplet" style:application "cardapio-applet-style-no-space"
+				''')
+
+		# apparently this happens sometimes (maybe when the parent isn't realized yet?)
 		if self.panel_button.parent is None: return
 
-		self.panel_button.parent.connect('button-press-event', self.on_panel_button_pressed)
+		menubar = self.panel_button.parent 
+		menubar.remove(self.panel_button)
+		menubar.add(self.panel_button)
+
+		menubar.connect('button-press-event', self.on_panel_button_pressed)
 
 		if 'applet_press_handler' in dir(self):
 			self.panel_button.disconnect(self.applet_press_handler)
@@ -923,7 +957,7 @@ class Cardapio(dbus.service.Object):
 		if self.settings['open categories on hover']:
 			for category_button in category_buttons:
 
-				if 'has_hover_handler' in dir(category_button): # is there a better way to check this?
+				if 'has_hover_handler' in dir(category_button) and not category_button.has_hover_handler: # is there a better way to check this?
 					category_button.handler_unblock_by_func(self.on_sidebar_button_hovered)
 				else: 
 					category_button.connect('enter', self.on_sidebar_button_hovered)
@@ -931,8 +965,9 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			for category_button in category_buttons:
-				if 'has_hover_handler' in dir(category_button):
+				if 'has_hover_handler' in dir(category_button) and category_button.has_hover_handler:
 					category_button.handler_block_by_func(self.on_sidebar_button_hovered)
+					category_button.has_hover_handler = False
 
 
 	def build_ui(self):
@@ -4000,10 +4035,11 @@ def applet_factory(applet, iid):
 
 	button.set_tooltip_text(_('Access applications, folders, system settings, etc.'))
 	button.set_always_show_image(True)
+	button.set_name('CardapioApplet')
 
-	menu = gtk.MenuBar()
-	menu.set_name('CardapioAppletMenu')
-	menu.add(button)
+	menubar = gtk.MenuBar()
+	menubar.set_name('CardapioAppletMenu')
+	menubar.add(button)
 
 	gtk.rc_parse_string('''
 		style "cardapio-applet-menu-style"
@@ -4016,20 +4052,10 @@ def applet_factory(applet, iid):
 			GtkMenuBar::focus-padding = 0
 			#bg[NORMAL] = "#ff0000"
 		}
-
-		style "cardapio-applet-style"
-		{
-			xthickness = 0
-			ythickness = 0
-			GtkWidget::focus-line-width = 0
-			GtkWidget::focus-padding = 0
-		}
-
-		widget "*CardapioAppletMenu" style:highest "cardapio-applet-menu-style"
-		widget "*PanelApplet" style:highest "cardapio-applet-style"
+		widget "*CardapioAppletMenu" style:application "cardapio-applet-menu-style"
 		''')
 
-	applet.add(menu)
+	applet.add(menubar)
 
 	applet.connect('size-allocate', cardapio.on_panel_size_changed)
 	applet.connect('change-orient', cardapio.panel_change_orientation)
