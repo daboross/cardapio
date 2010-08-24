@@ -850,7 +850,7 @@ class Cardapio(dbus.service.Object):
 
 			icon_size_pixels = gtk.icon_size_lookup(icon_size)[0]
 
-			if abs(icon_size_pixels - panel_size) < 3:
+			if abs(icon_size_pixels - panel_size) <= 1:
 				return icon_size_pixels
 
 		# if no stock icon size if close enough, then use the panel size
@@ -4052,7 +4052,17 @@ def applet_factory(applet, iid):
 			GtkMenuBar::focus-padding = 0
 			#bg[NORMAL] = "#ff0000"
 		}
-		widget "*CardapioAppletMenu" style:application "cardapio-applet-menu-style"
+
+		style "cardapio-applet-style"
+		{
+			xthickness = 0
+			ythickness = 0
+			GtkWidget::focus-line-width = 0
+			GtkWidget::focus-padding = 0
+		}
+
+		widget "*CardapioAppletMenu" style:highest "cardapio-applet-menu-style"
+		widget "*PanelApplet" style:highest "cardapio-applet-style"
 		''')
 
 	applet.add(menubar)
@@ -4075,4 +4085,5 @@ __builtin__.dbus = dbus
 __builtin__.CardapioPluginInterface = CardapioPluginInterface
 __builtin__.logging = logging
 __builtin__.subprocess = subprocess
+
 
