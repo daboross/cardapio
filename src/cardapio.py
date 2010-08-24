@@ -873,24 +873,16 @@ class Cardapio(dbus.service.Object):
 			default_spacing = clean_imagemenuitem.style_get_property('toggle-spacing')
 
 			gtk.rc_parse_string('''
-				style "cardapio-applet-style"
+				style "cardapio-applet-style-with-space"
 				{
-					xthickness = 0
-					ythickness = 0
-					GtkWidget::focus-line-width = 0
-					GtkWidget::focus-padding    = 0
 					GtkImageMenuItem::toggle-spacing = %d
 				}
-				widget "*CardapioApplet" style:application "cardapio-applet-style"
+				widget "*CardapioApplet" style:application "cardapio-applet-style-with-space"
 				''' % default_spacing)
 		else:
 			gtk.rc_parse_string('''
 				style "cardapio-applet-style-no-space"
 				{
-					xthickness = 0
-					ythickness = 0
-					GtkWidget::focus-line-width = 0
-					GtkWidget::focus-padding    = 0
 					GtkImageMenuItem::toggle-spacing = 0
 				}
 				widget "*CardapioApplet" style:application "cardapio-applet-style-no-space"
