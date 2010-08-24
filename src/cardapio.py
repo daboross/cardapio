@@ -2919,7 +2919,6 @@ class Cardapio(dbus.service.Object):
 				self.add_uncategorized_slab()
 				self.add_session_slab()
 				self.add_system_slab()
-				#self.build_system_list() # TODO: use gnomecc.menu
 
 			elif basename == 'places':
 				self.add_places_slab()
@@ -3644,6 +3643,9 @@ class Cardapio(dbus.service.Object):
 				self.no_results_to_show = False
 			else:
 				sec.hide()
+
+		if not self.no_results_to_show:
+			self.hide_no_results_text()
 
 		if self.selected_section is not None:
 			widget = self.section_list[self.selected_section]['category']
