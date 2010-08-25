@@ -30,7 +30,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.13'
+	version            = '1.23'
 
 	plugin_api_version = 1.39
 
@@ -58,6 +58,15 @@ class CardapioPlugin(CardapioPluginInterface):
 			self.c.write_to_log(self, 'Could not import certain modules', is_error = True)
 			self.c.write_to_log(self, import_error, is_error = True)
 			return
+			
+		try:
+			
+			ubuntu_ver = subprocess.Popen(["lsb_release", "-r"], stdout=subprocess.PIPE).communicate()[0]
+			is_maverick = ubuntu_ver.find("10.10") != -1
+			
+		except Exception:
+			self.c.write_to_log(self, 'Could not detect Ubuntu version. Defaulting to 10.04', is_warning = True)
+			is_maverick = False
 
 		self.cache = apt.Cache() # this line is really slow! around 0.28s on my computer!
 		db_path = '/var/cache/software-center/xapian'
@@ -72,14 +81,25 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.apps_filter.set_not_installed_only(True)
 		self.apps_filter.set_only_packages_without_applications(True)
 
-		self.action = {
-			'name'         : _('Open Software Center'),
-			'tooltip'      : _('Search for more software in the Software Center'),
-			'icon name'    : 'system-search', # using this icon because otherwise it looks strange...
-			'type'         : 'raw',
-			'command'      : 'software-center',
-			'context menu' : None,
-			}
+		if is_maverick:
+			self.c.write_to_log(self, 'Detected Ubuntu 10.10')
+			self.action = {
+				'name'         : _('Open Software Center'),
+				'tooltip'      : _('Search for more software in the Software Center'),
+				'icon name'    : 'system-search', # using this icon because otherwise it looks strange...
+				'type'         : 'callback',
+				'command'      : self.open_softwarecenter_search,
+				'context menu' : None,
+				}
+		else:
+			self.action = {
+				'name'         : _('Open Software Center'),
+				'tooltip'      : _('Search for more software in the Software Center'),
+				'icon name'    : 'system-search', # using this icon because otherwise it looks strange...
+				'type'         : 'raw',
+				'command'      : 'software-center',
+				'context menu' : None,
+				}
 
 		self.context_menu_action_name = _('_Install %s')
 		self.context_menu_action_tooltip = _('Install this package without opening the Software Center')
@@ -166,5 +186,11 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		if event == gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
 			self.c.ask_for_reload_permission(self)
+			
+	def open_softwarecenter_search(self, text):
+		try:
+			subprocess.Popen(["software-center", "search:%s"  % text])
+		except Exception:
+			self.c.write_to_log(self, 'Unable to open Software Center', is_error = True)
 
 
