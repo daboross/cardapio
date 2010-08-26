@@ -224,7 +224,6 @@ class Cardapio(dbus.service.Object):
 		self.setup_base_ui() # must be the first ui-related method to be called
 		self.setup_plugins()
 		self.build_ui()
-		self.setup_ui_from_all_settings()
 
 		self.schedule_search_with_all_plugins('')
 
@@ -1022,6 +1021,7 @@ class Cardapio(dbus.service.Object):
 		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 
+		self.setup_ui_from_all_settings()
 		self.set_message_window_visible(False)
 
 
@@ -1030,6 +1030,8 @@ class Cardapio(dbus.service.Object):
 		Rebuild the UI after a timer (this is called when the menu data changes,
 		for example)
 		"""
+
+		logging.info('Rebuilding UI')
 
 		if self.rebuild_timer is not None:
 			glib.source_remove(self.rebuild_timer)
