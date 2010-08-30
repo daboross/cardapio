@@ -278,8 +278,7 @@
                       <object class="GtkScrolledWindow" id="ScrolledWindow">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
-                        <property name="hscrollbar_policy">automatic</property>
-                        <property name="vscrollbar_policy">automatic</property>
+                        <property name="hscrollbar_policy">never</property>
                         <property name="shadow_type">in</property>
                         <child>
                           <object class="GtkViewport" id="ScrolledViewport">
@@ -700,7 +699,7 @@
                             <child type="label">
                               <object class="GtkLabel" id="label4">
                                 <property name="visible">True</property>
-                                <property name="label" translatable="yes">&lt;b&gt;Main window:&lt;/b&gt;</property>
+                                <property name="label" translatable="yes">&lt;b&gt;Main window&lt;/b&gt;</property>
                                 <property name="use_markup">True</property>
                               </object>
                             </child>
@@ -801,7 +800,7 @@
                             <child type="label">
                               <object class="GtkLabel" id="label8">
                                 <property name="visible">True</property>
-                                <property name="label" translatable="yes">&lt;b&gt;Panel applet:&lt;/b&gt;</property>
+                                <property name="label" translatable="yes">&lt;b&gt;Panel applet&lt;/b&gt;</property>
                                 <property name="use_markup">True</property>
                               </object>
                             </child>
@@ -928,7 +927,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="hscrollbar_policy">never</property>
-                            <property name="vscrollbar_policy">automatic</property>
+                            <property name="vscrollbar_policy">never</property>
                             <child>
                               <object class="GtkViewport" id="viewport3">
                                 <property name="visible">True</property>
@@ -949,7 +948,7 @@
                           </object>
                           <packing>
                             <property name="resize">True</property>
-                            <property name="shrink">True</property>
+                            <property name="shrink">False</property>
                           </packing>
                         </child>
                       </object>
@@ -1015,7 +1014,8 @@
     <property name="program_name">Cardapio</property>
     <property name="version">0.9.143</property>
     <property name="copyright" translatable="yes">&#xA9; Thiago Teixeira 2010</property>
-    <property name="website">http://www.launchpad.net/cardapio</property>
+    <property name="website">http://launchpad.net/cardapio</property>
+    <property name="website_label" translatable="yes">Cardapio Website</property>
     <property name="license" translatable="yes">GNU General Public License v3
 http://www.gnu.org/licenses/gpl-3.0-standalone.html	</property>
     <property name="authors">Thiago Teixeira</property>
@@ -1142,7 +1142,7 @@ Rebuilding&#x2026;</property>
     <signal name="hide" handler="unblock_focus_out_event"/>
     <child>
       <object class="GtkImageMenuItem" id="PinMenuItem">
-        <property name="label" translatable="yes">_Pin this item</property>
+        <property name="label" translatable="yes">_Pin This Item</property>
         <property name="visible">True</property>
         <property name="tooltip_text" translatable="yes">Place this item into the "Pinned Items" list</property>
         <property name="use_underline">True</property>
@@ -1153,7 +1153,7 @@ Rebuilding&#x2026;</property>
     </child>
     <child>
       <object class="GtkImageMenuItem" id="UnpinMenuItem">
-        <property name="label" translatable="yes">_Unpin this item</property>
+        <property name="label" translatable="yes">_Unpin This Item</property>
         <property name="visible">True</property>
         <property name="tooltip_text" translatable="yes">Remove this item from the "Pinned Items" list</property>
         <property name="use_underline">True</property>
@@ -1164,7 +1164,7 @@ Rebuilding&#x2026;</property>
     </child>
     <child>
       <object class="GtkImageMenuItem" id="AddSidePaneMenuItem">
-        <property name="label" translatable="yes">_Add to side pane</property>
+        <property name="label" translatable="yes">_Add To Side Pane</property>
         <property name="visible">True</property>
         <property name="tooltip_text" translatable="yes">Place this item in the side pane</property>
         <property name="use_underline">True</property>
@@ -1175,7 +1175,7 @@ Rebuilding&#x2026;</property>
     </child>
     <child>
       <object class="GtkImageMenuItem" id="RemoveSidePaneMenuItem">
-        <property name="label" translatable="yes">_Remove from side pane</property>
+        <property name="label" translatable="yes">_Remove From Side Pane</property>
         <property name="visible">True</property>
         <property name="tooltip_text" translatable="yes">Remove this item from the side pane</property>
         <property name="use_underline">True</property>
@@ -1191,7 +1191,7 @@ Rebuilding&#x2026;</property>
     </child>
     <child>
       <object class="GtkImageMenuItem" id="OpenParentFolderMenuItem">
-        <property name="label" translatable="yes">Open parent _folder</property>
+        <property name="label" translatable="yes">Open Parent _Folder</property>
         <property name="visible">True</property>
         <property name="tooltip_text" translatable="yes">Open this item's parent folder in the file browser</property>
         <property name="use_underline">True</property>
@@ -1202,7 +1202,7 @@ Rebuilding&#x2026;</property>
     </child>
     <child>
       <object class="GtkImageMenuItem" id="OpenInBackground">
-        <property name="label" translatable="yes">_Launch in background</property>
+        <property name="label" translatable="yes">_Launch In Background</property>
         <property name="visible">True</property>
         <property name="tooltip_text" translatable="yes">Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-Click)</property>
         <property name="use_underline">True</property>

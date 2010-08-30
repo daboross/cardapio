@@ -322,7 +322,7 @@ class Cardapio(dbus.service.Object):
 		self.plugin_database['pinned'] = {
 				'name'              : _('Pinned items'),
 				'author'            : _('Cardapio Team'),
-				'description'       : _('Displays your favorite applications'),
+				'description'       : _('Displays your favorite items'),
 				'version'           : self.version,
 				'category name'     : None,
 				'category icon'     : 'emblem-favorite',
@@ -605,7 +605,7 @@ class Cardapio(dbus.service.Object):
 		self.read_config_option(s, 'remote search timeout'      , 5000                     ) # msec
 		self.read_config_option(s, 'autohide delay'             , 250                      ) # msec
 		self.read_config_option(s, 'keybinding'                 , '<Super>space'           ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
-		self.read_config_option(s, 'applet label'               , Cardapio.distro_name     ) # string
+		self.read_config_option(s, 'applet label'               , _('Menu')                ) # string
 		self.read_config_option(s, 'applet icon'                , 'start-here'             , override_empty_str = True) # string (either a path to the icon, or an icon name)
 		self.read_config_option(s, 'pinned items'               , []                       )
 		self.read_config_option(s, 'side pane items'            , default_side_pane_items  )
@@ -2872,7 +2872,7 @@ class Cardapio(dbus.service.Object):
 		Add the Pinned Items slab to the app pane
 		"""
 
-		section_slab, section_contents, dummy = self.add_slab(_('Pinned items'), 'emblem-favorite', tooltip = _('Your favorite applications'), hide = False)
+		section_slab, section_contents, dummy = self.add_slab(_('Pinned items'), 'emblem-favorite', tooltip = _('Your favorite items'), hide = False)
 		self.favorites_section_slab = section_slab
 		self.favorites_section_contents = section_contents
 
