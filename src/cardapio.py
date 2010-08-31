@@ -253,10 +253,16 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.save_config_file()
+		self.quit_now()
 
+
+	def quit_now(self):
+		"""
+		Quits without saving the current state (usually called if 
+		there's an error)
+		"""
 		logging.info('Exiting...')
 		gtk.main_quit()
-		sys.exit(0)
 
 
 	def setup_dbus(self):
@@ -520,7 +526,7 @@ class Cardapio(dbus.service.Object):
 
 		elif not os.path.isdir(self.config_folder_path):
 			logging.error('Error! Cannot create folder "%s" because a file with that name already exists!' % self.config_folder_path)
-			sys.exit(1)
+			self.quit_now()
 
 
 	def get_config_file(self, mode):
@@ -535,7 +541,7 @@ class Cardapio(dbus.service.Object):
 
 		elif not os.path.isfile(config_file_path):
 			logging.error('Error! Cannot create file "%s" because a folder with that name already exists!' % config_file_path)
-			sys.exit(1)
+			self.quit_now()
 
 		try:
 			config_file = open(config_file_path, mode)
