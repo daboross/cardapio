@@ -76,7 +76,7 @@ else:
 
 	# make sure Cardapio shows even if using Ubuntu's AppMenu
 	import os
-	os.environ.pop('UBUNTU_MENUPROXY')
+	os.environ['UBUNTU_MENUPROXY'] = ''
 
 	gnomeapplet.bonobo_factory('OAFIID:GNOME_Cardapio_Factory', 
 			gnomeapplet.Applet.__gtype__, 'Cardapio', '0', applet_factory)
