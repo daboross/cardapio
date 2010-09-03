@@ -854,6 +854,7 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_STRUCTURE_MASK</property>
+                                <property name="tooltip_text" translatable="yes">Drag to reorder plugins</property>
                                 <property name="model">PluginListstore</property>
                                 <property name="headers_visible">False</property>
                                 <property name="headers_clickable">False</property>
@@ -861,7 +862,6 @@
                                 <property name="rules_hint">True</property>
                                 <property name="search_column">4</property>
                                 <property name="show_expanders">False</property>
-                                <property name="tooltip_column">6</property>
                                 <signal name="motion_notify_event" handler="on_plugintreeview_hover"/>
                                 <signal name="cursor_changed" handler="update_plugin_description"/>
                                 <signal name="drag_end" handler="apply_plugins_from_option_window"/>
@@ -1012,7 +1012,7 @@
     <property name="type_hint">normal</property>
     <property name="has_separator">False</property>
     <property name="program_name">Cardapio</property>
-    <property name="version">0.9.143</property>
+    <property name="version">0.9.144</property>
     <property name="copyright" translatable="yes">&#xA9; Thiago Teixeira 2010</property>
     <property name="website">http://launchpad.net/cardapio</property>
     <property name="website_label" translatable="yes">Cardapio Website</property>
