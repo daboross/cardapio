@@ -908,14 +908,14 @@ class Cardapio(dbus.service.Object):
 			self.panel_button.disconnect(self.applet_leave_handler)
 
 		if self.settings['open on hover']:
-			self.applet_press_handler = self.panel_button.connect('button-press-event', self.hide)
+			self.applet_press_handler = self.panel_button.connect('button-press-event', return_true)
 			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', self.on_applet_cursor_enter)
 			self.applet_leave_handler = self.panel_button.connect('leave-notify-event', self.on_mainwindow_cursor_leave)
 
 		else:
 			self.applet_press_handler = self.panel_button.connect('button-press-event', self.on_panel_button_toggled)
-			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', lambda x, y: True)
-			self.applet_leave_handler = self.panel_button.connect('leave-notify-event', lambda x, y: True)
+			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', return_true)
+			self.applet_leave_handler = self.panel_button.connect('leave-notify-event', return_true)
 
 
 	def setup_ui_from_all_settings(self):
@@ -1442,7 +1442,10 @@ class Cardapio(dbus.service.Object):
 		Handler for when the cursor enters the panel applet.
 		"""
 
-		if not self.visible: self.show()
+		if self.visible: self.hide()
+		else: self.show()
+
+		return True
 
 
 	def on_mainwindow_cursor_leave(self, widget, event):
@@ -4026,6 +4029,8 @@ class CardapioPluginInterface:
 		"""
 		pass
 
+
+def return_true(*dummy): return True
 
 def applet_factory(applet, iid):
 
