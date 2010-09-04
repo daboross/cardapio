@@ -125,7 +125,7 @@ class Cardapio(dbus.service.Object):
 
 	distro_name = getoutput('lsb_release -is')
 
-	min_visibility_toggle_interval = 0.010 # seconds (this is a bit of a hack to fix some focus problems)
+	min_visibility_toggle_interval = 0.100 # seconds (this is a bit of a hack to fix some focus problems)
 
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
@@ -1442,8 +1442,7 @@ class Cardapio(dbus.service.Object):
 		Handler for when the cursor enters the panel applet.
 		"""
 
-		if self.visible: self.hide()
-		else: self.show()
+		self.show_hide()
 
 		return True
 
@@ -2385,6 +2384,8 @@ class Cardapio(dbus.service.Object):
 
 		if self.visible: self.hide()
 		else: self.show(show_near_mouse = show_near_mouse)
+
+		return True
 
 
 	def hide_if_mouse_away(self):
