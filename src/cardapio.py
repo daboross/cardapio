@@ -908,12 +908,12 @@ class Cardapio(dbus.service.Object):
 			self.panel_button.disconnect(self.applet_leave_handler)
 
 		if self.settings['open on hover']:
-			self.applet_press_handler = self.panel_button.connect('button-press-event', return_true)
+			self.applet_press_handler = self.panel_button.connect('button-press-event', self.on_panel_button_toggled, True)
 			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', self.on_applet_cursor_enter)
 			self.applet_leave_handler = self.panel_button.connect('leave-notify-event', self.on_mainwindow_cursor_leave)
 
 		else:
-			self.applet_press_handler = self.panel_button.connect('button-press-event', self.on_panel_button_toggled)
+			self.applet_press_handler = self.panel_button.connect('button-press-event', self.on_panel_button_toggled, False)
 			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', return_true)
 			self.applet_leave_handler = self.panel_button.connect('leave-notify-event', return_true)
 
@@ -1443,7 +1443,6 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.show_hide()
-
 		return True
 
 
@@ -2458,7 +2457,7 @@ class Cardapio(dbus.service.Object):
 				self.hide()
 
 
-	def on_panel_button_toggled(self, widget, event):
+	def on_panel_button_toggled(self, widget, event, ignore_main_button):
 		"""
 		Show/Hide cardapio when the panel applet is clicked
 		"""
@@ -2467,8 +2466,9 @@ class Cardapio(dbus.service.Object):
 
 			if event.button == 1:
 
-				if self.visible: self.hide()
-				else: self.show()
+				if not ignore_main_button:
+					if self.visible: self.hide()
+					else: self.show()
 
 				return True # required! or we get strange focus problems
 
@@ -4032,6 +4032,7 @@ class CardapioPluginInterface:
 
 
 def return_true(*dummy): return True
+def return_false(*dummy): return False
 
 def applet_factory(applet, iid):
 
