@@ -1,3 +1,17 @@
+cardapio (0.9.145-ubuntu1-maverick1) maverick; urgency=low
+
+   * More small bugfixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 4 Sep 2010 20:01:00 -0400
+
+
+cardapio (0.9.145-ubuntu1-lucid1) lucid; urgency=low
+
+   * More small bugfixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 4 Sep 2010 20:01:00 -0400
+
+
 cardapio (0.9.144-ubuntu1-maverick1) maverick; urgency=low
 
    * Bugfixes, bugfixes
