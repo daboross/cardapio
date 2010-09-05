@@ -1,0 +1,745 @@
+# Spanish translation for cardapio
+# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
+# This file is distributed under the same license as the cardapio package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cardapio\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2010-09-04 20:04-0400\n"
+"PO-Revision-Date: 2010-09-04 17:33+0000\n"
+"Last-Translator: Nicolas Ramirez <Unknown>\n"
+"Language-Team: Spanish <es@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2010-09-05 05:07+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+
+#: cardapio.py:307
+msgid "Application menu"
+msgstr "Menú de Aplicaciones"
+
+#: cardapio.py:308 cardapio.py:319 cardapio.py:330 plugins/google.py:7
+#: plugins/google_localized.py:7 plugins/tracker.py:5 plugins/tracker_fts.py:5
+#: plugins/zg_recent_documents.py:16
+msgid "Cardapio Team"
+msgstr "Equipo de Cardapio"
+
+#: cardapio.py:309
+msgid "Displays installed applications"
+msgstr "Mostrar aplicaciones instaladas"
+
+#: cardapio.py:318
+msgid "Places menu"
+msgstr "Menú de Lugares"
+
+#: cardapio.py:320
+msgid "Displays a list of folders"
+msgstr "Mostrar una lista de carpetas"
+
+#: cardapio.py:329 cardapio.py:2885
+msgid "Pinned items"
+msgstr "Elementos Anclados"
+
+#: cardapio.py:331
+msgid "Displays your favorite items"
+msgstr "Mostrar sus elementos favoritos"
+
+#: cardapio.py:582
+msgid "Ubuntu Software Center"
+msgstr "Centro de Software de Ubuntu"
+
+#: cardapio.py:584
+msgid ""
+"Lets you choose from thousands of free applications available for Ubuntu"
+msgstr ""
+"Le permite elegir entre miles de aplicaciones libres disponibles para Ubuntu"
+
+#: cardapio.py:591
+msgid "Help and Support"
+msgstr "Ayuda y soporte"
+
+#: cardapio.py:593
+#, python-format
+msgid "Get help with %(distro_name)s"
+msgstr "Conseguir ayuda con %(distro_name)s"
+
+#: cardapio.py:614
+msgid "Menu"
+msgstr "Menú"
+
+#: cardapio.py:798
+msgid "_Properties"
+msgstr "_Propiedades..."
+
+#: cardapio.py:799
+msgid "_Edit Menus"
+msgstr "_Editar menús"
+
+#: cardapio.py:800 cardapio.ui.h:33
+msgid "_About Cardapio"
+msgstr "_Acerca de Cardapio"
+
+#: cardapio.py:801
+msgid "_About Gnome"
+msgstr "_Acerca de Gnome"
+
+#: cardapio.py:802
+#, python-format
+msgid "_About %(distro_name)s"
+msgstr "_Acerca de %(distro_name)s"
+
+#: cardapio.py:976
+msgid "No results to show"
+msgstr "No existen resultados para mostrar"
+
+#: cardapio.py:977
+#, python-format
+msgid "No results to show in \"%(category_name)s\""
+msgstr "No existen resultados para mostrar en \"%(category_name)s\""
+
+#: cardapio.py:978
+msgid "Searching..."
+msgstr "Buscando..."
+
+#: cardapio.py:979
+msgid "Search timed out"
+msgstr "Tiempo de búsqueda agotado"
+
+#: cardapio.py:998 cardapio.py:1005
+msgid "All"
+msgstr "Todos"
+
+#: cardapio.py:998 cardapio.py:1005
+msgid "Show all categories"
+msgstr "Mostrar todas las categorías"
+
+#: cardapio.py:1066
+#, python-format
+msgid "Do you want to run \"%(file_name)s\" or display its contents?"
+msgstr "Quiere ejecutar \"%(file_name)s\" o mostrar su contenido?"
+
+#: cardapio.py:1067
+#, python-format
+msgid "\"%(file_name)s\" is an executable text file."
+msgstr "\"%(file_name)s\" es un archivo de texto ejecutable."
+
+#: cardapio.py:1213
+#, python-format
+msgid ""
+"<b>Plugin:</b> %(name)s %(version)s\n"
+"<b>Author:</b> %(author)s\n"
+"<b>Description:</b> %(description)s"
+msgstr ""
+"<b>Plugin:</b> %(name)s %(version)s\n"
+"<b>Author:</b> %(author)s\n"
+"<b>Description:</b> %(description)s"
+
+#: cardapio.py:1214
+msgid "This is a community-supported plugin"
+msgstr "Este es un complemento soportado por la comunidad"
+
+#: cardapio.py:1694
+msgid "Filesystem Root"
+msgstr "Directorio raíz del Sistema de Archivos"
+
+#: cardapio.py:2581 cardapio.py:2905
+msgid "Uncategorized"
+msgstr "Sin categorizar"
+
+#: cardapio.py:2581
+msgid "Other configuration tools"
+msgstr "Otras herramientas de configuración"
+
+#: cardapio.py:2600
+msgid "Home"
+msgstr "Carpeta Personal"
+
+#: cardapio.py:2600
+msgid "Open your personal folder"
+msgstr "Abrir su carpeta personal"
+
+#: cardapio.py:2601
+msgid "Computer"
+msgstr "Equipo"
+
+#: cardapio.py:2601
+msgid ""
+"Browse all local and remote disks and folders accessible from this computer"
+msgstr ""
+"Examinar todos los discos remotos, locales y carpetas accesibles desde este "
+"equipo."
+
+#: cardapio.py:2619
+msgid "Desktop"
+msgstr "Escritorio"
+
+#: cardapio.py:2642
+msgid "Trash"
+msgstr "Papelera"
+
+#: cardapio.py:2642
+msgid "Open the trash"
+msgstr "Abrir la papelera"
+
+#: cardapio.py:2769
+msgid "Lock Screen"
+msgstr "Bloquear la pantalla"
+
+#: cardapio.py:2770
+msgid "Protect your computer from unauthorized use"
+msgstr "Protejer su equipo del uso no autorizado"
+
+#: cardapio.py:2776
+msgid "Log Out..."
+msgstr "Cerrar sesión..."
+
+#: cardapio.py:2777
+msgid "Log out of this session to log in as a different user"
+msgstr "Salir de esta sesión para entrar como usuario diferente"
+
+#: cardapio.py:2783
+msgid "Shut Down..."
+msgstr "Apagar..."
+
+#: cardapio.py:2784
+msgid "Shut down the system"
+msgstr "Apagar el Equipo"
+
+#: cardapio.py:2864
+msgid "Places"
+msgstr "Lugares"
+
+#: cardapio.py:2864
+msgid "Access documents and folders"
+msgstr "Acceder a Documentos y Carpetas"
+
+#: cardapio.py:2874
+msgid "Folder Contents"
+msgstr "Contenidos de la Carpeta"
+
+#: cardapio.py:2874
+msgid "Look inside folders"
+msgstr "Ver dentro de las carpetas"
+
+#: cardapio.py:2885
+msgid "Your favorite items"
+msgstr "Sus elementos favoritos"
+
+#: cardapio.py:2895
+msgid "Side Pane"
+msgstr "Panel Lateral"
+
+#: cardapio.py:2895
+msgid "Items pinned to the side pane"
+msgstr "Elementos anclados al panel lateral"
+
+#: cardapio.py:2905
+msgid "Items that are not under any menu category"
+msgstr "Elementos sin categorizar"
+
+#: cardapio.py:2915
+msgid "Session"
+msgstr "Sesión"
+
+#: cardapio.py:2925
+msgid "System"
+msgstr "Sistema"
+
+#: cardapio.py:4043
+msgid "Access applications, folders, system settings, etc."
+msgstr "Acceder a Aplicaciones, Carpetas, Ajustes del Sistema, etc."
+
+#: cardapio.ui.h:1
+msgid "&#xA9; Thiago Teixeira 2010"
+msgstr "&#xA9; Thiago Teixeira 2010"
+
+#: cardapio.ui.h:2
+msgid "<b>Main window</b>"
+msgstr "<b>Ventana principal</b>"
+
+#: cardapio.ui.h:3
+msgid "<b>Panel applet</b>"
+msgstr "<b>Complemento</b>"
+
+#: cardapio.ui.h:4
+msgid ""
+"<big>Data has recently changed.</big>\n"
+"Rebuilding&#x2026;"
+msgstr ""
+"<big>La base de datos ha cambiado recientemente.</big>\n"
+"Reconstruyendo...&#x2026;"
+
+#: cardapio.ui.h:6
+msgid "Applet icon:"
+msgstr "Icono del Complemento"
+
+#: cardapio.ui.h:7
+msgid "Applet label:"
+msgstr "Nombre del Complemento"
+
+#: cardapio.ui.h:8
+msgid "Cardapio Properties"
+msgstr "Propiedades de Cardapio"
+
+#: cardapio.ui.h:9
+msgid "Cardapio Website"
+msgstr "Sitio Web de Cardapio"
+
+#: cardapio.ui.h:10
+msgid "Change your system's appearance and behavior"
+msgstr "Cambia la apariencia y comportamiento de tu sistema"
+
+#: cardapio.ui.h:11
+msgid "Drag to reorder plugins"
+msgstr ""
+
+#: cardapio.ui.h:12
+msgid "Edit Menus"
+msgstr "Editar Menús"
+
+#: cardapio.ui.h:13
+msgid ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+msgstr ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+
+#: cardapio.ui.h:15
+msgid "General"
+msgstr "General"
+
+#: cardapio.ui.h:16
+msgid "Keep search results when Cardapio is hidden"
+msgstr "Mantener los resultados de búsqueda cuando Cardapio esté oculto"
+
+#: cardapio.ui.h:17
+msgid ""
+"Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-"
+"Click)"
+msgstr ""
+"Lanzar este elemento, pero no ocultar Cardapio (como Click-Central o Ctrl-"
+"Clic)"
+
+#: cardapio.ui.h:18
+msgid "Open Parent _Folder"
+msgstr "Abrir directorio superior"
+
+#: cardapio.ui.h:19
+msgid "Open categories when cursor hovers them"
+msgstr "Abrir categorías cuando el cursor pase por encima"
+
+#: cardapio.ui.h:20
+msgid "Open menu when cursor hovers the applet"
+msgstr "Abrir el menú cuando el cursor se encuentre sobre el complemento"
+
+#: cardapio.ui.h:21
+msgid "Open this item's parent folder in the file browser"
+msgstr "Abrir la carpeta contenedora de este elemento en el navegador"
+
+#: cardapio.ui.h:22
+msgid "Place this item in the side pane"
+msgstr "Colocar este elemento en el panel lateral"
+
+#: cardapio.ui.h:23
+msgid "Place this item into the \"Pinned Items\" list"
+msgstr "Colacar este elemento en la lista de anclados"
+
+#: cardapio.ui.h:24
+msgid "Plugins"
+msgstr "Complementos"
+
+#: cardapio.ui.h:25
+msgid "Remove this item from the \"Pinned Items\" list"
+msgstr "Eliminar este elemento de la lista de anclados"
+
+#: cardapio.ui.h:26
+msgid "Remove this item from the side pane"
+msgstr "Eliminar este elemento del panel lateral"
+
+#: cardapio.ui.h:27
+msgid "Run in _Terminal"
+msgstr "Ejecutar en  _terminal"
+
+#: cardapio.ui.h:28
+msgid "Search"
+msgstr "Buscar..."
+
+#: cardapio.ui.h:29
+msgid "See https://translations.launchpad.net/cardapio"
+msgstr "Vea https://translations.launchpad.net/cardapio"
+
+#: cardapio.ui.h:30
+msgid "Shortcut key:"
+msgstr "Tecla de acceso rápido:"
+
+#: cardapio.ui.h:31
+msgid "Show session buttons in bottom pane"
+msgstr "Mostrar botones de Sesión en el panel"
+
+#: cardapio.ui.h:32
+msgid "View"
+msgstr "Ver..."
+
+#: cardapio.ui.h:34
+msgid "_Add To Side Pane"
+msgstr "_Añadir al Panel Lateral"
+
+#: cardapio.ui.h:35
+msgid "_Control Center"
+msgstr "_Centro de Control"
+
+#: cardapio.ui.h:36
+msgid "_Display"
+msgstr "_Pantalla"
+
+#: cardapio.ui.h:37
+msgid "_Launch In Background"
+msgstr "Lanzar en segundo plano"
+
+#: cardapio.ui.h:38
+msgid "_Pin This Item"
+msgstr "_Anclar este elemento"
+
+#: cardapio.ui.h:39
+msgid "_Remove From Side Pane"
+msgstr "_Eliminar del Panel Lateral"
+
+#: cardapio.ui.h:40
+msgid "_Run"
+msgstr "_Ejecutar"
+
+#: cardapio.ui.h:41
+msgid "_Unpin This Item"
+msgstr "_Desanclar este elemento"
+
+#: cardapio.ui.h:42
+msgid "translators: just enter any text here"
+msgstr "translators: just enter any text here"
+
+#: plugins/amazon.py:38
+msgid "Amazon"
+msgstr "Amazon"
+
+#: plugins/amazon.py:39
+msgid "Search for results in Amazon"
+msgstr "Buscar en Amazon"
+
+#: plugins/amazon.py:51
+msgid "Amazon Results"
+msgstr "Resultados en Amazon"
+
+#: plugins/amazon.py:52
+msgid "Results found in Amazon"
+msgstr "Resultados encontrados en Amazon"
+
+#: plugins/amazon.py:247 plugins/bing.py:122 plugins/ebay.py:214
+#: plugins/ebay.py:230 plugins/google.py:51 plugins/google_localized.py:55
+#: plugins/tracker.py:42 plugins/tracker_fts.py:41 plugins/yahoo.py:141
+#: plugins/you_tube.py:131 plugins/zg_recent_documents.py:76
+msgid "Show additional results"
+msgstr "Mostrar resultados adicionales"
+
+#: plugins/amazon.py:248 plugins/bing.py:123 plugins/ebay.py:215
+#: plugins/ebay.py:231 plugins/google.py:52 plugins/google_localized.py:56
+#: plugins/yahoo.py:142 plugins/you_tube.py:132
+msgid "Show additional search results in your web browser"
+msgstr "Mostrar resultados adicionales en el Navegador Web"
+
+#: plugins/bing.py:18
+msgid "Bing"
+msgstr "Bing"
+
+#: plugins/bing.py:19
+msgid "Perform a search using Microsoft's Bing"
+msgstr "Realizar una búsqueda usando Microsoft' s Bing"
+
+#: plugins/bing.py:31
+msgid "Bing Results"
+msgstr "Resultados Bing"
+
+#: plugins/bing.py:32
+msgid "Results found using Bing"
+msgstr "Resultados encontrados usando Bing"
+
+#: plugins/ebay.py:31
+msgid "eBay"
+msgstr "eBay"
+
+#: plugins/ebay.py:32
+msgid "Search for items on eBay"
+msgstr "Buscar en eBay"
+
+#: plugins/ebay.py:44
+msgid "eBay Results"
+msgstr "Resultados en eBay"
+
+#: plugins/ebay.py:45
+msgid "Items found on eBay"
+msgstr "Resultados encontrados en eBay"
+
+#: plugins/google.py:8
+msgid "Google"
+msgstr "Google"
+
+#: plugins/google.py:9
+msgid "Perform quick Google searches in <b>all</b> languages"
+msgstr "Realizar búsquedas rápidas en Google en <b>todos</b> los idiomas"
+
+#: plugins/google.py:21
+msgid "Web Results"
+msgstr "Resultados Web"
+
+#: plugins/google.py:23
+msgid "Results found with Google"
+msgstr "Resultados encontrados con Google"
+
+#: plugins/google_localized.py:8
+msgid "Google localized results"
+msgstr "Resultados localizados de Google"
+
+#: plugins/google_localized.py:9
+msgid ""
+"Perform quick Google searches <b>limited to</b> the system's default language"
+msgstr ""
+"Realizar búsquedas rápidas de Google <b>limitadas a</b> el idioma "
+"predeterminado del sistema"
+
+#: plugins/google_localized.py:21
+msgid "Localized Web Results"
+msgstr "Resultados Web localizados"
+
+#: plugins/google_localized.py:23
+msgid "Results found with Google in you system language"
+msgstr "Resultados encontrados con Google en el idioma de tu sistema"
+
+#: plugins/pidgin.py:22
+msgid "Pidgin"
+msgstr "Pidgin"
+
+#: plugins/pidgin.py:23
+msgid "Search for online Pidgin buddies"
+msgstr "Buscar contactos de Pidgin en línea"
+
+#: plugins/pidgin.py:35
+msgid "Pidgin Buddies"
+msgstr "Contactos de Pidgin"
+
+#: plugins/pidgin.py:36
+msgid "Your online Pidgin buddies"
+msgstr "Sus contactos de Pidgin en línea"
+
+#: plugins/pidgin.py:115
+msgid "Talk to this buddy"
+msgstr "Hablar a este contacto"
+
+#: plugins/software_center.py:28
+msgid "Software Center"
+msgstr "Centro de Software"
+
+#: plugins/software_center.py:29
+msgid "Search for new applications in the Software Center"
+msgstr "Buscar aplicaciones nuevas en el Centro de Software"
+
+#: plugins/software_center.py:39
+msgid "Available Software"
+msgstr "Aplicaciones disponibles"
+
+#: plugins/software_center.py:41
+msgid "Software available to install on your system"
+msgstr "Aplicaciones disponibles para instalar en tu sistema"
+
+#: plugins/software_center.py:87 plugins/software_center.py:96
+msgid "Open Software Center"
+msgstr "Centro de Software Abierto"
+
+#: plugins/software_center.py:88 plugins/software_center.py:97
+msgid "Search for more software in the Software Center"
+msgstr "Buscar más aplicaciones en el Centro de Software"
+
+#: plugins/software_center.py:104
+#, python-format
+msgid "_Install %s"
+msgstr "_Instalar %s"
+
+#: plugins/software_center.py:105
+msgid "Install this package without opening the Software Center"
+msgstr "Instalar este paquete sin abrir el Centro de Software"
+
+#: plugins/software_center.py:107
+#, python-format
+msgid "Show %s in the Software Center"
+msgstr "Muestra %s en el Centro de Software"
+
+#: plugins/software_center.py:108
+msgid "Description:"
+msgstr "Descripción:"
+
+#: plugins/tomboy.py:20
+msgid "Tomboy"
+msgstr "Tomboy"
+
+#: plugins/tomboy.py:21
+msgid "Search for Tomboy notes"
+msgstr "Buscar notas de Tomboy"
+
+#: plugins/tomboy.py:33
+msgid "Tomboy Results"
+msgstr "Resultados en Tomboy"
+
+#: plugins/tomboy.py:34
+msgid "Your Tomboy notes"
+msgstr "Sus notas de Tomboy"
+
+#: plugins/tomboy.py:106
+msgid "Create this note"
+msgstr "Crear esta nota"
+
+#: plugins/tomboy.py:107
+msgid "Create a new note with this title in Tomboy"
+msgstr "Crear una nueva nota con éste título en Tomboy"
+
+#: plugins/tomboy.py:116
+msgid "Show additional notes"
+msgstr "Mostrar notas adicionales"
+
+#: plugins/tomboy.py:117
+msgid "Show additional notes in Tomboy"
+msgstr "Mostrar notas adicionales en Tomboy"
+
+#: plugins/tomboy.py:196
+msgid "Open this note"
+msgstr "Abrir esta nota"
+
+#: plugins/tracker.py:6
+msgid "File search"
+msgstr "Búsqueda de archivos"
+
+#: plugins/tracker.py:7
+msgid "Search local files and folders indexed with Tracker"
+msgstr "Buscar archivos y carpetas locales indexadas con rastreador"
+
+#: plugins/tracker.py:19
+msgid "Local Results"
+msgstr "Resultados locales"
+
+#: plugins/tracker.py:21
+msgid "Results found in your computer"
+msgstr "Resultados encontrados en tu computadora"
+
+#: plugins/tracker.py:43 plugins/tracker_fts.py:42
+msgid "Show additional search results in the Tracker search tool"
+msgstr "Mostrar resultados adicionales en la herramienta de rastreo"
+
+#: plugins/tracker_fts.py:6
+msgid "Full-text file search"
+msgstr "Búsqueda de archivos con texto completo"
+
+#: plugins/tracker_fts.py:7
+msgid "Search <b>inside</b> local files and folders indexed with Tracker"
+msgstr ""
+"Buscar <b>inside</b> archivos y carpetas locales indexadas con rastreador"
+
+#: plugins/tracker_fts.py:19
+msgid "Results within files"
+msgstr "Resultados dentro de archivos"
+
+#: plugins/tracker_fts.py:21
+msgid "Results found inside the files in your computer"
+msgstr "Resultados encontrados a partir de los archivos en tu computadora"
+
+#: plugins/virtualbox.py:14
+msgid "VirtualBox"
+msgstr "VirtualBox"
+
+#: plugins/virtualbox.py:15
+msgid "Search for and start VirtualBox virtual machines from the menu"
+msgstr "Buscar e iniciar máquinas virtuales VirtualBox desde el menú"
+
+#: plugins/virtualbox.py:28
+msgid "Virtual Machines"
+msgstr "Máquinas virtuales"
+
+#: plugins/virtualbox.py:30
+msgid "Your VirtualBox virtual machines"
+msgstr "Tus máquinas virtuales en VirtualBox"
+
+#: plugins/virtualbox.py:98
+#, python-format
+msgid ""
+"Start virtual machine %(name)s\n"
+"OS Type: %(os)s"
+msgstr ""
+"Iniciar maquina virtual %(name)s\n"
+"Tipo de Sistema Operativo: %(os)s"
+
+#: plugins/wikipedia.py:25
+msgid "Wikipedia"
+msgstr "Wikipedia"
+
+#: plugins/wikipedia.py:26
+msgid "Search for results in Wikipedia"
+msgstr "Buscar resultados en wikipedia"
+
+#: plugins/wikipedia.py:38
+msgid "Wikipedia Results"
+msgstr "Resultados Wikipedia"
+
+#: plugins/wikipedia.py:39
+msgid "Results found in Wikipedia"
+msgstr "Resultados encontrados en Wikipedia"
+
+#: plugins/yahoo.py:27
+msgid "Yahoo"
+msgstr "Yahoo"
+
+#: plugins/yahoo.py:28
+msgid "Perform a search using Yahoo"
+msgstr "Realizar una búsqueda usando Yahoo"
+
+#: plugins/yahoo.py:40
+msgid "Yahoo Results"
+msgstr "Resultados Yahoo"
+
+#: plugins/yahoo.py:41
+msgid "Results found using Yahoo"
+msgstr "Resultados encontrados usando Yahoo"
+
+#: plugins/you_tube.py:18
+msgid "YouTube"
+msgstr "YouTube"
+
+#: plugins/you_tube.py:19
+msgid "Search for results in YouTube"
+msgstr "Resultados encontrados usando YouTube"
+
+#: plugins/you_tube.py:31
+msgid "YouTube Results"
+msgstr "Resultados YouTube"
+
+#: plugins/you_tube.py:32
+msgid "Results found in YouTube"
+msgstr "Resultados encontrados en YouTube"
+
+#: plugins/zg_recent_documents.py:17
+msgid "Recent documents"
+msgstr "Documentos recientes"
+
+#: plugins/zg_recent_documents.py:18
+msgid "Search for your most recently used files"
+msgstr "Buscar los archivos mas recientemente utilizados"
+
+#: plugins/zg_recent_documents.py:30
+msgid "Recent Documents"
+msgstr "Documentos recientes"
+
+#: plugins/zg_recent_documents.py:32
+msgid "Files that you have used recently"
+msgstr "Archivos que has usado recientemente"
+
+#: plugins/zg_recent_documents.py:77
+msgid "Show additional search results in Sezen"
+msgstr "Muestra resultados de búsqueda adicionales en Sezen"

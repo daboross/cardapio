@@ -1,0 +1,739 @@
+# Croatian translation for cardapio
+# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
+# This file is distributed under the same license as the cardapio package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cardapio\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2010-09-04 20:04-0400\n"
+"PO-Revision-Date: 2010-07-05 00:16+0000\n"
+"Last-Translator: Marko Martinović <Fusion.Reactor1@gmail.com>\n"
+"Language-Team: Croatian <hr@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2010-09-05 05:07+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+
+#: cardapio.py:307
+msgid "Application menu"
+msgstr "Izbornik programa"
+
+#: cardapio.py:308 cardapio.py:319 cardapio.py:330 plugins/google.py:7
+#: plugins/google_localized.py:7 plugins/tracker.py:5 plugins/tracker_fts.py:5
+#: plugins/zg_recent_documents.py:16
+msgid "Cardapio Team"
+msgstr ""
+
+#: cardapio.py:309
+msgid "Displays installed applications"
+msgstr ""
+
+#: cardapio.py:318
+msgid "Places menu"
+msgstr "Izbornik lokacija"
+
+#: cardapio.py:320
+msgid "Displays a list of folders"
+msgstr ""
+
+#: cardapio.py:329 cardapio.py:2885
+msgid "Pinned items"
+msgstr "Izdvojene stvari"
+
+#: cardapio.py:331
+msgid "Displays your favorite items"
+msgstr ""
+
+#: cardapio.py:582
+msgid "Ubuntu Software Center"
+msgstr "Ubuntu Centar softvera"
+
+#: cardapio.py:584
+msgid ""
+"Lets you choose from thousands of free applications available for Ubuntu"
+msgstr ""
+"Dopušta vam odabir među tisućama slobodnih aplikacija dostupnih za Ubuntu"
+
+#: cardapio.py:591
+msgid "Help and Support"
+msgstr "Pomoć i podrška"
+
+#: cardapio.py:593
+#, python-format
+msgid "Get help with %(distro_name)s"
+msgstr "Potraži pomoć u vezi %(distro_name)s"
+
+#: cardapio.py:614
+msgid "Menu"
+msgstr ""
+
+#: cardapio.py:798
+msgid "_Properties"
+msgstr "_Postavke"
+
+#: cardapio.py:799
+msgid "_Edit Menus"
+msgstr "_Uređivanje izbornika"
+
+#: cardapio.py:800 cardapio.ui.h:33
+msgid "_About Cardapio"
+msgstr "O programu Cardapio"
+
+#: cardapio.py:801
+msgid "_About Gnome"
+msgstr "O Gnome radnoj okolini"
+
+#: cardapio.py:802
+#, python-format
+msgid "_About %(distro_name)s"
+msgstr "_O distribuciji %(distro_name)s"
+
+#: cardapio.py:976
+msgid "No results to show"
+msgstr "Nema rezultata"
+
+#: cardapio.py:977
+#, python-format
+msgid "No results to show in \"%(category_name)s\""
+msgstr "Nema razultata u kategoriji \"%(category_name)s\""
+
+#: cardapio.py:978
+msgid "Searching..."
+msgstr ""
+
+#: cardapio.py:979
+msgid "Search timed out"
+msgstr ""
+
+#: cardapio.py:998 cardapio.py:1005
+msgid "All"
+msgstr "Sve"
+
+#: cardapio.py:998 cardapio.py:1005
+msgid "Show all categories"
+msgstr "Prikaži sve kategorije"
+
+#: cardapio.py:1066
+#, python-format
+msgid "Do you want to run \"%(file_name)s\" or display its contents?"
+msgstr ""
+"Želite li pokrenuti datoteku \"%(file_name)s\" ili prikazati njen sadržaj?"
+
+#: cardapio.py:1067
+#, python-format
+msgid "\"%(file_name)s\" is an executable text file."
+msgstr "\"%(file_name)s\" je tekstualna datoteka koju je moguće pokrenuti."
+
+#: cardapio.py:1213
+#, python-format
+msgid ""
+"<b>Plugin:</b> %(name)s %(version)s\n"
+"<b>Author:</b> %(author)s\n"
+"<b>Description:</b> %(description)s"
+msgstr ""
+
+#: cardapio.py:1214
+msgid "This is a community-supported plugin"
+msgstr "Ovaj dodatak podupire zajednica korisnika"
+
+#: cardapio.py:1694
+msgid "Filesystem Root"
+msgstr ""
+
+#: cardapio.py:2581 cardapio.py:2905
+msgid "Uncategorized"
+msgstr "Nekategorizirano"
+
+#: cardapio.py:2581
+msgid "Other configuration tools"
+msgstr ""
+
+#: cardapio.py:2600
+msgid "Home"
+msgstr "Osobna mapa"
+
+#: cardapio.py:2600
+msgid "Open your personal folder"
+msgstr "Otvorite svoju osobnu mapu"
+
+#: cardapio.py:2601
+msgid "Computer"
+msgstr "Računalo"
+
+#: cardapio.py:2601
+msgid ""
+"Browse all local and remote disks and folders accessible from this computer"
+msgstr ""
+"Pregledaj sve lokalne i udaljene diskove i mape dostupne s ovog računala."
+
+#: cardapio.py:2619
+msgid "Desktop"
+msgstr "Radna površina"
+
+#: cardapio.py:2642
+msgid "Trash"
+msgstr "Smeće"
+
+#: cardapio.py:2642
+msgid "Open the trash"
+msgstr "Otvori smeće"
+
+#: cardapio.py:2769
+msgid "Lock Screen"
+msgstr "Zaključaj zaslon"
+
+#: cardapio.py:2770
+msgid "Protect your computer from unauthorized use"
+msgstr "Zaštitite vaše računalo od neovlaštene uporabe"
+
+#: cardapio.py:2776
+msgid "Log Out..."
+msgstr "Odjava..."
+
+#: cardapio.py:2777
+msgid "Log out of this session to log in as a different user"
+msgstr ""
+"Odjavite se iz ove sesije kako biste se mogli prijaviti kao drugi korisnik"
+
+#: cardapio.py:2783
+msgid "Shut Down..."
+msgstr "Isključivanje..."
+
+#: cardapio.py:2784
+msgid "Shut down the system"
+msgstr "Ugasite Vaše računalo"
+
+#: cardapio.py:2864
+msgid "Places"
+msgstr "Lokacije"
+
+#: cardapio.py:2864
+msgid "Access documents and folders"
+msgstr "Pristupite dokumentima i mapama"
+
+#: cardapio.py:2874
+msgid "Folder Contents"
+msgstr ""
+
+#: cardapio.py:2874
+msgid "Look inside folders"
+msgstr ""
+
+#: cardapio.py:2885
+msgid "Your favorite items"
+msgstr ""
+
+#: cardapio.py:2895
+msgid "Side Pane"
+msgstr "Bočna traka"
+
+#: cardapio.py:2895
+msgid "Items pinned to the side pane"
+msgstr "Stvari izdvojene na bočnu ploču"
+
+#: cardapio.py:2905
+msgid "Items that are not under any menu category"
+msgstr "Stvari koje nisu u niti jednoj kategoriji"
+
+#: cardapio.py:2915
+msgid "Session"
+msgstr "Sesija"
+
+#: cardapio.py:2925
+msgid "System"
+msgstr "Sustav"
+
+#: cardapio.py:4043
+msgid "Access applications, folders, system settings, etc."
+msgstr "Pristup programima, mapama i postavkama sustava"
+
+#: cardapio.ui.h:1
+msgid "&#xA9; Thiago Teixeira 2010"
+msgstr "&#xA9; Thiago Teixeira 2010"
+
+#: cardapio.ui.h:2
+msgid "<b>Main window</b>"
+msgstr ""
+
+#: cardapio.ui.h:3
+msgid "<b>Panel applet</b>"
+msgstr ""
+
+#: cardapio.ui.h:4
+msgid ""
+"<big>Data has recently changed.</big>\n"
+"Rebuilding&#x2026;"
+msgstr ""
+"<big>Podaci su nedavno izmijenjeni.</big>\n"
+"Ažuriram&#x2026;"
+
+#: cardapio.ui.h:6
+msgid "Applet icon:"
+msgstr "Ikona programa:"
+
+#: cardapio.ui.h:7
+msgid "Applet label:"
+msgstr "Naziv programa:"
+
+#: cardapio.ui.h:8
+msgid "Cardapio Properties"
+msgstr "Postavke programa Cardapio"
+
+#: cardapio.ui.h:9
+msgid "Cardapio Website"
+msgstr ""
+
+#: cardapio.ui.h:10
+msgid "Change your system's appearance and behavior"
+msgstr ""
+
+#: cardapio.ui.h:11
+msgid "Drag to reorder plugins"
+msgstr ""
+
+#: cardapio.ui.h:12
+msgid "Edit Menus"
+msgstr "Uredite izbornike"
+
+#: cardapio.ui.h:13
+msgid ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+msgstr ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+
+#: cardapio.ui.h:15
+msgid "General"
+msgstr "Općenito"
+
+#: cardapio.ui.h:16
+msgid "Keep search results when Cardapio is hidden"
+msgstr "Zadržavanje rezultata pretrage kada je Cardapio skriven"
+
+#: cardapio.ui.h:17
+msgid ""
+"Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-"
+"Click)"
+msgstr ""
+"Pokreni ovu stvar bez sakrivanja programa Cardapio (isto kao srednji klik "
+"mišem ili CTRL-klik)"
+
+#: cardapio.ui.h:18
+msgid "Open Parent _Folder"
+msgstr ""
+
+#: cardapio.ui.h:19
+msgid "Open categories when cursor hovers them"
+msgstr ""
+
+#: cardapio.ui.h:20
+msgid "Open menu when cursor hovers the applet"
+msgstr "Otvaranje izbornika kada je pokazivač iznad Cardapio gumba"
+
+#: cardapio.ui.h:21
+msgid "Open this item's parent folder in the file browser"
+msgstr "Otvori nadređenu mapu ove stvari u pregledniku datoteka"
+
+#: cardapio.ui.h:22
+msgid "Place this item in the side pane"
+msgstr "Postavi ovu stvar na bočnu traku"
+
+#: cardapio.ui.h:23
+msgid "Place this item into the \"Pinned Items\" list"
+msgstr "Postavi ovu stvar na listu \"Izdvojene Stvari\""
+
+#: cardapio.ui.h:24
+msgid "Plugins"
+msgstr "Dodaci"
+
+#: cardapio.ui.h:25
+msgid "Remove this item from the \"Pinned Items\" list"
+msgstr "Ukloni ovu stvar iz liste \"Izdvojenih Stvari\""
+
+#: cardapio.ui.h:26
+msgid "Remove this item from the side pane"
+msgstr "Ukloni ovu stvar sa bočne ploče"
+
+#: cardapio.ui.h:27
+msgid "Run in _Terminal"
+msgstr "Pokreni u _terminalu"
+
+#: cardapio.ui.h:28
+msgid "Search"
+msgstr "Pretraga"
+
+#: cardapio.ui.h:29
+msgid "See https://translations.launchpad.net/cardapio"
+msgstr "Pogledati https://translations.launchpad.net/cardapio"
+
+#: cardapio.ui.h:30
+msgid "Shortcut key:"
+msgstr "Prečac na tipkovnici"
+
+#: cardapio.ui.h:31
+msgid "Show session buttons in bottom pane"
+msgstr "Prikazati sesijske gumbe u donjoj traci"
+
+#: cardapio.ui.h:32
+msgid "View"
+msgstr "Prikaz"
+
+#: cardapio.ui.h:34
+msgid "_Add To Side Pane"
+msgstr ""
+
+#: cardapio.ui.h:35
+msgid "_Control Center"
+msgstr ""
+
+#: cardapio.ui.h:36
+msgid "_Display"
+msgstr "_Otvori"
+
+#: cardapio.ui.h:37
+msgid "_Launch In Background"
+msgstr ""
+
+#: cardapio.ui.h:38
+msgid "_Pin This Item"
+msgstr ""
+
+#: cardapio.ui.h:39
+msgid "_Remove From Side Pane"
+msgstr ""
+
+#: cardapio.ui.h:40
+msgid "_Run"
+msgstr "_Pokreni"
+
+#: cardapio.ui.h:41
+msgid "_Unpin This Item"
+msgstr ""
+
+#: cardapio.ui.h:42
+msgid "translators: just enter any text here"
+msgstr "prevoditelji:"
+
+#: plugins/amazon.py:38
+msgid "Amazon"
+msgstr ""
+
+#: plugins/amazon.py:39
+msgid "Search for results in Amazon"
+msgstr ""
+
+#: plugins/amazon.py:51
+msgid "Amazon Results"
+msgstr ""
+
+#: plugins/amazon.py:52
+msgid "Results found in Amazon"
+msgstr ""
+
+#: plugins/amazon.py:247 plugins/bing.py:122 plugins/ebay.py:214
+#: plugins/ebay.py:230 plugins/google.py:51 plugins/google_localized.py:55
+#: plugins/tracker.py:42 plugins/tracker_fts.py:41 plugins/yahoo.py:141
+#: plugins/you_tube.py:131 plugins/zg_recent_documents.py:76
+msgid "Show additional results"
+msgstr "Pokaži dodatne rezultate"
+
+#: plugins/amazon.py:248 plugins/bing.py:123 plugins/ebay.py:215
+#: plugins/ebay.py:231 plugins/google.py:52 plugins/google_localized.py:56
+#: plugins/yahoo.py:142 plugins/you_tube.py:132
+msgid "Show additional search results in your web browser"
+msgstr "Pokaži dodatne rezultate pretrage u internet pregledniku"
+
+#: plugins/bing.py:18
+msgid "Bing"
+msgstr ""
+
+#: plugins/bing.py:19
+msgid "Perform a search using Microsoft's Bing"
+msgstr ""
+
+#: plugins/bing.py:31
+msgid "Bing Results"
+msgstr ""
+
+#: plugins/bing.py:32
+msgid "Results found using Bing"
+msgstr ""
+
+#: plugins/ebay.py:31
+msgid "eBay"
+msgstr ""
+
+#: plugins/ebay.py:32
+msgid "Search for items on eBay"
+msgstr ""
+
+#: plugins/ebay.py:44
+msgid "eBay Results"
+msgstr ""
+
+#: plugins/ebay.py:45
+msgid "Items found on eBay"
+msgstr ""
+
+#: plugins/google.py:8
+msgid "Google"
+msgstr "Google"
+
+#: plugins/google.py:9
+msgid "Perform quick Google searches in <b>all</b> languages"
+msgstr "Pokretanje brzog Google pretraživanja na <b>svim</b> jezicima"
+
+#: plugins/google.py:21
+msgid "Web Results"
+msgstr "Rezulatati sa Interneta"
+
+#: plugins/google.py:23
+msgid "Results found with Google"
+msgstr "Rezultati pretrage Google tražilicom"
+
+#: plugins/google_localized.py:8
+msgid "Google localized results"
+msgstr "Rezultati pretrage lokaliziranom Google tražilicom"
+
+#: plugins/google_localized.py:9
+msgid ""
+"Perform quick Google searches <b>limited to</b> the system's default language"
+msgstr "Pokretanje brzog Google pretraživanja na <b>Vašem</b> jeziku"
+
+#: plugins/google_localized.py:21
+msgid "Localized Web Results"
+msgstr "Lokalizirani rezulatati sa Interneta"
+
+#: plugins/google_localized.py:23
+msgid "Results found with Google in you system language"
+msgstr "Rezultati pretrage Google tražilicom na jeziku vašeg sustava"
+
+#: plugins/pidgin.py:22
+msgid "Pidgin"
+msgstr ""
+
+#: plugins/pidgin.py:23
+msgid "Search for online Pidgin buddies"
+msgstr ""
+
+#: plugins/pidgin.py:35
+msgid "Pidgin Buddies"
+msgstr ""
+
+#: plugins/pidgin.py:36
+msgid "Your online Pidgin buddies"
+msgstr ""
+
+#: plugins/pidgin.py:115
+msgid "Talk to this buddy"
+msgstr ""
+
+#: plugins/software_center.py:28
+msgid "Software Center"
+msgstr "Centar softvera"
+
+#: plugins/software_center.py:29
+msgid "Search for new applications in the Software Center"
+msgstr "Traženje softvera u Centru softvera"
+
+#: plugins/software_center.py:39
+msgid "Available Software"
+msgstr ""
+
+#: plugins/software_center.py:41
+msgid "Software available to install on your system"
+msgstr ""
+
+#: plugins/software_center.py:87 plugins/software_center.py:96
+msgid "Open Software Center"
+msgstr ""
+
+#: plugins/software_center.py:88 plugins/software_center.py:97
+msgid "Search for more software in the Software Center"
+msgstr ""
+
+#: plugins/software_center.py:104
+#, python-format
+msgid "_Install %s"
+msgstr ""
+
+#: plugins/software_center.py:105
+msgid "Install this package without opening the Software Center"
+msgstr ""
+
+#: plugins/software_center.py:107
+#, python-format
+msgid "Show %s in the Software Center"
+msgstr ""
+
+#: plugins/software_center.py:108
+msgid "Description:"
+msgstr "Opis:"
+
+#: plugins/tomboy.py:20
+msgid "Tomboy"
+msgstr ""
+
+#: plugins/tomboy.py:21
+msgid "Search for Tomboy notes"
+msgstr ""
+
+#: plugins/tomboy.py:33
+msgid "Tomboy Results"
+msgstr ""
+
+#: plugins/tomboy.py:34
+msgid "Your Tomboy notes"
+msgstr ""
+
+#: plugins/tomboy.py:106
+msgid "Create this note"
+msgstr ""
+
+#: plugins/tomboy.py:107
+msgid "Create a new note with this title in Tomboy"
+msgstr ""
+
+#: plugins/tomboy.py:116
+msgid "Show additional notes"
+msgstr ""
+
+#: plugins/tomboy.py:117
+msgid "Show additional notes in Tomboy"
+msgstr ""
+
+#: plugins/tomboy.py:196
+msgid "Open this note"
+msgstr ""
+
+#: plugins/tracker.py:6
+msgid "File search"
+msgstr ""
+
+#: plugins/tracker.py:7
+msgid "Search local files and folders indexed with Tracker"
+msgstr "Pretraga lokalnih datoteka i mapa indeksiranih Tracker-om"
+
+#: plugins/tracker.py:19
+msgid "Local Results"
+msgstr "Lokalni rezultati"
+
+#: plugins/tracker.py:21
+msgid "Results found in your computer"
+msgstr "Rezultati pretrage na Vašem računalu"
+
+#: plugins/tracker.py:43 plugins/tracker_fts.py:42
+msgid "Show additional search results in the Tracker search tool"
+msgstr "Pokaži dodatne rezultate pretrage u Tracker alatu za pretragu"
+
+#: plugins/tracker_fts.py:6
+msgid "Full-text file search"
+msgstr ""
+
+#: plugins/tracker_fts.py:7
+msgid "Search <b>inside</b> local files and folders indexed with Tracker"
+msgstr ""
+"Pretraga <b>unutar</b> lokalnih datoteka i mapa indeksiranih Tracker alatom"
+
+#: plugins/tracker_fts.py:19
+msgid "Results within files"
+msgstr "Rezultati unutar datoteka"
+
+#: plugins/tracker_fts.py:21
+msgid "Results found inside the files in your computer"
+msgstr "Rezultati pronađeni unutar datoteka na Vašem računalu"
+
+#: plugins/virtualbox.py:14
+msgid "VirtualBox"
+msgstr "VirtualBox"
+
+#: plugins/virtualbox.py:15
+msgid "Search for and start VirtualBox virtual machines from the menu"
+msgstr "Pretraga i pokretanje VirtualBox virtualnih strojeva iz izbornika"
+
+#: plugins/virtualbox.py:28
+msgid "Virtual Machines"
+msgstr "Virtualni stroj"
+
+#: plugins/virtualbox.py:30
+msgid "Your VirtualBox virtual machines"
+msgstr "Vaši VirtualBox virtualni strojevi"
+
+#: plugins/virtualbox.py:98
+#, python-format
+msgid ""
+"Start virtual machine %(name)s\n"
+"OS Type: %(os)s"
+msgstr ""
+
+#: plugins/wikipedia.py:25
+msgid "Wikipedia"
+msgstr ""
+
+#: plugins/wikipedia.py:26
+msgid "Search for results in Wikipedia"
+msgstr ""
+
+#: plugins/wikipedia.py:38
+msgid "Wikipedia Results"
+msgstr ""
+
+#: plugins/wikipedia.py:39
+msgid "Results found in Wikipedia"
+msgstr ""
+
+#: plugins/yahoo.py:27
+msgid "Yahoo"
+msgstr ""
+
+#: plugins/yahoo.py:28
+msgid "Perform a search using Yahoo"
+msgstr ""
+
+#: plugins/yahoo.py:40
+msgid "Yahoo Results"
+msgstr ""
+
+#: plugins/yahoo.py:41
+msgid "Results found using Yahoo"
+msgstr ""
+
+#: plugins/you_tube.py:18
+msgid "YouTube"
+msgstr ""
+
+#: plugins/you_tube.py:19
+msgid "Search for results in YouTube"
+msgstr ""
+
+#: plugins/you_tube.py:31
+msgid "YouTube Results"
+msgstr ""
+
+#: plugins/you_tube.py:32
+msgid "Results found in YouTube"
+msgstr ""
+
+#: plugins/zg_recent_documents.py:17
+msgid "Recent documents"
+msgstr "Nedavno korišteni dokumenti"
+
+#: plugins/zg_recent_documents.py:18
+msgid "Search for your most recently used files"
+msgstr ""
+
+#: plugins/zg_recent_documents.py:30
+msgid "Recent Documents"
+msgstr "Nedavno korišteni dokumenti"
+
+#: plugins/zg_recent_documents.py:32
+msgid "Files that you have used recently"
+msgstr "Nedavno korištene datoteke"
+
+#: plugins/zg_recent_documents.py:77
+msgid "Show additional search results in Sezen"
+msgstr ""

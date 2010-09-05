@@ -1,0 +1,747 @@
+# Bulgarian translation for cardapio
+# Copyright (c) 2010 Rosetta Contributors and Canonical Ltd 2010
+# This file is distributed under the same license as the cardapio package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: cardapio\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2010-09-04 20:04-0400\n"
+"PO-Revision-Date: 2010-08-09 08:36+0000\n"
+"Last-Translator: Svetoslav Stefanov <svetlisashkov@yahoo.com>\n"
+"Language-Team: Bulgarian <bg@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2010-09-05 05:07+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+
+#: cardapio.py:307
+msgid "Application menu"
+msgstr "Меню Приложения"
+
+#: cardapio.py:308 cardapio.py:319 cardapio.py:330 plugins/google.py:7
+#: plugins/google_localized.py:7 plugins/tracker.py:5 plugins/tracker_fts.py:5
+#: plugins/zg_recent_documents.py:16
+msgid "Cardapio Team"
+msgstr "Екипът на Cardapio"
+
+#: cardapio.py:309
+msgid "Displays installed applications"
+msgstr "Показва инсталираните приложения"
+
+#: cardapio.py:318
+msgid "Places menu"
+msgstr "Меню Места"
+
+#: cardapio.py:320
+msgid "Displays a list of folders"
+msgstr "Показва списък с папки"
+
+#: cardapio.py:329 cardapio.py:2885
+msgid "Pinned items"
+msgstr "Отметки"
+
+#: cardapio.py:331
+msgid "Displays your favorite items"
+msgstr ""
+
+#: cardapio.py:582
+msgid "Ubuntu Software Center"
+msgstr "Софтуерен център на Убунту"
+
+#: cardapio.py:584
+msgid ""
+"Lets you choose from thousands of free applications available for Ubuntu"
+msgstr "Можете да изберете от хиляди безплатни програми за Убунту"
+
+#: cardapio.py:591
+msgid "Help and Support"
+msgstr "Помощ и поддръжка"
+
+#: cardapio.py:593
+#, python-format
+msgid "Get help with %(distro_name)s"
+msgstr "Получаване на помощ за %(distro_name)s"
+
+#: cardapio.py:614
+msgid "Menu"
+msgstr ""
+
+#: cardapio.py:798
+msgid "_Properties"
+msgstr "_Свойства"
+
+#: cardapio.py:799
+msgid "_Edit Menus"
+msgstr "_Редактиране на менютата"
+
+#: cardapio.py:800 cardapio.ui.h:33
+msgid "_About Cardapio"
+msgstr "_Относно Cardapio"
+
+#: cardapio.py:801
+msgid "_About Gnome"
+msgstr "О_тносно Gnome"
+
+#: cardapio.py:802
+#, python-format
+msgid "_About %(distro_name)s"
+msgstr "От_носно %(distro_name)s"
+
+#: cardapio.py:976
+msgid "No results to show"
+msgstr "Няма резултати за показване"
+
+#: cardapio.py:977
+#, python-format
+msgid "No results to show in \"%(category_name)s\""
+msgstr "Няма резултати за показване в \"%(category_name)s\""
+
+#: cardapio.py:978
+msgid "Searching..."
+msgstr "Търсене..."
+
+#: cardapio.py:979
+msgid "Search timed out"
+msgstr ""
+
+#: cardapio.py:998 cardapio.py:1005
+msgid "All"
+msgstr "Всички"
+
+#: cardapio.py:998 cardapio.py:1005
+msgid "Show all categories"
+msgstr "Показване на всички категории"
+
+#: cardapio.py:1066
+#, python-format
+msgid "Do you want to run \"%(file_name)s\" or display its contents?"
+msgstr ""
+"Желаете да изпълните \"%(file_name)s\" или да покажете съдържанието му?"
+
+#: cardapio.py:1067
+#, python-format
+msgid "\"%(file_name)s\" is an executable text file."
+msgstr "\"%(file_name)s\" е изпълним текстов файл."
+
+#: cardapio.py:1213
+#, python-format
+msgid ""
+"<b>Plugin:</b> %(name)s %(version)s\n"
+"<b>Author:</b> %(author)s\n"
+"<b>Description:</b> %(description)s"
+msgstr ""
+"<b>Приставка:</b> %(name)s %(version)s\n"
+"<b>Автор:</b> %(author)s\n"
+"<b>Описание:</b> %(description)s"
+
+#: cardapio.py:1214
+msgid "This is a community-supported plugin"
+msgstr "Това е приставка, поддържана от общостта"
+
+#: cardapio.py:1694
+msgid "Filesystem Root"
+msgstr ""
+
+#: cardapio.py:2581 cardapio.py:2905
+msgid "Uncategorized"
+msgstr "Без категория"
+
+#: cardapio.py:2581
+msgid "Other configuration tools"
+msgstr "Други инструменти за настройка"
+
+#: cardapio.py:2600
+msgid "Home"
+msgstr "Домашна папка"
+
+#: cardapio.py:2600
+msgid "Open your personal folder"
+msgstr "Отваряне на вашата лична папка"
+
+#: cardapio.py:2601
+msgid "Computer"
+msgstr "Компютър"
+
+#: cardapio.py:2601
+msgid ""
+"Browse all local and remote disks and folders accessible from this computer"
+msgstr ""
+"Преглед на всички локални и отдалечени дискове и папки достъпни от този "
+"компютър"
+
+#: cardapio.py:2619
+msgid "Desktop"
+msgstr "Работен плот"
+
+#: cardapio.py:2642
+msgid "Trash"
+msgstr "Кошче"
+
+#: cardapio.py:2642
+msgid "Open the trash"
+msgstr "Отваряне на кошчето"
+
+#: cardapio.py:2769
+msgid "Lock Screen"
+msgstr "Заключване на екрана"
+
+#: cardapio.py:2770
+msgid "Protect your computer from unauthorized use"
+msgstr "Защита на компютъра от непозволен достъп"
+
+#: cardapio.py:2776
+msgid "Log Out..."
+msgstr "Излизане..."
+
+#: cardapio.py:2777
+msgid "Log out of this session to log in as a different user"
+msgstr "Излизане от тази сесия, за да влезете като различен потребител"
+
+#: cardapio.py:2783
+msgid "Shut Down..."
+msgstr "Изключване..."
+
+#: cardapio.py:2784
+msgid "Shut down the system"
+msgstr "Изключване на системата"
+
+#: cardapio.py:2864
+msgid "Places"
+msgstr "Места"
+
+#: cardapio.py:2864
+msgid "Access documents and folders"
+msgstr "Достъп до документи и папки"
+
+#: cardapio.py:2874
+msgid "Folder Contents"
+msgstr "Съдържание на папка"
+
+#: cardapio.py:2874
+msgid "Look inside folders"
+msgstr "Преглед в папките"
+
+#: cardapio.py:2885
+msgid "Your favorite items"
+msgstr ""
+
+#: cardapio.py:2895
+msgid "Side Pane"
+msgstr "Страничен панел"
+
+#: cardapio.py:2895
+msgid "Items pinned to the side pane"
+msgstr "Елементи, отметнати в страничния панел"
+
+#: cardapio.py:2905
+msgid "Items that are not under any menu category"
+msgstr "Елементи, които не попадат в нито една категория на менюто"
+
+#: cardapio.py:2915
+msgid "Session"
+msgstr "Сесия"
+
+#: cardapio.py:2925
+msgid "System"
+msgstr "Система"
+
+#: cardapio.py:4043
+msgid "Access applications, folders, system settings, etc."
+msgstr "Достъп до приложения, папки, системни настройки и др."
+
+#: cardapio.ui.h:1
+msgid "&#xA9; Thiago Teixeira 2010"
+msgstr "&#xA9; Thiago Teixeira 2010"
+
+#: cardapio.ui.h:2
+msgid "<b>Main window</b>"
+msgstr ""
+
+#: cardapio.ui.h:3
+msgid "<b>Panel applet</b>"
+msgstr ""
+
+#: cardapio.ui.h:4
+msgid ""
+"<big>Data has recently changed.</big>\n"
+"Rebuilding&#x2026;"
+msgstr ""
+"<big>Данните бяха променени.</big>\n"
+"Преизграждане&#x2026;"
+
+#: cardapio.ui.h:6
+msgid "Applet icon:"
+msgstr "Икона на аплета:"
+
+#: cardapio.ui.h:7
+msgid "Applet label:"
+msgstr "Етикет на аплета:"
+
+#: cardapio.ui.h:8
+msgid "Cardapio Properties"
+msgstr "Свойства на Cardapio"
+
+#: cardapio.ui.h:9
+msgid "Cardapio Website"
+msgstr ""
+
+#: cardapio.ui.h:10
+msgid "Change your system's appearance and behavior"
+msgstr "Промяна на облика и поведението на системата"
+
+#: cardapio.ui.h:11
+msgid "Drag to reorder plugins"
+msgstr ""
+
+#: cardapio.ui.h:12
+msgid "Edit Menus"
+msgstr "Редактиране на менюта"
+
+#: cardapio.ui.h:13
+msgid ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+msgstr ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+
+#: cardapio.ui.h:15
+msgid "General"
+msgstr "Общи"
+
+#: cardapio.ui.h:16
+msgid "Keep search results when Cardapio is hidden"
+msgstr "Запазване на резултатите от търсене, при скриване на Cardapio"
+
+#: cardapio.ui.h:17
+msgid ""
+"Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-"
+"Click)"
+msgstr ""
+"Стартиране на този елемент без скриване на Cardapio (същото като цъкане със "
+"среден бутон или CTRL-Цъкане)"
+
+#: cardapio.ui.h:18
+msgid "Open Parent _Folder"
+msgstr ""
+
+#: cardapio.ui.h:19
+msgid "Open categories when cursor hovers them"
+msgstr ""
+
+#: cardapio.ui.h:20
+msgid "Open menu when cursor hovers the applet"
+msgstr "Отваряне на менюто при преминаване на показалеца над аплета"
+
+#: cardapio.ui.h:21
+msgid "Open this item's parent folder in the file browser"
+msgstr "Отваря родителската папка на този елемент във файловия браузър"
+
+#: cardapio.ui.h:22
+msgid "Place this item in the side pane"
+msgstr "Поставяне на този елемент в страничния панел"
+
+#: cardapio.ui.h:23
+msgid "Place this item into the \"Pinned Items\" list"
+msgstr "Поставя този елемен в списъка \"Отметки\""
+
+#: cardapio.ui.h:24
+msgid "Plugins"
+msgstr "Приставки"
+
+#: cardapio.ui.h:25
+msgid "Remove this item from the \"Pinned Items\" list"
+msgstr "Премахва този елемен от списъка \"Отметки\""
+
+#: cardapio.ui.h:26
+msgid "Remove this item from the side pane"
+msgstr "Премахва този елемент от страничния панел"
+
+#: cardapio.ui.h:27
+msgid "Run in _Terminal"
+msgstr "Изпълняване в тер_минал"
+
+#: cardapio.ui.h:28
+msgid "Search"
+msgstr "Търсене"
+
+#: cardapio.ui.h:29
+msgid "See https://translations.launchpad.net/cardapio"
+msgstr "Вижте https://translations.launchpad.net/cardapio"
+
+#: cardapio.ui.h:30
+msgid "Shortcut key:"
+msgstr "Бърз клавиш:"
+
+#: cardapio.ui.h:31
+msgid "Show session buttons in bottom pane"
+msgstr "Показване на бутоните за сесия в долния панел"
+
+#: cardapio.ui.h:32
+msgid "View"
+msgstr "Изглед"
+
+#: cardapio.ui.h:34
+msgid "_Add To Side Pane"
+msgstr ""
+
+#: cardapio.ui.h:35
+msgid "_Control Center"
+msgstr "_Контролен център"
+
+#: cardapio.ui.h:36
+msgid "_Display"
+msgstr "По_казване"
+
+#: cardapio.ui.h:37
+msgid "_Launch In Background"
+msgstr ""
+
+#: cardapio.ui.h:38
+msgid "_Pin This Item"
+msgstr ""
+
+#: cardapio.ui.h:39
+msgid "_Remove From Side Pane"
+msgstr ""
+
+#: cardapio.ui.h:40
+msgid "_Run"
+msgstr "_Стартиране"
+
+#: cardapio.ui.h:41
+msgid "_Unpin This Item"
+msgstr ""
+
+#: cardapio.ui.h:42
+msgid "translators: just enter any text here"
+msgstr ""
+
+#: plugins/amazon.py:38
+msgid "Amazon"
+msgstr ""
+
+#: plugins/amazon.py:39
+msgid "Search for results in Amazon"
+msgstr ""
+
+#: plugins/amazon.py:51
+msgid "Amazon Results"
+msgstr ""
+
+#: plugins/amazon.py:52
+msgid "Results found in Amazon"
+msgstr ""
+
+#: plugins/amazon.py:247 plugins/bing.py:122 plugins/ebay.py:214
+#: plugins/ebay.py:230 plugins/google.py:51 plugins/google_localized.py:55
+#: plugins/tracker.py:42 plugins/tracker_fts.py:41 plugins/yahoo.py:141
+#: plugins/you_tube.py:131 plugins/zg_recent_documents.py:76
+msgid "Show additional results"
+msgstr "Показване на допълнителни резултати"
+
+#: plugins/amazon.py:248 plugins/bing.py:123 plugins/ebay.py:215
+#: plugins/ebay.py:231 plugins/google.py:52 plugins/google_localized.py:56
+#: plugins/yahoo.py:142 plugins/you_tube.py:132
+msgid "Show additional search results in your web browser"
+msgstr "Показва допълнителни резултати от търсенето в уеб четеца"
+
+#: plugins/bing.py:18
+msgid "Bing"
+msgstr "Bing"
+
+#: plugins/bing.py:19
+msgid "Perform a search using Microsoft's Bing"
+msgstr "Търсене с Bing на Microsoft"
+
+#: plugins/bing.py:31
+msgid "Bing Results"
+msgstr "Резултати от Bing"
+
+#: plugins/bing.py:32
+msgid "Results found using Bing"
+msgstr "Получени резултати от Bing"
+
+#: plugins/ebay.py:31
+msgid "eBay"
+msgstr ""
+
+#: plugins/ebay.py:32
+msgid "Search for items on eBay"
+msgstr ""
+
+#: plugins/ebay.py:44
+msgid "eBay Results"
+msgstr ""
+
+#: plugins/ebay.py:45
+msgid "Items found on eBay"
+msgstr ""
+
+#: plugins/google.py:8
+msgid "Google"
+msgstr "Google"
+
+#: plugins/google.py:9
+msgid "Perform quick Google searches in <b>all</b> languages"
+msgstr "Бързо търсене с Google на <b>всички</b> езици"
+
+#: plugins/google.py:21
+msgid "Web Results"
+msgstr "Уеб резулати"
+
+#: plugins/google.py:23
+msgid "Results found with Google"
+msgstr "Резултати, намерени с Google"
+
+#: plugins/google_localized.py:8
+msgid "Google localized results"
+msgstr "Локализирани резултати с Google"
+
+#: plugins/google_localized.py:9
+msgid ""
+"Perform quick Google searches <b>limited to</b> the system's default language"
+msgstr ""
+"Изпълнява бъзро търсене с Google, <b>ограничено до</b> стандартния език на "
+"системата"
+
+#: plugins/google_localized.py:21
+msgid "Localized Web Results"
+msgstr "Локализирани уеб резултати"
+
+#: plugins/google_localized.py:23
+msgid "Results found with Google in you system language"
+msgstr "Резултати от Google на вашия системен език"
+
+#: plugins/pidgin.py:22
+msgid "Pidgin"
+msgstr ""
+
+#: plugins/pidgin.py:23
+msgid "Search for online Pidgin buddies"
+msgstr ""
+
+#: plugins/pidgin.py:35
+msgid "Pidgin Buddies"
+msgstr ""
+
+#: plugins/pidgin.py:36
+msgid "Your online Pidgin buddies"
+msgstr ""
+
+#: plugins/pidgin.py:115
+msgid "Talk to this buddy"
+msgstr ""
+
+#: plugins/software_center.py:28
+msgid "Software Center"
+msgstr "Софтуерен център"
+
+#: plugins/software_center.py:29
+msgid "Search for new applications in the Software Center"
+msgstr "Търсене за нови приложения в Софтуерния център"
+
+#: plugins/software_center.py:39
+msgid "Available Software"
+msgstr "Наличен софтуер"
+
+#: plugins/software_center.py:41
+msgid "Software available to install on your system"
+msgstr "Наличен софтуер за инсталиране в системата ви"
+
+#: plugins/software_center.py:87 plugins/software_center.py:96
+msgid "Open Software Center"
+msgstr "Отваряне на Софтуерен център"
+
+#: plugins/software_center.py:88 plugins/software_center.py:97
+msgid "Search for more software in the Software Center"
+msgstr "Търсене за повече софтуер в Софтуерния център"
+
+#: plugins/software_center.py:104
+#, python-format
+msgid "_Install %s"
+msgstr "_Инсталиране на %s"
+
+#: plugins/software_center.py:105
+msgid "Install this package without opening the Software Center"
+msgstr "Инсталира този пакет без да се отваря Софтуерния център"
+
+#: plugins/software_center.py:107
+#, python-format
+msgid "Show %s in the Software Center"
+msgstr "Показване на %s в Софтуерния център"
+
+#: plugins/software_center.py:108
+msgid "Description:"
+msgstr "Описание:"
+
+#: plugins/tomboy.py:20
+msgid "Tomboy"
+msgstr ""
+
+#: plugins/tomboy.py:21
+msgid "Search for Tomboy notes"
+msgstr ""
+
+#: plugins/tomboy.py:33
+msgid "Tomboy Results"
+msgstr ""
+
+#: plugins/tomboy.py:34
+msgid "Your Tomboy notes"
+msgstr ""
+
+#: plugins/tomboy.py:106
+msgid "Create this note"
+msgstr ""
+
+#: plugins/tomboy.py:107
+msgid "Create a new note with this title in Tomboy"
+msgstr ""
+
+#: plugins/tomboy.py:116
+msgid "Show additional notes"
+msgstr ""
+
+#: plugins/tomboy.py:117
+msgid "Show additional notes in Tomboy"
+msgstr ""
+
+#: plugins/tomboy.py:196
+msgid "Open this note"
+msgstr ""
+
+#: plugins/tracker.py:6
+msgid "File search"
+msgstr ""
+
+#: plugins/tracker.py:7
+msgid "Search local files and folders indexed with Tracker"
+msgstr "Търсене на локални файлове и папки, индексирани с Tracker"
+
+#: plugins/tracker.py:19
+msgid "Local Results"
+msgstr "Локални резултати"
+
+#: plugins/tracker.py:21
+msgid "Results found in your computer"
+msgstr "Намерени резултати във вашия компютър"
+
+#: plugins/tracker.py:43 plugins/tracker_fts.py:42
+msgid "Show additional search results in the Tracker search tool"
+msgstr ""
+"Показване на допълнителни резултати от търсенето в инструмента за търсeне "
+"Tracker"
+
+#: plugins/tracker_fts.py:6
+msgid "Full-text file search"
+msgstr ""
+
+#: plugins/tracker_fts.py:7
+msgid "Search <b>inside</b> local files and folders indexed with Tracker"
+msgstr ""
+"Търсене <b>вътре в</b> локални файлове и папки, индексирани с Tracker"
+
+#: plugins/tracker_fts.py:19
+msgid "Results within files"
+msgstr "Резултати в съдържанието на файловете"
+
+#: plugins/tracker_fts.py:21
+msgid "Results found inside the files in your computer"
+msgstr "Резултати в съдържанието на файловете в компютъра"
+
+#: plugins/virtualbox.py:14
+msgid "VirtualBox"
+msgstr "VirtualBox"
+
+#: plugins/virtualbox.py:15
+msgid "Search for and start VirtualBox virtual machines from the menu"
+msgstr "Търси и стартира виртуални машини на VirtualBox от менюто"
+
+#: plugins/virtualbox.py:28
+msgid "Virtual Machines"
+msgstr "Виртуални машини"
+
+#: plugins/virtualbox.py:30
+msgid "Your VirtualBox virtual machines"
+msgstr "Вашите виртуални машини на VirtualBox"
+
+#: plugins/virtualbox.py:98
+#, python-format
+msgid ""
+"Start virtual machine %(name)s\n"
+"OS Type: %(os)s"
+msgstr ""
+"Стартиране на виртуалната машина %(name)s\n"
+"Тип на операционната система: %(os)s"
+
+#: plugins/wikipedia.py:25
+msgid "Wikipedia"
+msgstr "Уикипедия"
+
+#: plugins/wikipedia.py:26
+msgid "Search for results in Wikipedia"
+msgstr "Търсене за резултати в Уикипедия"
+
+#: plugins/wikipedia.py:38
+msgid "Wikipedia Results"
+msgstr "Резултати от Уикипедия"
+
+#: plugins/wikipedia.py:39
+msgid "Results found in Wikipedia"
+msgstr "Получени резултати от Уикипедия"
+
+#: plugins/yahoo.py:27
+msgid "Yahoo"
+msgstr "Yahoo"
+
+#: plugins/yahoo.py:28
+msgid "Perform a search using Yahoo"
+msgstr "Търсене с Yahoo"
+
+#: plugins/yahoo.py:40
+msgid "Yahoo Results"
+msgstr "Резултати от Yahoo"
+
+#: plugins/yahoo.py:41
+msgid "Results found using Yahoo"
+msgstr "Получени резултати от Yahoo"
+
+#: plugins/you_tube.py:18
+msgid "YouTube"
+msgstr "YouTube"
+
+#: plugins/you_tube.py:19
+msgid "Search for results in YouTube"
+msgstr "Търсене за резултати в YouTube"
+
+#: plugins/you_tube.py:31
+msgid "YouTube Results"
+msgstr "Резултати от YouTube"
+
+#: plugins/you_tube.py:32
+msgid "Results found in YouTube"
+msgstr "Получени резултати от YouTube"
+
+#: plugins/zg_recent_documents.py:17
+msgid "Recent documents"
+msgstr "Скорошни документи"
+
+#: plugins/zg_recent_documents.py:18
+msgid "Search for your most recently used files"
+msgstr "Търси в последно използваните документи"
+
+#: plugins/zg_recent_documents.py:30
+msgid "Recent Documents"
+msgstr "Скорошни документи"
+
+#: plugins/zg_recent_documents.py:32
+msgid "Files that you have used recently"
+msgstr "Наскоро изполвани файлове"
+
+#: plugins/zg_recent_documents.py:77
+msgid "Show additional search results in Sezen"
+msgstr "Показване на допълнителни резултати от търсенето в Sezen"
