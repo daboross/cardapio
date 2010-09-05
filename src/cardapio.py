@@ -130,7 +130,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.144'
+	version = '0.9.145'
 
 	core_plugins = [
 			'applications',
@@ -2526,20 +2526,15 @@ class Cardapio(dbus.service.Object):
 		clean_style = gtk.RcStyle()
 		self.panel_button.parent.modify_style(clean_style)
 
-		if bg_type == gnomeapplet.NO_BACKGROUND:
-			# TODO: fix bug where going from "Solid color" back to "None (use
-			# system theme)" causes cardapio to keep a "Solid color" background.
-			# This means I probably need to reset some theme-related property here,
-			# I just don't know what...
-			pass
-
-		elif bg_type == gnomeapplet.COLOR_BACKGROUND:
+		if bg_type == gnomeapplet.COLOR_BACKGROUND:
 			self.panel_button.parent.modify_bg(gtk.STATE_NORMAL, color)
 
-		else: #if bg_type == gnomeapplet.PIXMAP_BACKGROUND:
+		elif bg_type == gnomeapplet.PIXMAP_BACKGROUND:
 			style = self.panel_button.style
 			style.bg_pixmap[gtk.STATE_NORMAL] = pixmap
 			self.panel_button.parent.set_style(style)
+
+		#elif bg_type == gnomeapplet.NO_BACKGROUND: pass
 
 
 	def auto_toggle_panel_button(self, state):
@@ -4053,7 +4048,7 @@ def applet_factory(applet, iid):
 		{
 			xthickness = 0
 			ythickness = 0
-			GtkMenuBar::shadow-type = none
+			GtkMenuBar::shadow-type = GTK_SHADOW_NONE
 			GtkMenuBar::internal-padding = 0
 			GtkWidget::focus-padding = 0
 			GtkMenuBar::focus-padding = 0
