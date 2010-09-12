@@ -1201,7 +1201,7 @@ Rebuilding&#x2026;</property>
       </object>
     </child>
     <child>
-      <object class="GtkImageMenuItem" id="OpenInBackground">
+      <object class="GtkImageMenuItem" id="OpenInBackgroundMenuItem">
         <property name="label" translatable="yes">_Launch In Background</property>
         <property name="visible">True</property>
         <property name="tooltip_text" translatable="yes">Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-Click)</property>
@@ -1209,6 +1209,17 @@ Rebuilding&#x2026;</property>
         <property name="image">image7</property>
         <property name="use_stock">False</property>
         <signal name="activate" handler="on_launch_in_background_pressed"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="EjectMenuItem">
+        <property name="label" translatable="yes">_Eject</property>
+        <property name="visible">True</property>
+        <property name="tooltip_text" translatable="yes">Safely eject this mount</property>
+        <property name="use_underline">True</property>
+        <property name="image">image11</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="on_eject_pressed"/>
       </object>
     </child>
   </object>
@@ -1395,5 +1406,9 @@ Rebuilding&#x2026;</property>
       <action-widget response="0">ExecutableDialogCancel</action-widget>
       <action-widget response="3">button6</action-widget>
     </action-widgets>
+  </object>
+  <object class="GtkImage" id="image11">
+    <property name="visible">True</property>
+    <property name="icon_name">media-eject</property>
   </object>
 </interface>
