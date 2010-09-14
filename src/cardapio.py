@@ -202,6 +202,8 @@ class Cardapio(dbus.service.Object):
 		self.active_plugin_instances       = []
 		self.in_system_menu_mode           = False
 		self.plugins_still_searching       = 0
+		self.volume_monitor                = None
+		self.bookmark_monitor              = None
 
 		self.icon_extension_types = re.compile('.*\.(png|xpm|svg)$')
 
@@ -2602,11 +2604,14 @@ class Cardapio(dbus.service.Object):
 		Populate the "system places", which include Computer, the list of connected drives, and so on.
 		"""
 
+		del self.volume_monitor
 		self.volume_monitor = gio.volume_monitor_get() # keep a reference to avoid getting it garbage-collected
 
 		self.add_app_button(_('Computer'), 'computer', section_contents, 'xdg', 'computer:///', tooltip = _('Browse all local and remote disks and folders accessible from this computer'), app_list = self.app_list)
 		self.add_app_button(_('File System'), 'drive-harddisk', section_contents, 'xdg', '/', tooltip = _('Open the contents of the file system'), app_list = self.app_list)
 		self.add_app_button(_('Network'), 'network', section_contents, 'xdg', 'network://', tooltip = _('Browse the contents of the network'), app_list = self.app_list)
+
+		self.volumes = {}
 
 		for drive in self.volume_monitor.get_connected_drives():
 			if drive.has_media():
@@ -2616,11 +2621,12 @@ class Cardapio(dbus.service.Object):
 					try    : command = str(volume.get_mount().get_root().get_uri())
 					except : command = ''
 					self.add_app_button(name, icon_name, section_contents, 'xdg', command, tooltip = command, app_list = self.app_list)
+					self.volumes[command] = volume
 
 		self.add_app_button(_('Trash'), 'user-trash', section_contents, 'xdg', 'trash:///', tooltip = _('Open the trash'), app_list = self.app_list)
 
-		# re-read volumes when volumes are added/removed
-		self.volume_monitor.connect('drive-changed', self.on_volume_monitor_changed, self.places_section_contents)
+		self.volume_monitor.connect('volume-added', self.on_volume_monitor_changed, self.places_section_contents)
+		self.volume_monitor.connect('volume-removed', self.on_volume_monitor_changed, self.places_section_contents)
 
 
 	def build_bookmarked_places_list(self, section_contents):
@@ -2659,7 +2665,7 @@ class Cardapio(dbus.service.Object):
 
 		bookmark_file.close()
 
-		# re-read bookmarks when bookmarks are added/removed
+		del self.bookmark_monitor
 		self.bookmark_monitor = gio.File(bookmark_file_path).monitor_file() # keep a reference to avoid getting it garbage-collected
 		self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed, self.places_section_contents)
 
@@ -2675,7 +2681,7 @@ class Cardapio(dbus.service.Object):
 			self.build_places_list()
 
 
-	def on_volume_monitor_changed(self, drive, section_contents):
+	def on_volume_monitor_changed(self, monitor, drive, section_contents):
 		"""
 		Handler for when volumes are mounted or ejected
 		"""
@@ -3374,7 +3380,8 @@ class Cardapio(dbus.service.Object):
 		Handle the "eject" action
 		"""
 
-		pass
+		volume = self.volumes[self.clicked_app['command']]
+		volume.eject(return_true)
 
 
 	def on_app_button_button_pressed(self, widget, event):
