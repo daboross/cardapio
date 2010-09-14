@@ -1213,7 +1213,7 @@ Rebuilding&#x2026;</property>
     </child>
     <child>
       <object class="GtkImageMenuItem" id="EjectMenuItem">
-        <property name="label" translatable="yes">_Eject</property>
+        <property name="label" translatable="yes">_Unmount</property>
         <property name="visible">True</property>
         <property name="tooltip_text" translatable="yes">Safely eject this mount</property>
         <property name="use_underline">True</property>
