@@ -2607,10 +2607,6 @@ class Cardapio(dbus.service.Object):
 		del self.volume_monitor
 		self.volume_monitor = gio.volume_monitor_get() # keep a reference to avoid getting it garbage-collected
 
-		self.add_app_button(_('Computer'), 'computer', section_contents, 'xdg', 'computer:///', tooltip = _('Browse all local and remote disks and folders accessible from this computer'), app_list = self.app_list)
-		self.add_app_button(_('File System'), 'drive-harddisk', section_contents, 'xdg', '/', tooltip = _('Open the contents of the file system'), app_list = self.app_list)
-		self.add_app_button(_('Network'), 'network', section_contents, 'xdg', 'network://', tooltip = _('Browse the contents of the network'), app_list = self.app_list)
-
 		self.volumes = {}
 
 		for drive in self.volume_monitor.get_connected_drives():
@@ -2622,6 +2618,8 @@ class Cardapio(dbus.service.Object):
 					except : command = ''
 					self.add_app_button(name, icon_name, section_contents, 'xdg', command, tooltip = command, app_list = self.app_list)
 					self.volumes[command] = volume
+
+		self.add_app_button(_('Network'), 'network', section_contents, 'xdg', 'network://', tooltip = _('Browse the contents of the network'), app_list = self.app_list)
 
 		self.add_app_button(_('Trash'), 'user-trash', section_contents, 'xdg', 'trash:///', tooltip = _('Open the trash'), app_list = self.app_list)
 
