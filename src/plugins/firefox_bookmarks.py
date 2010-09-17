@@ -61,13 +61,14 @@ class CardapioPlugin (CardapioPluginInterface):
 	
 	def build_bookmark_list(self):
 		
-		firefox_path = os.environ['HOME'] + "/.mozilla/firefox"
-		ini_file = open('%s/profiles.ini' % firefox_path)
+		firefox_path = os.path.join(os.environ['HOME'],".mozilla/firefox")
+		ini_file = open(os.path.join(firefox_path,'profiles.ini'))
 		prof_list = ini_file.read().split()
 		ini_file.close()
 		
 		prof_folder = prof_list[prof_list.index('Default=1') - 1].split('=')[1]
-		db_path = '%s/%s/places.sqlite' % (firefox_path, prof_folder)
+		
+		db_path = os.path.join(firefox_path, prof_folder, 'places.sqlite')
 		
 		if not os.path.exists(db_path):
 			self.c.write_to_log(self, 'Could not find the bookmarks database', is_error = True)
