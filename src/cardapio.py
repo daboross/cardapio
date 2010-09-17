@@ -2533,7 +2533,7 @@ class Cardapio(dbus.service.Object):
 			self.panel_button.parent.modify_bg(gtk.STATE_NORMAL, color)
 
 		elif bg_type == gnomeapplet.PIXMAP_BACKGROUND:
-			style = self.panel_button.style
+			style = self.panel_button.parent.style
 			style.bg_pixmap[gtk.STATE_NORMAL] = pixmap
 			self.panel_button.parent.set_style(style)
 
