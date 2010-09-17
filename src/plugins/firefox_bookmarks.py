@@ -3,6 +3,7 @@ try:
 	import os
 	import sqlite3
 	import shutil
+	import gio
 	
 except Exception, exception:
 	import_error = exception
@@ -42,7 +43,14 @@ class CardapioPlugin (CardapioPluginInterface):
 			self.loaded = False
 			return
 		
+		
 		self.build_bookmark_list()
+		lock_path = os.path.join(self.prof_path,'lock')
+		
+		#The lock file may not exist at first, but the monitor will
+		#detect when it is created and deleted
+		self.package_monitor = gio.File(lock_path).monitor_file()
+		self.package_monitor.connect('changed', self.on_lock_changed)
 		
 	   	self.loaded = True # set to true if everything goes well
 	   	
@@ -67,8 +75,9 @@ class CardapioPlugin (CardapioPluginInterface):
 		ini_file.close()
 		
 		prof_folder = prof_list[prof_list.index('Default=1') - 1].split('=')[1]
+		self.prof_path = os.path.join(firefox_path,prof_folder)
 		
-		db_path = os.path.join(firefox_path, prof_folder, 'places.sqlite')
+		db_path = os.path.join(self.prof_path, 'places.sqlite')
 		
 		if not os.path.exists(db_path):
 			self.c.write_to_log(self, 'Could not find the bookmarks database', is_error = True)
@@ -103,4 +112,11 @@ class CardapioPlugin (CardapioPluginInterface):
 		os.remove(db_copy_path)
 		
 	#TODO: Find a way to update plugin when bookmarks change in Firefox
-		
+	
+	def on_lock_changed(self, monitor, file, other_file, event):
+		#Happens whenever Firefox is closed
+		if event == gio.FILE_MONITOR_EVENT_DELETED:
+			self.c.ask_for_reload_permission(self)	
+			
+	def on_reload_permission_granted(self):
+		self.build_bookmark_list()	
