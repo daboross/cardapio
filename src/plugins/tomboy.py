@@ -92,7 +92,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.tomboy.SearchNotes(text.lower(), False, reply_handler = callback.handle_search_result,
 			error_handler = self.handle_search_error)
 
-	def finalize_search(self, items, text):
+	def finalize_search(self, items, text, has_more_results):
 		"""
 		DBusSearchNotesCallback invokes this when it finishes gathering
 		single search results. This method finalizes the search, then
@@ -111,15 +111,16 @@ class CardapioPlugin(CardapioPluginInterface):
 				'context menu' : None
 			})
 
-		# the 'search more' option is always present
-		items.append({
-			'name'         : _('Show additional notes'),
-			'tooltip'      : _('Show additional notes in Tomboy'),
-			'icon name'    : 'tomboy',
-			'type'         : 'callback',
-			'command'      : self.tomboy_find_more,
-			'context menu' : None
-		})
+		# show the 'search more' option if required
+		if has_more_results:
+			items.append({
+				'name'         : _('Show additional notes'),
+				'tooltip'      : _('Show additional notes in Tomboy'),
+				'icon name'    : 'tomboy',
+				'type'         : 'callback',
+				'command'      : self.tomboy_find_more,
+				'context menu' : None
+			})
 
 		self.cardapio.handle_search_result(self, items, text)
 
@@ -202,4 +203,5 @@ class DBusSearchNotesCallback:
 
 		# pass all of the gathered items and the current search
 		# text to the main plugin class
-		self.result_callback(items, self.text)
+		self.result_callback(items, self.text, len(result) > len(items))
+

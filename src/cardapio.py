@@ -134,6 +134,7 @@ class Cardapio(dbus.service.Object):
 
 	core_plugins = [
 			'applications',
+			'command_launcher',
 			'google',
 			'google_localized',
 			'pinned',

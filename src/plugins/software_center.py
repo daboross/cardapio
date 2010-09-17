@@ -24,7 +24,7 @@ except Exception, exception:
 
 class CardapioPlugin(CardapioPluginInterface):
 
-	author             = 'Clifton Mulkey'
+	author             = 'Cardapio team' # tvst: changed this, now that Clifton is in the Cardapio team
 	name               = _('Software Center')
 	description        = _('Search for new applications in the Software Center')
 
