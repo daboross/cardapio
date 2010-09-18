@@ -9,7 +9,7 @@ except Exception, exception:
 
 class CardapioPlugin (CardapioPluginInterface):
 
-	author             = 'Cardapio team' # tvst: changed this, now that Clifton is in the Cardapio team
+	author             = 'Cardapio team' 
 	name               = _('Command Launcher')
 	description        = _('Run commands from the search box')
 
@@ -100,15 +100,10 @@ class CardapioPlugin (CardapioPluginInterface):
 					num_results += 1
 
 				except StopIteration:
-					# tvst: Hey Clifton, what command throws this exception?
 					break
 					
-		# tvst: make results look a little nicer
 		results.sort(key = lambda r: r['name'])
 					
-		# tvst: I moved the action below into an "if not results" to avoid
-		# duplicate entries.
-
 		if not results:
 			results.append({
 				'name'          : text,

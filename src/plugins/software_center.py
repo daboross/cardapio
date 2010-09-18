@@ -24,7 +24,7 @@ except Exception, exception:
 
 class CardapioPlugin(CardapioPluginInterface):
 
-	author             = 'Cardapio team' # tvst: changed this, now that Clifton is in the Cardapio team
+	author             = 'Cardapio team'
 	name               = _('Software Center')
 	description        = _('Search for new applications in the Software Center')
 
@@ -34,7 +34,11 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	plugin_api_version = 1.39
 
-	search_delay_type  = 'local'
+	search_delay_type  = 'remote' # HACK: this should be 'local', but searching
+	                              # the software center DB can be pretty slow, so we set 
+								  # this to 'remote' as a stopgap measure. See:
+								  # https://bugs.launchpad.net/cardapio/+bug/642264
+
 	default_keyword    = 'softwarecenter'
 	category_name      = _('Available Software')
 	category_icon      = 'softwarecenter'
