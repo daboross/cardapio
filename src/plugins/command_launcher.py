@@ -65,12 +65,12 @@ class CardapioPlugin (CardapioPluginInterface):
 
 		num_results = 0
 		for path in self.pathlist:
-			if num_results > result_limit: break
+			if num_results >= result_limit: break
 
 			cmd_iter = (glob.iglob('%s/%s*' % (path, cmdname)))
 
 			while True:
-				if num_results > result_limit: break
+				if num_results >= result_limit: break
 
 				try:
 					cmd = os.path.basename(cmd_iter.next())
