@@ -1024,7 +1024,7 @@ class Cardapio(dbus.service.Object):
 		self.add_subfolders_slab()
 		self.add_all_reorderable_slabs()
 
-		self.build_places_list()
+		self.build_places_list(set_monitors = True)
 		self.build_session_list()
 		self.build_system_list()
 		self.build_uncategorized_list()
@@ -2591,44 +2591,47 @@ class Cardapio(dbus.service.Object):
 		self.add_tree_to_app_list(self.app_tree.root, self.uncategorized_section_contents, self.app_list, recursive = False)
 
 
-	def build_places_list(self):
+	def build_places_list(self, set_monitors = False):
 		"""
 		Populate the places list
 		"""
 
-		self.build_bookmarked_places_list(self.places_section_contents)
-		self.build_system_places_list(self.places_section_contents)
+		self.build_bookmarked_places_list(self.places_section_contents, set_monitors)
+		self.build_system_places_list(self.places_section_contents, set_monitors)
 
 
-	def build_system_places_list(self, section_contents):
+	def build_system_places_list(self, section_contents, set_monitors):
 		"""
-		Populate the "system places", which include Computer, the list of connected drives, and so on.
+		Populate the "system places", which include Computer, the list of
+		connected drives, and so on.
 		"""
 
-		del self.volume_monitor
 		self.volume_monitor = gio.volume_monitor_get() # keep a reference to avoid getting it garbage-collected
-
 		self.volumes = {}
 
-		for drive in self.volume_monitor.get_connected_drives():
-			if drive.has_media():
-				for volume in drive.get_volumes():
-					name = volume.get_name()
-					icon_name = self.get_icon_name_from_gio_icon(volume.get_icon())
-					try    : command = str(volume.get_mount().get_root().get_uri())
-					except : command = ''
-					self.add_app_button(name, icon_name, section_contents, 'xdg', command, tooltip = command, app_list = self.app_list)
-					self.volumes[command] = volume
+		for mount in self.volume_monitor.get_mounts():
+
+			volume = mount.get_volume()
+			if volume is None: continue
+
+			name = volume.get_name()
+			icon_name = self.get_icon_name_from_gio_icon(volume.get_icon())
+
+			try    : command = str(volume.get_mount().get_root().get_uri())
+			except : command = ''
+
+			self.add_app_button(name, icon_name, section_contents, 'xdg', command, tooltip = command, app_list = self.app_list)
+			self.volumes[command] = volume
 
 		self.add_app_button(_('Network'), 'network', section_contents, 'xdg', 'network://', tooltip = _('Browse the contents of the network'), app_list = self.app_list)
-
 		self.add_app_button(_('Trash'), 'user-trash', section_contents, 'xdg', 'trash:///', tooltip = _('Open the trash'), app_list = self.app_list)
 
-		self.volume_monitor.connect('volume-added', self.on_volume_monitor_changed, self.places_section_contents)
-		self.volume_monitor.connect('volume-removed', self.on_volume_monitor_changed, self.places_section_contents)
+		if set_monitors:
+			self.mount_added_handler   = self.volume_monitor.connect('mount-added', self.on_volume_monitor_changed, self.places_section_contents)
+			self.mount_removed_handler = self.volume_monitor.connect('mount-removed', self.on_volume_monitor_changed, self.places_section_contents)
 
 
-	def build_bookmarked_places_list(self, section_contents):
+	def build_bookmarked_places_list(self, section_contents, set_monitors):
 		"""
 		Populate the "bookmarked places", which include Home and your personal bookmarks.
 		"""
@@ -2664,9 +2667,10 @@ class Cardapio(dbus.service.Object):
 
 		bookmark_file.close()
 
-		del self.bookmark_monitor
-		self.bookmark_monitor = gio.File(bookmark_file_path).monitor_file() # keep a reference to avoid getting it garbage-collected
-		self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed, self.places_section_contents)
+		if set_monitors:
+			del self.bookmark_monitor
+			self.bookmark_monitor = gio.File(bookmark_file_path).monitor_file() # keep a reference to avoid getting it garbage-collected
+			self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed, self.places_section_contents)
 
 
 	def on_bookmark_monitor_changed(self, monitor, file, other_file, event, section_contents):
@@ -3465,8 +3469,8 @@ class Cardapio(dbus.service.Object):
 					self.open_folder_menuitem.show()
 
 		# figure out whether to show the 'eject' menuitem
-		if 'file:///media/' == widget.app_info['command'][:14]:
-			# figure out if should show '
+		#if 'file:///media/' == widget.app_info['command'][:14]:
+		if widget.app_info['command'] in self.volumes:
 			self.eject_menuitem.show()
 		else:
 			self.eject_menuitem.hide()
