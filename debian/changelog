@@ -1,3 +1,23 @@
+cardapio (0.0.147-ubuntu1-maverick1) maverick; urgency=low
+
+   * Command launcher plugin allows you to run CLI commands from Cardapio
+   * Removable disks are now shown in Cardapio
+   * Able to mount/unmount disks from Cardapio
+   * Plus several bug fixes!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 26 Sep 2010 22:01:00 -0400
+
+
+cardapio (0.0.147-ubuntu1-lucid1) lucid; urgency=low
+
+   * Command launcher plugin allows you to run CLI commands from Cardapio
+   * Removable disks are now shown in Cardapio
+   * Able to mount/unmount disks from Cardapio
+   * Plus several bug fixes!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 26 Sep 2010 22:01:00 -0400
+
+
 cardapio (0.9.146-ubuntu1-maverick1) maverick; urgency=low
 
    * Updating translations
