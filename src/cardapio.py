@@ -152,6 +152,8 @@ class Cardapio(dbus.service.Object):
 	SESSION_BUTTON  = 2
 	SIDEPANE_BUTTON = 3
 
+	REMOTE_PROTOCOLS = ['ftp', 'sftp', 'smb']
+
 	class SafeCardapioProxy:
 		pass
 
@@ -2662,7 +2664,13 @@ class Cardapio(dbus.service.Object):
 
 		for line in bookmark_file.readlines():
 			if line.strip(' \n\r\t'):
+
 				name, path = self.get_place_name_and_path(line)
+				path_type, dummy = urllib2.splittype(path)
+
+				gio_path_obj = gio.File(path)
+				if not gio_path_obj.query_exists() and path_type not in Cardapio.REMOTE_PROTOCOLS: continue
+
 				self.add_place(name, path, 'folder')
 
 		bookmark_file.close()
@@ -3469,7 +3477,6 @@ class Cardapio(dbus.service.Object):
 					self.open_folder_menuitem.show()
 
 		# figure out whether to show the 'eject' menuitem
-		#if 'file:///media/' == widget.app_info['command'][:14]:
 		if widget.app_info['command'] in self.volumes:
 			self.eject_menuitem.show()
 		else:
@@ -3671,7 +3678,7 @@ class Cardapio(dbus.service.Object):
 				else:
 					return
 
-		elif path_type in ['ftp', 'sftp', 'smb']:
+		elif path_type in Cardapio.REMOTE_PROTOCOLS:
 			special_handler = self.settings['handler for %s paths' % path_type]
 			return self.launch_raw(special_handler % path, hide)
 
