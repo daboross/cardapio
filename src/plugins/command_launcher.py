@@ -15,7 +15,7 @@ class CardapioPlugin (CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.0'
+	version            = '1.1'
 
 	plugin_api_version = 1.39
 
@@ -46,6 +46,11 @@ class CardapioPlugin (CardapioPluginInterface):
 			return
 		
 		self.pathlist = os.environ['PATH'].split(':')
+
+		self.in_a_terminal         = _('Execute \'%s\' In Terminal')
+		self.in_a_terminal_tooltip = _('Execute the command \'%s\' inside a new terminal window')
+		self.as_root               = _('Execute \'%s\' As Root')
+		self.as_root_tooltip       = _('Execute the command \'%s\' with administrative rights')
 		
 	   	self.loaded = True # set to true if everything goes well
 
@@ -74,6 +79,7 @@ class CardapioPlugin (CardapioPluginInterface):
 
 				try:
 					cmd = os.path.basename(cmd_iter.next())
+					cmdargs = cmd + args
 					item = {
 						'name'          : '%s%s' % (cmd, args),
 						'tooltip'       : 'Run \'%s%s\'' % (cmd, args),
@@ -82,15 +88,15 @@ class CardapioPlugin (CardapioPluginInterface):
 						'command'       : '%s%s' % (cmd, args),
 						'context menu'  : [
 							{
-							'name'      : '%s%s %s' % (cmd, args, '(in Terminal)'),
-							'tooltip'   : 'Run \'%s%s\' in a terminal' % (cmd, args),
+							'name'      : self.in_a_terminal % cmdargs,
+							'tooltip'   : self.in_a_terminal_tooltip % cmdargs,
 							'icon name' : 'utilities-terminal',
 							'type'      : 'raw',
 							'command'   : 'gnome-terminal -x bash -c \"%s%s ; bash\"' % (cmd, args)
 							},
 							{
-							'name'      : '%s%s %s' % (cmd, args, '(as root)'),
-							'tooltip'   : 'Run \'%s%s\' as root' % (cmd, args),
+							'name'      : self.as_root % cmdargs,
+							'tooltip'   : self.as_root_tooltip % cmdargs,
 							'icon name' : cmd,
 							'type'      : 'raw',
 							'command'   : 'gksudo \"%s%s\"' % (cmd, args)
@@ -113,15 +119,15 @@ class CardapioPlugin (CardapioPluginInterface):
 				'command'       : text,
 				'context menu'  : [
 					{
-					'name'      : text + ' (in Terminal)',
-					'tooltip'   : 'Run \'%s\' in a terminal' % text,
+					'name'      : self.in_a_terminal % text,
+					'tooltip'   : self.in_a_terminal_tooltip % text,
 					'icon name' : 'utilities-terminal',
 					'type'      : 'raw',
 					'command'   : 'gnome-terminal -x bash -c \"%s ; bash\"' % text
 					},
 					{
-					'name'      : text + ' (as root)',
-					'tooltip'   : 'Run \'%s\' as root' % text,
+					'name'      : self.as_root % text,
+					'tooltip'   : self.as_root_tooltip % text,
 					'icon name' : 'system-run',
 					'type'      : 'raw',
 					'command'   : 'gksudo \"%s\"' % text

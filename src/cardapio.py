@@ -3469,8 +3469,8 @@ class Cardapio(dbus.service.Object):
 			path_type, canonical_path = split_command
 			dummy, extension = os.path.splitext(canonical_path)
 
-			# don't show it for computer://, trash://, or .desktop files
-			if path_type != 'computer' and path_type != 'trash' and extension != '.desktop':
+			# don't show it for network://, trash://, or .desktop files
+			if path_type not in ('computer', 'network', 'trash') and extension != '.desktop':
 
 				# only show if path that exists
 				if os.path.exists(self.unescape(canonical_path)):
