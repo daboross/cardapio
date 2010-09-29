@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-26 21:09+0200\n"
+"POT-Creation-Date: 2010-09-29 23:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -473,6 +473,26 @@ msgstr ""
 
 #: plugins/command_launcher.py:28
 msgid "Run system commands, just like in the command-line"
+msgstr ""
+
+#: plugins/command_launcher.py:50
+#, python-format
+msgid "Execute '%s' In Terminal"
+msgstr ""
+
+#: plugins/command_launcher.py:51
+#, python-format
+msgid "Execute the command '%s' inside a new terminal window"
+msgstr ""
+
+#: plugins/command_launcher.py:52
+#, python-format
+msgid "Execute '%s' As Root"
+msgstr ""
+
+#: plugins/command_launcher.py:53
+#, python-format
+msgid "Execute the command '%s' with administrative rights"
 msgstr ""
 
 #: plugins/ebay.py:31
