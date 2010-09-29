@@ -2536,7 +2536,7 @@ class Cardapio(dbus.service.Object):
 			self.panel_button.parent.modify_bg(gtk.STATE_NORMAL, color)
 
 		elif bg_type == gnomeapplet.PIXMAP_BACKGROUND:
-			style = self.panel_button.parent.style
+			style = self.panel_button.parent.get_style()
 			style.bg_pixmap[gtk.STATE_NORMAL] = pixmap
 			self.panel_button.parent.set_style(style)
 
@@ -4128,11 +4128,13 @@ def applet_factory(applet, iid):
 		{
 			xthickness = 0
 			ythickness = 0
-			GtkMenuBar::shadow-type = GTK_SHADOW_NONE
+			GtkMenuBar::shadow-type      = GTK_SHADOW_NONE
 			GtkMenuBar::internal-padding = 0
-			GtkWidget::focus-padding = 0
-			GtkMenuBar::focus-padding = 0
+			GtkMenuBar::focus-padding    = 0
+			GtkWidget::focus-padding     = 0
+			GtkWidget::focus-line-width  = 0
 			#bg[NORMAL] = "#ff0000"
+			engine "murrine" {} # fix background color bug
 		}
 
 		style "cardapio-applet-style"
@@ -4140,7 +4142,7 @@ def applet_factory(applet, iid):
 			xthickness = 0
 			ythickness = 0
 			GtkWidget::focus-line-width = 0
-			GtkWidget::focus-padding = 0
+			GtkWidget::focus-padding    = 0
 		}
 
 		widget "*CardapioAppletMenu" style:highest "cardapio-applet-menu-style"
