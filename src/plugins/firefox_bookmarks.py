@@ -74,7 +74,19 @@ class CardapioPlugin (CardapioPluginInterface):
 		prof_list = ini_file.read().split()
 		ini_file.close()
 		
-		prof_folder = prof_list[prof_list.index('Default=1') - 1].split('=')[1]
+		try:
+			prof_folder = prof_list[prof_list.index('Default=1') - 1].split('=')[1]
+			
+		except ValueError:
+			
+			try:
+				prof_folder = prof_list[prof_list.index('Name=default') + 2].split('=')[1]
+			
+			except ValueError:
+				self.c.write_to_log(self, 'Could not determine firefox profile folder',
+									is_error = True)
+				return
+			
 		self.prof_path = os.path.join(firefox_path,prof_folder)
 		
 		db_path = os.path.join(self.prof_path, 'places.sqlite')
