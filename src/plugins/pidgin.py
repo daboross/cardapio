@@ -1,3 +1,5 @@
+from operator import itemgetter
+
 from dbus.exceptions import DBusException
 
 class CardapioPlugin(CardapioPluginInterface):
@@ -88,11 +90,11 @@ class CardapioPlugin(CardapioPluginInterface):
 		# prepare a parametrized callback that remembers the current search text and
 		# the result limit
 		callback = DBusGatherBuddiesCallback(self.pidgin, self.finalize_search,
-			text, result_limit)
+					text, result_limit)
 
 		# let's start by getting all of the user's active accounts
 		self.pidgin.PurpleAccountsGetAllActive(reply_handler = callback.handle_search_result,
-			error_handler = self.handle_search_error)
+					error_handler = self.handle_search_error)
 
 	def finalize_search(self, buddies, text):
 		"""
@@ -111,7 +113,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 			# add 'talk to this buddy' item
 			items.append({
-				'name'         : buddy[2] + ' ({0})'.format(buddy[1]),
+				'name'         : buddy[2] + ' ({0}) - {1}'.format(buddy[1], buddy[3]),
 				'tooltip'      : _('Talk to this buddy'),
 				'icon name'    : 'pidgin',
 				'type'         : 'callback',
@@ -150,7 +152,11 @@ class DBusGatherBuddiesCallback:
 		"""
 
 		# gather all online buddies
-		self.result_callback(self.gather_buddies(accounts), self.text)
+		# we're sorting the results by status and then by alias
+		buddies = self.gather_buddies(accounts)
+		buddies.sort(key=itemgetter(3, 2))
+
+		self.result_callback(buddies, self.text)
 
 	def gather_buddies(self, accounts):
 		"""
@@ -171,20 +177,25 @@ class DBusGatherBuddiesCallback:
 			for buddy in self.pidgin.PurpleFindBuddies(account, ''):
 
 				# obey the result limit!
+				# TODO: should we crop this after or before sorting?
 				if len(buddies) == self.result_limit:
 					return buddies
 
-				# we remember only those buddies who are online now
-				if self.pidgin.PurpleBuddyIsOnline(buddy):
+				buddy_alias = self.pidgin.PurpleBuddyGetAlias(buddy)
 
-					buddy_alias = self.pidgin.PurpleBuddyGetAlias(buddy)
+				# if buddy's alias contains (case insensitive) the search
+				# keyword, add him to the result list
+				if buddy_alias.lower().count(self.text.lower()) > 0:
+
+					# but gather rest of his data first...
 					buddy_name = self.pidgin.PurpleBuddyGetName(buddy)
 
-					# if buddies alias contains (case insensitive) the search
-					# keyword, add him to the result list
-					if buddy_alias.lower().count(self.text.lower()) > 0:
-						buddies.append((account, buddy_name, buddy_alias))
+					presence = self.pidgin.PurpleBuddyGetPresence(buddy)
+					active_status = self.pidgin.PurplePresenceGetActiveStatus(presence)
+					status_id = self.pidgin.PurpleStatusGetId(active_status)
 
+					buddies.append((account, buddy_name, buddy_alias, status_id))
+		
 		return buddies
 
 
