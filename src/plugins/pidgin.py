@@ -113,7 +113,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 			# add 'talk to this buddy' item
 			items.append({
-				'name'         : buddy[2] + ' ({0}) - {1}'.format(buddy[1], buddy[3]),
+				'name'         : buddy[2] + ' ({0}) - {1}'.format(buddy[1], buddy[4]),
 				'tooltip'      : _('Talk to this buddy'),
 				'icon name'    : 'pidgin',
 				'type'         : 'callback',
@@ -152,11 +152,11 @@ class DBusGatherBuddiesCallback:
 		"""
 
 		# gather all online buddies
-		# we're sorting the results by status and then by alias
 		buddies = self.gather_buddies(accounts)
-		buddies.sort(key=itemgetter(3, 2))
 
-		self.result_callback(buddies, self.text)
+		# we're sorting the results by status and by alias, then we're
+		# limiting their count
+		self.result_callback(sorted(buddies, key=itemgetter(3, 2))[:self.result_limit], self.text)
 
 	def gather_buddies(self, accounts):
 		"""
@@ -176,11 +176,6 @@ class DBusGatherBuddiesCallback:
 			# and every buddy associated with this active account...
 			for buddy in self.pidgin.PurpleFindBuddies(account, ''):
 
-				# obey the result limit!
-				# TODO: should we crop this after or before sorting?
-				if len(buddies) == self.result_limit:
-					return buddies
-
 				buddy_alias = self.pidgin.PurpleBuddyGetAlias(buddy)
 
 				# if buddy's alias contains (case insensitive) the search
@@ -193,8 +188,9 @@ class DBusGatherBuddiesCallback:
 					presence = self.pidgin.PurpleBuddyGetPresence(buddy)
 					active_status = self.pidgin.PurplePresenceGetActiveStatus(presence)
 					status_id = self.pidgin.PurpleStatusGetId(active_status)
+					status_name = self.pidgin.PurpleStatusGetName(active_status)
 
-					buddies.append((account, buddy_name, buddy_alias, status_id))
+					buddies.append((account, buddy_name, buddy_alias, status_id, status_name))
 		
 		return buddies
 
