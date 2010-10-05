@@ -38,7 +38,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	category_tooltip = _('Your online Pidgin buddies')
 
 	category_icon = 'pidgin'
-	fallback_icon = ''
+	fallback_icon = 'pidgin'
 
 	hide_from_sidebar = True
 
@@ -113,9 +113,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 			# add 'talk to this buddy' item
 			items.append({
-				'name'         : buddy[2] + ' ({0}) - {1}'.format(buddy[1], buddy[4]),
+				'name'         : buddy[2] + ' ({0})'.format(buddy[1]),
 				'tooltip'      : _('Talk to this buddy'),
-				'icon name'    : 'pidgin',
+				'icon name'    : 'user-' + buddy[3],
 				'type'         : 'callback',
 				'command'      : conversation_callback.start_conversation,
 				'context menu' : None
@@ -149,13 +149,15 @@ class DBusGatherBuddiesCallback:
 		Callback to asynchronous Pidgin's PurpleAccountsGetAllActive
 		call. It gathers results and then passes those back to the
 		main plugin class through the result_callback method.
+
+		Results are prepared in certain way:
+		- sorted by status, then alias
+		- limited to at most result_limit entries
 		"""
 
 		# gather all online buddies
 		buddies = self.gather_buddies(accounts)
-
-		# we're sorting the results by status and by alias, then we're
-		# limiting their count
+		# sort and crop before returning
 		self.result_callback(sorted(buddies, key=itemgetter(3, 2))[:self.result_limit], self.text)
 
 	def gather_buddies(self, accounts):
@@ -188,9 +190,8 @@ class DBusGatherBuddiesCallback:
 					presence = self.pidgin.PurpleBuddyGetPresence(buddy)
 					active_status = self.pidgin.PurplePresenceGetActiveStatus(presence)
 					status_id = self.pidgin.PurpleStatusGetId(active_status)
-					status_name = self.pidgin.PurpleStatusGetName(active_status)
 
-					buddies.append((account, buddy_name, buddy_alias, status_id, status_name))
+					buddies.append((account, buddy_name, buddy_alias, status_id))
 		
 		return buddies
 
