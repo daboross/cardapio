@@ -62,19 +62,41 @@ class CardapioPlugin(CardapioPluginInterface):
 			self.cardapio.write_to_log(self, 'Pidgin plugin initialization error: {0}'.format(str(ex)), is_error = True)
 			self.loaded = False
 
+	# Pidgin's status primitives (constants)
+	status_primitives = ['offline', 'available', 'unavailable', 'invisible', 'away',
+	                     'extended_away', 'mobile', 'tune', 'mood']
+
+	# mappings of Pidgin's status primitives to standard icon names
+	status_icons = { 'offline' : 'user-offline', 'available' : 'user-available',
+	                 'unavailable' : 'user-offline', 'invisible' : 'user-offline',
+			 'away' : 'user-away', 'extended_away' : 'user-away',
+			 'mobile' : 'user-available', 'tune' : 'user-available',
+			 'mood' : 'user-available' }
+
 	def on_dbus_name_change(self, connection_name):
 		"""
 		This method effectively tracks down the events of Pidgin app starting
 		and shutting down. When the app shuts down, this callback nullifies our
-		Pidgin's proxy and when the app starts, this callback sets the valid
-		proxy again.
+		Pidgin's proxy. When the app starts, this callback sets the valid
+		proxy, then refreshes the constants that represent possible Pidgin's
+		status primitives.
 		"""
 
 		if len(connection_name) == 0:
+			# clear the state
+			self.statuses = {}
 			self.pidgin = None
 		else:
 			bus_object = self.bus.get_object(connection_name, self.dpidgin_object_path)
-			self.pidgin = dbus.Interface(bus_object, self.dpidgin_iface_name)
+			pidgin = dbus.Interface(bus_object, self.dpidgin_iface_name)
+
+			# remember the unique id of each status primitive
+			self.statuses = {}
+			for primitive in self.status_primitives:
+				self.statuses[primitive] = pidgin.PurplePrimitiveGetTypeFromId(primitive)
+
+			# ready
+			self.pidgin = pidgin
 
 	def search(self, text, result_limit):
 		if len(text) == 0:
@@ -89,8 +111,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		# prepare a parametrized callback that remembers the current search text and
 		# the result limit
-		callback = DBusGatherBuddiesCallback(self.pidgin, self.finalize_search,
-					text, result_limit)
+		callback = DBusGatherBuddiesCallback(self, text, result_limit)
 
 		# let's start by getting all of the user's active accounts
 		self.pidgin.PurpleAccountsGetAllActive(reply_handler = callback.handle_search_result,
@@ -115,7 +136,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			items.append({
 				'name'         : buddy[2] + ' ({0})'.format(buddy[1]),
 				'tooltip'      : _('Talk to this buddy'),
-				'icon name'    : 'user-' + buddy[3],
+				'icon name'    : buddy[3],
 				'type'         : 'callback',
 				'command'      : conversation_callback.start_conversation,
 				'context menu' : None
@@ -137,9 +158,10 @@ class DBusGatherBuddiesCallback:
 	call.
 	"""
 
-	def __init__(self, pidgin, result_callback, text, result_limit):
-		self.pidgin = pidgin
-		self.result_callback = result_callback
+	def __init__(self, parent, text, result_limit):
+		self.parent = parent
+		self.pidgin = parent.pidgin
+		self.result_callback = parent.finalize_search
 
 		self.text = text
 		self.result_limit = result_limit
@@ -157,7 +179,8 @@ class DBusGatherBuddiesCallback:
 
 		# gather all online buddies
 		buddies = self.gather_buddies(accounts)
-		# sort and crop before returning
+		# sort (we rely on alphabetical order of icon names) and crop
+		# the results before triggering further processing of them
 		self.result_callback(sorted(buddies, key=itemgetter(3, 2))[:self.result_limit], self.text)
 
 	def gather_buddies(self, accounts):
@@ -186,15 +209,25 @@ class DBusGatherBuddiesCallback:
 
 					# but gather rest of his data first...
 					buddy_name = self.pidgin.PurpleBuddyGetName(buddy)
-
 					presence = self.pidgin.PurpleBuddyGetPresence(buddy)
-					active_status = self.pidgin.PurplePresenceGetActiveStatus(presence)
-					status_id = self.pidgin.PurpleStatusGetId(active_status)
 
-					buddies.append((account, buddy_name, buddy_alias, status_id))
+					buddies.append((account, buddy_name, buddy_alias, self.get_icon_name(presence)))
 		
 		return buddies
 
+	def get_icon_name(self, presence):
+		"""
+		Returns standard icon name for given presence of user.
+		"""
+
+		# look for active status primitive...
+		for primitive in self.parent.status_primitives:
+			status_const = self.parent.statuses[primitive]
+			if(self.pidgin.PurplePresenceIsStatusPrimitiveActive(presence, status_const)):
+				return self.parent.status_icons[primitive]
+
+		# couldn't find it - fallback icon...
+		return 'user-offline'
 
 class DBusTalkToBuddyCallback:
 	"""
