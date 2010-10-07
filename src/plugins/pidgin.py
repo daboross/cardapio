@@ -8,10 +8,16 @@ class CardapioPlugin(CardapioPluginInterface):
 	Pidgin plugin based on it's D-Bus interface. Documentation:
 	http://developer.pidgin.im/wiki/DbusHowto
 
-	The plugin looks for online buddies and provides the user with
+	The plugin looks for Pidgin buddies and provides the user with
 	possibility to start a conversation with any of them. All active
 	accounts are considered. We match buddies by their alias (case
 	insensitive).
+
+	Each buddy is marked with icon representing his or her current
+	status. We try to avoid nonexistent status icons by translating
+	the categories of statuses to three standard icons (user-available,
+	user-away or user-offline). Results are categorized and sorted
+	according to their status too.
 
 	Please note that the plugin only works when Pidgin is on. You don't
 	need to turn Pidgin on before starting Cardapio or before initializing
