@@ -130,7 +130,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.147'
+	version = '0.9.148'
 
 	core_plugins = [
 			'applications',
@@ -3190,9 +3190,9 @@ class Cardapio(dbus.service.Object):
 			icon_name = icon_name[:-4]
 
 		if icon_pixbuf is None:
-			icon_name_ = self.get_icon_name_from_theme(icon_name)
-			if icon_name_ is not None:
-				try: icon_pixbuf = self.icon_theme.load_icon(icon_name_, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
+			cleaned_icon_name = self.get_icon_name_from_theme(icon_name)
+			if cleaned_icon_name is not None:
+				try: icon_pixbuf = self.icon_theme.load_icon(cleaned_icon_name, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
 				except: pass
 
 		if icon_pixbuf is None:
@@ -3217,16 +3217,16 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		# replace slashed with dashes for mimetype icons
-		icon_name = icon_name.replace('/', '-')
+		cleaned_icon_name = icon_name.replace('/', '-')
 
-		if self.icon_theme.has_icon(icon_name):
-			return icon_name
+		if self.icon_theme.has_icon(cleaned_icon_name):
+			return cleaned_icon_name
 
 		# try generic mimetype
-		gen_type = icon_name.split('-')[0]
-		icon_name = gen_type + '-x-generic'
-		if self.icon_theme.has_icon(icon_name):
-			return icon_name
+		gen_type = cleaned_icon_name.split('-')[0]
+		cleaned_icon_name = gen_type + '-x-generic'
+		if self.icon_theme.has_icon(cleaned_icon_name):
+			return cleaned_icon_name
 
 		return None
 
@@ -3245,7 +3245,7 @@ class Cardapio(dbus.service.Object):
 		except Exception, exception:
 			logging.warn('Could not get icon for %s' % path)
 			logging.warn(exception)
-
+			return None
 
 		if info is not None:
 			icons = info.get_icon().get_property('names')
