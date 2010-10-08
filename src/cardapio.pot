@@ -8,10 +8,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-29 23:33+0200\n"
+"POT-Creation-Date: 2010-10-08 10:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -544,23 +545,23 @@ msgstr ""
 msgid "Results found with Google in you system language"
 msgstr ""
 
-#: plugins/pidgin.py:22
+#: plugins/pidgin.py:30
 msgid "Pidgin"
 msgstr ""
 
-#: plugins/pidgin.py:23
+#: plugins/pidgin.py:31
 msgid "Search for online Pidgin buddies"
 msgstr ""
 
-#: plugins/pidgin.py:35
+#: plugins/pidgin.py:43
 msgid "Pidgin Buddies"
 msgstr ""
 
-#: plugins/pidgin.py:36
+#: plugins/pidgin.py:44
 msgid "Your online Pidgin buddies"
 msgstr ""
 
-#: plugins/pidgin.py:115
+#: plugins/pidgin.py:144
 msgid "Talk to this buddy"
 msgstr ""
 
