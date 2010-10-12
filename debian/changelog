@@ -1,3 +1,35 @@
+cardapio (0.9.149-ubuntu1-maverick1) maverick; urgency=low
+
+   * Pidgin plugin now displays offline buddies and buddy status
+   * Updated translations
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 30 Sep 2010 13:01:00 -0000
+
+
+cardapio (0.9.149-ubuntu1-lucid1) lucid; urgency=low
+
+   * Pidgin plugin now displays offline buddies and buddy status
+   * Updated translations
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 30 Sep 2010 13:01:00 -0000
+
+
+cardapio (0.9.149-ubuntu1-maverick1) maverick; urgency=low
+
+   * Pidgin plugin now displays offline buddies and buddy status
+   * Updated translations
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 30 Sep 2010 13:01:00 -0000
+
+
+cardapio (0.9.149-ubuntu1-lucid1) lucid; urgency=low
+
+   * Pidgin plugin now displays offline buddies and buddy status
+   * Updated translations
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 30 Sep 2010 13:01:00 -0000
+
+
 cardapio (0.9.148-ubuntu1-maverick1) maverick; urgency=low
 
    * Fixed applet background bug
@@ -25,26 +57,6 @@ cardapio (0.9.147-ubuntu1-maverick1) maverick; urgency=low
 
 
 cardapio (0.9.147-ubuntu1-lucid1) lucid; urgency=low
-
-   * Command launcher plugin allows you to run CLI commands from Cardapio
-   * Removable disks are now shown in Cardapio
-   * Able to mount/unmount disks from Cardapio
-   * Plus several bug fixes!
-
- -- Thiago Teixeira <tvst@hotmail.com>  Sun, 26 Sep 2010 22:01:00 -0400
-
-
-cardapio (0.0.147-ubuntu1-maverick1) maverick; urgency=low
-
-   * Command launcher plugin allows you to run CLI commands from Cardapio
-   * Removable disks are now shown in Cardapio
-   * Able to mount/unmount disks from Cardapio
-   * Plus several bug fixes!
-
- -- Thiago Teixeira <tvst@hotmail.com>  Sun, 26 Sep 2010 22:01:00 -0400
-
-
-cardapio (0.0.147-ubuntu1-lucid1) lucid; urgency=low
 
    * Command launcher plugin allows you to run CLI commands from Cardapio
    * Removable disks are now shown in Cardapio

@@ -130,7 +130,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.148'
+	version = '0.9.149'
 
 	core_plugins = [
 			'applications',
@@ -1572,6 +1572,8 @@ class Cardapio(dbus.service.Object):
 		self.no_results_to_show = True
 		self.hide_no_results_text()
 
+		handled = False
+
 		if self.in_system_menu_mode:
 			self.fully_hide_all_sections()
 			self.subfolder_stack = []
@@ -1593,9 +1595,9 @@ class Cardapio(dbus.service.Object):
 			selected_app_widget = self.get_selected_app()
 			self.fully_hide_all_sections()
 			self.previously_focused_widget = None
-			self.search_subfolders(text, first_app_widget, selected_app_widget)
+			handled = self.search_subfolders(text, first_app_widget, selected_app_widget)
 
-		else:
+		if not handled:
 			self.fully_hide_all_sections()
 			self.subfolder_stack = []
 			self.search_menus(text, self.app_list)
@@ -1645,6 +1647,10 @@ class Cardapio(dbus.service.Object):
 
 
 	def search_subfolders(self, text, first_app_widget, selected_app_widget):
+		"""
+		Lets you browse your filesystem through Cardapio by typing slash "/" after
+		a search query to "push into" a folder. 
+		"""
 
 		text = text.lower()
 
@@ -1652,12 +1658,16 @@ class Cardapio(dbus.service.Object):
 		slash_pos     = text.rfind('/')
 		parent_text   = text[:slash_pos]
 		base_text     = text[slash_pos+1:]
+		path          = None
 
 		self.subfolders_section_slab.hide() # for added performance
 		self.clear_pane(self.subfolders_section_contents)
 
 		if not search_inside:
-			path = self.subfolder_stack[-1][1]
+			if not self.subfolder_stack: return False
+			slash_count = text.count('/')
+			path = self.subfolder_stack[slash_count - 1][1]
+			self.subfolder_stack = self.subfolder_stack[:slash_count]
 
 		else:
 			text = text[:-1]
@@ -1684,12 +1694,12 @@ class Cardapio(dbus.service.Object):
 					if selected_app_widget is not None: widget = selected_app_widget
 					else: widget = first_app_widget
 
-					if widget.app_info['type'] != 'xdg': return
+					if widget.app_info['type'] != 'xdg': return False
 					path = self.escape_quotes(self.unescape(widget.app_info['command']))
 
 					path_type, path = urllib2.splittype(path)
-					if path_type and path_type != 'file': return
-					if not os.path.isdir(path): return
+					if path_type and path_type != 'file': return False
+					if not os.path.isdir(path): return False
 					self.subfolder_stack.append((text,path))
 
 			# if popping out of a folder
@@ -1697,13 +1707,15 @@ class Cardapio(dbus.service.Object):
 				if prev_level > curr_level: self.subfolder_stack.pop()
 				path = self.subfolder_stack[-1][1]
 
+		if path is None: return False
+
 		if path == '/': parent_name = _('Filesystem Root')
 		else: dummy, parent_name = os.path.split(path)
 		self.subfolders_label.set_text(parent_name)
 
 		count = 0
 		limit = self.settings['long search results limit']
-
+		
 		for filename in os.listdir(path):
 
 			# ignore hidden files
@@ -1728,6 +1740,8 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			self.no_results_to_show = True
+
+		return True
 
 
 	def cancel_all_plugin_timers(self):
@@ -2160,6 +2174,7 @@ class Cardapio(dbus.service.Object):
 
 			for child in slab.get_children()[0].get_children()[0].get_children():
 				if not child.get_visible(): continue
+				if type(child) != gtk.Button: continue
 
 				return child
 
