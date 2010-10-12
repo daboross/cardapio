@@ -2295,6 +2295,29 @@ class Cardapio(dbus.service.Object):
 
 		window.move(window_x + offset_x, window_y + offset_y)
 
+	def reposition_main_window_at(self, x, y):
+		"""
+		Place the Cardapio window at given coordinates and make sure
+		it's visible.
+		"""
+
+		root_window = gtk.gdk.get_default_root_window()
+		screen_property = gtk.gdk.atom_intern('_NET_WORKAREA')
+		screen_dimensions = root_window.property_get(screen_property)[2]
+
+		if screen_dimensions:
+			possible_x = screen_dimensions[2] - screen_dimensions[0]
+			possible_y = screen_dimensions[3] - screen_dimensions[1]
+
+		else:
+			logging.warn('Could not get dimensions of usable screen area. Using max screen area instead.')
+			possible_x = gtk.gdk.screen_width()
+			possible_y = gtk.gdk.screen_height()
+
+		if x > possible_x or y > possible_y:
+			logging.error('[' + str(x) + ',' + str(y) + '] are not correct coordinates - ignoring move request!')
+		else:
+			self.window.move(x, y)
 
 	def restore_dimensions(self):
 		"""
@@ -2342,15 +2365,21 @@ class Cardapio(dbus.service.Object):
 		Show the Cardapio window
 		"""
 
-		if 'show_near_mouse' in kwargs:
-			show_near_mouse = kwargs['show_near_mouse']
-		else:
-			show_near_mouse = False
+		show_near_mouse = kwargs.get('show_near_mouse', False)
 
 		self.auto_toggle_panel_button(True)
 
 		self.restore_dimensions()
-		self.reposition_window(show_near_mouse = show_near_mouse)
+
+		x = kwargs.get('x', None)
+		y = kwargs.get('y', None)
+
+		# absolute positioning?
+		if x is not None and y is not None:
+			self.reposition_main_window_at(x, y)
+		else:
+			self.reposition_window(show_near_mouse = show_near_mouse)
+
 		self.show_window_on_top(self.window)
 
 		self.window.set_focus(self.search_entry)
@@ -2402,8 +2431,31 @@ class Cardapio(dbus.service.Object):
 
 		show_near_mouse = bool(show_near_mouse)
 
-		if self.visible: self.hide()
-		else: self.show(show_near_mouse = show_near_mouse)
+		if self.visible:
+			self.hide()
+		else:
+			self.show(show_near_mouse = show_near_mouse)
+
+		return True
+
+
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = 'ii', out_signature = None)
+	def show_hide_at(self, x, y):
+		"""
+		Toggle Show/Hide the Cardapio window at given coordinates.
+		This function is dbus-accessible.
+		"""
+
+		if time() - self.last_visibility_toggle < Cardapio.min_visibility_toggle_interval:
+			return
+
+		x = int(x)
+		y = int(y)
+
+		if self.visible:
+			self.hide()
+		else:
+			self.show(x = x, y = y)
 
 		return True
 
