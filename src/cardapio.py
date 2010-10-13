@@ -1583,6 +1583,7 @@ class Cardapio(dbus.service.Object):
 
 		if self.in_system_menu_mode:
 			self.search_menus(text, self.sys_list)
+			handled = True
 
 		elif text and text[0] == '?':
 			keyword, dummy, text = text.partition(' ')
@@ -1592,6 +1593,7 @@ class Cardapio(dbus.service.Object):
 				self.search_with_plugin_keyword(keyword[1:], text)
 
 			self.consider_showing_no_results_text()
+			handled = True
 
 		elif in_subfolder_search_mode:
 			first_app_widget = self.get_first_visible_app()
