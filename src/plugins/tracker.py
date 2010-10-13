@@ -49,6 +49,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			}
 
 		if getoutput('tracker-info -V | grep 0.9'):
+			self.tracker_case_insensitive = True
 			self.sparql_query = """
 					SELECT ?uri ?mime
 					WHERE { 
@@ -62,6 +63,7 @@ class CardapioPlugin(CardapioPluginInterface):
 					LIMIT %d
 				""" 
 		else:
+			self.tracker_case_insensitive = False
 			self.sparql_query = """
 					SELECT ?uri ?mime
 					WHERE { 
@@ -81,7 +83,8 @@ class CardapioPlugin(CardapioPluginInterface):
 	def search(self, text, result_limit):
 
 		self.current_query = text
-		text = urllib2.quote(text).lower()
+		text = urllib2.quote(text)
+		if self.tracker_case_insensitive: text = text.lower()
 
 		self.tracker.SparqlQuery(self.sparql_query % (text, result_limit),
 			dbus_interface='org.freedesktop.Tracker1.Resources',
