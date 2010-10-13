@@ -941,7 +941,8 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if self.keybinding is not None:
-			keybinder.unbind(self.keybinding)
+			try: keybinder.unbind(self.keybinding)
+			except: pass
 
 		self.keybinding = self.settings['keybinding']
 		keybinder.bind(self.keybinding, self.show_hide)
