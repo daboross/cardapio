@@ -1629,12 +1629,9 @@ class Cardapio(dbus.service.Object):
 
 		for app in app_list:
 
-			print app['name'],
 			if app['name'].find(text) == -1 and app['basename'].find(text) == -1:
-				print 'hidden'
 				app['button'].hide()
 			else:
-				print 'visible'
 				app['button'].show()
 				self.set_section_has_entries(app['section'])
 				self.no_results_to_show = False
@@ -2151,7 +2148,7 @@ class Cardapio(dbus.service.Object):
 			text = self.search_entry.get_text()
 			slash_pos = text.rfind('/')
 
-			if slash_pos != -1:
+			if self.subfolder_stack and slash_pos != -1:
 				if text[-1] == '/': slash_pos = text[:-1].rfind('/')
 				text = text[:slash_pos+1]
 				self.search_entry.set_text(text)
