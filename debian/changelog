@@ -1,3 +1,21 @@
+cardapio (0.9.150-ubuntu1-maverick1) maverick; urgency=low
+
+   * File search plugin now works with the default Tracker version in Maverick
+   * Fixed bugs with the subfolder search
+   * Updated translations
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 13 Sep 2010 21:01:00 -0000
+
+
+cardapio (0.9.150-ubuntu1-lucid1) lucid; urgency=low
+
+   * File search plugin now works with the default Tracker version in Maverick
+   * Fixed bugs with the subfolder search
+   * Updated translations
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 13 Sep 2010 21:01:00 -0000
+
+
 cardapio (0.9.149-ubuntu1-maverick1) maverick; urgency=low
 
    * Pidgin plugin now displays offline buddies and buddy status
