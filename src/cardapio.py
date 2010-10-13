@@ -1574,15 +1574,16 @@ class Cardapio(dbus.service.Object):
 		self.hide_no_results_text()
 
 		handled = False
+		in_subfolder_search_mode = (text and text.find('/') != -1)
 
-		if self.in_system_menu_mode:
+		if not in_subfolder_search_mode:
 			self.fully_hide_all_sections()
 			self.subfolder_stack = []
+
+		if self.in_system_menu_mode:
 			self.search_menus(text, self.sys_list)
 
 		elif text and text[0] == '?':
-			self.fully_hide_all_sections()
-			self.subfolder_stack = []
 			keyword, dummy, text = text.partition(' ')
 			self.current_query = text
 
@@ -1591,7 +1592,7 @@ class Cardapio(dbus.service.Object):
 
 			self.consider_showing_no_results_text()
 
-		elif text and text.find('/') != -1:
+		elif in_subfolder_search_mode:
 			first_app_widget = self.get_first_visible_app()
 			selected_app_widget = self.get_selected_app()
 			self.fully_hide_all_sections()
@@ -1599,8 +1600,6 @@ class Cardapio(dbus.service.Object):
 			handled = self.search_subfolders(text, first_app_widget, selected_app_widget)
 
 		if not handled:
-			self.fully_hide_all_sections()
-			self.subfolder_stack = []
 			self.search_menus(text, self.app_list)
 			self.schedule_search_with_all_plugins(text)
 
@@ -1625,16 +1624,17 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		text = text.lower()
-		first_app = None
 
 		self.application_pane.hide() # for speed
 
 		for app in app_list:
 
+			print app['name'],
 			if app['name'].find(text) == -1 and app['basename'].find(text) == -1:
+				print 'hidden'
 				app['button'].hide()
 			else:
-				if first_app is None: first_app = app
+				print 'visible'
 				app['button'].show()
 				self.set_section_has_entries(app['section'])
 				self.no_results_to_show = False
@@ -1643,8 +1643,6 @@ class Cardapio(dbus.service.Object):
 			self.untoggle_and_show_all_sections()
 
 		self.application_pane.show() # restore application_pane
-
-		return first_app
 
 
 	def create_subfolder_stack(self, path):
@@ -1671,7 +1669,6 @@ class Cardapio(dbus.service.Object):
 		a search query to "push into" a folder. 
 		"""
 
-		#text         = text.lower()
 		search_inside = (text[-1] == '/')
 		slash_pos     = text.rfind('/')
 		base_text     = text[slash_pos+1:]
@@ -1729,6 +1726,7 @@ class Cardapio(dbus.service.Object):
 
 		count = 0
 		limit = self.settings['long search results limit']
+		base_text = base_text.lower()
 		
 		for filename in os.listdir(path):
 
