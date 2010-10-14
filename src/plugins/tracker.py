@@ -1,4 +1,5 @@
 import urllib2, os
+from commands import getoutput
 
 class CardapioPlugin(CardapioPluginInterface):
 
@@ -8,7 +9,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.38'
+	version            = '1.40'
 
 	plugin_api_version = 1.39
 
@@ -47,28 +48,45 @@ class CardapioPlugin(CardapioPluginInterface):
 			'context menu' : None,
 			}
 
+		if getoutput('tracker-info -V | grep 0.9'):
+			self.tracker_case_insensitive = True
+			self.sparql_query = """
+					SELECT ?uri ?mime
+					WHERE { 
+						?item a nie:InformationElement;
+							nie:url ?uri;
+							nie:mimeType ?mime;
+							tracker:available true.
+						FILTER (fn:contains(fn:lower-case(?uri), "%s"))
+						}
+					ORDER BY ASC(?uri)
+					LIMIT %d
+				""" 
+		else:
+			self.tracker_case_insensitive = False
+			self.sparql_query = """
+					SELECT ?uri ?mime
+					WHERE { 
+						?item a nie:InformationElement;
+							nie:url ?uri;
+							nie:mimeType ?mime;
+							tracker:available true.
+						FILTER (fn:contains(?uri, "%s"))
+						}
+					ORDER BY ASC(?uri)
+					LIMIT %d
+				""" 
+
 		self.loaded = True
 
 
 	def search(self, text, result_limit):
 
 		self.current_query = text
-		text = urllib2.quote(text).lower()
+		text = urllib2.quote(text)
+		if self.tracker_case_insensitive: text = text.lower()
 
-		self.tracker.SparqlQuery(
-			"""
-				SELECT ?uri ?mime
-				WHERE { 
-					?item a nie:InformationElement;
-						nie:url ?uri;
-						nie:mimeType ?mime;
-						tracker:available true.
-					FILTER (fn:contains(fn:lower-case(?uri), "%s"))
-					}
-				ORDER BY ASC(?uri)
-				LIMIT %d
-			""" 
-			% (text, result_limit),
+		self.tracker.SparqlQuery(self.sparql_query % (text, result_limit),
 			dbus_interface='org.freedesktop.Tracker1.Resources',
 			reply_handler=self.prepare_and_handle_search_result,
 			error_handler=self.handle_search_error

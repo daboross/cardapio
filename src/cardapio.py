@@ -130,7 +130,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.149'
+	version = '0.9.151'
 
 	core_plugins = [
 			'applications',
@@ -738,6 +738,7 @@ class Cardapio(dbus.service.Object):
 		self.add_side_pane_menuitem    = self.get_object('AddSidePaneMenuItem')
 		self.remove_side_pane_menuitem = self.get_object('RemoveSidePaneMenuItem')
 		self.open_folder_menuitem      = self.get_object('OpenParentFolderMenuItem')
+		self.peek_inside_menuitem      = self.get_object('PeekInsideMenuItem')
 		self.eject_menuitem            = self.get_object('EjectMenuItem')
 		self.plugin_tree_model         = self.get_object('PluginListstore')
 		self.plugin_checkbox_column    = self.get_object('PluginCheckboxColumn')
@@ -940,7 +941,8 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if self.keybinding is not None:
-			keybinder.unbind(self.keybinding)
+			try: keybinder.unbind(self.keybinding)
+			except: pass
 
 		self.keybinding = self.settings['keybinding']
 		keybinder.bind(self.keybinding, self.show_hide)
@@ -1573,15 +1575,17 @@ class Cardapio(dbus.service.Object):
 		self.hide_no_results_text()
 
 		handled = False
+		in_subfolder_search_mode = (text and text.find('/') != -1)
+
+		if not in_subfolder_search_mode:
+			self.fully_hide_all_sections()
+			self.subfolder_stack = []
 
 		if self.in_system_menu_mode:
-			self.fully_hide_all_sections()
-			self.subfolder_stack = []
 			self.search_menus(text, self.sys_list)
+			handled = True
 
 		elif text and text[0] == '?':
-			self.fully_hide_all_sections()
-			self.subfolder_stack = []
 			keyword, dummy, text = text.partition(' ')
 			self.current_query = text
 
@@ -1589,8 +1593,9 @@ class Cardapio(dbus.service.Object):
 				self.search_with_plugin_keyword(keyword[1:], text)
 
 			self.consider_showing_no_results_text()
+			handled = True
 
-		elif text and text.find('/') != -1:
+		elif in_subfolder_search_mode:
 			first_app_widget = self.get_first_visible_app()
 			selected_app_widget = self.get_selected_app()
 			self.fully_hide_all_sections()
@@ -1598,8 +1603,6 @@ class Cardapio(dbus.service.Object):
 			handled = self.search_subfolders(text, first_app_widget, selected_app_widget)
 
 		if not handled:
-			self.fully_hide_all_sections()
-			self.subfolder_stack = []
 			self.search_menus(text, self.app_list)
 			self.schedule_search_with_all_plugins(text)
 
@@ -1624,7 +1627,6 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		text = text.lower()
-		first_app = None
 
 		self.application_pane.hide() # for speed
 
@@ -1633,7 +1635,6 @@ class Cardapio(dbus.service.Object):
 			if app['name'].find(text) == -1 and app['basename'].find(text) == -1:
 				app['button'].hide()
 			else:
-				if first_app is None: first_app = app
 				app['button'].show()
 				self.set_section_has_entries(app['section'])
 				self.no_results_to_show = False
@@ -1643,7 +1644,23 @@ class Cardapio(dbus.service.Object):
 
 		self.application_pane.show() # restore application_pane
 
-		return first_app
+
+	def create_subfolder_stack(self, path):
+		"""
+		Fills in the subfolder_stack array with all ancestors of a given path
+		"""
+
+		path = '/' + path.strip('/')
+		self.subfolder_stack = [('', '/')]
+
+		i = 0
+		while True:
+			i = path.find('/', i+1)
+			if i == -1: break
+			partial_path = path[:i]
+			self.subfolder_stack.append((partial_path, partial_path))
+
+		self.subfolder_stack.append((path, path))
 
 
 	def search_subfolders(self, text, first_app_widget, selected_app_widget):
@@ -1652,11 +1669,8 @@ class Cardapio(dbus.service.Object):
 		a search query to "push into" a folder. 
 		"""
 
-		text = text.lower()
-
 		search_inside = (text[-1] == '/')
 		slash_pos     = text.rfind('/')
-		parent_text   = text[:slash_pos]
 		base_text     = text[slash_pos+1:]
 		path          = None
 
@@ -1673,19 +1687,16 @@ class Cardapio(dbus.service.Object):
 			text = text[:-1]
 			curr_level = text.count('/')
 
-			if len(self.subfolder_stack) > 0:
+			if self.subfolder_stack:
 				prev_level = self.subfolder_stack[-1][0].count('/')
-				parent_text, path = self.subfolder_stack[-1] 
-
-			else:
+			else: 
 				prev_level = -1
 
 			# if typed root folder
 			if text == '': 
 				path        = '/'
-				parent_text = ''
 				base_text   = ''
-				self.subfolder_stack = [('','/')]
+				self.subfolder_stack = [(text, path)]
 
 			# if pushing into a folder
 			elif prev_level < curr_level:
@@ -1700,7 +1711,7 @@ class Cardapio(dbus.service.Object):
 					path_type, path = urllib2.splittype(path)
 					if path_type and path_type != 'file': return False
 					if not os.path.isdir(path): return False
-					self.subfolder_stack.append((text,path))
+					self.subfolder_stack.append((text, path))
 
 			# if popping out of a folder
 			else:
@@ -1715,6 +1726,7 @@ class Cardapio(dbus.service.Object):
 
 		count = 0
 		limit = self.settings['long search results limit']
+		base_text = base_text.lower()
 		
 		for filename in os.listdir(path):
 
@@ -2139,7 +2151,7 @@ class Cardapio(dbus.service.Object):
 			text = self.search_entry.get_text()
 			slash_pos = text.rfind('/')
 
-			if slash_pos != -1:
+			if self.subfolder_stack and slash_pos != -1:
 				if text[-1] == '/': slash_pos = text[:-1].rfind('/')
 				text = text[:slash_pos+1]
 				self.search_entry.set_text(text)
@@ -3477,6 +3489,17 @@ class Cardapio(dbus.service.Object):
 		self.launch_button_command(self.clicked_app, hide = False)
 
 
+	def on_peek_inside_pressed(self, widget):
+		"""
+		Handle the "peek inside folder" action
+		"""
+
+		dummy, path = urllib2.splittype(self.clicked_app['command'])
+		if os.path.isfile(path): path, dummy = os.path.split(path)
+ 		self.create_subfolder_stack(path)
+		self.search_entry.set_text(self.subfolder_stack[-1][1] + '/')
+
+
 	def on_eject_pressed(self, widget):
 		"""
 		Handle the "eject" action
@@ -3511,13 +3534,15 @@ class Cardapio(dbus.service.Object):
 
 		self.clicked_app = widget.app_info
 
+		self.open_folder_menuitem.hide()
+		self.peek_inside_menuitem.hide()
+		self.eject_menuitem.hide()
+
 		if widget.app_info['type'] == 'callback':
 			self.pin_menuitem.hide()
 			self.unpin_menuitem.hide()
 			self.add_side_pane_menuitem.hide()
 			self.remove_side_pane_menuitem.hide()
-			self.open_folder_menuitem.hide()
-			self.eject_menuitem.hide()
 			self.app_menu_separator.hide()
 			self.plugin_setup_context_menu()
 			return
@@ -3553,7 +3578,6 @@ class Cardapio(dbus.service.Object):
 
 		# figure out whether to show the 'open parent folder' menuitem
 		split_command = urllib2.splittype(widget.app_info['command'])
-		self.open_folder_menuitem.hide()
 
 		if widget.app_info['type'] == 'xdg' or len(split_command) == 2:
 
@@ -3566,12 +3590,11 @@ class Cardapio(dbus.service.Object):
 				# only show if path that exists
 				if os.path.exists(self.unescape(canonical_path)):
 					self.open_folder_menuitem.show()
+					self.peek_inside_menuitem.show()
 
 		# figure out whether to show the 'eject' menuitem
 		if widget.app_info['command'] in self.volumes:
 			self.eject_menuitem.show()
-		else:
-			self.eject_menuitem.hide()
 
 		self.plugin_setup_context_menu()
 
