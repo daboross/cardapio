@@ -1,3 +1,38 @@
+cardapio (0.9.151-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fix a case-sensitivity bug with Tracker plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 13 Sep 2010 21:01:00 -0000
+
+
+cardapio (0.9.151-ubuntu1-lucid1) lucid; urgency=low
+
+   * Fix a case-sensitivity bug with Tracker plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 13 Sep 2010 21:01:00 -0000
+
+
+cardapio (0.9.151-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fix a case-sensitivity bug with Tracker plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 13 Sep 2010 21:01:00 -0000
+
+
+cardapio (0.9.151-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fix a case-sensitivity bug with Tracker plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 13 Sep 2010 21:01:00 -0000
+
+
+cardapio (0.9.151-ubuntu1-lucid1) lucid; urgency=low
+
+   * Fix a case-sensitivity bug with Tracker plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 13 Sep 2010 21:01:00 -0000
+
+
 cardapio (0.9.150-ubuntu1-maverick1) maverick; urgency=low
 
    * File search plugin now works with the default Tracker version in Maverick
