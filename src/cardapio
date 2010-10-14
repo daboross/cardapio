@@ -33,6 +33,7 @@ if len(sys.argv) == 2:
 
 	if sys.argv[1] == 'run-in-window':
 
+		# open new Cardapio instance
 		main_window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		main_window.set_title('Cardapio')
 		main_window.connect('destroy', gtk.main_quit)
@@ -47,7 +48,7 @@ if len(sys.argv) == 2:
 
 	elif sys.argv[1] == 'hidden':
 
-		# check if another instance is running
+		# if there's no other instance - start hidden Cardapio
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
 			del bus
 			Cardapio(hidden = True)
@@ -58,7 +59,7 @@ if len(sys.argv) == 2:
 
 	elif sys.argv[1] == 'show' or sys.argv[1] == 'show-near-mouse':
 
-		# check if another instance is running
+		# if there's no other instance - start Cardapio
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
 			del bus
 			Cardapio()
@@ -66,15 +67,20 @@ if len(sys.argv) == 2:
 			gtk.main()
 			gtk.gdk.threads_leave()
 
+		# if there is - "show / hide" it or "show / hide" it near the
+		# mouse pointer
 		else:
-			show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide')
-			show_near_mouse = (sys.argv[1] == 'show-near-mouse')
-			show_hide(show_near_mouse)
+			if sys.argv[1] == 'show-near-mouse':
+				show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_mouse')
+			else:
+				show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide')
+
+			show_hide()
 
 
 	elif sys.argv[1] == 'show-docky-mode':
 
-		# if there's no cardapio - just start it in hidden mode
+		# if there's no other instance - start hidden Cardapio
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
 			del bus
 			Cardapio(hidden = True)
@@ -82,11 +88,12 @@ if len(sys.argv) == 2:
 			gtk.main()
 			gtk.gdk.threads_leave()
 
-		# the cardapio's out there - show it in the proper place
+		# if there is - "show / hide" it near the proper side of the
+		# screen
 		else:
-			show_hide_at = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_at')
+			show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near')
 			# TODO: calculate the place...
-			show_hide_at(500, 0)
+			show_hide(500, 0)
 
 else:
 

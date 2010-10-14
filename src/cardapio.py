@@ -2195,7 +2195,7 @@ class Cardapio(dbus.service.Object):
 		return None
 
 
-	def reposition_window(self, is_message_window = False, show_near_mouse = False):
+	def reposition_window(self, is_message_window = False):
 		"""
 		Place the Cardapio window near the applet and make sure it's visible.
 		If there is no applet, place it in the center of the screen.
@@ -2203,21 +2203,7 @@ class Cardapio(dbus.service.Object):
 
 		window_width, window_height = self.window.get_size()
 
-		root_window = gtk.gdk.get_default_root_window()
-		screen_property = gtk.gdk.atom_intern('_NET_WORKAREA')
-		screen_dimensions = root_window.property_get(screen_property)[2]
-
-		if screen_dimensions:
-			screen_x      = screen_dimensions[0]
-			screen_y      = screen_dimensions[1]
-			screen_width  = screen_dimensions[2]
-			screen_height = screen_dimensions[3]
-
-		else:
-			logging.warn('Could not get dimensions of usable screen area. Using max screen area instead.')
-			screen_x, screen_y = 0, 0
-			screen_width = gtk.gdk.screen_width()
-			screen_height = gtk.gdk.screen_height()
+		screen_x, screen_y, screen_width, screen_height = self.get_screen_dimensions()
 
 		if is_message_window:
 			window = self.message_window
@@ -2229,22 +2215,10 @@ class Cardapio(dbus.service.Object):
 			window = self.window
 			offset_x = offset_y = 0
 
-		if show_near_mouse or self.panel_applet is None:
+		if self.panel_applet is None:
 
-			if show_near_mouse:
-				mouse_x, mouse_y, dummy = root_window.get_pointer()
-				if mouse_x + window_width  > screen_x + screen_width : mouse_x = mouse_x - window_width
-				if mouse_y + window_height > screen_y + screen_height: mouse_y = mouse_y - window_height
-				if mouse_x + window_width  > screen_x + screen_width : mouse_x = screen_x + screen_width  - window_width
-				if mouse_y + window_height > screen_y + screen_height: mouse_y = screen_y + screen_height - window_height
-				if mouse_x < screen_x: mouse_x = screen_x
-				if mouse_y < screen_y: mouse_y = screen_y
-				window_x = mouse_x
-				window_y = mouse_y
-
-			else:
-				window_x = (screen_width - window_width)/2
-				window_y = (screen_height - window_height)/2
+			window_x = (screen_width - window_width)/2
+			window_y = (screen_height - window_height)/2
 
 			window.move(window_x + offset_x, window_y + offset_y)
 			return
@@ -2297,8 +2271,26 @@ class Cardapio(dbus.service.Object):
 
 	def reposition_main_window_at(self, x, y):
 		"""
-		Place the Cardapio window at given coordinates and make sure
-		it's visible.
+		Places the Cardapio window at given coordinates. Makes sure
+		that given x and y are in usable range and ignores the request
+		if they're not.
+		"""
+
+		dim_x, dim_y, dim_width, dim_height = self.get_screen_dimensions()
+
+		possible_x = dim_width - dim_x
+		possible_y = dim_height - dim_y
+
+		if x < 0 or x > possible_x or y < 0 or y > possible_y:
+			logging.warn('[' + str(x) + ',' + str(y) + '] are not correct coordinates - ignoring move request!')
+		else:
+			self.window.move(x, y)
+
+	def get_screen_dimensions(self):
+		"""
+		Returns usable dimensions of the current desktop in a form of
+		a tuple: (x, y, width, height). If the real numbers can't be
+		determined, returns the size of the whole screen instead.
 		"""
 
 		root_window = gtk.gdk.get_default_root_window()
@@ -2306,18 +2298,12 @@ class Cardapio(dbus.service.Object):
 		screen_dimensions = root_window.property_get(screen_property)[2]
 
 		if screen_dimensions:
-			possible_x = screen_dimensions[2] - screen_dimensions[0]
-			possible_y = screen_dimensions[3] - screen_dimensions[1]
+			return (screen_dimensions[0], screen_dimensions[1],
+				screen_dimensions[2], screen_dimensions[3])
 
 		else:
 			logging.warn('Could not get dimensions of usable screen area. Using max screen area instead.')
-			possible_x = gtk.gdk.screen_width()
-			possible_y = gtk.gdk.screen_height()
-
-		if x > possible_x or y > possible_y:
-			logging.error('[' + str(x) + ',' + str(y) + '] are not correct coordinates - ignoring move request!')
-		else:
-			self.window.move(x, y)
+			return (0, 0, gtk.gdk.screen_width(), gtk.gdk.screen_height())
 
 	def restore_dimensions(self):
 		"""
@@ -2365,8 +2351,6 @@ class Cardapio(dbus.service.Object):
 		Show the Cardapio window
 		"""
 
-		show_near_mouse = kwargs.get('show_near_mouse', False)
-
 		self.auto_toggle_panel_button(True)
 
 		self.restore_dimensions()
@@ -2378,7 +2362,7 @@ class Cardapio(dbus.service.Object):
 		if x is not None and y is not None:
 			self.reposition_main_window_at(x, y)
 		else:
-			self.reposition_window(show_near_mouse = show_near_mouse)
+			self.reposition_window()
 
 		self.show_window_on_top(self.window)
 
@@ -2420,29 +2404,58 @@ class Cardapio(dbus.service.Object):
 		return False # used for when hide() is called from a timer
 
 
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = 'b', out_signature = None)
-	def show_hide(self, show_near_mouse = False):
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
+	def show_hide(self):
 		"""
-		Toggle Show/Hide the Cardapio window. This function is dbus-accessible.
+		Toggle show / hide the Cardapio window.
+		
+		Requests are ignored if they come more often than
+		min_visibility_toggle_interval.
+		
+		This function is dbus-accessible.
 		"""
 
 		if time() - self.last_visibility_toggle < Cardapio.min_visibility_toggle_interval:
 			return
 
-		show_near_mouse = bool(show_near_mouse)
-
 		if self.visible:
 			self.hide()
 		else:
-			self.show(show_near_mouse = show_near_mouse)
+			self.show()
 
 		return True
 
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
+	def show_hide_near_mouse(self):
+		"""
+		Toggle show / hide the Cardapio window near the mouse pointer.
+
+		By near we mean a location in which one corner of Cardapio
+		lies under the pointer and the Cardapio's window is not even
+		partially off screen at the same time.
+
+		Requests are ignored if they come more often than
+		min_visibility_toggle_interval.
+
+		This function is dbus-accessible.
+		"""
+		
+		mouse_x, mouse_y, dummy = gtk.gdk.get_default_root_window().get_pointer()
+		return self.show_hide_near(x = mouse_x, y = mouse_y)
 
 	@dbus.service.method(dbus_interface = bus_name_str, in_signature = 'ii', out_signature = None)
-	def show_hide_at(self, x, y):
+	def show_hide_near(self, x, y):
 		"""
-		Toggle Show/Hide the Cardapio window at given coordinates.
+		Toggle show / hide the Cardapio window near the given
+		coordinates.
+
+		By near we mean a location in which one corner of Cardapio
+		lies under the point (x, y) and the Cardapio's window is not
+		even partially off screen at the same time.
+
+		Requests are ignored if they come more often than
+		min_visibility_toggle_interval.
+
 		This function is dbus-accessible.
 		"""
 
@@ -2455,6 +2468,17 @@ class Cardapio(dbus.service.Object):
 		if self.visible:
 			self.hide()
 		else:
+			window_width, window_height = self.window.get_size()
+
+			screen_x, screen_y, screen_width, screen_height = self.get_screen_dimensions()
+
+			if x + window_width  > screen_x + screen_width : x -= window_width
+			if y + window_height > screen_y + screen_height: y -= window_height
+			if x + window_width  > screen_x + screen_width : x = screen_x + screen_width - window_width
+			if y + window_height > screen_y + screen_height: y = screen_y + screen_height - window_height
+			if x < screen_x: x = screen_x
+			if y < screen_y: y = screen_y
+			
 			self.show(x = x, y = y)
 
 		return True
