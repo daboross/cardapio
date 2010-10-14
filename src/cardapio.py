@@ -2712,7 +2712,7 @@ class Cardapio(dbus.service.Object):
 
 		if self.bookmark_monitor is None:
 			self.bookmark_monitor = gio.File(bookmark_file_path).monitor_file() # keep a reference to avoid getting it garbage-collected
-			self.bookmarks_changed_handler = self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed, self.places_section_contents)
+			self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed, self.places_section_contents)
 
 
 	def on_bookmark_monitor_changed(self, monitor, file, other_file, event, section_contents):
@@ -3046,8 +3046,8 @@ class Cardapio(dbus.service.Object):
 		Remove all children from a GTK container
 		"""
 
-		# this is necessary when clearing section contents, but does nothing
-		# when clearing other containers:
+		# this is necessary when clearing section contents to avoid a memory
+		# leak, but does nothing when clearing other containers:
 		self.app_list = [app for app in self.app_list if app['section'] != container.parent.parent]
 		self.sys_list = [app for app in self.sys_list if app['section'] != container.parent.parent]
 
@@ -3993,6 +3993,7 @@ class Cardapio(dbus.service.Object):
 		self.scroll_adjustment.set_value(0)
 
 	
+
 class CardapioPluginInterface:
 	# for documentation, see: https://answers.launchpad.net/cardapio/+faq/1172
 
