@@ -15,7 +15,13 @@ class CardapioItem(DockManagerItem):
 	def __init__(self, sink, path):
 		DockManagerItem.__init__(self, sink, path)
 
-		self.add_menu_item("Test item", "pidgin", "Test category")
+		# TODO: this stuff duplicates on reinstall
+		self.add_menu_item("Properties", "gtk-properties", "")
+		self.add_menu_item("Edit menus", "gtk-edit", "")
+
+		self.add_menu_item("About Cardapio", "gtk-about", "Informations")
+		self.add_menu_item("About Gnome", "", "Informations")
+		self.add_menu_item("About Ubuntu", "", "Informations")
 
 class CardapioSink(DockManagerSink):
 
