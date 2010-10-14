@@ -3418,8 +3418,9 @@ class Cardapio(dbus.service.Object):
 		Handle the "peek inside folder" action
 		"""
 
-		dummy, folder = urllib2.splittype(self.clicked_app['command'])
- 		self.create_subfolder_stack(folder)
+		dummy, path = urllib2.splittype(self.clicked_app['command'])
+		if os.path.isfile(path): path, dummy = os.path.split(path)
+ 		self.create_subfolder_stack(path)
 		self.search_entry.set_text(self.subfolder_stack[-1][1] + '/')
 
 
