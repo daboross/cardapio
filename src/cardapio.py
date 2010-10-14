@@ -125,7 +125,7 @@ class Cardapio(dbus.service.Object):
 
 	distro_name = getoutput('lsb_release -is')
 
-	min_visibility_toggle_interval = 0.100 # seconds (this is a bit of a hack to fix some focus problems)
+	min_visibility_toggle_interval = 0.200 # seconds (this is a bit of a hack to fix some focus problems)
 
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
@@ -205,8 +205,8 @@ class Cardapio(dbus.service.Object):
 		self.active_plugin_instances       = []
 		self.in_system_menu_mode           = False
 		self.plugins_still_searching       = 0
-		self.volume_monitor                = None
 		self.bookmark_monitor              = None
+		self.volume_monitor                = None
 
 		self.icon_extension_types = re.compile('.*\.(png|xpm|svg)$')
 
@@ -775,6 +775,7 @@ class Cardapio(dbus.service.Object):
 
 		self.window.set_keep_above(True)
 
+		# make edges draggable
 		self.get_object('MarginLeft').realize()
 		self.get_object('MarginRight').realize()
 		self.get_object('MarginTop').realize()
@@ -910,9 +911,11 @@ class Cardapio(dbus.service.Object):
 		menubar.connect('button-press-event', self.on_panel_button_pressed)
 
 		if 'applet_press_handler' in dir(self):
-			self.panel_button.disconnect(self.applet_press_handler)
-			self.panel_button.disconnect(self.applet_enter_handler)
-			self.panel_button.disconnect(self.applet_leave_handler)
+			try:
+				self.panel_button.disconnect(self.applet_press_handler)
+				self.panel_button.disconnect(self.applet_enter_handler)
+				self.panel_button.disconnect(self.applet_leave_handler)
+			except: pass
 
 		if self.settings['open on hover']:
 			self.applet_press_handler = self.panel_button.connect('button-press-event', self.on_panel_button_toggled, True)
@@ -988,16 +991,16 @@ class Cardapio(dbus.service.Object):
 
 		self.read_gtk_theme_info()
 
+		self.app_list              = []  # holds a list of all apps for searching purposes
+		self.sys_list              = []  # holds a list of all apps in the system menus
+		self.section_list          = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
+
 		self.clear_pane(self.application_pane)
 		self.clear_pane(self.category_pane)
 		self.clear_pane(self.system_category_pane)
 		self.clear_pane(self.sidepane)
 		self.clear_pane(self.left_session_pane)
 		self.clear_pane(self.right_session_pane)
-
-		self.app_list              = []  # holds a list of all apps for searching purposes
-		self.sys_list              = []  # holds a list of all apps in the system menus
-		self.section_list          = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
 
 		self.current_query         = ''
 		self.subfolder_stack       = []
@@ -1028,7 +1031,7 @@ class Cardapio(dbus.service.Object):
 		self.add_subfolders_slab()
 		self.add_all_reorderable_slabs()
 
-		self.build_places_list(set_monitors = True)
+		self.build_places_list()
 		self.build_session_list()
 		self.build_system_list()
 		self.build_uncategorized_list()
@@ -2620,22 +2623,27 @@ class Cardapio(dbus.service.Object):
 		self.add_tree_to_app_list(self.app_tree.root, self.uncategorized_section_contents, self.app_list, recursive = False)
 
 
-	def build_places_list(self, set_monitors = False):
+	def build_places_list(self):
 		"""
 		Populate the places list
 		"""
 
-		self.build_bookmarked_places_list(self.places_section_contents, set_monitors)
-		self.build_system_places_list(self.places_section_contents, set_monitors)
+		self.build_bookmarked_places_list(self.places_section_contents)
+		self.build_system_places_list(self.places_section_contents)
 
 
-	def build_system_places_list(self, section_contents, set_monitors):
+	def build_system_places_list(self, section_contents):
 		"""
 		Populate the "system places", which include Computer, the list of
 		connected drives, and so on.
 		"""
 
-		self.volume_monitor = gio.volume_monitor_get() # keep a reference to avoid getting it garbage-collected
+		if self.volume_monitor is None:
+			volume_monitor_already_existed = False
+			self.volume_monitor = gio.volume_monitor_get() # keep a reference to avoid getting it garbage-collected
+		else:
+			volume_monitor_already_existed = True
+
 		self.volumes = {}
 
 		for mount in self.volume_monitor.get_mounts():
@@ -2655,12 +2663,12 @@ class Cardapio(dbus.service.Object):
 		self.add_app_button(_('Network'), 'network', section_contents, 'xdg', 'network://', tooltip = _('Browse the contents of the network'), app_list = self.app_list)
 		self.add_app_button(_('Trash'), 'user-trash', section_contents, 'xdg', 'trash:///', tooltip = _('Open the trash'), app_list = self.app_list)
 
-		if set_monitors:
+		if not volume_monitor_already_existed:
 			self.mount_added_handler   = self.volume_monitor.connect('mount-added', self.on_volume_monitor_changed, self.places_section_contents)
 			self.mount_removed_handler = self.volume_monitor.connect('mount-removed', self.on_volume_monitor_changed, self.places_section_contents)
 
 
-	def build_bookmarked_places_list(self, section_contents, set_monitors):
+	def build_bookmarked_places_list(self, section_contents):
 		"""
 		Populate the "bookmarked places", which include Home and your personal bookmarks.
 		"""
@@ -2702,10 +2710,9 @@ class Cardapio(dbus.service.Object):
 
 		bookmark_file.close()
 
-		if set_monitors:
-			del self.bookmark_monitor
+		if self.bookmark_monitor is None:
 			self.bookmark_monitor = gio.File(bookmark_file_path).monitor_file() # keep a reference to avoid getting it garbage-collected
-			self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed, self.places_section_contents)
+			self.bookmarks_changed_handler = self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed, self.places_section_contents)
 
 
 	def on_bookmark_monitor_changed(self, monitor, file, other_file, event, section_contents):
@@ -3038,6 +3045,11 @@ class Cardapio(dbus.service.Object):
 		"""
 		Remove all children from a GTK container
 		"""
+
+		# this is necessary when clearing section contents, but does nothing
+		# when clearing other containers:
+		self.app_list = [app for app in self.app_list if app['section'] != container.parent.parent]
+		self.sys_list = [app for app in self.sys_list if app['section'] != container.parent.parent]
 
 		for	child in container.get_children():
 			container.remove(child)
@@ -3980,8 +3992,7 @@ class Cardapio(dbus.service.Object):
 
 		self.scroll_adjustment.set_value(0)
 
-
-
+	
 class CardapioPluginInterface:
 	# for documentation, see: https://answers.launchpad.net/cardapio/+faq/1172
 
