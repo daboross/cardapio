@@ -1162,7 +1162,7 @@ Rebuilding…</property>
     </child>
     <child>
       <object class="GtkImageMenuItem" id="AddSidePaneMenuItem">
-        <property name="label" translatable="yes">_Add To Side Pane</property>
+        <property name="label" translatable="yes">_Add to Side Pane</property>
         <property name="visible">True</property>
         <property name="tooltip_text" translatable="yes">Place this item in the side pane</property>
         <property name="use_underline">True</property>
@@ -1173,7 +1173,7 @@ Rebuilding…</property>
     </child>
     <child>
       <object class="GtkImageMenuItem" id="RemoveSidePaneMenuItem">
-        <property name="label" translatable="yes">_Remove From Side Pane</property>
+        <property name="label" translatable="yes">_Remove from Side Pane</property>
         <property name="visible">True</property>
         <property name="tooltip_text" translatable="yes">Remove this item from the side pane</property>
         <property name="use_underline">True</property>
@@ -1200,7 +1200,7 @@ Rebuilding…</property>
     </child>
     <child>
       <object class="GtkImageMenuItem" id="OpenInBackgroundMenuItem">
-        <property name="label" translatable="yes">_Launch In Background</property>
+        <property name="label" translatable="yes">_Launch in Background</property>
         <property name="visible">True</property>
         <property name="tooltip_text" translatable="yes">Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-Click)</property>
         <property name="use_underline">True</property>
