@@ -2464,9 +2464,11 @@ class Cardapio(dbus.service.Object):
 		Toggle show / hide the Cardapio window near the given
 		coordinates.
 
-		By near we mean a location in which one corner of Cardapio
-		lies under the point (x, y) and the Cardapio's window is not
-		even partially off screen at the same time.
+		It treats the given point as the upper left corner of the
+		Cardapio's window and if the window won't fit on the usable
+		screen, the method will rotate it over it's x = 0 or y = 0
+		axis (or even both axes). Also - the window won't ever hide
+		beyond the top and left borders of the usable screen.
 
 		Requests are ignored if they come more often than
 		min_visibility_toggle_interval.
@@ -2484,15 +2486,27 @@ class Cardapio(dbus.service.Object):
 			self.hide()
 		else:
 			window_width, window_height = self.window.get_size()
-
 			screen_x, screen_y, screen_width, screen_height = self.get_screen_dimensions()
 
-			if x + window_width  > screen_x + screen_width : x -= window_width
-			if y + window_height > screen_y + screen_height: y -= window_height
-			if x + window_width  > screen_x + screen_width : x = screen_x + screen_width - window_width
-			if y + window_height > screen_y + screen_height: y = screen_y + screen_height - window_height
-			if x < screen_x: x = screen_x
-			if y < screen_y: y = screen_y
+			# maximal coordinates of window and usable screen
+			max_window_x, max_window_y = x + window_width, y + window_height
+			max_screen_x, max_screen_y = screen_x + screen_width, screen_y + screen_height
+
+			# if the window won't fit horizontally, rotate it over it's x = 0
+			# axis
+			if max_window_x > max_screen_x:
+				x -= window_width
+			# if the window won't fit vertically, rotate it over it's y = 0
+			# axis
+			if max_window_y > max_screen_y:
+				y -= window_height
+
+			# just to be sure - never hide behind top and left borders
+			# of the usable screen!
+			if x < screen_x:
+				x = screen_x
+			if y < screen_y:
+				y = screen_y
 			
 			self.show(x = x, y = y)
 

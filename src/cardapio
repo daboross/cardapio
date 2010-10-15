@@ -71,7 +71,7 @@ class DockySettingsHelper:
 
 	def get_zoom_percentage(self, dock):
 		"""
-		Returns the ZoomPercent property for chosen dock if zoom is 
+		Returns the ZoomPercent property for chosen dock if zoom is
 		enabled (ZoomEnabled). If not, returns neutral scaling
 		factor (number 1).
 		"""
@@ -87,6 +87,25 @@ class DockySettingsHelper:
 		"""
 
 		return self.gconf_client.get_string(self.docky_gconf_root + dock + '/Position')
+
+
+	def get_horizontal_offset(self, dock):
+		"""
+		Returns the horizontal offset necessary to avoid overlapping of Cardapio launchers'
+		tooltip	with Cardapio's window. The offset depends on whether the dock is in panel
+		mode.
+		"""
+
+		return 10 if self.gconf_client.get_bool(self.docky_gconf_root + dock + '/PanelMode') else 20
+
+	def get_vertical_offset(self, dock):
+		"""
+		Returns the vertical offset necessary to avoid overlapping of Cardapio launchers'
+		tooltip	with Cardapio's window. The offset depends on whether the dock is in panel
+		mode.
+		"""
+
+		return 30 if self.gconf_client.get_bool(self.docky_gconf_root + dock + '/PanelMode') else 60
 
 
 # main
@@ -175,21 +194,22 @@ if len(sys.argv) == 2:
 					mouse_x, mouse_y, dummy = gtk.gdk.get_default_root_window().get_pointer()
 					screen_width, screen_height = gtk.gdk.screen_width(), gtk.gdk.screen_height()
 
-					# constant offset (distance from Docky's icons to screen border etc.)
-					offset = 30
+					# offsets from screen's borders
+					horizontal_offset = settings_helper.get_horizontal_offset(dock_num)
+					vertical_offset = settings_helper.get_vertical_offset(dock_num)
 
 					# calculating final position...
 					if position == 'Bottom':
 						x = mouse_x
-						y = screen_height - (icon_size * zoom_percent + offset)
+						y = screen_height - (icon_size * zoom_percent + vertical_offset)
 					elif position == 'Top':
 						x = mouse_x
-						y = icon_size * zoom_percent + offset
+						y = icon_size * zoom_percent + vertical_offset
 					elif position == 'Left':
-						x = icon_size * zoom_percent + offset
+						x = icon_size * zoom_percent + horizontal_offset
 						y = mouse_y
 					elif position == 'Right':
-						x = screen_width - (icon_size * zoom_percent + offset)
+						x = screen_width - (icon_size * zoom_percent + horizontal_offset)
 						y = mouse_y
 
 					show_hide(x, y)
