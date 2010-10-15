@@ -3048,8 +3048,9 @@ class Cardapio(dbus.service.Object):
 
 		# this is necessary when clearing section contents to avoid a memory
 		# leak, but does nothing when clearing other containers:
-		self.app_list = [app for app in self.app_list if app['section'] != container.parent.parent]
-		self.sys_list = [app for app in self.sys_list if app['section'] != container.parent.parent]
+		if container is not None and container.parent is not None and container.parent.parent is not None:
+			self.app_list = [app for app in self.app_list if app['section'] != container.parent.parent]
+			self.sys_list = [app for app in self.sys_list if app['section'] != container.parent.parent]
 
 		for	child in container.get_children():
 			container.remove(child)
