@@ -2661,6 +2661,11 @@ class Cardapio(dbus.service.Object):
 			self.volumes[command] = volume
 
 		self.add_app_button(_('Network'), 'network', section_contents, 'xdg', 'network://', tooltip = _('Browse the contents of the network'), app_list = self.app_list)
+
+		connect_to_server_app_path = getoutput('which nautilus-connect-server')
+		if connect_to_server_app_path:
+			self.add_app_button(_(u'Connect to Server\u2026'), 'network-server', section_contents, 'raw', connect_to_server_app_path, tooltip = _('Connect to a remote computer or shared disk'), app_list = self.app_list)
+
 		self.add_app_button(_('Trash'), 'user-trash', section_contents, 'xdg', 'trash:///', tooltip = _('Open the trash'), app_list = self.app_list)
 
 		if not volume_monitor_already_existed:

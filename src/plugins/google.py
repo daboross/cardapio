@@ -1,4 +1,6 @@
-import simplejson, urllib2, gio
+from gio import File, Cancellable
+from urllib2 import quote
+from simplejson import loads
 from locale import getdefaultlocale
 from glib import GError
 
@@ -10,7 +12,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.38'
+	version            = '1.39'
 
 	plugin_api_version = 1.39
 
@@ -44,7 +46,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.query_url = r'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz={0}&q={1}'
 
-		self.search_controller = gio.Cancellable()
+		self.search_controller = Cancellable()
 
 		self.action_command = "xdg-open 'http://www.google.com/search?q=%%s&hl=%s'" % google_interface_language_format
 		self.action = {
@@ -69,7 +71,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		# proceeding...
 
 		self.current_query = text
-		text = urllib2.quote(text)
+		text = quote(text)
 
 		# The google search API only supports two sizes for the result list,
 		# that is: small (4 results) or large (8 results). So this plugin
@@ -78,7 +80,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		query = self.query_url.format('large' if result_limit >= 8 else 'small', text)
 
-		self.stream = gio.File(query)
+		self.stream = File(query)
 
 		self.search_controller.reset()
 		self.stream.load_contents_async(self.handle_search_result, cancellable = self.search_controller)
@@ -101,7 +103,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			self.c.handle_search_error(self, 'no response')
 			return
 
-		raw_results = simplejson.loads(response)
+		raw_results = loads(response)
 
 		parsed_results = [] 
 
