@@ -1091,6 +1091,15 @@ class Cardapio(dbus.service.Object):
 		return response
 
 
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
+	def open_about_cardapio_dialog(self):
+		"""
+		Opens the "About Cardapio" dialog. This method is d-bus
+		accessible.
+		"""
+		self.open_about_dialog(None, 'AboutCardapio')
+	
+
 	def open_about_dialog(self, widget, verb = None):
 		"""
 		Opens either the "About Gnome" dialog, or the "About Ubuntu" dialog,
@@ -1137,10 +1146,11 @@ class Cardapio(dbus.service.Object):
 		widget.handler_unblock_by_func(self.on_options_changed)
 
 
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
 	def open_options_dialog(self, *dummy):
 		"""
 		Show the Options Dialog and populate its widgets with values from the
-		user's settings (self.settings)
+		user's settings (self.settings). This method is d-bus accessible.
 		"""
 
 		self.set_widget_from_option('OptionKeybinding', 'keybinding')
@@ -3442,9 +3452,10 @@ class Cardapio(dbus.service.Object):
 		self.scrollbar_width = scrollbar.style_get_property('slider-width')
 
 
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
 	def launch_edit_app(self, *dummy):
 		"""
-		Opens Gnome's menu editor
+		Opens Gnome's menu editor. This method is d-bus accessible.
 		"""
 
 		self.launch_raw('alacarte')
