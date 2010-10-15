@@ -1,4 +1,5 @@
-import urllib2, os
+from os.path import split
+from urllib2 import quote, splittype
 from commands import getoutput
 
 class CardapioPlugin(CardapioPluginInterface):
@@ -9,7 +10,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.40'
+	version            = '1.41'
 
 	plugin_api_version = 1.39
 
@@ -83,7 +84,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	def search(self, text, result_limit):
 
 		self.current_query = text
-		text = urllib2.quote(text)
+		text = quote(text)
 		if self.tracker_case_insensitive: text = text.lower()
 
 		self.tracker.SparqlQuery(self.sparql_query % (text, result_limit),
@@ -104,8 +105,8 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		for result in results:
 			
-			dummy, canonical_path = urllib2.splittype(result[0])
-			parent_name, child_name = os.path.split(canonical_path)
+			dummy, canonical_path = splittype(result[0])
+			parent_name, child_name = split(canonical_path)
 			icon_name = result[1]
 
 			formatted_result = {

@@ -1,7 +1,8 @@
 import_error = None
 try:
-	import os
-	import glob
+	from os.path import basename
+	from os import environ
+	from glob import iglob
 
 except Exception, exception:
 	import_error = exception
@@ -15,7 +16,7 @@ class CardapioPlugin (CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.1'
+	version            = '1.11'
 
 	plugin_api_version = 1.39
 
@@ -45,7 +46,7 @@ class CardapioPlugin (CardapioPluginInterface):
 			self.loaded = False
 			return
 		
-		self.pathlist = os.environ['PATH'].split(':')
+		self.pathlist = environ['PATH'].split(':')
 
 		self.in_a_terminal         = _('Execute \'%s\' In Terminal')
 		self.in_a_terminal_tooltip = _('Execute the command \'%s\' inside a new terminal window')
@@ -72,13 +73,13 @@ class CardapioPlugin (CardapioPluginInterface):
 		for path in self.pathlist:
 			if num_results >= result_limit: break
 
-			cmd_iter = (glob.iglob('%s/%s*' % (path, cmdname)))
+			cmd_iter = (iglob('%s/%s*' % (path, cmdname)))
 
 			while True:
 				if num_results >= result_limit: break
 
 				try:
-					cmd = os.path.basename(cmd_iter.next())
+					cmd = basename(cmd_iter.next())
 					cmdargs = cmd + args
 					item = {
 						'name'          : '%s%s' % (cmd, args),

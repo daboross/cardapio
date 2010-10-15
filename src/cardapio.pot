@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-10-14 23:02+0200\n"
+"POT-Creation-Date: 2010-10-15 20:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,8 +21,8 @@ msgstr ""
 msgid "Application menu"
 msgstr ""
 
-#: cardapio.py:313 cardapio.py:324 cardapio.py:335 plugins/google.py:7
-#: plugins/google_localized.py:7 plugins/tracker.py:6 plugins/tracker_fts.py:5
+#: cardapio.py:313 cardapio.py:324 cardapio.py:335 plugins/google.py:9
+#: plugins/google_localized.py:9 plugins/tracker.py:7 plugins/tracker_fts.py:6
 #: plugins/zg_recent_documents.py:16
 msgid "Cardapio Team"
 msgstr ""
@@ -39,7 +39,7 @@ msgstr ""
 msgid "Displays a list of folders"
 msgstr ""
 
-#: cardapio.py:334 cardapio.py:2957
+#: cardapio.py:334 cardapio.py:2962
 msgid "Pinned items"
 msgstr ""
 
@@ -141,7 +141,7 @@ msgstr ""
 msgid "Filesystem Root"
 msgstr ""
 
-#: cardapio.py:2612 cardapio.py:2977
+#: cardapio.py:2612 cardapio.py:2982
 msgid "Uncategorized"
 msgstr ""
 
@@ -157,91 +157,99 @@ msgstr ""
 msgid "Browse the contents of the network"
 msgstr ""
 
-#: cardapio.py:2664
+#: cardapio.py:2667
+msgid "Connect to Server…"
+msgstr ""
+
+#: cardapio.py:2667
+msgid "Connect to a remote computer or shared disk"
+msgstr ""
+
+#: cardapio.py:2669
 msgid "Trash"
 msgstr ""
 
-#: cardapio.py:2664
+#: cardapio.py:2669
 msgid "Open the trash"
 msgstr ""
 
-#: cardapio.py:2676
+#: cardapio.py:2681
 msgid "Home"
 msgstr ""
 
-#: cardapio.py:2676
+#: cardapio.py:2681
 msgid "Open your personal folder"
 msgstr ""
 
-#: cardapio.py:2692
+#: cardapio.py:2697
 msgid "Desktop"
 msgstr ""
 
-#: cardapio.py:2841
+#: cardapio.py:2846
 msgid "Lock Screen"
 msgstr ""
 
-#: cardapio.py:2842
+#: cardapio.py:2847
 msgid "Protect your computer from unauthorized use"
 msgstr ""
 
-#: cardapio.py:2848
+#: cardapio.py:2853
 msgid "Log Out..."
 msgstr ""
 
-#: cardapio.py:2849
+#: cardapio.py:2854
 msgid "Log out of this session to log in as a different user"
 msgstr ""
 
-#: cardapio.py:2855
+#: cardapio.py:2860
 msgid "Shut Down..."
 msgstr ""
 
-#: cardapio.py:2856
+#: cardapio.py:2861
 msgid "Shut down the system"
 msgstr ""
 
-#: cardapio.py:2936
+#: cardapio.py:2941
 msgid "Places"
 msgstr ""
 
-#: cardapio.py:2936
+#: cardapio.py:2941
 msgid "Access documents and folders"
 msgstr ""
 
-#: cardapio.py:2946
+#: cardapio.py:2951
 msgid "Folder Contents"
 msgstr ""
 
-#: cardapio.py:2946
+#: cardapio.py:2951
 msgid "Look inside folders"
 msgstr ""
 
-#: cardapio.py:2957
+#: cardapio.py:2962
 msgid "Your favorite items"
 msgstr ""
 
-#: cardapio.py:2967
+#: cardapio.py:2972
 msgid "Side Pane"
 msgstr ""
 
-#: cardapio.py:2967
+#: cardapio.py:2972
 msgid "Items pinned to the side pane"
 msgstr ""
 
-#: cardapio.py:2977
+#: cardapio.py:2982
 msgid "Items that are not under any menu category"
 msgstr ""
 
-#: cardapio.py:2987
+#: cardapio.py:2992
 msgid "Session"
 msgstr ""
 
-#: cardapio.py:2997
+#: cardapio.py:3002
 msgid "System"
 msgstr ""
 
-#: cardapio.py:4168
+#: cardapio.py:4174
 msgid "Access applications, folders, system settings, etc."
 msgstr ""
 
@@ -262,14 +270,14 @@ msgid "Results found in Amazon"
 msgstr ""
 
 #: plugins/amazon.py:247 plugins/bing.py:122 plugins/ebay.py:214
-#: plugins/ebay.py:230 plugins/google.py:51 plugins/google_localized.py:55
-#: plugins/tracker.py:43 plugins/tracker_fts.py:41 plugins/yahoo.py:141
+#: plugins/ebay.py:230 plugins/google.py:53 plugins/google_localized.py:57
+#: plugins/tracker.py:44 plugins/tracker_fts.py:42 plugins/yahoo.py:141
 #: plugins/you_tube.py:131 plugins/zg_recent_documents.py:76
 msgid "Show additional results"
 msgstr ""
 
 #: plugins/amazon.py:248 plugins/bing.py:123 plugins/ebay.py:215
-#: plugins/ebay.py:231 plugins/google.py:52 plugins/google_localized.py:56
+#: plugins/ebay.py:231 plugins/google.py:54 plugins/google_localized.py:58
 #: plugins/yahoo.py:142 plugins/you_tube.py:132
 msgid "Show additional search results in your web browser"
 msgstr ""
@@ -290,38 +298,38 @@ msgstr ""
 msgid "Results found using Bing"
 msgstr ""
 
-#: plugins/command_launcher.py:13
+#: plugins/command_launcher.py:14
 msgid "Command Launcher"
 msgstr ""
 
-#: plugins/command_launcher.py:14
+#: plugins/command_launcher.py:15
 msgid "Run commands from the search box"
 msgstr ""
 
-#: plugins/command_launcher.py:26
+#: plugins/command_launcher.py:27
 msgid "Run Command"
 msgstr ""
 
-#: plugins/command_launcher.py:28
+#: plugins/command_launcher.py:29
 msgid "Run system commands, just like in the command-line"
-msgstr ""
-
-#: plugins/command_launcher.py:50
-#, python-format
-msgid "Execute '%s' In Terminal"
 msgstr ""
 
 #: plugins/command_launcher.py:51
 #, python-format
-msgid "Execute the command '%s' inside a new terminal window"
+msgid "Execute '%s' In Terminal"
 msgstr ""
 
 #: plugins/command_launcher.py:52
 #, python-format
-msgid "Execute '%s' As Root"
+msgid "Execute the command '%s' inside a new terminal window"
 msgstr ""
 
 #: plugins/command_launcher.py:53
+#, python-format
+msgid "Execute '%s' As Root"
+msgstr ""
+
+#: plugins/command_launcher.py:54
 #, python-format
 msgid "Execute the command '%s' with administrative rights"
 msgstr ""
@@ -342,36 +350,36 @@ msgstr ""
 msgid "Items found on eBay"
 msgstr ""
 
-#: plugins/google.py:8
+#: plugins/google.py:10
 msgid "Google"
 msgstr ""
 
-#: plugins/google.py:9
+#: plugins/google.py:11
 msgid "Perform quick Google searches in <b>all</b> languages"
 msgstr ""
 
-#: plugins/google.py:21
+#: plugins/google.py:23
 msgid "Web Results"
 msgstr ""
 
-#: plugins/google.py:23
+#: plugins/google.py:25
 msgid "Results found with Google"
 msgstr ""
 
-#: plugins/google_localized.py:8
+#: plugins/google_localized.py:10
 msgid "Google localized results"
 msgstr ""
 
-#: plugins/google_localized.py:9
+#: plugins/google_localized.py:11
 msgid ""
 "Perform quick Google searches <b>limited to</b> the system's default language"
 msgstr ""
 
-#: plugins/google_localized.py:21
+#: plugins/google_localized.py:23
 msgid "Localized Web Results"
 msgstr ""
 
-#: plugins/google_localized.py:23
+#: plugins/google_localized.py:25
 msgid "Results found with Google in you system language"
 msgstr ""
 
@@ -473,39 +481,39 @@ msgstr ""
 msgid "Open this note"
 msgstr ""
 
-#: plugins/tracker.py:7
+#: plugins/tracker.py:8
 msgid "File search"
 msgstr ""
 
-#: plugins/tracker.py:8
+#: plugins/tracker.py:9
 msgid "Search local files and folders indexed with Tracker"
 msgstr ""
 
-#: plugins/tracker.py:20
+#: plugins/tracker.py:21
 msgid "Local Results"
 msgstr ""
 
-#: plugins/tracker.py:22
+#: plugins/tracker.py:23
 msgid "Results found in your computer"
 msgstr ""
 
-#: plugins/tracker.py:44 plugins/tracker_fts.py:42
+#: plugins/tracker.py:45 plugins/tracker_fts.py:43
 msgid "Show additional search results in the Tracker search tool"
 msgstr ""
 
-#: plugins/tracker_fts.py:6
+#: plugins/tracker_fts.py:7
 msgid "Full-text file search"
 msgstr ""
 
-#: plugins/tracker_fts.py:7
+#: plugins/tracker_fts.py:8
 msgid "Search <b>inside</b> local files and folders indexed with Tracker"
 msgstr ""
 
-#: plugins/tracker_fts.py:19
+#: plugins/tracker_fts.py:20
 msgid "Results within files"
 msgstr ""
 
-#: plugins/tracker_fts.py:21
+#: plugins/tracker_fts.py:22
 msgid "Results found inside the files in your computer"
 msgstr ""
 
@@ -713,7 +721,7 @@ msgid "Remove this item from the \"Pinned Items\" list"
 msgstr ""
 
 #: cardapio.ui:1165
-msgid "_Add To Side Pane"
+msgid "_Add to Side Pane"
 msgstr ""
 
 #: cardapio.ui:1167
@@ -721,7 +729,7 @@ msgid "Place this item in the side pane"
 msgstr ""
 
 #: cardapio.ui:1176
-msgid "_Remove From Side Pane"
+msgid "_Remove from Side Pane"
 msgstr ""
 
 #: cardapio.ui:1178
@@ -737,7 +745,7 @@ msgid "Open this item's parent folder in the file browser"
 msgstr ""
 
 #: cardapio.ui:1203
-msgid "_Launch In Background"
+msgid "_Launch in Background"
 msgstr ""
 
 #: cardapio.ui:1205
