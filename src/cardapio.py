@@ -157,7 +157,14 @@ class Cardapio(dbus.service.Object):
 	class SafeCardapioProxy:
 		pass
 
-	def __init__(self, hidden = False, panel_applet = None, panel_button = None, debug = False):
+	def __init__(self, hidden = False, panel_applet = None, panel_button = None, mini_mode = False, debug = False):
+		"""
+		Creates a instance of Cardapio.
+
+		mini_mode argument let's you to start Cardapio in so called
+		"minimal mode". "minimal mode" can't be switched off without
+		restarting Cardapio.
+		"""
 
 		self.create_config_folder()
 		logging_filename = os.path.join(self.config_folder_path, 'cardapio.log')
@@ -174,6 +181,8 @@ class Cardapio(dbus.service.Object):
 		logging.info('Distribution: %s' % getoutput('lsb_release -ds'))
 
 		self.home_folder_path = os.path.abspath(os.path.expanduser('~'))
+
+		self.mini_mode = mini_mode
 
 		self.read_config_file()
 
@@ -229,6 +238,13 @@ class Cardapio(dbus.service.Object):
 		self.setup_base_ui() # must be the first ui-related method to be called
 		self.setup_plugins()
 		self.build_ui()
+
+		# some custom preparations for minimal mode
+		if self.mini_mode:
+			self.get_object('ViewLabel').set_text('')
+			self.get_object('ControlCenterLabel').set_text('')
+			# TODO: proper size
+			self.get_object('SidePaneMargin').set_size_request(4 * self.icon_size_category + 10, -1)
 
 		self.schedule_search_with_all_plugins('')
 
@@ -724,14 +740,6 @@ class Cardapio(dbus.service.Object):
 		self.category_pane             = self.get_object('CategoryPane')
 		self.system_category_pane      = self.get_object('SystemCategoryPane')
 		self.sidepane                  = self.get_object('SideappPane')
-
-		self.t_search_slab             = self.get_object('TopSearchSlab')
-		self.b_search_slab             = self.get_object('BottomSearchSlab')
-		self.t_search_entry            = self.get_object('TopSearchEntry')
-		self.b_search_entry            = self.get_object('BottomSearchEntry')
-		# default value
-		self.search_entry              = self.t_search_entry
-
 		self.scrolled_window           = self.get_object('ScrolledWindow')
 		self.scroll_adjustment         = self.scrolled_window.get_vadjustment()
 		self.session_pane              = self.get_object('SessionPane')
@@ -750,6 +758,10 @@ class Cardapio(dbus.service.Object):
 		self.plugin_tree_model         = self.get_object('PluginListstore')
 		self.plugin_checkbox_column    = self.get_object('PluginCheckboxColumn')
 		self.view_mode_button          = self.get_object('ViewModeButton')
+
+		# facade for all search bars (only one of four is visible at
+		# the same time)
+		self.search_entry = SearchEntriesController(self, 'RIGHT' if self.mini_mode else 'LEFT')
 
 		# HACK: fix names of widgets to allow theming
 		# (glade doesn't seem to properly add names to widgets anymore...)
@@ -1013,14 +1025,14 @@ class Cardapio(dbus.service.Object):
 		self.subfolder_stack       = []
 
 		# "All" button for the regular menu
-		button = self.add_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
+		button = self.add_button(self.get_slab_title(_('All')), None, self.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_sections_sidebar_button = button
 		self.set_sidebar_button_active(button, True)
 		self.all_sections_sidebar_button.set_sensitive(False)
 
 		# "All" button for the system menu
-		button = self.add_button(_('All'), None, self.system_category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
+		button = self.add_button(self.get_slab_title(_('All')), None, self.system_category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_system_sections_sidebar_button = button
 		self.set_sidebar_button_active(button, True)
@@ -1411,14 +1423,16 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		w = self.window.get_focus()
+		active_entry = self.search_entry.get_active_entry()
 
-		if w != self.search_entry and w == self.previously_focused_widget:
+		if w != active_entry and w == self.previously_focused_widget:
+			if event.is_modifier:
+				return
 
-			if event.is_modifier: return
-
-			self.window.set_focus(self.search_entry)
+			self.window.set_focus(active_entry)
 			self.search_entry.set_position(len(self.search_entry.get_text()))
-			self.search_entry.emit('key-press-event', event)
+			
+			active_entry.emit('key-press-event', event)
 
 		else:
 			self.previously_focused_widget = None
@@ -1431,7 +1445,7 @@ class Cardapio(dbus.service.Object):
 		Because that would enter two of each key.
 		"""
 
-		if self.window.get_focus() != self.search_entry:
+		if self.window.get_focus() != self.search_entry.get_active_entry():
 			self.previously_focused_widget = self.window.get_focus()
 
 
@@ -2425,11 +2439,12 @@ class Cardapio(dbus.service.Object):
 		Resize Cardapio according to the user preferences
 		"""
 
-		if self.settings['window size'] is not None:
-			self.window.resize(*self.settings['window size'])
+		# TODO: restore this even though it screws my mini mode
+		#if self.settings['window size'] is not None:
+			#self.window.resize(*self.settings['window size'])
 
-		if self.settings['splitter position'] > 0:
-			self.get_object('MainSplitter').set_position(self.settings['splitter position'])
+		#if self.settings['splitter position'] > 0:
+			#self.get_object('MainSplitter').set_position(self.settings['splitter position'])
 
 
 	def save_dimensions(self, *dummy):
@@ -2459,23 +2474,6 @@ class Cardapio(dbus.service.Object):
 		gtk.gdk.flush()
 		while gtk.events_pending():
 			gtk.main_iteration()
-
-
-	def show_chosen_search_bar(self, bar):
-		"""
-		Shows one of two search bars according to the "bar" argument
-		('TOP' or 'BOTTOM').
-		"""
-
-		if(bar == 'TOP'):
-			self.search_entry = self.t_search_entry
-			self.b_search_slab.hide()
-			self.t_search_slab.show()
-
-		elif(bar == 'BOTTOM'):
-			self.search_entry = self.b_search_entry
-			self.b_search_slab.show()
-			self.t_search_slab.hide()
 
 
 	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
@@ -2570,8 +2568,8 @@ class Cardapio(dbus.service.Object):
 
 		# decide which search bar to show (top or bottom) depending
 		# on the y = 0 axis window inversion
-		self.show_chosen_search_bar('BOTTOM' if inversion[1] else 'TOP')
-		self.window.set_focus(self.search_entry)
+		self.search_entry.set_active_entry('BOTTOM' if inversion[1] else 'TOP')
+		self.window.set_focus(self.search_entry.get_active_entry())
 
 		self.show_window_on_top(self.window)
 
@@ -2607,8 +2605,8 @@ class Cardapio(dbus.service.Object):
 			self.clear_search_entry()
 			self.untoggle_and_show_all_sections()
 		else:
-			self.t_search_entry.set_text(self.current_query)
-			self.b_search_entry.set_text(self.current_query)
+			# remembering current search text in all entries
+			self.search_entry.set_text(self.current_query)
 
 		self.cancel_all_plugins()
 
@@ -3013,7 +3011,7 @@ class Cardapio(dbus.service.Object):
 			if slab == self.sidepane_section_slab:
 
 				app_info = button.app_info
-				button = self.add_button(app['name'], app['icon name'], self.sidepane, tooltip = app['tooltip'], button_type = Cardapio.SIDEPANE_BUTTON)
+				button = self.add_button(self.get_slab_title(app['name']), app['icon name'], self.sidepane, tooltip = app['tooltip'], button_type = Cardapio.SIDEPANE_BUTTON)
 				button.app_info = app_info
 				button.connect('clicked', self.on_app_button_clicked)
 				button.connect('button-press-event', self.on_app_button_button_pressed)
@@ -3091,7 +3089,7 @@ class Cardapio(dbus.service.Object):
 			app_list = self.app_list
 
 		# add category to category pane
-		sidebar_button = self.add_button(title_str, icon_name, category_pane, tooltip = tooltip, button_type = Cardapio.CATEGORY_BUTTON)
+		sidebar_button = self.add_button(self.get_slab_title(title_str), icon_name, category_pane, tooltip = tooltip, button_type = Cardapio.CATEGORY_BUTTON)
 
 		# add category to application pane
 		section_slab, section_contents, label = self.add_application_section(title_str)
@@ -3125,11 +3123,21 @@ class Cardapio(dbus.service.Object):
 		return section_slab, section_contents, label
 
 
+	def get_slab_title(self, title):
+		"""
+		Prepares a title for section. The title is always either:
+		- the one proposed by user (normal mode) or
+		- an empty string (mini mode)
+		"""
+
+		return '' if self.mini_mode else title
+
+
 	def add_places_slab(self):
 		"""
 		Add the Places slab to the app pane
 		"""
-
+		
 		section_slab, section_contents, dummy = self.add_slab(_('Places'), 'folder', tooltip = _('Access documents and folders'), hide = False)
 		self.places_section_slab = section_slab
 		self.places_section_contents = section_contents
@@ -3255,12 +3263,10 @@ class Cardapio(dbus.service.Object):
 
 	def clear_search_entry(self):
 		"""
-		Clears both search entries (top and bottom).
+		Clears search entry.
 		"""
 
-		self.t_search_entry.set_text('')
-		self.b_search_entry.set_text('')
-
+		self.search_entry.set_text('')
 		self.subfolder_stack = []
 
 
@@ -4193,6 +4199,107 @@ class Cardapio(dbus.service.Object):
 
 		self.scroll_adjustment.set_value(0)
 
+
+class SearchEntriesController:
+	"""
+	Facade which hides complexity of search entries from Cardapio.
+
+	While there are really four search entries in the GUI, and exactly
+	one's visible at the same time, working with facade makes all of them
+	seem like just one entry.
+	"""
+
+	possible_orientation = [ 'TOP', 'BOTTOM' ]
+
+	def __init__(self, parent, side):
+		# four search entry slabs
+		self.slabs = {
+			'LEFT' : { 
+				'TOP'    : parent.get_object('TopLeftSearchSlab'),
+				'BOTTOM' : parent.get_object('BottomLeftSearchSlab'),
+			},
+			'RIGHT' : {
+				'TOP'    : parent.get_object('TopRightSearchSlab'),
+				'BOTTOM' : parent.get_object('BottomRightSearchSlab'),
+			}
+		}
+		# four search entries
+		self.entries = {
+			'TOP-LEFT'     : parent.get_object('TopLeftSearchEntry'),
+			'BOTTOM-LEFT'  : parent.get_object('BottomLeftSearchEntry'),
+			'TOP-RIGHT'    : parent.get_object('TopRightSearchEntry'),
+			'BOTTOM-RIGHT' : parent.get_object('BottomRightSearchEntry'),
+		}
+
+		# vertical orientation (modifiable after creation)
+		self.orientation = 'TOP'
+		# horizontal orientation (readonly after creation)
+		self.side = side
+
+	def get_text(self):
+		"""
+		Returns the text taken from the active search entry. In
+		practice, you may assume that texts of all the search
+		entries are equal at any given time.
+		"""
+
+		return self.entries[self.get_current_side()].get_text()
+
+	def set_text(self, text):
+		"""
+		Changes the text of all the search entries.
+		"""
+
+		for entry in self.entries.values():
+			entry.set_text(text)
+
+	def set_position(self, position):
+		"""
+		Sets position of all the search entries.
+		"""
+		
+		for entry in self.entries.values():
+			entry.set_position(position)
+
+	def get_active_entry(self):
+		"""
+		Gets the active search entry component (for purposes of
+		set_focus() for example).
+		"""
+
+		return self.entries[self.get_current_side()]
+
+	def set_active_entry(self, orientation):
+		"""
+		Sets the active entry or, in other words, the vertical
+		orientation of this facade. orientation can be either 'TOP'
+		or 'BOTTOM'.
+		"""
+
+		if not orientation in self.possible_orientation:
+			raise "incorrect active value"
+
+		for slab_side in self.slabs.items():
+			# if it's the current mode...
+			if(slab_side[0] == self.side):
+				for slab in slab_side[1].items():
+					# show the entry corresponding to the
+					# proposed orientation
+					if(slab[0] == orientation):
+						slab[1].show()
+					# show the other one
+					else:
+						slab[1].hide()
+			# hide both entries of the other mode
+			else:
+				for slab in slab_side[1].items():
+					slab[1].hide()
+
+		self.orientation = orientation
+
+	def get_current_side(self):
+		return self.orientation + '-' + self.side
+		
 
 class CardapioPluginInterface:
 	# for documentation, see: https://answers.launchpad.net/cardapio/+faq/1172

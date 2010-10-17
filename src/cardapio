@@ -113,7 +113,10 @@ DBusGMainLoop(set_as_default=True)
 bus = dbus.SessionBus()
 bus_request_name = bus.request_name(Cardapio.bus_name_str)
 
-if len(sys.argv) == 2:
+if len(sys.argv) >= 2:
+
+	# mini-mode flag
+	mini_mode = len(sys.argv) == 3 and sys.argv[2] == 'mini-mode'
 
 	if sys.argv[1] == 'run-in-window':
 
@@ -135,7 +138,7 @@ if len(sys.argv) == 2:
 		# if there's no other instance - start hidden Cardapio
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
 			del bus
-			Cardapio(hidden = True)
+			Cardapio(hidden = True, mini_mode = mini_mode)
 			gtk.gdk.threads_enter()
 			gtk.main()
 			gtk.gdk.threads_leave()
@@ -146,7 +149,7 @@ if len(sys.argv) == 2:
 		# if there's no other instance - start Cardapio
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
 			del bus
-			Cardapio()
+			Cardapio(mini_mode = mini_mode)
 			gtk.gdk.threads_enter()
 			gtk.main()
 			gtk.gdk.threads_leave()
@@ -167,7 +170,7 @@ if len(sys.argv) == 2:
 		# if there's no other instance - start hidden Cardapio
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
 			del bus
-			Cardapio(hidden = True)
+			Cardapio(hidden = True, mini_mode = mini_mode)
 			gtk.gdk.threads_enter()
 			gtk.main()
 			gtk.gdk.threads_leave()
