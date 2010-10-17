@@ -2606,6 +2606,9 @@ class Cardapio(dbus.service.Object):
 		if not self.settings['keep search results']:
 			self.clear_search_entry()
 			self.untoggle_and_show_all_sections()
+		else:
+			self.t_search_entry.set_text(self.current_query)
+			self.b_search_entry.set_text(self.current_query)
 
 		self.cancel_all_plugins()
 
@@ -3252,10 +3255,12 @@ class Cardapio(dbus.service.Object):
 
 	def clear_search_entry(self):
 		"""
-		Clears the search entry
+		Clears both search entries (top and bottom).
 		"""
 
-		self.search_entry.set_text('')
+		self.t_search_entry.set_text('')
+		self.b_search_entry.set_text('')
+
 		self.subfolder_stack = []
 
 
@@ -4188,7 +4193,6 @@ class Cardapio(dbus.service.Object):
 
 		self.scroll_adjustment.set_value(0)
 
-	
 
 class CardapioPluginInterface:
 	# for documentation, see: https://answers.launchpad.net/cardapio/+faq/1172
