@@ -724,7 +724,14 @@ class Cardapio(dbus.service.Object):
 		self.category_pane             = self.get_object('CategoryPane')
 		self.system_category_pane      = self.get_object('SystemCategoryPane')
 		self.sidepane                  = self.get_object('SideappPane')
-		self.search_entry              = self.get_object('SearchEntry')
+
+		self.t_search_slab             = self.get_object('TopSearchSlab')
+		self.b_search_slab             = self.get_object('BottomSearchSlab')
+		self.t_search_entry            = self.get_object('TopSearchEntry')
+		self.b_search_entry            = self.get_object('BottomSearchEntry')
+		# default value
+		self.search_entry              = self.t_search_entry
+
 		self.scrolled_window           = self.get_object('ScrolledWindow')
 		self.scroll_adjustment         = self.scrolled_window.get_vadjustment()
 		self.session_pane              = self.get_object('SessionPane')
@@ -2293,6 +2300,11 @@ class Cardapio(dbus.service.Object):
 		x = 0 or y = 0 axis (or even both axes). Also - thanks to the
 		new coordinates, the window won't hide beyond the top and left
 		borders of the usable screen.
+
+		Also, function returns the rotation flags which show whether
+		the window was rotated over it's axes. For example "(False,
+		True)" tuple means that the new y coordinate of window was
+		rotated over it's x = 0 axis.
 		"""
 
 		x = coordinates[0]
@@ -2305,13 +2317,17 @@ class Cardapio(dbus.service.Object):
 		max_window_x, max_window_y = x + window_width, y + window_height
 		max_screen_x, max_screen_y = screen_x + screen_width, screen_y + screen_height
 
+		x_inverted = False
+		y_inverted = False
 		# if the window won't fit horizontally, rotate it over it's x = 0
 		# axis
 		if max_window_x > max_screen_x:
+			x_inverted = True
 			x -= window_width
 		# if the window won't fit vertically, rotate it over it's y = 0
 		# axis
 		if max_window_y > max_screen_y:
+			y_inverted = True
 			y -= window_height
 
 		# just to be sure - never hide behind top and left borders
@@ -2321,38 +2337,48 @@ class Cardapio(dbus.service.Object):
 		if y < screen_y:
 			y = screen_y
 
-		return (x, y)
+		return ((x, y), (x_inverted, y_inverted))
 
 
 	def reposition_window(self, window):
 		"""
 		Places any window at coordinates determined by 
 		self.get_coordinates_for_window() algorithm.
+
+		Returns the inversion flags.
 		"""
 
-		coordinates = self.get_coordinates_for_window(window)
+		coordinates, inversion = self.get_coordinates_for_window(window)
 		window.move(coordinates[0], coordinates[1])
+
+		return inversion
 
 
 	def reposition_main_window(self):
 		"""
 		Places Cardapio's main window at coordinates determined by
 		self.get_coordinates_for_window() algorithm.
+
+		Returns the inversion flags.
 		"""
 
-		self.reposition_window(self.window)
+		return self.reposition_window(self.window)
 
 
 	def reposition_main_window_at(self, x, y):
 		"""
 		Places Cardapio's main window near the given (x, y) point,
 		according to self.make_coordinates_usable() method's algorithm.
+		
+		Returns the inversion flags.
 		"""
 		
 		window = self.window
 
-		coordinates = self.make_coordinates_usable(window, (x, y))
+		coordinates, inversion = self.make_coordinates_usable(window, (x, y))
 		window.move(coordinates[0], coordinates[1])
+
+		return inversion
 
 
 	def reposition_rebuilding_message(self):
@@ -2369,7 +2395,7 @@ class Cardapio(dbus.service.Object):
 		offset_x = (main_window_width - message_width) / 2
 		offset_y = (main_window_height - message_height) / 2
 
-		coordinates = self.get_coordinates_for_window(self.window)
+		coordinates, inversion = self.get_coordinates_for_window(self.window)
 		window.move(coordinates[0] + offset_x, coordinates[1] + offset_y)
 		
 
@@ -2432,6 +2458,22 @@ class Cardapio(dbus.service.Object):
 		while gtk.events_pending():
 			gtk.main_iteration()
 
+
+	def show_chosen_search_bar(self, bar):
+		"""
+		Shows one of two search bars according to the "bar" argument
+		('TOP' or 'BOTTOM').
+		"""
+
+		if(bar == 'TOP'):
+			self.search_entry = self.t_search_entry
+			self.b_search_slab.hide()
+			self.t_search_slab.show()
+
+		elif(bar == 'BOTTOM'):
+			self.search_entry = self.b_search_entry
+			self.b_search_slab.show()
+			self.t_search_slab.hide()
 
 
 	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
@@ -2520,13 +2562,17 @@ class Cardapio(dbus.service.Object):
 
 		# absolute positioning?
 		if x is not None and y is not None:
-			self.reposition_main_window_at(x, y)
+			inversion = self.reposition_main_window_at(x, y)
 		else:
-			self.reposition_main_window()
+			inversion = self.reposition_main_window()
+
+		# decide which search bar to show (top or bottom) depending
+		# on the y axis window inversion
+		self.show_chosen_search_bar('BOTTOM' if inversion[1] else 'TOP')
+		self.window.set_focus(self.search_entry)
 
 		self.show_window_on_top(self.window)
 
-		self.window.set_focus(self.search_entry)
  		self.scroll_to_top()
 
 		self.visible = True
