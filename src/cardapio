@@ -162,7 +162,7 @@ if len(sys.argv) == 2:
 			show_hide()
 
 
-	elif sys.argv[1] == 'show-docky-mode':
+	elif sys.argv[1] == 'docky-mode':
 
 		# if there's no other instance - start hidden Cardapio
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:

@@ -1114,6 +1114,7 @@ class Cardapio(dbus.service.Object):
 			# i'm assuming this is the pattern for all distros...
 
 		else:
+			self.reposition_window(self.about_dialog)
 			self.about_dialog.show()
 
 
@@ -1186,6 +1187,8 @@ class Cardapio(dbus.service.Object):
 			self.plugin_tree_model.append([basename, name, name, is_active, is_core, not is_required, icon_pixbuf])
 
 		self.update_plugin_description()
+		
+		self.reposition_window(self.options_dialog)
 		self.options_dialog.show()
 
 
@@ -2220,96 +2223,155 @@ class Cardapio(dbus.service.Object):
 		return None
 
 
-	def reposition_window(self, is_message_window = False):
+	def get_coordinates_for_window(self, window):
 		"""
-		Place the Cardapio window near the applet and make sure it's visible.
-		If there is no applet, place it in the center of the screen.
+		Returns the appropriate coordinates for the given window. The
+		coordinates are determined according to the algorithm described
+		below:
+
+		- if there's no Cardapio applet, the coordinates will make
+		  the window appear in the center of the screen
+		- otherwise, the coordinates will position the window near the
+		  applet (just below it if the panel is top opriented, just
+		  to the left of it if the panel is right oriented and so on)
+
+		The coordinates are cleaned using the
+		self.make_coordinates_usable() method.
 		"""
 
-		window_width, window_height = self.window.get_size()
-
+		window_width, window_height = window.get_size()
 		screen_x, screen_y, screen_width, screen_height = self.get_screen_dimensions()
-
-		if is_message_window:
-			window = self.message_window
-			message_width, message_height = self.message_window.get_size()
-			offset_x = (window_width - message_width) / 2
-			offset_y = (window_height - message_height) / 2
-
-		else:
-			window = self.window
-			offset_x = offset_y = 0
 
 		if self.panel_applet is None:
 
 			window_x = (screen_width - window_width)/2
 			window_y = (screen_height - window_height)/2
 
-			window.move(window_x + offset_x, window_y + offset_y)
-			return
+			return self.make_coordinates_usable(window, (window_x, window_y))
 
-		panel = self.panel_button.get_toplevel().window
-		panel_x, panel_y = panel.get_origin()
+		else:
 
-		applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
-		orientation = self.panel_applet.get_orient()
+			panel = self.panel_button.get_toplevel().window
+			panel_x, panel_y = panel.get_origin()
 
-		# weird:
-		# - orient_up    means panel is at the bottom
-		# - orient_down  means panel is at the top
-		# - orient_left  means panel is at the ritgh
-		# - orient_right means panel is at the left
+			applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
+			orientation = self.panel_applet.get_orient()
 
-		# top
-		if orientation == gnomeapplet.ORIENT_DOWN:
-			window_x = panel_x + applet_x
-			window_y = panel_y + applet_y + applet_height
+			# weird:
+			# - orient_up    means panel is at the bottom
+			# - orient_down  means panel is at the top
+			# - orient_left  means panel is at the ritgh
+			# - orient_right means panel is at the left
 
-		# bottom
-		elif orientation == gnomeapplet.ORIENT_UP:
-			window_x = panel_x + applet_x
-			window_y = panel_y + applet_y - window_height
+			# top
+			if orientation == gnomeapplet.ORIENT_DOWN:
+				window_x = panel_x + applet_x
+				window_y = panel_y + applet_y + applet_height
 
-		# left
-		elif orientation == gnomeapplet.ORIENT_RIGHT:
-			window_x = panel_x + applet_x + applet_width
-			window_y = panel_y + applet_y
+			# bottom
+			elif orientation == gnomeapplet.ORIENT_UP:
+				window_x = panel_x + applet_x
+				window_y = panel_y + applet_y - window_height
 
-		# right
-		elif orientation == gnomeapplet.ORIENT_LEFT:
-			window_x = panel_x + applet_x - window_width
-			window_y = panel_y + applet_y
+			# left
+			elif orientation == gnomeapplet.ORIENT_RIGHT:
+				window_x = panel_x + applet_x + applet_width
+				window_y = panel_y + applet_y
 
-		if window_x + window_width > screen_x + screen_width:
-			window_x = screen_width - window_width
+			# right
+			elif orientation == gnomeapplet.ORIENT_LEFT:
+				window_x = panel_x + applet_x - window_width
+				window_y = panel_y + applet_y
 
-		if window_y + window_height > screen_y + screen_height:
-			window_y = screen_height - window_height
+			return self.make_coordinates_usable(window, (window_x, window_y))
 
-		if window_x < screen_x:
-			window_x = screen_x
 
-		if window_y < screen_y:
-			window_y = screen_y
+	def make_coordinates_usable(self, window, coordinates):
+		"""
+		If the window won't fit on the usable screen, given it's size
+		and proposed coordinates, the method will rotate it over it's
+		x = 0 or y = 0 axis (or even both axes). Also - thanks to the
+		new coordinates, the window won't hide beyond the top and left
+		borders of the usable screen.
+		"""
 
-		window.move(window_x + offset_x, window_y + offset_y)
+		x = coordinates[0]
+		y = coordinates[1]
+
+		window_width, window_height = window.get_size()
+		screen_x, screen_y, screen_width, screen_height = self.get_screen_dimensions()
+
+		# maximal coordinates of window and usable screen
+		max_window_x, max_window_y = x + window_width, y + window_height
+		max_screen_x, max_screen_y = screen_x + screen_width, screen_y + screen_height
+
+		# if the window won't fit horizontally, rotate it over it's x = 0
+		# axis
+		if max_window_x > max_screen_x:
+			x -= window_width
+		# if the window won't fit vertically, rotate it over it's y = 0
+		# axis
+		if max_window_y > max_screen_y:
+			y -= window_height
+
+		# just to be sure - never hide behind top and left borders
+		# of the usable screen!
+		if x < screen_x:
+			x = screen_x
+		if y < screen_y:
+			y = screen_y
+
+		return (x, y)
+
+
+	def reposition_window(self, window):
+		"""
+		Places any window at coordinates determined by 
+		self.get_coordinates_for_window() algorithm.
+		"""
+
+		coordinates = self.get_coordinates_for_window(window)
+		window.move(coordinates[0], coordinates[1])
+
+
+	def reposition_main_window(self):
+		"""
+		Places Cardapio's main window at coordinates determined by
+		self.get_coordinates_for_window() algorithm.
+		"""
+
+		self.reposition_window(self.window)
+
 
 	def reposition_main_window_at(self, x, y):
 		"""
-		Places the Cardapio window at given coordinates. Makes sure
-		that given x and y are in usable range and ignores the request
-		if they're not.
+		Places Cardapio's main window near the given (x, y) point,
+		according to self.make_coordinates_usable() method's algorithm.
+		"""
+		
+		window = self.window
+
+		coordinates = self.make_coordinates_usable(window, (x, y))
+		window.move(coordinates[0], coordinates[1])
+
+
+	def reposition_rebuilding_message(self):
+		"""
+		Places the "Rebuilding..." message at the center of Cardapio's
+		window.
 		"""
 
-		dim_x, dim_y, dim_width, dim_height = self.get_screen_dimensions()
+		window = self.message_window
 
-		possible_x = dim_width - dim_x
-		possible_y = dim_height - dim_y
+		main_window_width, main_window_height = self.window.get_size()
+		message_width, message_height = window.get_size()
 
-		if x < 0 or x > possible_x or y < 0 or y > possible_y:
-			logging.warn('[' + str(x) + ',' + str(y) + '] are not correct coordinates - ignoring move request!')
-		else:
-			self.window.move(x, y)
+		offset_x = (main_window_width - message_width) / 2
+		offset_y = (main_window_height - message_height) / 2
+
+		coordinates = self.get_coordinates_for_window(self.window)
+		window.move(coordinates[0] + offset_x, coordinates[1] + offset_y)
+		
 
 	def get_screen_dimensions(self):
 		"""
@@ -2360,7 +2422,7 @@ class Cardapio(dbus.service.Object):
 			self.message_window.hide()
 			return
 
-		self.reposition_window(is_message_window = True)
+		self.reposition_rebuilding_message()
 
 		self.message_window.set_keep_above(True)
 		self.show_window_on_top(self.message_window)
@@ -2371,9 +2433,82 @@ class Cardapio(dbus.service.Object):
 			gtk.main_iteration()
 
 
+
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
+	def show_hide(self):
+		"""
+		Toggles the "hidden" flag of Cardapio window. Position of the
+		window is determined using self.show() method's algorithm.
+
+		Requests are ignored if they come more often than
+		min_visibility_toggle_interval.
+
+		This function is dbus-accessible.
+		"""
+
+		if time() - self.last_visibility_toggle < Cardapio.min_visibility_toggle_interval:
+			return
+
+		if self.visible:
+			self.hide()
+		else:
+			self.show()
+
+		return True
+
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
+	def show_hide_near_mouse(self):
+		"""
+		Toggles the "hidden" flag of Cardapio window. The window will
+		be positioned near to the mouse pointer, according to the
+		self.make_coordinates_usable() method's algorithm.
+
+		Requests are ignored if they come more often than
+		min_visibility_toggle_interval.
+
+		This function is dbus-accessible.
+		"""
+
+		mouse_x, mouse_y, dummy = gtk.gdk.get_default_root_window().get_pointer()
+		return self.show_hide_near(mouse_x, mouse_y)
+
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = 'ii', out_signature = None)
+	def show_hide_near(self, x, y):
+		"""
+		Toggles the "hidden" flag of Cardapio window. The window will
+		be positioned near the given coordinates, according to the
+		self.make_coordinates_usable() method's algorithm.
+
+		Requests are ignored if they come more often than
+		min_visibility_toggle_interval.
+
+		This function is dbus-accessible.
+		"""
+
+		if time() - self.last_visibility_toggle < Cardapio.min_visibility_toggle_interval:
+			return
+
+		x = int(x)
+		y = int(y)
+
+		if self.visible:
+			self.hide()
+		else:
+			self.show(x = x, y = y)
+
+		return True
+	
+
 	def show(self, *dummy, **kwargs):
 		"""
-		Show the Cardapio window
+		Shows the Cardapio window.
+
+		If arguments named "x" and "y" are given, the window will be
+		positioned somewhere near that point according to
+		self.make_coordinates_usable() method's algorithm.
+
+		Otherwise, the window will be positioned near applet or in
+		the center of the screen (if there's no applet).
 		"""
 
 		self.auto_toggle_panel_button(True)
@@ -2387,7 +2522,7 @@ class Cardapio(dbus.service.Object):
 		if x is not None and y is not None:
 			self.reposition_main_window_at(x, y)
 		else:
-			self.reposition_window()
+			self.reposition_main_window()
 
 		self.show_window_on_top(self.window)
 
@@ -2410,7 +2545,7 @@ class Cardapio(dbus.service.Object):
 
 	def hide(self, *dummy):
 		"""
-		Hide the Cardapio window
+		Hides the Cardapio window.
 		"""
 
 		self.auto_toggle_panel_button(False)
@@ -2427,100 +2562,6 @@ class Cardapio(dbus.service.Object):
 		self.cancel_all_plugins()
 
 		return False # used for when hide() is called from a timer
-
-
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
-	def show_hide(self):
-		"""
-		Toggle show / hide the Cardapio window.
-		
-		Requests are ignored if they come more often than
-		min_visibility_toggle_interval.
-		
-		This function is dbus-accessible.
-		"""
-
-		if time() - self.last_visibility_toggle < Cardapio.min_visibility_toggle_interval:
-			return
-
-		if self.visible:
-			self.hide()
-		else:
-			self.show()
-
-		return True
-
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
-	def show_hide_near_mouse(self):
-		"""
-		Toggle show / hide the Cardapio window near the mouse pointer.
-
-		By near we mean a location in which one corner of Cardapio
-		lies under the pointer and the Cardapio's window is not even
-		partially off screen at the same time.
-
-		Requests are ignored if they come more often than
-		min_visibility_toggle_interval.
-
-		This function is dbus-accessible.
-		"""
-		
-		mouse_x, mouse_y, dummy = gtk.gdk.get_default_root_window().get_pointer()
-		return self.show_hide_near(x = mouse_x, y = mouse_y)
-
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = 'ii', out_signature = None)
-	def show_hide_near(self, x, y):
-		"""
-		Toggle show / hide the Cardapio window near the given
-		coordinates.
-
-		It treats the given point as the upper left corner of the
-		Cardapio's window and if the window won't fit on the usable
-		screen, the method will rotate it over it's x = 0 or y = 0
-		axis (or even both axes). Also - the window won't ever hide
-		beyond the top and left borders of the usable screen.
-
-		Requests are ignored if they come more often than
-		min_visibility_toggle_interval.
-
-		This function is dbus-accessible.
-		"""
-
-		if time() - self.last_visibility_toggle < Cardapio.min_visibility_toggle_interval:
-			return
-
-		x = int(x)
-		y = int(y)
-
-		if self.visible:
-			self.hide()
-		else:
-			window_width, window_height = self.window.get_size()
-			screen_x, screen_y, screen_width, screen_height = self.get_screen_dimensions()
-
-			# maximal coordinates of window and usable screen
-			max_window_x, max_window_y = x + window_width, y + window_height
-			max_screen_x, max_screen_y = screen_x + screen_width, screen_y + screen_height
-
-			# if the window won't fit horizontally, rotate it over it's x = 0
-			# axis
-			if max_window_x > max_screen_x:
-				x -= window_width
-			# if the window won't fit vertically, rotate it over it's y = 0
-			# axis
-			if max_window_y > max_screen_y:
-				y -= window_height
-
-			# just to be sure - never hide behind top and left borders
-			# of the usable screen!
-			if x < screen_x:
-				x = screen_x
-			if y < screen_y:
-				y = screen_y
-			
-			self.show(x = x, y = y)
-
-		return True
 
 
 	def hide_if_mouse_away(self):
@@ -4326,5 +4367,3 @@ __builtin__.dbus = dbus
 __builtin__.CardapioPluginInterface = CardapioPluginInterface
 __builtin__.logging = logging
 __builtin__.subprocess = subprocess
-
-
