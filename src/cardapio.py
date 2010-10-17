@@ -2362,6 +2362,7 @@ class Cardapio(dbus.service.Object):
 		Returns the inversion flags.
 		"""
 
+		self.window.props.border_width = 0
 		return self.reposition_window(self.window)
 
 
@@ -2374,6 +2375,7 @@ class Cardapio(dbus.service.Object):
 		"""
 		
 		window = self.window
+		window.props.border_width = 15
 
 		coordinates, inversion = self.make_coordinates_usable(window, (x, y))
 		window.move(coordinates[0], coordinates[1])
