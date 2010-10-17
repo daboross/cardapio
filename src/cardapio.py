@@ -2304,7 +2304,7 @@ class Cardapio(dbus.service.Object):
 		Also, function returns the rotation flags which show whether
 		the window was rotated over it's axes. For example "(False,
 		True)" tuple means that the new y coordinate of window was
-		rotated over it's x = 0 axis.
+		rotated over it's y = 0 axis.
 		"""
 
 		x = coordinates[0]
@@ -2569,7 +2569,7 @@ class Cardapio(dbus.service.Object):
 			inversion = self.reposition_main_window()
 
 		# decide which search bar to show (top or bottom) depending
-		# on the y axis window inversion
+		# on the y = 0 axis window inversion
 		self.show_chosen_search_bar('BOTTOM' if inversion[1] else 'TOP')
 		self.window.set_focus(self.search_entry)
 
