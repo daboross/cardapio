@@ -1,3 +1,17 @@
+cardapio (0.9.154-ubuntu1-maverick1) maverick; urgency=low
+
+   * Added "Connect to Network"
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 15 Oct 2010 22:01:00 -0000
+
+
+cardapio (0.9.154-ubuntu1-lucid1) lucid; urgency=low
+
+   * Added "Connect to Network"
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 15 Oct 2010 22:01:00 -0000
+
+
 cardapio (0.9.153-ubuntu1-maverick1) maverick; urgency=low
 
    * Bugfix release

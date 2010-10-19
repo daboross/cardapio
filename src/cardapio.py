@@ -19,11 +19,27 @@
 # TODO: fix shift-tab from first app widget
 # TODO: alt-1, ..., alt-9, alt-0 should activate 1st, ..., 9th, 10th results
 # TODO: ctrl-1, ..., ctrl-9, ctrl-0 should activate categories
-# TODO: add mount points to "places", allow ejecting from context menu
-# TODO: multiple columns when window is wide enough (like gnome-control-center)
+# TODO: grid view / multiple columns when window is wide enough (like gnome-control-center)
 # TODO: add "most recent" and "most frequent" with a zeitgeist plugin
-# TODO: search results could have context menu with "Open with...", and so on.
 # plus other TODO's elsewhere in the code...
+
+def fatal_error(title, errortext):
+	"""
+	This shows a last-resort error message, which does not depend on any external
+	modules. It only depends on Tkinter, which is part of Python's standard library.
+	"""
+
+	import Tkinter
+
+	label = Tkinter.Label(text = title, padx = 5, pady = 5, anchor = Tkinter.W, justify = Tkinter.LEFT)
+	label.pack()
+
+	text = Tkinter.Text(padx = 5, pady = 5, relief=Tkinter.FLAT, wrap=Tkinter.CHAR)
+	text.insert(Tkinter.INSERT, errortext, 'code')
+	text.pack()
+
+	Tkinter.mainloop()
+
 
 try:
 
@@ -52,7 +68,7 @@ try:
 	from distutils.sysconfig import get_python_lib
 
 except Exception, exception:
-	print(exception)
+	fatal_error('Fatal error loading Cardapio', exception)
 	sys.exit(1)
 
 try:
@@ -81,7 +97,7 @@ except Exception, exception:
 
 
 if gtk.ver < (2, 14, 0):
-	print('Error! Gtk version must be at least 2.14. You have version %s' % gtk.ver)
+	fatal_error('Fatal error loading Cardapio', 'Error! Gtk version must be at least 2.14. You have version %s' % gtk.ver)
 	sys.exit(1)
 
 
@@ -130,7 +146,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.153'
+	version = '0.9.154'
 
 	core_plugins = [
 			'applications',
@@ -385,6 +401,9 @@ class Cardapio(dbus.service.Object):
 							'hide from sidebar' : plugin_class.hide_from_sidebar,
 							'instance'          : None,
 							}
+
+		# TODO: figure out how to make Python unmap all the memory that gets
+		# freed when the garbage collector releases the inactive plugins
 
 
 	def activate_plugins_from_settings(self):
@@ -3639,6 +3658,7 @@ class Cardapio(dbus.service.Object):
 
 		dummy, path = urllib2.splittype(self.clicked_app['command'])
 		if os.path.isfile(path): path, dummy = os.path.split(path)
+		path = self.unescape(path)
  		self.create_subfolder_stack(path)
 		self.search_entry.set_text(self.subfolder_stack[-1][1] + '/')
 
