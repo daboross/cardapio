@@ -257,10 +257,21 @@ class Cardapio(dbus.service.Object):
 
 		# some custom preparations for minimal mode
 		if self.mini_mode:
-			self.get_object('ViewLabel').set_text('')
-			self.get_object('ControlCenterLabel').set_text('')
-			# TODO: proper size
-			self.get_object('SidePaneMargin').set_size_request(4 * self.icon_size_category + 10, -1)
+			self.get_object('ViewLabel').hide()
+
+			# center the icon of Control Center and remove it's label and arrow
+			# TODO: is this the way?
+			ccenter_icon = self.get_object('ControlCenterIcon')
+
+			self.get_object('ControlCenterHBox').remove(ccenter_icon)
+			self.get_object('ControlCenterHBox').remove(self.get_object('ControlCenterLabel'))
+			self.get_object('ControlCenterHBox').remove(self.get_object('ControlCenterArrow'))
+			
+			self.get_object('ControlCenterHBox').pack_start(ccenter_icon, True, True, 0)
+			
+			# TODO: is this the way? could be "2 *" instead of "3 *" but then we won't have
+			# space for categories scroller (if present)
+			self.get_object('SidePaneMargin').set_size_request(3 * self.icon_size_category, -1)
 
 		self.schedule_search_with_all_plugins('')
 
@@ -1044,14 +1055,14 @@ class Cardapio(dbus.service.Object):
 		self.subfolder_stack       = []
 
 		# "All" button for the regular menu
-		button = self.add_button(self.get_slab_title(_('All')), None, self.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
+		button = self.add_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_sections_sidebar_button = button
 		self.set_sidebar_button_active(button, True)
 		self.all_sections_sidebar_button.set_sensitive(False)
 
 		# "All" button for the system menu
-		button = self.add_button(self.get_slab_title(_('All')), None, self.system_category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
+		button = self.add_button(_('All'), None, self.system_category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_system_sections_sidebar_button = button
 		self.set_sidebar_button_active(button, True)
@@ -2408,7 +2419,7 @@ class Cardapio(dbus.service.Object):
 		"""
 		
 		window = self.window
-		window.props.border_width = 15
+		window.props.border_width = 7
 
 		coordinates, inversion = self.make_coordinates_usable(window, (x, y))
 		window.move(coordinates[0], coordinates[1])
@@ -2458,12 +2469,11 @@ class Cardapio(dbus.service.Object):
 		Resize Cardapio according to the user preferences
 		"""
 
-		# TODO: restore this even though it screws my mini mode
-		#if self.settings['window size'] is not None:
-			#self.window.resize(*self.settings['window size'])
+		if self.settings['window size'] is not None:
+			self.window.resize(*self.settings['window size'])
 
-		#if self.settings['splitter position'] > 0:
-			#self.get_object('MainSplitter').set_position(self.settings['splitter position'])
+		if self.settings['splitter position'] > 0:
+			self.get_object('MainSplitter').set_position(self.settings['splitter position'])
 
 
 	def save_dimensions(self, *dummy):
@@ -3030,7 +3040,7 @@ class Cardapio(dbus.service.Object):
 			if slab == self.sidepane_section_slab:
 
 				app_info = button.app_info
-				button = self.add_button(self.get_slab_title(app['name']), app['icon name'], self.sidepane, tooltip = app['tooltip'], button_type = Cardapio.SIDEPANE_BUTTON)
+				button = self.add_button(app['name'], app['icon name'], self.sidepane, tooltip = app['tooltip'], button_type = Cardapio.SIDEPANE_BUTTON)
 				button.app_info = app_info
 				button.connect('clicked', self.on_app_button_clicked)
 				button.connect('button-press-event', self.on_app_button_button_pressed)
@@ -3108,7 +3118,7 @@ class Cardapio(dbus.service.Object):
 			app_list = self.app_list
 
 		# add category to category pane
-		sidebar_button = self.add_button(self.get_slab_title(title_str), icon_name, category_pane, tooltip = tooltip, button_type = Cardapio.CATEGORY_BUTTON)
+		sidebar_button = self.add_button(title_str, icon_name, category_pane, tooltip = tooltip, button_type = Cardapio.CATEGORY_BUTTON)
 
 		# add category to application pane
 		section_slab, section_contents, label = self.add_application_section(title_str)
@@ -3140,16 +3150,6 @@ class Cardapio(dbus.service.Object):
 					}
 
 		return section_slab, section_contents, label
-
-
-	def get_slab_title(self, title):
-		"""
-		Prepares a title for section. The title is always either:
-		- the one proposed by user (normal mode) or
-		- an empty string (mini mode)
-		"""
-
-		return '' if self.mini_mode else title
 
 
 	def add_places_slab(self):
@@ -3375,20 +3375,28 @@ class Cardapio(dbus.service.Object):
 		icon_pixbuf = self.get_icon_pixbuf(icon_name, icon_size_pixels)
 		icon = gtk.image_new_from_pixbuf(icon_pixbuf)
 
-		hbox = gtk.HBox()
-		hbox.add(icon)
-		hbox.add(label)
-		hbox.set_spacing(5)
-		hbox.set_homogeneous(False)
+		# if not mini_mode or mini_mode but not a button on the left
+		# panel...
+		if not self.mini_mode or (button_type != Cardapio.CATEGORY_BUTTON and button_type != Cardapio.SIDEPANE_BUTTON):
+			hbox = gtk.HBox()
+			hbox.add(icon)
+			hbox.add(label)
+			hbox.set_spacing(5)
+			hbox.set_homogeneous(False)
 
-		align = gtk.Alignment(0, 0.5)
-		align.add(hbox)
+			align = gtk.Alignment(0, 0.5)
+			align.add(hbox)
+			
+			button.add(align)
+
+		# otherwise just icon - no label and so on
+		else:
+			button.set_image(icon)
 
 		if tooltip:
 			tooltip = self.unescape(tooltip)
 			button.set_tooltip_text(tooltip)
 
-		button.add(align)
 		button.set_relief(gtk.RELIEF_NONE)
 		button.set_use_underline(False)
 
