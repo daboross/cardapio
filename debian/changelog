@@ -1,3 +1,31 @@
+cardapio (0.9.155-ubuntu1-maverick1) maverick; urgency=low
+
+   * Added a last-resort error message to help debug problems loading the applet
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 19 Oct 2010 10:21:00 -0000
+
+
+cardapio (0.9.155-ubuntu1-lucid1) lucid; urgency=low
+
+   * Added a last-resort error message to help debug problems loading the applet
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 19 Oct 2010 10:21:00 -0000
+
+
+cardapio (0.9.155-ubuntu1-maverick1) maverick; urgency=low
+
+   * Added a last-resort error message to help debug problems loading the applet
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 19 Oct 2010 10:21:00 -0000
+
+
+cardapio (0.9.155-ubuntu1-lucid1) lucid; urgency=low
+
+   * Added a last-resort error message to help debug problems loading the applet
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 19 Oct 2010 10:21:00 -0000
+
+
 cardapio (0.9.154-ubuntu1-maverick1) maverick; urgency=low
 
    * Added "Connect to Network"

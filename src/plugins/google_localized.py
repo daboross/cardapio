@@ -1,8 +1,14 @@
-from gio import File, Cancellable
-from urllib2 import quote
-from simplejson import loads
-from locale import getdefaultlocale
-from glib import GError
+import_error = None
+try:
+	from gio import File, Cancellable
+	from urllib2 import quote
+	from simplejson import loads
+	from locale import getdefaultlocale
+	from glib import GError
+
+except Exception, exception:
+	import_error = exception
+
 
 class CardapioPlugin(CardapioPluginInterface):
 
@@ -14,7 +20,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	help_text          = ''
 	version            = '1.39'
 
-	plugin_api_version = 1.39
+	plugin_api_version = 1.40
 
 	search_delay_type  = 'remote'
 
@@ -30,6 +36,12 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.c = cardapio_proxy
 
+		if import_error:
+			self.c.write_to_log(self, 'Could not import certain modules', is_error = True)
+			self.c.write_to_log(self, import_error, is_error = True)
+			self.loaded = False
+			return
+		
 		language, encoding = getdefaultlocale()
 		google_results_language_format = language.split('_')[0]
 		google_interface_language_format = language.replace('_', '-')

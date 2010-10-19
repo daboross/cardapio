@@ -146,7 +146,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.154'
+	version = '0.9.155'
 
 	core_plugins = [
 			'applications',
@@ -4241,9 +4241,10 @@ def applet_factory(applet, iid):
 
 import __builtin__
 __builtin__._ = _
-__builtin__.dbus = dbus
 __builtin__.CardapioPluginInterface = CardapioPluginInterface
-__builtin__.logging = logging
-__builtin__.subprocess = subprocess
+__builtin__.dbus        = dbus
+__builtin__.logging     = logging
+__builtin__.subprocess  = subprocess
+__builtin__.fatal_error = fatal_error
 
 

@@ -1,6 +1,11 @@
-from operator import itemgetter
+import_error = None
+try:
+	from operator import itemgetter
+	from dbus.exceptions import DBusException
 
-from dbus.exceptions import DBusException
+except Exception, exception:
+	import_error = exception
+
 
 class CardapioPlugin(CardapioPluginInterface):
 
@@ -29,7 +34,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('Pidgin')
 	description = _('Search for online Pidgin buddies')
-	version = '0.91b'
+	version = '0.92'
 
 	url = ''
 	help_text = ''
@@ -52,6 +57,12 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.cardapio = cardapio_proxy
 
+		if import_error:
+			self.cardapio.write_to_log(self, 'Could not import certain modules', is_error = True)
+			self.cardapio.write_to_log(self, import_error, is_error = True)
+			self.loaded = False
+			return
+		
 		# Pidgin's D-Bus constants
 		self.dpidgin_bus_name = 'im.pidgin.purple.PurpleService'
 		self.dpidgin_object_path = '/im/pidgin/purple/PurpleObject'
