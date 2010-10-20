@@ -2305,36 +2305,7 @@ class Cardapio(dbus.service.Object):
 			panel = self.panel_button.get_toplevel().window
 			panel_x, panel_y = panel.get_origin()
 
-			applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
-			orientation = self.panel_applet.get_orient()
-
-			# weird:
-			# - orient_up    means panel is at the bottom
-			# - orient_down  means panel is at the top
-			# - orient_left  means panel is at the ritgh
-			# - orient_right means panel is at the left
-
-			# top
-			if orientation == gnomeapplet.ORIENT_DOWN:
-				window_x = panel_x + applet_x
-				window_y = panel_y + applet_y + applet_height
-
-			# bottom
-			elif orientation == gnomeapplet.ORIENT_UP:
-				window_x = panel_x + applet_x
-				window_y = panel_y + applet_y - window_height
-
-			# left
-			elif orientation == gnomeapplet.ORIENT_RIGHT:
-				window_x = panel_x + applet_x + applet_width
-				window_y = panel_y + applet_y
-
-			# right
-			elif orientation == gnomeapplet.ORIENT_LEFT:
-				window_x = panel_x + applet_x - window_width
-				window_y = panel_y + applet_y
-
-			return self.make_coordinates_usable(window, (window_x, window_y))
+			return self.make_coordinates_usable(window, (panel_x, panel_y))
 
 
 	def make_coordinates_usable(self, window, coordinates):
@@ -2469,11 +2440,13 @@ class Cardapio(dbus.service.Object):
 		Resize Cardapio according to the user preferences
 		"""
 
-		if self.settings['window size'] is not None:
-			self.window.resize(*self.settings['window size'])
+		# TODO: make it work in mini mode too
+		if not self.mini_mode:
+			if self.settings['window size'] is not None:
+				self.window.resize(*self.settings['window size'])
 
-		if self.settings['splitter position'] > 0:
-			self.get_object('MainSplitter').set_position(self.settings['splitter position'])
+			if self.settings['splitter position'] > 0:
+				self.get_object('MainSplitter').set_position(self.settings['splitter position'])
 
 
 	def save_dimensions(self, *dummy):

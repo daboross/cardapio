@@ -113,10 +113,10 @@ DBusGMainLoop(set_as_default=True)
 bus = dbus.SessionBus()
 bus_request_name = bus.request_name(Cardapio.bus_name_str)
 
-if len(sys.argv) >= 2:
-
-	# mini-mode flag
-	mini_mode = len(sys.argv) == 3 and sys.argv[2] == 'mini-mode'
+# relying on three command line arguments here breaks Cardapio as an
+# applet; instead we look for "mini-mode" explicitly
+mini_mode = sys.argv.count('mini-mode') > 0
+if len(sys.argv) == 2 or mini_mode:
 
 	if sys.argv[1] == 'run-in-window':
 
