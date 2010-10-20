@@ -1,15 +1,21 @@
-import json
-import gio
-import urllib
+import_error = None
+try:
+	import json
+	import gio
+	import urllib
 
-import base64
-import hashlib
-import hmac
-import time
+	import base64
+	import hashlib
+	import hmac
+	import time
 
-from xml.etree import ElementTree
+	from xml.etree import ElementTree
 
-from locale import getdefaultlocale
+	from locale import getdefaultlocale
+
+except Exception, exception:
+	import_error = exception
+
 
 class CardapioPlugin(CardapioPluginInterface):
 
@@ -37,7 +43,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('Amazon')
 	description = _('Search for results in Amazon')
-	version = '0.91b'
+	version = '0.92'
 
 	url = ''
 	help_text = ''
@@ -60,6 +66,12 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.cardapio = cardapio_proxy
 
+		if import_error:
+			self.cardapio.write_to_log(self, 'Could not import certain modules', is_error = True)
+			self.cardapio.write_to_log(self, import_error, is_error = True)
+			self.loaded = False
+			return
+		
 		self.cancellable = gio.Cancellable()
 
 		# my API keys

@@ -1,5 +1,11 @@
-from os.path import split
-from urllib2 import quote, splittype
+import_error = None
+try:
+	from os.path import split
+	from urllib2 import quote, splittype
+
+except Exception, exception:
+	import_error = exception
+
 
 class CardapioPlugin(CardapioPluginInterface):
 
@@ -9,7 +15,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.41'
+	version            = '1.42'
 
 	plugin_api_version = 1.39
 
@@ -27,6 +33,12 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.c = cardapio_proxy
 
+		if import_error:
+			self.c.write_to_log(self, 'Could not import certain modules', is_error = True)
+			self.c.write_to_log(self, import_error, is_error = True)
+			self.loaded = False
+			return
+		
 		self.tracker = None
 		bus = dbus.SessionBus()
 

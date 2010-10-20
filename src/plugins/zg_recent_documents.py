@@ -1,14 +1,12 @@
-from commands import getoutput
-import urllib2, os
-
-plugin_exception = None
-
+import_error = None
 try:
+	from commands import getoutput
+	import urllib2, os
 	from zeitgeist.client import ZeitgeistClient
 	from zeitgeist import datamodel
 
 except Exception, exception:
-	plugin_exception = exception
+	import_error = exception
 
 
 class CardapioPlugin(CardapioPluginInterface):
@@ -19,7 +17,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '0.98b'
+	version            = '0.99'
 
 	plugin_api_version = 1.39
 
@@ -41,9 +39,13 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.loaded = False
 
+		if import_error:
+			self.cardapio.write_to_log(self, 'Could not import certain modules', is_error = True)
+			self.cardapio.write_to_log(self, import_error, is_error = True)
+			return
+		
 		if 'ZeitgeistClient' not in globals():
 			self.c.write_to_log(self, 'Could not import Zeitgeist', is_error = True)
-			if plugin_exception: self.c.write_to_log(self, plugin_exception, is_error = True)
 			return
 
 		try:

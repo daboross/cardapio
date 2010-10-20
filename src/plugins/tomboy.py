@@ -1,4 +1,10 @@
-from dbus.exceptions import DBusException
+import_error = None
+try:
+	from dbus.exceptions import DBusException
+
+except Exception, exception:
+	import_error = exception
+
 
 class CardapioPlugin(CardapioPluginInterface):
 
@@ -19,7 +25,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('Tomboy')
 	description = _('Search for Tomboy notes')
-	version = '0.91b'
+	version = '0.92'
 
 	url = ''
 	help_text = ''
@@ -42,6 +48,12 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.cardapio = cardapio_proxy
 
+		if import_error:
+			self.cardapio.write_to_log(self, 'Could not import certain modules', is_error = True)
+			self.cardapio.write_to_log(self, import_error, is_error = True)
+			self.loaded = False
+			return
+		
 		# Tomboy's D-Bus constants
 		self.dtomboy_bus_name = 'org.gnome.Tomboy'
 		self.dtomboy_object_path = '/org/gnome/Tomboy/RemoteControl'

@@ -1,8 +1,14 @@
-import json
-import gio
-import urllib
+import_error = None
+try:
+	import json
+	import gio
+	import urllib
 
-from glib import GError
+	from glib import GError
+
+except Exception, exception:
+	import_error = exception
+
 
 # TODO: it would be nice to localize this but it's hard; the Wikipedia's API
 # has no locale parameter and the only way to look for results in other
@@ -24,7 +30,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('Wikipedia')
 	description = _('Search for results in Wikipedia')
-	version = '0.93b'
+	version = '0.94'
 
 	url = ''
 	help_text = ''
@@ -47,6 +53,12 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.cardapio = cardapio_proxy
 
+		if import_error:
+			self.cardapio.write_to_log(self, 'Could not import certain modules', is_error = True)
+			self.cardapio.write_to_log(self, import_error, is_error = True)
+			self.loaded = False
+			return
+		
 		self.cancellable = gio.Cancellable()
 
 		# Wikipedia's unofficial API arguments (search truncated to
