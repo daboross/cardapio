@@ -1,6 +1,5 @@
 import_error = None
 try:
-	from commands import getoutput
 	import urllib2, os
 	from zeitgeist.client import ZeitgeistClient
 	from zeitgeist import datamodel
@@ -17,7 +16,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '0.99'
+	version            = '0.991'
 
 	plugin_api_version = 1.39
 
@@ -69,7 +68,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			self.c.write_to_log(self, exception, is_error = True)
 			return 
 
-		self.have_sezen = (len(getoutput('which sezen')) != 0)
+		self.have_sezen = getoutput('which sezen')
 		if not self.have_sezen:
 			self.c.write_to_log(self, 'Sezen not found, so you will not see the "Show additional results" button.', is_warning = True)
 

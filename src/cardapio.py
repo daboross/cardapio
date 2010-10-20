@@ -59,7 +59,6 @@ try:
 	import dbus, dbus.service
 
 	from time import time
-	from commands import getoutput
 	from pango import ELLIPSIZE_END
 	from threading import Lock, Thread
 	from locale import setlocale, LC_ALL
@@ -133,6 +132,17 @@ _ = gettext.gettext
 import gtk.glade
 gtk.glade.bindtextdomain(APP, DIR)
 gtk.glade.textdomain(APP)
+
+
+def getoutput(shell_command):
+
+	try: 
+		return subprocess.check_output(shell_command, shell = True)
+	except Exception, exception: 
+		logging.info('Exception when executing' + shell_command)
+		logging.info(exception)
+		return False
+
 
 
 # Main Cardapio class
@@ -600,7 +610,7 @@ class Cardapio(dbus.service.Object):
 
 		default_side_pane_items = []
 		path = getoutput('which software-center')
-		if os.path.exists(path):
+		if path and os.path.exists(path):
 			default_side_pane_items.append(
 				{
 					'name'      : _('Ubuntu Software Center'),
@@ -4182,6 +4192,7 @@ class CardapioPluginInterface:
 		pass
 
 
+
 def return_true(*dummy): return True
 def return_false(*dummy): return False
 
@@ -4245,6 +4256,7 @@ __builtin__.CardapioPluginInterface = CardapioPluginInterface
 __builtin__.dbus        = dbus
 __builtin__.logging     = logging
 __builtin__.subprocess  = subprocess
+__builtin__.getoutput   = getoutput
 __builtin__.fatal_error = fatal_error
 
 

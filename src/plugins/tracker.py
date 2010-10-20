@@ -2,7 +2,6 @@ import_error = None
 try:
 	from os.path import split
 	from urllib2 import quote, splittype
-	from commands import getoutput
 
 except Exception, exception:
 	import_error = exception
@@ -16,7 +15,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.42'
+	version            = '1.421'
 
 	plugin_api_version = 1.39
 
