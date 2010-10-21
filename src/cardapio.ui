@@ -39,50 +39,54 @@
                   <object class="GtkHPaned" id="MainSplitter">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <signal name="accept_position" handler="save_dimensions"/>
                     <child>
                       <object class="GtkAlignment" id="SidePaneMargin">
                         <property name="visible">True</property>
-                        <property name="top_padding">4</property>
                         <child>
                           <object class="GtkVBox" id="SidePane">
                             <property name="visible">True</property>
-                            <property name="spacing">12</property>
                             <child>
-                              <object class="GtkFrame" id="SearchSlab">
+                              <object class="GtkAlignment" id="TopLeftSearchSlabMargin">
                                 <property name="visible">True</property>
-                                <property name="label_xalign">0</property>
-                                <property name="shadow_type">none</property>
+                                <property name="top_padding">5</property>
+                                <property name="bottom_padding">7</property>
                                 <child>
-                                  <object class="GtkAlignment" id="SearchEntryMargin">
+                                  <object class="GtkFrame" id="TopLeftSearchSlab">
                                     <property name="visible">True</property>
-                                    <property name="top_padding">4</property>
+                                    <property name="label_xalign">0</property>
+                                    <property name="shadow_type">none</property>
                                     <child>
-                                      <object class="GtkEntry" id="SearchEntry">
+                                      <object class="GtkAlignment" id="TopLeftSearchEntryMargin">
                                         <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="invisible_char">•</property>
-                                        <property name="truncate_multiline">True</property>
-                                        <property name="secondary_icon_stock">gtk-clear</property>
-                                        <property name="secondary_icon_activatable">True</property>
-                                        <property name="secondary_icon_sensitive">True</property>
-                                        <signal name="changed" handler="on_search_entry_changed" after="yes"/>
-                                        <signal name="key_press_event" handler="on_search_entry_key_pressed"/>
-                                        <signal name="activate" handler="on_search_entry_activate"/>
-                                        <signal name="icon_press" handler="on_search_entry_icon_pressed"/>
+                                        <property name="top_padding">4</property>
+                                        <child>
+                                          <object class="GtkEntry" id="TopLeftSearchEntry">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="invisible_char">•</property>
+                                            <property name="truncate_multiline">True</property>
+                                            <property name="secondary_icon_stock">gtk-clear</property>
+                                            <property name="secondary_icon_activatable">True</property>
+                                            <property name="secondary_icon_sensitive">True</property>
+                                            <signal name="changed" handler="on_search_entry_changed" after="yes"/>
+                                            <signal name="key_press_event" handler="on_search_entry_key_pressed"/>
+                                            <signal name="activate" handler="on_search_entry_activate"/>
+                                            <signal name="icon_press" handler="on_search_entry_icon_pressed"/>
+                                          </object>
+                                        </child>
                                       </object>
                                     </child>
-                                  </object>
-                                </child>
-                                <child type="label">
-                                  <object class="GtkLabel" id="SearchLabel">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="label" translatable="yes">Search</property>
-                                    <attributes>
-                                      <attribute name="weight" value="bold"/>
-                                      <attribute name="scale" value="1.125000"/>
-                                    </attributes>
+                                    <child type="label">
+                                      <object class="GtkLabel" id="TopLeftSearchLabel">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">Search</property>
+                                        <attributes>
+                                          <attribute name="weight" value="bold"/>
+                                          <attribute name="scale" value="1.125000"/>
+                                        </attributes>
+                                      </object>
+                                    </child>
                                   </object>
                                 </child>
                               </object>
@@ -92,48 +96,55 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkFrame" id="CategorySlab">
+                              <object class="GtkAlignment" id="CategorySlabMargin">
                                 <property name="visible">True</property>
-                                <property name="label_xalign">0</property>
-                                <property name="shadow_type">none</property>
+                                <property name="top_padding">5</property>
+                                <property name="bottom_padding">12</property>
                                 <child>
-                                  <object class="GtkAlignment" id="CategoryMargin">
+                                  <object class="GtkFrame" id="CategorySlab">
                                     <property name="visible">True</property>
-                                    <property name="top_padding">4</property>
+                                    <property name="label_xalign">0</property>
+                                    <property name="shadow_type">none</property>
                                     <child>
-                                      <object class="GtkScrolledWindow" id="CategoryScrolledWindow">
+                                      <object class="GtkAlignment" id="CategoryMargin">
                                         <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="hscrollbar_policy">never</property>
-                                        <property name="vscrollbar_policy">automatic</property>
+                                        <property name="top_padding">4</property>
                                         <child>
-                                          <object class="GtkViewport" id="CategoryViewport">
+                                          <object class="GtkScrolledWindow" id="CategoryScrolledWindow">
                                             <property name="visible">True</property>
-                                            <property name="resize_mode">queue</property>
-                                            <property name="shadow_type">none</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="hscrollbar_policy">never</property>
+                                            <property name="vscrollbar_policy">automatic</property>
                                             <child>
-                                              <object class="GtkVBox" id="CategorySwitcherPane">
+                                              <object class="GtkViewport" id="CategoryViewport">
                                                 <property name="visible">True</property>
+                                                <property name="resize_mode">queue</property>
+                                                <property name="shadow_type">none</property>
                                                 <child>
-                                                  <object class="GtkVBox" id="CategoryPane">
+                                                  <object class="GtkVBox" id="CategorySwitcherPane">
                                                     <property name="visible">True</property>
                                                     <child>
-                                                      <placeholder/>
+                                                      <object class="GtkVBox" id="CategoryPane">
+                                                        <property name="visible">True</property>
+                                                        <child>
+                                                          <placeholder/>
+                                                        </child>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="position">0</property>
+                                                      </packing>
                                                     </child>
-                                                  </object>
-                                                  <packing>
-                                                    <property name="position">0</property>
-                                                  </packing>
-                                                </child>
-                                                <child>
-                                                  <object class="GtkVBox" id="SystemCategoryPane">
                                                     <child>
-                                                      <placeholder/>
+                                                      <object class="GtkVBox" id="SystemCategoryPane">
+                                                        <child>
+                                                          <placeholder/>
+                                                        </child>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="position">1</property>
+                                                      </packing>
                                                     </child>
                                                   </object>
-                                                  <packing>
-                                                    <property name="position">1</property>
-                                                  </packing>
                                                 </child>
                                               </object>
                                             </child>
@@ -141,17 +152,17 @@
                                         </child>
                                       </object>
                                     </child>
-                                  </object>
-                                </child>
-                                <child type="label">
-                                  <object class="GtkLabel" id="ViewLabel">
-                                    <property name="visible">True</property>
-                                    <property name="xalign">0</property>
-                                    <property name="label" translatable="yes">View</property>
-                                    <attributes>
-                                      <attribute name="weight" value="bold"/>
-                                      <attribute name="scale" value="1.125000"/>
-                                    </attributes>
+                                    <child type="label">
+                                      <object class="GtkLabel" id="ViewLabel">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">View</property>
+                                        <attributes>
+                                          <attribute name="weight" value="bold"/>
+                                          <attribute name="scale" value="1.125000"/>
+                                        </attributes>
+                                      </object>
+                                    </child>
                                   </object>
                                 </child>
                               </object>
@@ -160,92 +171,96 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkFrame" id="SideappSlab">
+                              <object class="GtkAlignment" id="SideappSlabMargin">
                                 <property name="visible">True</property>
-                                <property name="label_xalign">0</property>
-                                <property name="shadow_type">none</property>
                                 <child>
-                                  <object class="GtkAlignment" id="SideappMargin">
+                                  <object class="GtkFrame" id="SideappSlab">
                                     <property name="visible">True</property>
-                                    <property name="top_padding">4</property>
+                                    <property name="label_xalign">0</property>
+                                    <property name="shadow_type">none</property>
                                     <child>
-                                      <object class="GtkScrolledWindow" id="SideappScrolledWindow">
+                                      <object class="GtkAlignment" id="SideappMargin">
                                         <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="hscrollbar_policy">never</property>
-                                        <property name="vscrollbar_policy">never</property>
+                                        <property name="top_padding">4</property>
                                         <child>
-                                          <object class="GtkViewport" id="SideappViewport">
+                                          <object class="GtkScrolledWindow" id="SideappScrolledWindow">
                                             <property name="visible">True</property>
-                                            <property name="resize_mode">queue</property>
-                                            <property name="shadow_type">none</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="hscrollbar_policy">never</property>
+                                            <property name="vscrollbar_policy">never</property>
                                             <child>
-                                              <object class="GtkVBox" id="SideappSubdivider">
+                                              <object class="GtkViewport" id="SideappViewport">
                                                 <property name="visible">True</property>
+                                                <property name="resize_mode">queue</property>
+                                                <property name="shadow_type">none</property>
                                                 <child>
-                                                  <object class="GtkVBox" id="SideappPane">
+                                                  <object class="GtkVBox" id="SideappSubdivider">
                                                     <property name="visible">True</property>
                                                     <child>
-                                                      <placeholder/>
-                                                    </child>
-                                                  </object>
-                                                  <packing>
-                                                    <property name="position">0</property>
-                                                  </packing>
-                                                </child>
-                                                <child>
-                                                  <object class="GtkToggleButton" id="ViewModeButton">
-                                                    <property name="visible">True</property>
-                                                    <property name="can_focus">True</property>
-                                                    <property name="receives_default">True</property>
-                                                    <property name="tooltip_text" translatable="yes">Change your system's appearance and behavior</property>
-                                                    <property name="relief">none</property>
-                                                    <signal name="toggled" handler="on_view_mode_toggled"/>
-                                                    <child>
-                                                      <object class="GtkHBox" id="hbox1">
+                                                      <object class="GtkVBox" id="SideappPane">
                                                         <property name="visible">True</property>
-                                                        <property name="spacing">5</property>
                                                         <child>
-                                                          <object class="GtkImage" id="image10">
+                                                          <placeholder/>
+                                                        </child>
+                                                      </object>
+                                                      <packing>
+                                                        <property name="position">0</property>
+                                                      </packing>
+                                                    </child>
+                                                    <child>
+                                                      <object class="GtkToggleButton" id="ViewModeButton">
+                                                        <property name="visible">True</property>
+                                                        <property name="can_focus">True</property>
+                                                        <property name="receives_default">True</property>
+                                                        <property name="relief">none</property>
+                                                        <signal name="toggled" handler="on_view_mode_toggled"/>
+                                                        <child>
+                                                          <object class="GtkHBox" id="ControlCenterHBox">
+                                                            <property name="visible">True</property>
+                                                            <property name="spacing">5</property>
+                                                            <child>
+                                                            <object class="GtkImage" id="ControlCenterIcon">
                                                             <property name="visible">True</property>
                                                             <property name="stock">gtk-preferences</property>
-                                                          </object>
-                                                          <packing>
+                                                            </object>
+                                                            <packing>
                                                             <property name="expand">False</property>
                                                             <property name="position">0</property>
-                                                          </packing>
-                                                        </child>
-                                                        <child>
-                                                          <object class="GtkLabel" id="label2">
+                                                            </packing>
+                                                            </child>
+                                                            <child>
+                                                            <object class="GtkLabel" id="ControlCenterLabel">
                                                             <property name="visible">True</property>
                                                             <property name="xalign">0</property>
                                                             <property name="label" translatable="yes">_Control Center</property>
                                                             <property name="use_underline">True</property>
                                                             <property name="mnemonic_widget">ViewModeButton</property>
-                                                          </object>
-                                                          <packing>
+                                                            </object>
+                                                            <packing>
                                                             <property name="position">1</property>
-                                                          </packing>
-                                                        </child>
-                                                        <child>
-                                                          <object class="GtkArrow" id="arrow1">
+                                                            </packing>
+                                                            </child>
+                                                            <child>
+                                                            <object class="GtkArrow" id="ControlCenterArrow">
                                                             <property name="visible">True</property>
                                                             <property name="xalign">1</property>
-                                                          </object>
-                                                          <packing>
+                                                            </object>
+                                                            <packing>
                                                             <property name="expand">False</property>
                                                             <property name="position">2</property>
-                                                          </packing>
+                                                            </packing>
+                                                            </child>
+                                                          </object>
                                                         </child>
                                                       </object>
+                                                      <packing>
+                                                        <property name="expand">False</property>
+                                                        <property name="fill">False</property>
+                                                        <property name="pack_type">end</property>
+                                                        <property name="position">1</property>
+                                                      </packing>
                                                     </child>
                                                   </object>
-                                                  <packing>
-                                                    <property name="expand">False</property>
-                                                    <property name="fill">False</property>
-                                                    <property name="pack_type">end</property>
-                                                    <property name="position">1</property>
-                                                  </packing>
                                                 </child>
                                               </object>
                                             </child>
@@ -253,17 +268,64 @@
                                         </child>
                                       </object>
                                     </child>
+                                    <child type="label_item">
+                                      <placeholder/>
+                                    </child>
                                   </object>
-                                </child>
-                                <child type="label_item">
-                                  <placeholder/>
                                 </child>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
-                                <property name="fill">False</property>
-                                <property name="pack_type">end</property>
                                 <property name="position">2</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkAlignment" id="BottomLeftSearchSlabMargin">
+                                <property name="visible">True</property>
+                                <property name="top_padding">12</property>
+                                <child>
+                                  <object class="GtkFrame" id="BottomLeftSearchSlab">
+                                    <property name="visible">True</property>
+                                    <property name="label_xalign">0</property>
+                                    <property name="shadow_type">none</property>
+                                    <child>
+                                      <object class="GtkAlignment" id="BottomLeftSearchEntryMargin">
+                                        <property name="visible">True</property>
+                                        <property name="top_padding">4</property>
+                                        <child>
+                                          <object class="GtkEntry" id="BottomLeftSearchEntry">
+                                            <property name="visible">True</property>
+                                            <property name="can_focus">True</property>
+                                            <property name="invisible_char">•</property>
+                                            <property name="truncate_multiline">True</property>
+                                            <property name="secondary_icon_stock">gtk-clear</property>
+                                            <property name="secondary_icon_activatable">True</property>
+                                            <property name="secondary_icon_sensitive">True</property>
+                                            <signal name="changed" handler="on_search_entry_changed" after="yes"/>
+                                            <signal name="key_press_event" handler="on_search_entry_key_pressed"/>
+                                            <signal name="activate" handler="on_search_entry_activate"/>
+                                            <signal name="icon_press" handler="on_search_entry_icon_pressed"/>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </child>
+                                    <child type="label">
+                                      <object class="GtkLabel" id="BottomLeftSearchLabel">
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">Search</property>
+                                        <attributes>
+                                          <attribute name="weight" value="bold"/>
+                                          <attribute name="scale" value="1.125000"/>
+                                        </attributes>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="position">3</property>
                               </packing>
                             </child>
                           </object>
@@ -275,68 +337,137 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkScrolledWindow" id="ScrolledWindow">
+                      <object class="GtkAlignment" id="AppPaneMargin">
                         <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="hscrollbar_policy">never</property>
-                        <property name="shadow_type">in</property>
                         <child>
-                          <object class="GtkViewport" id="ScrolledViewport">
+                          <object class="GtkVBox" id="AppPane">
                             <property name="visible">True</property>
-                            <property name="resize_mode">queue</property>
-                            <property name="shadow_type">none</property>
                             <child>
-                              <object class="GtkAlignment" id="ApplicationPaneMargin">
+                              <object class="GtkAlignment" id="TopRightSearchSlabMargin">
                                 <property name="visible">True</property>
-                                <property name="bottom_padding">8</property>
-                                <property name="left_padding">4</property>
-                                <property name="right_padding">4</property>
+                                <property name="bottom_padding">4</property>
                                 <child>
-                                  <object class="GtkVBox" id="ApplicationPane">
+                                  <object class="GtkEntry" id="TopRightSearchEntry">
                                     <property name="visible">True</property>
-                                    <property name="spacing">12</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">•</property>
+                                    <property name="truncate_multiline">True</property>
+                                    <property name="secondary_icon_stock">gtk-clear</property>
+                                    <property name="secondary_icon_activatable">True</property>
+                                    <property name="secondary_icon_sensitive">True</property>
+                                    <signal name="changed" handler="on_search_entry_changed" after="yes"/>
+                                    <signal name="key_press_event" handler="on_search_entry_key_pressed"/>
+                                    <signal name="activate" handler="on_search_entry_activate"/>
+                                    <signal name="icon_press" handler="on_search_entry_icon_pressed"/>
+                                  </object>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkAlignment" id="ScrolledWindowMargin">
+                                <property name="visible">True</property>
+                                <child>
+                                  <object class="GtkScrolledWindow" id="ScrolledWindow">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="hscrollbar_policy">never</property>
+                                    <property name="vscrollbar_policy">automatic</property>
+                                    <property name="shadow_type">in</property>
                                     <child>
-                                      <object class="GtkFrame" id="SectionSlab">
+                                      <object class="GtkViewport" id="ScrolledViewport">
                                         <property name="visible">True</property>
-                                        <property name="label_xalign">0</property>
+                                        <property name="resize_mode">queue</property>
                                         <property name="shadow_type">none</property>
                                         <child>
-                                          <object class="GtkAlignment" id="SectionMargin">
+                                          <object class="GtkAlignment" id="ApplicationPaneMargin">
                                             <property name="visible">True</property>
+                                            <property name="bottom_padding">8</property>
                                             <property name="left_padding">4</property>
+                                            <property name="right_padding">4</property>
                                             <child>
-                                              <object class="GtkVBox" id="SectionContents">
+                                              <object class="GtkVBox" id="ApplicationPane">
                                                 <property name="visible">True</property>
-                                                <property name="homogeneous">True</property>
+                                                <property name="spacing">12</property>
                                                 <child>
-                                                  <placeholder/>
+                                                  <object class="GtkFrame" id="SectionSlab">
+                                                    <property name="visible">True</property>
+                                                    <property name="label_xalign">0</property>
+                                                    <property name="shadow_type">none</property>
+                                                    <child>
+                                                      <object class="GtkAlignment" id="SectionMargin">
+                                                        <property name="visible">True</property>
+                                                        <property name="left_padding">4</property>
+                                                        <child>
+                                                          <object class="GtkVBox" id="SectionContents">
+                                                            <property name="visible">True</property>
+                                                            <property name="homogeneous">True</property>
+                                                            <child>
+                                                            <placeholder/>
+                                                            </child>
+                                                          </object>
+                                                        </child>
+                                                      </object>
+                                                    </child>
+                                                    <child type="label">
+                                                      <object class="GtkLabel" id="SectionName">
+                                                        <property name="visible">True</property>
+                                                        <property name="xalign">0</property>
+                                                        <property name="ypad">4</property>
+                                                        <property name="label">Section Name</property>
+                                                        <attributes>
+                                                          <attribute name="weight" value="bold"/>
+                                                          <attribute name="scale" value="1.125000"/>
+                                                        </attributes>
+                                                      </object>
+                                                    </child>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">False</property>
+                                                    <property name="fill">False</property>
+                                                    <property name="position">0</property>
+                                                  </packing>
                                                 </child>
                                               </object>
                                             </child>
                                           </object>
                                         </child>
-                                        <child type="label">
-                                          <object class="GtkLabel" id="SectionName">
-                                            <property name="visible">True</property>
-                                            <property name="xalign">0</property>
-                                            <property name="ypad">4</property>
-                                            <property name="label">Section Name</property>
-                                            <attributes>
-                                              <attribute name="weight" value="bold"/>
-                                              <attribute name="scale" value="1.125000"/>
-                                            </attributes>
-                                          </object>
-                                        </child>
                                       </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">False</property>
-                                        <property name="position">0</property>
-                                      </packing>
                                     </child>
                                   </object>
                                 </child>
                               </object>
+                              <packing>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkAlignment" id="BottomRightSearchSlabMargin">
+                                <property name="visible">True</property>
+                                <property name="top_padding">4</property>
+                                <child>
+                                  <object class="GtkEntry" id="BottomRightSearchEntry">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">True</property>
+                                    <property name="invisible_char">•</property>
+                                    <property name="truncate_multiline">True</property>
+                                    <property name="secondary_icon_stock">gtk-clear</property>
+                                    <property name="secondary_icon_activatable">True</property>
+                                    <property name="secondary_icon_sensitive">True</property>
+                                    <signal name="changed" handler="on_search_entry_changed" after="yes"/>
+                                    <signal name="key_press_event" handler="on_search_entry_key_pressed"/>
+                                    <signal name="activate" handler="on_search_entry_activate"/>
+                                    <signal name="icon_press" handler="on_search_entry_icon_pressed"/>
+                                  </object>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="position">2</property>
+                              </packing>
                             </child>
                           </object>
                         </child>
@@ -591,7 +722,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <child>
-                  <object class="GtkAlignment" id="alignment2">
+                  <object class="GtkAlignment" id="GeneralAppletOptionPane">
                     <property name="visible">True</property>
                     <property name="top_padding">10</property>
                     <property name="bottom_padding">10</property>
@@ -602,7 +733,7 @@
                         <property name="visible">True</property>
                         <property name="spacing">15</property>
                         <child>
-                          <object class="GtkFrame" id="frame1">
+                          <object class="GtkFrame" id="GeneralOptionPane">
                             <property name="visible">True</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
@@ -616,7 +747,7 @@
                                 <child>
                                   <object class="GtkTable" id="table1">
                                     <property name="visible">True</property>
-                                    <property name="n_rows">4</property>
+                                    <property name="n_rows">5</property>
                                     <property name="n_columns">2</property>
                                     <property name="column_spacing">5</property>
                                     <property name="row_spacing">5</property>
@@ -688,6 +819,22 @@
                                         <property name="right_attach">2</property>
                                         <property name="top_attach">3</property>
                                         <property name="bottom_attach">4</property>
+                                        <property name="y_options"></property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCheckButton" id="OptionMiniMode">
+                                        <property name="label" translatable="yes">Reduce the size of Cardapio's main window</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
+                                        <property name="draw_indicator">True</property>
+                                        <signal name="toggled" handler="on_options_changed"/>
+                                      </object>
+                                      <packing>
+                                        <property name="right_attach">2</property>
+                                        <property name="top_attach">4</property>
+                                        <property name="bottom_attach">5</property>
                                         <property name="y_options"></property>
                                       </packing>
                                     </child>
@@ -829,7 +976,7 @@
                   <placeholder/>
                 </child>
                 <child>
-                  <object class="GtkAlignment" id="alignment4">
+                  <object class="GtkAlignment" id="PluginsOptionPane">
                     <property name="visible">True</property>
                     <property name="top_padding">5</property>
                     <property name="bottom_padding">5</property>

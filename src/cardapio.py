@@ -42,7 +42,6 @@ def fatal_error(title, errortext):
 
 
 try:
-
 	import os
 	import re
 	import sys
@@ -184,6 +183,9 @@ class Cardapio(dbus.service.Object):
 		pass
 
 	def __init__(self, hidden = False, panel_applet = None, panel_button = None, debug = False):
+		"""
+		Creates a instance of Cardapio.
+		"""
 
 		self.create_config_folder()
 		logging_filename = os.path.join(self.config_folder_path, 'cardapio.log')
@@ -516,7 +518,7 @@ class Cardapio(dbus.service.Object):
 			return True
 
 		if self.selected_section is None:
-			self.clear_search_entry()
+			self.search_entry.clear()
 			widget.set_sensitive(False)
 
 		else:
@@ -630,13 +632,14 @@ class Cardapio(dbus.service.Object):
 			})
 
 		self.read_config_option(s, 'window size'                , None                     ) # format: [px, px]
+		self.read_config_option(s, 'mini mode'                  , False                    ) # bool
 		self.read_config_option(s, 'splitter position'          , 0                        ) # int, position in pixels
 		self.read_config_option(s, 'show session buttons'       , False                    ) # bool
 		self.read_config_option(s, 'keep search results'        , False                    ) # bool
 		self.read_config_option(s, 'open on hover'              , False                    ) # bool
 		self.read_config_option(s, 'open categories on hover'   , False                    ) # bool
 		self.read_config_option(s, 'min search string length'   , 3                        ) # int, number of characters
-		self.read_config_option(s, 'menu rebuild delay'         , 5                        , force_update_from_version = [0,9,96]) # seconds
+		self.read_config_option(s, 'menu rebuild delay'         , 3                        , force_update_from_version = [0,9,96]) # seconds
 		self.read_config_option(s, 'search results limit'       , 5                        ) # int, number of results
 		self.read_config_option(s, 'long search results limit'  , 15                       ) # int, number of results
 		self.read_config_option(s, 'local search update delay'  , 100                      , force_update_from_version = [0,9,96]) # msec
@@ -753,10 +756,7 @@ class Cardapio(dbus.service.Object):
 		self.category_pane             = self.get_object('CategoryPane')
 		self.system_category_pane      = self.get_object('SystemCategoryPane')
 		self.sidepane                  = self.get_object('SideappPane')
-		self.search_entry              = self.get_object('SearchEntry')
-		self.scrolled_window           = self.get_object('ScrolledWindow')
-		self.scroll_adjustment         = self.scrolled_window.get_vadjustment()
-		self.session_pane              = self.get_object('SessionPane')
+		self.scroll_adjustment         = self.get_object('ScrolledWindow').get_vadjustment()
 		self.left_session_pane         = self.get_object('LeftSessionPane')
 		self.right_session_pane        = self.get_object('RightSessionPane')
 		self.context_menu              = self.get_object('CardapioContextMenu')
@@ -772,6 +772,9 @@ class Cardapio(dbus.service.Object):
 		self.plugin_tree_model         = self.get_object('PluginListstore')
 		self.plugin_checkbox_column    = self.get_object('PluginCheckboxColumn')
 		self.view_mode_button          = self.get_object('ViewModeButton')
+		self.main_splitter             = self.get_object('MainSplitter')
+
+		self.search_entry              = self.get_object('TopLeftSearchEntry') # start with any search entry -- doesn't matter which
 
 		# HACK: fix names of widgets to allow theming
 		# (glade doesn't seem to properly add names to widgets anymore...)
@@ -963,7 +966,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.setup_ui_from_gui_settings()
-		self.restore_dimensions()
+		#self.restore_dimensions()
 
 
 	def setup_ui_from_gui_settings(self):
@@ -983,9 +986,9 @@ class Cardapio(dbus.service.Object):
 			self.setup_panel_button()
 
 		if self.settings['show session buttons']:
-			self.session_pane.show()
+			self.get_object('SessionPane').show()
 		else:
-			self.session_pane.hide()
+			self.get_object('SessionPane').hide()
 
 		# set up open-on-hover for categories
 
@@ -1005,6 +1008,8 @@ class Cardapio(dbus.service.Object):
 				if 'has_hover_handler' in dir(category_button) and category_button.has_hover_handler:
 					category_button.handler_block_by_func(self.on_sidebar_button_hovered)
 					category_button.has_hover_handler = False
+
+		self.toggle_mini_mode_ui()
 
 
 	def build_ui(self):
@@ -1120,6 +1125,15 @@ class Cardapio(dbus.service.Object):
 		return response
 
 
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
+	def open_about_cardapio_dialog(self):
+		"""
+		Opens the "About Cardapio" dialog. This method is d-bus
+		accessible.
+		"""
+		self.open_about_dialog(None, 'AboutCardapio')
+	
+
 	def open_about_dialog(self, widget, verb = None):
 		"""
 		Opens either the "About Gnome" dialog, or the "About Ubuntu" dialog,
@@ -1133,8 +1147,7 @@ class Cardapio(dbus.service.Object):
 			self.launch_raw('yelp ghelp:about-%s' % Cardapio.distro_name.lower())
 			# i'm assuming this is the pattern for all distros...
 
-		else:
-			self.about_dialog.show()
+		else: self.about_dialog.show()
 
 
 	def on_dialog_close(self, dialog, response = None):
@@ -1166,10 +1179,11 @@ class Cardapio(dbus.service.Object):
 		widget.handler_unblock_by_func(self.on_options_changed)
 
 
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
 	def open_options_dialog(self, *dummy):
 		"""
 		Show the Options Dialog and populate its widgets with values from the
-		user's settings (self.settings)
+		user's settings (self.settings). This method is d-bus accessible.
 		"""
 
 		self.set_widget_from_option('OptionKeybinding', 'keybinding')
@@ -1179,6 +1193,7 @@ class Cardapio(dbus.service.Object):
 		self.set_widget_from_option('OptionKeepResults', 'keep search results')
 		self.set_widget_from_option('OptionOpenOnHover', 'open on hover')
 		self.set_widget_from_option('OptionOpenCategoriesOnHover', 'open categories on hover')
+		self.set_widget_from_option('OptionMiniMode', 'mini mode')
 
 		icon_size = gtk.icon_size_lookup(4)[0] # 4 because it's that same as in the UI file
 
@@ -1231,6 +1246,7 @@ class Cardapio(dbus.service.Object):
 		self.settings['keep search results'] = self.get_object('OptionKeepResults').get_active()
 		self.settings['open on hover'] = self.get_object('OptionOpenOnHover').get_active()
 		self.settings['open categories on hover'] = self.get_object('OptionOpenCategoriesOnHover').get_active()
+		self.settings['mini mode'] = self.get_object('OptionMiniMode').get_active()
 		self.setup_ui_from_gui_settings()
 
 
@@ -1422,11 +1438,12 @@ class Cardapio(dbus.service.Object):
 		w = self.window.get_focus()
 
 		if w != self.search_entry and w == self.previously_focused_widget:
-
-			if event.is_modifier: return
+			if event.is_modifier:
+				return
 
 			self.window.set_focus(self.search_entry)
 			self.search_entry.set_position(len(self.search_entry.get_text()))
+			
 			self.search_entry.emit('key-press-event', event)
 
 		else:
@@ -2239,108 +2256,96 @@ class Cardapio(dbus.service.Object):
 		return None
 
 
-	def reposition_window(self, is_message_window = False, show_near_mouse = False):
+	def choose_coordinates_for_window(self, window):
 		"""
-		Place the Cardapio window near the applet and make sure it's visible.
-		If there is no applet, place it in the center of the screen.
+		Returns the appropriate coordinates for the given window. The
+		coordinates are determined according to the following algorithm:
+
+		- If there's no Cardapio applet, place the window in the center of the
+		  screen
+
+		- Otherwise, position the window near the applet (just below it if the
+		  panel is top opriented, just to the left of it if the panel is right
+		  oriented, and so on)
+
 		"""
 
-		window_width, window_height = self.window.get_size()
+		window_width, window_height = window.get_size()
+		screen_x, screen_y, screen_width, screen_height = self.get_screen_dimensions()
+
+		if self.panel_applet is None:
+
+			x = (screen_width - window_width)/2
+			y = (screen_height - window_height)/2
+
+		else:
+
+			panel = self.panel_button.get_toplevel().window
+			x, y = panel.get_origin()
+
+		return x, y
+
+
+	def get_coordinates_inside_screen(self, window, x, y):
+		"""
+		If the window won't fit on the usable screen, given its size and
+		proposed coordinates, the method will rotate it over its x, y, or x=y
+		axis. Als , the window won't hide beyond the top and left borders of the
+		usable screen.
+
+		Returns the new x, y coordinates and two booleans indicating whether the
+		window was rotated around the x and/or y axis.
+		"""
+
+		window_width, window_height = window.get_size()
+		screen_x, screen_y, screen_width, screen_height = self.get_screen_dimensions()
+
+		# maximal coordinates of window and usable screen
+		max_window_x, max_window_y = x + window_width, y + window_height
+		max_screen_x, max_screen_y = screen_x + screen_width, screen_y + screen_height
+
+		x_inverted = False
+		y_inverted = False
+
+		# if the window won't fit horizontally, rotate it over its y axis
+		if max_window_x > max_screen_x:
+			x_inverted = True
+			x -= window_width
+
+		# if the window won't fit vertically, rotate it over its x axis
+		if max_window_y > max_screen_y:
+			y_inverted = True
+			y -= window_height
+
+		# just to be sure - never hide behind top and left borders
+		# of the usable screen!
+		if x < screen_x: x = screen_x
+		if y < screen_y: y = screen_y
+
+		return x, y, x_inverted, y_inverted
+
+
+	def get_screen_dimensions(self):
+		"""
+		Returns usable dimensions of the current desktop in a form of
+		a tuple: (x, y, width, height). If the real numbers can't be
+		determined, returns the size of the whole screen instead.
+		"""
 
 		root_window = gtk.gdk.get_default_root_window()
 		screen_property = gtk.gdk.atom_intern('_NET_WORKAREA')
 		screen_dimensions = root_window.property_get(screen_property)[2]
 
 		if screen_dimensions:
-			screen_x      = screen_dimensions[0]
-			screen_y      = screen_dimensions[1]
-			screen_width  = screen_dimensions[2]
-			screen_height = screen_dimensions[3]
+			return (screen_dimensions[0], screen_dimensions[1],
+				screen_dimensions[2], screen_dimensions[3])
 
 		else:
 			logging.warn('Could not get dimensions of usable screen area. Using max screen area instead.')
-			screen_x, screen_y = 0, 0
-			screen_width = gtk.gdk.screen_width()
-			screen_height = gtk.gdk.screen_height()
-
-		if is_message_window:
-			window = self.message_window
-			message_width, message_height = self.message_window.get_size()
-			offset_x = (window_width - message_width) / 2
-			offset_y = (window_height - message_height) / 2
-
-		else:
-			window = self.window
-			offset_x = offset_y = 0
-
-		if show_near_mouse or self.panel_applet is None:
-
-			if show_near_mouse:
-				mouse_x, mouse_y, dummy = root_window.get_pointer()
-				if mouse_x + window_width  > screen_x + screen_width : mouse_x = mouse_x - window_width
-				if mouse_y + window_height > screen_y + screen_height: mouse_y = mouse_y - window_height
-				if mouse_x + window_width  > screen_x + screen_width : mouse_x = screen_x + screen_width  - window_width
-				if mouse_y + window_height > screen_y + screen_height: mouse_y = screen_y + screen_height - window_height
-				if mouse_x < screen_x: mouse_x = screen_x
-				if mouse_y < screen_y: mouse_y = screen_y
-				window_x = mouse_x
-				window_y = mouse_y
-
-			else:
-				window_x = (screen_width - window_width)/2
-				window_y = (screen_height - window_height)/2
-
-			window.move(window_x + offset_x, window_y + offset_y)
-			return
-
-		panel = self.panel_button.get_toplevel().window
-		panel_x, panel_y = panel.get_origin()
-
-		applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
-		orientation = self.panel_applet.get_orient()
-
-		# weird:
-		# - orient_up    means panel is at the bottom
-		# - orient_down  means panel is at the top
-		# - orient_left  means panel is at the ritgh
-		# - orient_right means panel is at the left
-
-		# top
-		if orientation == gnomeapplet.ORIENT_DOWN:
-			window_x = panel_x + applet_x
-			window_y = panel_y + applet_y + applet_height
-
-		# bottom
-		elif orientation == gnomeapplet.ORIENT_UP:
-			window_x = panel_x + applet_x
-			window_y = panel_y + applet_y - window_height
-
-		# left
-		elif orientation == gnomeapplet.ORIENT_RIGHT:
-			window_x = panel_x + applet_x + applet_width
-			window_y = panel_y + applet_y
-
-		# right
-		elif orientation == gnomeapplet.ORIENT_LEFT:
-			window_x = panel_x + applet_x - window_width
-			window_y = panel_y + applet_y
-
-		if window_x + window_width > screen_x + screen_width:
-			window_x = screen_width - window_width
-
-		if window_y + window_height > screen_y + screen_height:
-			window_y = screen_height - window_height
-
-		if window_x < screen_x:
-			window_x = screen_x
-
-		if window_y < screen_y:
-			window_y = screen_y
-
-		window.move(window_x + offset_x, window_y + offset_y)
+			return (0, 0, gtk.gdk.screen_width(), gtk.gdk.screen_height())
 
 
-	def restore_dimensions(self):
+	def restore_dimensions(self, x = None, y = None):
 		"""
 		Resize Cardapio according to the user preferences
 		"""
@@ -2348,8 +2353,23 @@ class Cardapio(dbus.service.Object):
 		if self.settings['window size'] is not None:
 			self.window.resize(*self.settings['window size'])
 
-		if self.settings['splitter position'] > 0:
-			self.get_object('MainSplitter').set_position(self.settings['splitter position'])
+		if x is None or y is None:
+			x, y = self.choose_coordinates_for_window(self.window)
+
+		x, y, x_inverted, y_inverted = self.get_coordinates_inside_screen(self.window, x, y)
+		self.window.move(x, y)
+
+		if self.settings['mini mode']:
+			self.main_splitter.child_set_property(self.get_object('SidePaneMargin'), 'shrink', True)
+			self.main_splitter.set_position(0)
+			self.main_splitter.child_set_property(self.get_object('SidePaneMargin'), 'shrink', False)
+
+		elif self.settings['splitter position'] > 0:
+			self.main_splitter.set_position(self.settings['splitter position'])
+
+		# decide which search bar to show (top or bottom) depending
+		# on the y = 0 axis window invert
+		self.setup_search_entry(place_at_top = not y_inverted)
 
 
 	def save_dimensions(self, *dummy):
@@ -2358,19 +2378,76 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.settings['window size'] = self.window.get_size()
-		self.settings['splitter position'] = self.get_object('MainSplitter').get_position()
+		if not self.settings['mini mode']:
+			self.settings['splitter position'] = self.main_splitter.get_position()
+
+
+	# TODO: collapse to mini mode when main_splitter is clicked (but not dragged)
+	#
+	#def on_main_splitter_clicked(self, *dummy):
+	#	"""
+	#	Toggle mini mode
+	#	"""
+	#	self.settings['mini mode'] = not self.settings['mini mode']
+	#	self.toggle_mini_mode_ui()
+	#	self.restore_dimensions()
+
+	
+	def toggle_mini_mode_ui(self):
+
+		category_buttons = self.category_pane.get_children() + self.system_category_pane.get_children()
+
+		if self.settings['mini mode']:
+
+			for category_button in category_buttons:
+				category_button.child.child.get_children()[1].hide()
+
+			self.get_object('ViewLabel').hide()
+			self.get_object('ControlCenterLabel').hide()
+			self.get_object('ControlCenterArrow').hide()
+			self.get_object('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
+
+			self.get_object('TopLeftSearchSlabMargin').hide()    # these are required, to make sure the splitter
+			self.get_object('BottomLeftSearchSlabMargin').hide() # ...moves all the way to the left
+			self.main_splitter.child_set_property(self.get_object('SidePaneMargin'), 'shrink', True)
+			self.main_splitter.set_position(0)
+			self.main_splitter.child_set_property(self.get_object('SidePaneMargin'), 'shrink', False)
+
+			# TODO: make splitter unmoveable
+			# TODO: make splitter clickable
+			# TODO: setup sidepane margins
+
+		else:
+
+			for category_button in category_buttons:
+				category_button.child.child.get_children()[1].show()
+
+			self.get_object('ViewLabel').show()
+			self.get_object('ControlCenterLabel').show()
+			self.get_object('ControlCenterArrow').show()
+			self.get_object('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+			
+			self.main_splitter.set_position(self.settings['splitter position'])
+			# TODO: make splitter moveable again
 
 
 	def set_message_window_visible(self, state = True):
 		"""
-		Show/Hide the "Rebuilding" message window
+		Show/Hide the "Rebuilding..." message window
 		"""
 
 		if state == False:
 			self.message_window.hide()
 			return
 
-		self.reposition_window(is_message_window = True)
+		main_window_width, main_window_height = self.window.get_size()
+		message_width, message_height = self.message_window.get_size()
+
+		offset_x = (main_window_width - message_width) / 2
+		offset_y = (main_window_height - message_height) / 2
+
+		coordinates, inversion = self.choose_coordinates_for_window(self.self.message_window)
+		self.message_window.move(coordinates[0] + offset_x, coordinates[1] + offset_y)
 
 		self.message_window.set_keep_above(True)
 		self.show_window_on_top(self.message_window)
@@ -2381,23 +2458,77 @@ class Cardapio(dbus.service.Object):
 			gtk.main_iteration()
 
 
-	def show(self, *dummy, **kwargs):
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
+	def show_hide(self):
 		"""
-		Show the Cardapio window
+		Toggles Cardapio's visibility and places the window near the applet or,
+		if there is no applet, centered on the screen.
+
+		Requests are ignored if they come more often than
+		min_visibility_toggle_interval.
+
+		This function is dbus-accessible.
 		"""
 
-		if 'show_near_mouse' in kwargs:
-			show_near_mouse = kwargs['show_near_mouse']
-		else:
-			show_near_mouse = False
+		return self.show_hide_near_point()
+
+
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
+	def show_hide_near_mouse(self):
+		"""
+		Toggles Cardapio's visibility and places the window near the mouse.
+
+		Requests are ignored if they come more often than
+		min_visibility_toggle_interval.
+
+		This function is dbus-accessible.
+		"""
+
+		mouse_x, mouse_y, dummy = gtk.gdk.get_default_root_window().get_pointer()
+		return self.show_hide_near_point(mouse_x, mouse_y)
+
+
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = 'ii', out_signature = None)
+	def show_hide_near_point(self, x = None, y = None):
+		"""
+		Toggles Cardapio's visibility and places the window at the given (x,y)
+		location -- or as close as possible so that the window still fits on the
+		screen.
+
+		Requests are ignored if they come more often than
+		min_visibility_toggle_interval.
+
+		This function is dbus-accessible.
+		"""
+
+		if time() - self.last_visibility_toggle < Cardapio.min_visibility_toggle_interval:
+			return
+
+		if self.visible: self.hide()
+		else: 
+			if x is not None: x = int(x)
+			if y is not None: y = int(y)
+			self.show(x, y)
+
+		return True
+	
+
+	def show(self, x = None, y = None):
+		"""
+		Shows the Cardapio window.
+
+		If arguments x and y are given, the window will be positioned somewhere
+		near that point.  Otherwise, the window will be positioned near applet
+		or in the center of the screen (if there's no applet).
+		"""
 
 		self.auto_toggle_panel_button(True)
 
-		self.restore_dimensions()
-		self.reposition_window(show_near_mouse = show_near_mouse)
-		self.show_window_on_top(self.window)
+		self.restore_dimensions(x,y)
 
 		self.window.set_focus(self.search_entry)
+		self.show_window_on_top(self.window)
+
  		self.scroll_to_top()
 
 		self.visible = True
@@ -2416,7 +2547,7 @@ class Cardapio(dbus.service.Object):
 
 	def hide(self, *dummy):
 		"""
-		Hide the Cardapio window
+		Hides the Cardapio window.
 		"""
 
 		self.auto_toggle_panel_button(False)
@@ -2429,27 +2560,13 @@ class Cardapio(dbus.service.Object):
 		if not self.settings['keep search results']:
 			self.clear_search_entry()
 			self.untoggle_and_show_all_sections()
+		else:
+			# remembering current search text in all entries
+			self.search_entry.set_text(self.current_query)
 
 		self.cancel_all_plugins()
 
 		return False # used for when hide() is called from a timer
-
-
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = 'b', out_signature = None)
-	def show_hide(self, show_near_mouse = False):
-		"""
-		Toggle Show/Hide the Cardapio window. This function is dbus-accessible.
-		"""
-
-		if time() - self.last_visibility_toggle < Cardapio.min_visibility_toggle_interval:
-			return
-
-		show_near_mouse = bool(show_near_mouse)
-
-		if self.visible: self.hide()
-		else: self.show(show_near_mouse = show_near_mouse)
-
-		return True
 
 
 	def hide_if_mouse_away(self):
@@ -2821,8 +2938,6 @@ class Cardapio(dbus.service.Object):
 		Populate either the Pinned Items or Side Pane list
 		"""
 
-		text = self.search_entry.get_text().strip().lower()
-
 		no_results = True
 
 		for app in self.settings[list_name]:
@@ -2838,14 +2953,10 @@ class Cardapio(dbus.service.Object):
 
 			button = self.add_app_button(app['name'], app['icon name'], self.section_list[slab]['contents'], app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
 
-			if app['name'].lower().find(text) == -1:
-				button.hide()
-
-			else:
-				button.show()
-				self.set_section_has_entries(slab)
-				self.no_results_to_show = False
-				no_results = False
+			button.show()
+			self.set_section_has_entries(slab)
+			self.no_results_to_show = False
+			no_results = False
 
 			if slab == self.sidepane_section_slab:
 
@@ -2855,7 +2966,7 @@ class Cardapio(dbus.service.Object):
 				button.connect('clicked', self.on_app_button_clicked)
 				button.connect('button-press-event', self.on_app_button_button_pressed)
 
-		if no_results or (slab is self.sidepane_section_slab and not text):
+		if no_results or (slab is self.sidepane_section_slab):
 			self.hide_section(slab, fully_hide = True)
 
 		elif (self.selected_section is not None) and (self.selected_section != slab):
@@ -2966,7 +3077,7 @@ class Cardapio(dbus.service.Object):
 		"""
 		Add the Places slab to the app pane
 		"""
-
+		
 		section_slab, section_contents, dummy = self.add_slab(_('Places'), 'folder', tooltip = _('Access documents and folders'), hide = False)
 		self.places_section_slab = section_slab
 		self.places_section_contents = section_contents
@@ -3090,9 +3201,43 @@ class Cardapio(dbus.service.Object):
 			container.remove(child)
 
 
+	def setup_search_entry(self, place_at_top = False):
+		"""
+		Hides 3 of the 4 search entries and returns the visible entry.
+		"""
+
+		text = self.search_entry.get_text()
+
+		place_at_left = not self.settings['mini mode']
+
+		self.get_object('TopLeftSearchSlabMargin').hide()
+		self.get_object('BottomLeftSearchSlabMargin').hide()
+		self.get_object('TopRightSearchSlabMargin').hide()
+		self.get_object('BottomRightSearchSlabMargin').hide()
+
+		if place_at_top:
+			if place_at_left:
+				self.search_entry = self.get_object('TopLeftSearchEntry')
+				self.get_object('TopLeftSearchSlabMargin').show()
+			else:
+				self.search_entry = self.get_object('TopRightSearchEntry')
+				self.get_object('TopRightSearchSlabMargin').show()
+		else:
+			if place_at_left:
+				self.search_entry = self.get_object('BottomLeftSearchEntry')
+				self.get_object('BottomLeftSearchSlabMargin').show()
+			else:
+				self.search_entry = self.get_object('BottomRightSearchEntry')
+				self.get_object('BottomRightSearchSlabMargin').show()
+
+		self.search_entry.handler_block_by_func(self.on_search_entry_changed)
+		self.search_entry.set_text(text)
+		self.search_entry.handler_unblock_by_func(self.on_search_entry_changed)
+
+
 	def clear_search_entry(self):
 		"""
-		Clears the search entry
+		Clears search entry.
 		"""
 
 		self.search_entry.set_text('')
@@ -3193,6 +3338,8 @@ class Cardapio(dbus.service.Object):
 
 		align = gtk.Alignment(0, 0.5)
 		align.add(hbox)
+			
+
 
 		if tooltip:
 			tooltip = self.unescape(tooltip)
@@ -3386,9 +3533,10 @@ class Cardapio(dbus.service.Object):
 		self.scrollbar_width = scrollbar.style_get_property('slider-width')
 
 
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
 	def launch_edit_app(self, *dummy):
 		"""
-		Opens Gnome's menu editor
+		Opens Gnome's menu editor. This method is d-bus accessible.
 		"""
 
 		self.launch_raw('alacarte')
@@ -4028,7 +4176,6 @@ class Cardapio(dbus.service.Object):
 
 		self.scroll_adjustment.set_value(0)
 
-	
 
 class CardapioPluginInterface:
 	# for documentation, see: https://answers.launchpad.net/cardapio/+faq/1172
@@ -4258,5 +4405,3 @@ __builtin__.logging     = logging
 __builtin__.subprocess  = subprocess
 __builtin__.getoutput   = getoutput
 __builtin__.fatal_error = fatal_error
-
-
