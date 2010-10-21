@@ -2360,9 +2360,7 @@ class Cardapio(dbus.service.Object):
 		self.window.move(x, y)
 
 		if self.settings['mini mode']:
-			self.main_splitter.child_set_property(self.get_object('SidePaneMargin'), 'shrink', True)
-			self.main_splitter.set_position(0)
-			self.main_splitter.child_set_property(self.get_object('SidePaneMargin'), 'shrink', False)
+			pass #self.main_splitter.set_position(0)
 
 		elif self.settings['splitter position'] > 0:
 			self.main_splitter.set_position(self.settings['splitter position'])
@@ -2395,7 +2393,8 @@ class Cardapio(dbus.service.Object):
 	
 	def toggle_mini_mode_ui(self):
 
-		category_buttons = self.category_pane.get_children() + self.system_category_pane.get_children()
+		category_buttons = self.category_pane.get_children() +\
+				self.system_category_pane.get_children() + self.sidepane.get_children()
 
 		if self.settings['mini mode']:
 
@@ -2409,9 +2408,10 @@ class Cardapio(dbus.service.Object):
 
 			self.get_object('TopLeftSearchSlabMargin').hide()    # these are required, to make sure the splitter
 			self.get_object('BottomLeftSearchSlabMargin').hide() # ...moves all the way to the left
-			self.main_splitter.child_set_property(self.get_object('SidePaneMargin'), 'shrink', True)
+			sidepane_margin = self.get_object('SidePaneMargin')
+			#self.main_splitter.child_set_property(sidepane_margin, 'shrink', True)
 			self.main_splitter.set_position(0)
-			self.main_splitter.child_set_property(self.get_object('SidePaneMargin'), 'shrink', False)
+			#self.main_splitter.child_set_property(sidepane_margin, 'shrink', False)
 
 			# TODO: make splitter unmoveable
 			# TODO: make splitter clickable
