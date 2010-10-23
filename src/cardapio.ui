@@ -49,7 +49,7 @@
                               <object class="GtkAlignment" id="TopLeftSearchSlabMargin">
                                 <property name="visible">True</property>
                                 <property name="top_padding">5</property>
-                                <property name="bottom_padding">7</property>
+                                <property name="bottom_padding">12</property>
                                 <child>
                                   <object class="GtkFrame" id="TopLeftSearchSlab">
                                     <property name="visible">True</property>
@@ -98,7 +98,6 @@
                             <child>
                               <object class="GtkAlignment" id="CategorySlabMargin">
                                 <property name="visible">True</property>
-                                <property name="top_padding">5</property>
                                 <property name="bottom_padding">12</property>
                                 <child>
                                   <object class="GtkFrame" id="CategorySlab">

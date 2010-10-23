@@ -2409,13 +2409,15 @@ class Cardapio(dbus.service.Object):
 			self.get_object('TopLeftSearchSlabMargin').hide()    # these are required, to make sure the splitter
 			self.get_object('BottomLeftSearchSlabMargin').hide() # ...moves all the way to the left
 			sidepane_margin = self.get_object('SidePaneMargin')
-			#self.main_splitter.child_set_property(sidepane_margin, 'shrink', True)
-			self.main_splitter.set_position(0)
-			#self.main_splitter.child_set_property(sidepane_margin, 'shrink', False)
+			#self.main_splitter.set_position(0)
+
+			# hack to make sure the viewport resizes to the minisize correctly
+			self.get_object('SideappViewport').hide()
+			self.get_object('SideappViewport').show()
 
 			# TODO: make splitter unmoveable
 			# TODO: make splitter clickable
-			# TODO: setup sidepane margins
+			# TODO: fix the top margin of the side pane
 
 		else:
 
@@ -2428,7 +2430,6 @@ class Cardapio(dbus.service.Object):
 			self.get_object('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
 			
 			self.main_splitter.set_position(self.settings['splitter position'])
-			# TODO: make splitter moveable again
 
 
 	def set_message_window_visible(self, state = True):
