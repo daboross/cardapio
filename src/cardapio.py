@@ -53,6 +53,7 @@ try:
 	import urllib2
 	import gettext
 	import logging
+	import commands
 	import keybinder
 	import subprocess
 	import dbus, dbus.service
@@ -136,7 +137,8 @@ gtk.glade.textdomain(APP)
 def getoutput(shell_command):
 
 	try: 
-		return subprocess.check_output(shell_command, shell = True)
+		return commands.getoutput(shell_command)
+		#return subprocess.check_output(shell_command, shell = True) # use this line with Python 2.7
 	except Exception, exception: 
 		logging.info('Exception when executing' + shell_command)
 		logging.info(exception)
@@ -1018,6 +1020,14 @@ class Cardapio(dbus.service.Object):
 		elements that support them.
 		"""
 
+		# MODEL/VIEW SEPARATION EFFORT: model
+		self.app_list              = []  # holds a list of all apps for searching purposes
+		self.sys_list              = []  # holds a list of all apps in the system menus
+		self.section_list          = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
+		self.current_query         = ''
+		self.subfolder_stack       = []
+
+		# MODEL/VIEW SEPARATION EFFORT: view
 		self.no_results_text             = _('No results to show')
 		self.no_results_in_category_text = _('No results to show in "%(category_name)s"')
 		self.plugin_loading_text         = _('Searching...')
@@ -1025,19 +1035,12 @@ class Cardapio(dbus.service.Object):
 
 		self.read_gtk_theme_info()
 
-		self.app_list              = []  # holds a list of all apps for searching purposes
-		self.sys_list              = []  # holds a list of all apps in the system menus
-		self.section_list          = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
-
 		self.clear_pane(self.application_pane)
 		self.clear_pane(self.category_pane)
 		self.clear_pane(self.system_category_pane)
 		self.clear_pane(self.sidepane)
 		self.clear_pane(self.left_session_pane)
 		self.clear_pane(self.right_session_pane)
-
-		self.current_query         = ''
-		self.subfolder_stack       = []
 
 		# "All" button for the regular menu
 		button = self.add_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
@@ -1065,6 +1068,8 @@ class Cardapio(dbus.service.Object):
 		self.add_subfolders_slab()
 		self.add_all_reorderable_slabs()
 
+		# MODEL/VIEW SEPARATION EFFORT:
+		# the methods below mix the model with the view
 		self.build_places_list()
 		self.build_session_list()
 		self.build_system_list()
@@ -2749,6 +2754,8 @@ class Cardapio(dbus.service.Object):
 		"""
 		Populate the System section
 		"""
+
+		# TODO: add session buttons here
 
 		for node in self.sys_tree.root.contents:
 			if isinstance(node, gmenu.Directory):
