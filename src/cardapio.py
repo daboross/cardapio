@@ -2365,7 +2365,7 @@ class Cardapio(dbus.service.Object):
 		self.window.move(x, y)
 
 		if self.settings['mini mode']:
-			pass #self.main_splitter.set_position(0)
+			self.main_splitter.set_position(0)
 
 		elif self.settings['splitter position'] > 0:
 			self.main_splitter.set_position(self.settings['splitter position'])
