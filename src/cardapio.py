@@ -3257,18 +3257,8 @@ class Cardapio(dbus.service.Object):
 		Adds a new button to the app pane
 		"""
 
+		# MODEL/VIEW SEPARATION EFFORT: view
 		button = self.add_button(button_str, icon_name, parent_widget, tooltip, button_type = Cardapio.APP_BUTTON)
-
-		if app_list is not None:
-
-			path, basename = os.path.split(command)
-			if basename : basename, dummy = os.path.splitext(basename)
-			else        : basename = path
-
-			app_list.append({'name': button_str.lower(), 'button': button, 'section': parent_widget.parent.parent, 'basename' : basename, 'command' : command})
-
-			# NOTE: IF THERE ARE CHANGES IN THE UI FILE, THIS MAY PRODUCE
-			# HARD-TO-FIND BUGS!!
 
 		button.connect('clicked', self.on_app_button_clicked)
 		button.connect('button-press-event', self.on_app_button_button_pressed)
@@ -3291,6 +3281,18 @@ class Cardapio(dbus.service.Object):
 			button.connect('drag-data-get', self.on_app_button_data_get)
 			# TODO: drag and drop to reorganize pinned items
 
+		# MODEL/VIEW SEPARATION EFFORT: model
+		if app_list is not None:
+
+			path, basename = os.path.split(command)
+			if basename : basename, dummy = os.path.splitext(basename)
+			else        : basename = path
+
+			app_list.append({'name': button_str.lower(), 'button': button, 'section': parent_widget.parent.parent, 'basename' : basename, 'command' : command})
+
+			# NOTE: IF THERE ARE CHANGES IN THE UI FILE, THIS MAY PRODUCE
+			# HARD-TO-FIND BUGS!!
+
 		# save some metadata for easy access
 		button.app_info = {
 			'name'         : self.unescape(button_str),
@@ -3304,6 +3306,7 @@ class Cardapio(dbus.service.Object):
 		return button
 
 
+	# MODEL/VIEW SEPARATION EFFORT: view
 	def add_button(self, button_str, icon_name, parent_widget, tooltip = '', button_type = APP_BUTTON):
 		"""
 		Adds a button to a parent container
@@ -3346,8 +3349,6 @@ class Cardapio(dbus.service.Object):
 
 		align = gtk.Alignment(0, 0.5)
 		align.add(hbox)
-			
-
 
 		if tooltip:
 			tooltip = self.unescape(tooltip)
@@ -3505,6 +3506,7 @@ class Cardapio(dbus.service.Object):
 		except: pass
 
 		return None
+
 
 	def add_tree_to_app_list(self, tree, parent_widget, app_list, recursive = True):
 		"""
