@@ -2823,8 +2823,8 @@ class Cardapio(dbus.service.Object):
 		self.add_app_button(_('Trash'), 'user-trash', section_contents, 'xdg', 'trash:///', tooltip = _('Open the trash'), app_list = self.app_list)
 
 		if not volume_monitor_already_existed:
-			self.mount_added_handler   = self.volume_monitor.connect('mount-added', self.on_volume_monitor_changed, self.places_section_contents)
-			self.mount_removed_handler = self.volume_monitor.connect('mount-removed', self.on_volume_monitor_changed, self.places_section_contents)
+			self.volume_monitor.connect('mount-added', self.on_volume_monitor_changed)
+			self.volume_monitor.connect('mount-removed', self.on_volume_monitor_changed)
 
 
 	def build_bookmarked_places_list(self, section_contents):
@@ -2871,27 +2871,39 @@ class Cardapio(dbus.service.Object):
 
 		if self.bookmark_monitor is None:
 			self.bookmark_monitor = gio.File(bookmark_file_path).monitor_file() # keep a reference to avoid getting it garbage-collected
-			self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed, self.places_section_contents)
+			self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed)
 
 
-	def on_bookmark_monitor_changed(self, monitor, file, other_file, event, section_contents):
+	def on_bookmark_monitor_changed(self, monitor, file, other_file, event):
 		"""
 		Handler for when the user adds/removes a bookmarked folder using
 		Nautilus or some other program
 		"""
 
+	 	# hoping this helps with bug 662249, in case there is some strange threading problem happening (although there are no explicit threads in this program)	
+		self.bookmark_monitor.handler_block_by_func(self.on_bookmark_monitor_changed)
+
 		if event == gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
-			self.clear_pane(section_contents)
+			self.clear_pane(self.places_section_contents)
 			self.build_places_list()
 
+		# same here
+		self.bookmark_monitor.handler_unblock_by_func(self.on_bookmark_monitor_changed) 
 
-	def on_volume_monitor_changed(self, monitor, drive, section_contents):
+
+	def on_volume_monitor_changed(self, monitor, drive):
 		"""
 		Handler for when volumes are mounted or ejected
 		"""
 
-		self.clear_pane(section_contents)
+	 	# hoping this helps with bug 662249, in case there is some strange threading problem happening (although there are no explicit threads in this program)	
+		self.volume_monitor.handler_block_by_func(self.on_volume_monitor_changed)
+
+		self.clear_pane(self.places_section_contents)
 		self.build_places_list()
+
+		# same here
+		self.volume_monitor.handler_unblock_by_func(self.on_volume_monitor_changed) 
 
 
 	def get_folder_name_and_path(self, folder_path):
@@ -3201,12 +3213,13 @@ class Cardapio(dbus.service.Object):
 
 		# this is necessary when clearing section contents to avoid a memory
 		# leak, but does nothing when clearing other containers:
-		if container is not None and container.parent is not None and container.parent.parent is not None:
-			self.app_list = [app for app in self.app_list if app['section'] != container.parent.parent]
-			self.sys_list = [app for app in self.sys_list if app['section'] != container.parent.parent]
+		if container is not None: 
+			if container.parent is not None and container.parent.parent is not None:
+				self.app_list = [app for app in self.app_list if app['section'] != container.parent.parent]
+				self.sys_list = [app for app in self.sys_list if app['section'] != container.parent.parent]
 
-		for	child in container.get_children():
-			container.remove(child)
+			for	child in container.get_children():
+				container.remove(child)
 
 
 	def setup_search_entry(self, place_at_top = False):
