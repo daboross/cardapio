@@ -1,3 +1,19 @@
+cardapio (0.9.156-ubuntu1-maverick1) maverick; urgency=low
+
+   * Hopefully fixed a bug with the Places menu, where it showed the same place
+   multiple times under certan conditions
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 28 Oct 2010 12:01:00 -0000
+
+
+cardapio (0.9.156-ubuntu1-lucid1) lucid; urgency=low
+
+   * Hopefully fixed a bug with the Places menu, where it showed the same place
+   multiple times under certan conditions
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 28 Oct 2010 12:01:00 -0000
+
+
 cardapio (0.9.155-ubuntu1-maverick1) maverick; urgency=low
 
    * Added a last-resort error message to help debug problems loading the applet
