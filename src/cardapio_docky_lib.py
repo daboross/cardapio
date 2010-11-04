@@ -1,4 +1,5 @@
 import gconf
+import gtk
 
 class DockySettingsHelper:
 	"""
@@ -82,7 +83,7 @@ class DockySettingsHelper:
 		return 30 if self.gconf_client.get_bool(self.docky_gconf_root + dock + '/PanelMode') else 60
 
 
-	def get_best_position(self):
+	def get_best_position(self, dock_num):
 
 		# properties of our dock
 		icon_size = self.get_icon_size(dock_num)

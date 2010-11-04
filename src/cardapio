@@ -26,8 +26,8 @@ import dbus
 import gnomeapplet
 from dbus.mainloop.glib import DBusGMainLoop
 
-def start_cardapio(hidden = False):
-	Cardapio(hidden)
+def start_cardapio(show):
+	Cardapio(show = show)
 	gtk.gdk.threads_enter()
 	gtk.main()
 	gtk.gdk.threads_leave()
@@ -62,14 +62,17 @@ if len(sys.argv) == 2:
 
 		# if there's no other instance, start hidden Cardapio
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
-			start_cardapio(hidden = True)
+			start_cardapio(show = Cardapio.DONT_SHOW)
 
 
 	elif sys.argv[1] == 'show' or sys.argv[1] == 'show-near-mouse':
 
 		# if there's no other instance - start Cardapio
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
-			start_cardapio(hidden = False)
+			if sys.argv[1] == 'show-near-mouse':
+				start_cardapio(show = Cardapio.SHOW_NEAR_MOUSE)
+			else:
+				start_cardapio(show = Cardapio.SHOW_CENTERED)
 
 		# if there is - "show / hide" it or "show / hide" it near the
 		# mouse pointer
@@ -86,7 +89,7 @@ if len(sys.argv) == 2:
 
 		# if there's no other instance - start hidden Cardapio
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
-			start_cardapio(hidden = True)
+			start_cardapio(show = Cardapio.DONT_SHOW)
 
 		# if there is - "show / hide" it near the proper side of the
 		# screen
@@ -100,7 +103,7 @@ if len(sys.argv) == 2:
 				dock_num = settings_helper.get_dock_for_this_helper()
 
 				if dock_num != '':
-					x, y = settings_helper.get_best_position()
+					x, y = settings_helper.get_best_position(dock_num)
 					show_hide(x, y)
 
 				else:

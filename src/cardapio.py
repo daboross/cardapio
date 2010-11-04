@@ -179,12 +179,16 @@ class Cardapio(dbus.service.Object):
 	SESSION_BUTTON  = 2
 	SIDEPANE_BUTTON = 3
 
+	DONT_SHOW       = 0
+	SHOW_CENTERED   = 1
+	SHOW_NEAR_MOUSE = 2
+
 	REMOTE_PROTOCOLS = ['ftp', 'sftp', 'smb']
 
 	class SafeCardapioProxy:
 		pass
 
-	def __init__(self, hidden = False, panel_applet = None, panel_button = None, debug = False):
+	def __init__(self, show = False, panel_applet = None, panel_button = None, debug = False):
 		"""
 		Creates a instance of Cardapio.
 		"""
@@ -262,7 +266,8 @@ class Cardapio(dbus.service.Object):
 
 		self.schedule_search_with_all_plugins('')
 
-		if not hidden: self.show()
+		if   show == Cardapio.SHOW_NEAR_MOUSE: self.show_hide_near_mouse()
+		elif show == Cardapio.SHOW_CENTERED  : self.show()
 
 		# this is useful so that the user can edit the config file on first-run
 		# without need to quit cardapio first:
@@ -4370,7 +4375,7 @@ def applet_factory(applet, iid):
 
 	button = gtk.ImageMenuItem()
 
-	cardapio = Cardapio(hidden = True, panel_button = button, panel_applet = applet)
+	cardapio = Cardapio(show = Cardapio.DONT_SHOW, panel_button = button, panel_applet = applet)
 
 	button.set_tooltip_text(_('Access applications, folders, system settings, etc.'))
 	button.set_always_show_image(True)

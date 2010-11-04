@@ -22,6 +22,7 @@ install:
 	cp -f src/cardapio $(PREFIX)/lib/cardapio/
 	cp -f src/cardapio.py $(PREFIX)/lib/cardapio/
 	cp -f src/cardapio.pyc $(PREFIX)/lib/cardapio/
+	cp -f src/cardapio_docky_lib.py $(PREFIX)/lib/cardapio/
 	cp -f src/cardapio.ui $(PREFIX)/lib/cardapio/
 	cp -f src/plugins/* $(PREFIX)/lib/cardapio/plugins/
 	
