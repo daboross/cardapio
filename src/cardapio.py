@@ -857,7 +857,11 @@ class Cardapio(dbus.service.Object):
 			('AboutDistro', self.open_about_dialog)
 		]
 
-		if self.panel_applet is not None:
+		if self.panel_applet is None:
+			self.window.set_decorated(True)
+			self.window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
+			self.get_object('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
+		else:
 			self.panel_applet.connect('destroy', self.quit)
 
 
