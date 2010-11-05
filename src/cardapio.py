@@ -2461,7 +2461,7 @@ class Cardapio(dbus.service.Object):
 		offset_x = (main_window_width - message_width) / 2
 		offset_y = (main_window_height - message_height) / 2
 
-		coordinates, inversion = self.choose_coordinates_for_window(self.self.message_window)
+		coordinates, inversion = self.choose_coordinates_for_window(self.message_window)
 		self.message_window.move(coordinates[0] + offset_x, coordinates[1] + offset_y)
 
 		self.message_window.set_keep_above(True)
@@ -3889,6 +3889,11 @@ class Cardapio(dbus.service.Object):
 		if os.path.exists(command):
 
 			path = DesktopEntry.DesktopEntry(command).getExec()
+
+			# debugging bug 603485 (TODO: remove this line when finished debugging)
+			if 'wine' in path: 
+				logging.info('Launching Wine app (logging to debug bug #603485)')
+				logging.info('Command: ' + path)
 
 			# Strip parts of the path that contain %<a-Z>
 
