@@ -3899,8 +3899,11 @@ class Cardapio(dbus.service.Object):
 					path_parts[i] = ''
 
 			path = ' '.join(path_parts)
-
-			return self.launch_raw(path, hide)
+			
+			if DesktopEntry.DesktopEntry(command).getTerminal():
+				return self.launch_raw_in_terminal(path, hide)
+			else:
+				return self.launch_raw(path, hide)
 
 		else:
 			logging.warn('Tried launching an app that does not exist: %s' % desktop_path)
