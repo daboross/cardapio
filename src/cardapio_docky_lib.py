@@ -73,15 +73,18 @@ class DockySettingsHelper:
 
 		return 10 if self.gconf_client.get_bool(self.docky_gconf_root + dock + '/PanelMode') else 20
 
-	def get_vertical_offset(self, dock):
+	def get_vertical_offset(self, position, dock):
 		"""
 		Returns the vertical offset necessary to avoid overlapping of Cardapio launchers'
 		tooltip	with Cardapio's window. The offset depends on whether the dock is in panel
-		mode.
+		mode and on it's position (on top it's lower because the decoration bar pushes
+		Cardapio down only when it's near the bottom of the screen).
 		"""
 
-		return 30 if self.gconf_client.get_bool(self.docky_gconf_root + dock + '/PanelMode') else 60
-
+		if position == 'Bottom':
+			return 55 if self.gconf_client.get_bool(self.docky_gconf_root + dock + '/PanelMode') else 90
+		else:
+			return 30 if self.gconf_client.get_bool(self.docky_gconf_root + dock + '/PanelMode') else 60
 
 	def get_best_position(self, dock_num):
 
@@ -96,7 +99,7 @@ class DockySettingsHelper:
 
 		# offsets from screen's borders
 		horizontal_offset = self.get_horizontal_offset(dock_num)
-		vertical_offset = self.get_vertical_offset(dock_num)
+		vertical_offset = self.get_vertical_offset(position, dock_num)
 
 		# calculating final position...
 		if position == 'Bottom':
