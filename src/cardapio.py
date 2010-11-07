@@ -193,8 +193,8 @@ class Cardapio(dbus.service.Object):
 		Creates a instance of Cardapio.
 		"""
 
-		self.create_config_folder()
-		logging_filename = os.path.join(self.config_folder_path, 'cardapio.log')
+		self.create_xdg_folders()
+		logging_filename = os.path.join(self.cache_folder_path, 'cardapio.log')
 
 		if debug == True: logging_level = logging.DEBUG
 		else: logging_level = logging.INFO
@@ -557,9 +557,10 @@ class Cardapio(dbus.service.Object):
 		widget.set_active(True)
 
 
-	def create_config_folder(self):
+	def create_xdg_folders(self):
 		"""
-		Creates Cardapio's config folder (usually at ~/.config/Cardapio)
+		Creates Cardapio's config and cache folders (usually at ~/.config/Cardapio and
+		~/.cache/Cardapio)
 		"""
 
 		self.config_folder_path = os.path.join(DesktopEntry.xdg_config_home, 'Cardapio')
@@ -571,16 +572,30 @@ class Cardapio(dbus.service.Object):
 			logging.error('Error! Cannot create folder "%s" because a file with that name already exists!' % self.config_folder_path)
 			self.quit_now()
 
+		self.cache_folder_path = os.path.join(DesktopEntry.xdg_cache_home, 'Cardapio')
+
+		if not os.path.exists(self.cache_folder_path):
+			os.mkdir(self.cache_folder_path)
+
+		elif not os.path.isdir(self.cache_folder_path):
+			logging.error('Error! Cannot create folder "%s" because a file with that name already exists!' % self.cache_folder_path)
+			self.quit_now()
+
 
 	def get_config_file(self, mode):
 		"""
 		Returns a file handler to Cardapio's config file.
 		"""
 
-		config_file_path = os.path.join(self.config_folder_path, 'config.ini')
+		old_config_file_path = os.path.join(self.config_folder_path, 'config.ini')
+		config_file_path = os.path.join(self.config_folder_path, 'config.json')
 
 		if not os.path.exists(config_file_path):
-			open(config_file_path, 'w+')
+
+			if os.path.exists(old_config_file_path):
+				os.rename(old_config_file_path, config_file_path)
+			else:
+				open(config_file_path, 'w+')
 
 		elif not os.path.isfile(config_file_path):
 			logging.error('Error! Cannot create file "%s" because a folder with that name already exists!' % config_file_path)
@@ -4258,7 +4273,7 @@ class CardapioPluginInterface:
 		communicate with Cardapio. This object has the following members:
 
 		   - settings - this is a dict containing the same things that you will
-		     find in the config.ini
+		     find in the config.json
 
 		   - write_to_log - this is a function that lets you write to Cardapio's
 		     log file, like this: write_to_log(self, 'hi there')
@@ -4383,7 +4398,7 @@ class CardapioPluginInterface:
 def return_true(*dummy): return True
 def return_false(*dummy): return False
 
-def applet_factory(applet, iid):
+def AppletFactory(applet, iid):
 
 	button = gtk.ImageMenuItem()
 

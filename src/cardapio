@@ -37,20 +37,21 @@ DBusGMainLoop(set_as_default=True)
 bus = dbus.SessionBus()
 bus_request_name = bus.request_name(Cardapio.bus_name_str)
 
+# make sure Cardapio shows even if using Ubuntu's AppMenu
 os.environ['UBUNTU_MENUPROXY'] = ''
 
 if len(sys.argv) == 2:
 
 	if sys.argv[1] == 'run-in-window':
 
-		from cardapio import applet_factory
+		from cardapio import AppletFactory
 
 		# open new Cardapio instance
 		main_window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		main_window.set_title('Cardapio')
 		main_window.connect('destroy', gtk.main_quit)
 		app = gnomeapplet.Applet()
-		applet_factory(app, None)
+		AppletFactory(app, None)
 		app.reparent(main_window)
 		main_window.show_all()
 		gtk.gdk.threads_enter()
@@ -94,7 +95,7 @@ if len(sys.argv) == 2:
 		# if there is - "show / hide" it near the proper side of the
 		# screen
 		else:
-			from cardapio_docky_lib import *
+			from docky.DockySettingsHelper import DockySettingsHelper
 
 			show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_point')
 
@@ -116,10 +117,8 @@ if len(sys.argv) == 2:
 
 else:
 
-	# make sure Cardapio shows even if using Ubuntu's AppMenu
-
-	from cardapio import applet_factory
+	from cardapio import AppletFactory
 
 	gnomeapplet.bonobo_factory('OAFIID:GNOME_Cardapio_Factory', 
-			gnomeapplet.Applet.__gtype__, 'Cardapio', '0', applet_factory)
+			gnomeapplet.Applet.__gtype__, 'Cardapio', '0', AppletFactory)
 
