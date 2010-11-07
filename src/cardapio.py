@@ -525,7 +525,7 @@ class Cardapio(dbus.service.Object):
 			return True
 
 		if self.selected_section is None:
-			self.search_entry.clear()
+			self.search_entry.set_text('')
 			widget.set_sensitive(False)
 
 		else:
@@ -594,6 +594,7 @@ class Cardapio(dbus.service.Object):
 
 			if os.path.exists(old_config_file_path):
 				os.rename(old_config_file_path, config_file_path)
+				os.remove(os.path.join(self.config_folder_path, 'cardapio.log'))
 			else:
 				open(config_file_path, 'w+')
 
