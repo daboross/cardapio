@@ -68,6 +68,7 @@
                                             <property name="secondary_icon_stock">gtk-clear</property>
                                             <property name="secondary_icon_activatable">True</property>
                                             <property name="secondary_icon_sensitive">True</property>
+                                            <signal name="button_press_event" handler="on_search_entry_button_pressed"/>
                                             <signal name="changed" handler="on_search_entry_changed" after="yes"/>
                                             <signal name="key_press_event" handler="on_search_entry_key_pressed"/>
                                             <signal name="activate" handler="on_search_entry_activate"/>
@@ -300,6 +301,7 @@
                                             <property name="secondary_icon_stock">gtk-clear</property>
                                             <property name="secondary_icon_activatable">True</property>
                                             <property name="secondary_icon_sensitive">True</property>
+                                            <signal name="button_press_event" handler="on_search_entry_button_pressed"/>
                                             <signal name="changed" handler="on_search_entry_changed" after="yes"/>
                                             <signal name="key_press_event" handler="on_search_entry_key_pressed"/>
                                             <signal name="activate" handler="on_search_entry_activate"/>
@@ -354,6 +356,7 @@
                                     <property name="secondary_icon_stock">gtk-clear</property>
                                     <property name="secondary_icon_activatable">True</property>
                                     <property name="secondary_icon_sensitive">True</property>
+                                    <signal name="button_press_event" handler="on_search_entry_button_pressed"/>
                                     <signal name="changed" handler="on_search_entry_changed" after="yes"/>
                                     <signal name="key_press_event" handler="on_search_entry_key_pressed"/>
                                     <signal name="activate" handler="on_search_entry_activate"/>
@@ -373,7 +376,7 @@
                                   <object class="GtkScrolledWindow" id="ScrolledWindow">
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
-                                    <property name="hscrollbar_policy">never</property>
+                                    <property name="hscrollbar_policy">automatic</property>
                                     <property name="vscrollbar_policy">automatic</property>
                                     <property name="shadow_type">in</property>
                                     <child>
@@ -456,6 +459,7 @@
                                     <property name="secondary_icon_stock">gtk-clear</property>
                                     <property name="secondary_icon_activatable">True</property>
                                     <property name="secondary_icon_sensitive">True</property>
+                                    <signal name="button_press_event" handler="on_search_entry_button_pressed"/>
                                     <signal name="changed" handler="on_search_entry_changed" after="yes"/>
                                     <signal name="key_press_event" handler="on_search_entry_key_pressed"/>
                                     <signal name="activate" handler="on_search_entry_activate"/>
@@ -1157,12 +1161,14 @@
     <property name="type_hint">normal</property>
     <property name="program_name">Cardapio</property>
     <property name="version">0.9.156</property>
-    <property name="copyright" translatable="yes">© Thiago Teixeira 2010</property>
     <property name="website">http://launchpad.net/cardapio</property>
     <property name="website_label" translatable="yes">Cardapio Website</property>
     <property name="license" translatable="yes">GNU General Public License v3
 http://www.gnu.org/licenses/gpl-3.0-standalone.html	</property>
-    <property name="authors">Thiago Teixeira</property>
+    <property name="authors">∙ Thiago Teixeira
+∙ Jan-Christoph Borchardt
+∙ Clifton Mulkey
+∙ Pawel Bara</property>
     <property name="translator_credits" translatable="yes">See https://translations.launchpad.net/cardapio</property>
     <signal name="close" handler="on_dialog_close"/>
     <signal name="response" handler="on_dialog_close"/>

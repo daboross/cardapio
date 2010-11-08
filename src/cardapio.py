@@ -1,6 +1,5 @@
 #
 #    Cardapio is an alternative Gnome menu applet, launcher, and much more!
-#    Copyright (C) 2010 Thiago Teixeira
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -1387,6 +1386,15 @@ class Cardapio(dbus.service.Object):
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 			self.block_focus_out_event()
 			self.context_menu.popup(None, None, None, event.button, event.time)
+
+
+	def on_search_entry_button_pressed(self, widget, event):
+		"""
+		Stop window from hiding when context menu is shown
+		"""
+
+		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
+			self.block_focus_out_event()
 
 
 	def start_resize(self, widget, event):

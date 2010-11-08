@@ -29,3 +29,4 @@ setup(
     scripts      = ['src/cardapio'],
     data_files   = data_files,
 	)
+

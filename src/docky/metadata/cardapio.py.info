@@ -1,5 +1,5 @@
 [DockmanagerHelper]
-Name=Cardapio
-Description=Replace your menu with Cardapio
-Icon=./cardapio.png
-AppName=cardapio
+Name="Cardapio"
+Description="Place the Cardapio menu on your dock"
+Icon=cardapio-256
+AppName="cardapio"

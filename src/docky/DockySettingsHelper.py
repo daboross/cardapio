@@ -23,13 +23,13 @@ class DockySettingsHelper:
 		more than one dock, LookupError is raised.
 		"""
 
-		found = ''
+		found = None
 
 		for dock in self.docks:
 			launchers = self.gconf_client.get_list(self.docky_gconf_root + dock + '/Launchers', 1)
 			for launcher in launchers:
 				if launcher.endswith(self.cardapio_desktop):
-					if found != '':
+					if found is not None:
 						raise LookupError
 					else:
 						found = dock
@@ -37,12 +37,14 @@ class DockySettingsHelper:
 
 		return found
 
+
 	def get_icon_size(self, dock):
 		"""
 		Returns the IconSize property for chosen dock.
 		"""
 
 		return self.gconf_client.get_int(self.docky_gconf_root + dock + '/IconSize')
+
 
 	def get_zoom_percentage(self, dock):
 		"""
@@ -55,6 +57,7 @@ class DockySettingsHelper:
 			return self.gconf_client.get_float(self.docky_gconf_root + dock + '/ZoomPercent')
 		else:
 			return 1
+
 
 	def get_position(self, dock):
 		"""
@@ -73,6 +76,7 @@ class DockySettingsHelper:
 
 		return 10 if self.gconf_client.get_bool(self.docky_gconf_root + dock + '/PanelMode') else 20
 
+
 	def get_vertical_offset(self, position, dock):
 		"""
 		Returns the vertical offset necessary to avoid overlapping of Cardapio launchers'
@@ -85,6 +89,7 @@ class DockySettingsHelper:
 			return 55 if self.gconf_client.get_bool(self.docky_gconf_root + dock + '/PanelMode') else 90
 		else:
 			return 30 if self.gconf_client.get_bool(self.docky_gconf_root + dock + '/PanelMode') else 60
+
 
 	def get_best_position(self, dock_num):
 
@@ -116,4 +121,5 @@ class DockySettingsHelper:
 			y = mouse_y
 
 		return x, y
+
 

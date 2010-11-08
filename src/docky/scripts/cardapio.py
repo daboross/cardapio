@@ -1,14 +1,34 @@
 #!/usr/bin/env python
 
+#
+#    Cardapio is an alternative Gnome menu applet, launcher, and much more!
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+
 import atexit
 import gobject
 
 import dbus
+import gconf
 
 try:
 	from dockmanager.dockmanager import DockManagerItem, DockManagerSink, DOCKITEM_IFACE
 	from signal import signal, SIGTERM
 	from sys import exit
+
 except ImportError, e:
 	exit()
 
@@ -33,6 +53,27 @@ class CardapioItem(DockManagerItem):
 		# we track Cardapio's on / off status
 		self.bus.watch_name_owner(self.cardapio_bus_name, self.on_dbus_name_change)
 
+#		# find out Cardapio's path in this system
+#		import os, commands, sys
+#		cardapio_bin = commands.getoutput('which cardapio')
+#		cardapio_real_bin = os.path.realpath(cardapio_bin)
+#		cardapio_path, dummy = os.path.split(cardapio_real_bin)
+#		os.chdir(os.path.join(cardapio_path, 'docky'))
+#
+#		# see if Cardapio is already on Docky
+#		DockySettingsHelper = __import__(DockySettingsHelper)
+#		settings_helper = DockySettingsHelper.DockySettingsHelper()
+#
+#		try: res = settings_helper.get_dock_for_this_helper() # (can return None)
+#		except: res = None
+#
+#		# if Cardapio is not on Docky, add it
+#		if res is None:
+#			launchers = settings_helper.gconf_client.get_list('/apps/docky-2/Docky/Interface/DockPreferences/Dock1/Launchers', gconf.VALUE_STRING)
+#			launchers.insert(0, 'file://' + cardapio_path + '/Cardapio.desktop')
+#			settings_helper.gconf_client.set_list('/apps/docky-2/Docky/Interface/DockPreferences/Dock1/Launchers', gconf.VALUE_STRING, launchers)
+
+
 	def on_dbus_name_change(self, connection_name):
 		"""
 		This method effectively tracks down the events of Cardapio app starting
@@ -48,6 +89,7 @@ class CardapioItem(DockManagerItem):
 			self.cardapio = dbus.Interface(bus_object, self.cardapio_iface_name)
 
   	def menu_pressed(self, menu_id):
+
 		if self.cardapio is None:
 			return
 		
@@ -81,3 +123,4 @@ if __name__ == "__main__":
 	signal(SIGTERM, lambda signum, stack_frame: exit(1))
 
 	mainloop.run()
+
