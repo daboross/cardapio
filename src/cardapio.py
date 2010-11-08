@@ -151,7 +151,10 @@ class Cardapio(dbus.service.Object):
 
 	distro_name = getoutput('lsb_release -is')
 
-	min_visibility_toggle_interval = 0.200 # seconds (this is a bit of a hack to fix some focus problems)
+	MIN_VISIBILITY_TOGGLE_INTERVAL    = 0.200 # seconds (this is a bit of a hack to fix some focus problems)
+	PANEL_SIZE_CHANGE_IGNORE_INTERVAL = 200 # milliseconds
+	SETUP_PANEL_BUTTON_DELAY          = 100 # milliseconds (must be smaller than PANEL_SIZE_CHANGE_IGNORE_INTERVAL)
+	FOCUS_BLOCK_INTERVAL              = 50  # milliseconds
 
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
@@ -1395,6 +1398,7 @@ class Cardapio(dbus.service.Object):
 
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 			self.block_focus_out_event()
+			glib.timeout_add(Cardapio.FOCUS_BLOCK_INTERVAL, self.unblock_focus_out_event)
 
 
 	def start_resize(self, widget, event):
@@ -2504,7 +2508,7 @@ class Cardapio(dbus.service.Object):
 		if there is no applet, centered on the screen.
 
 		Requests are ignored if they come more often than
-		min_visibility_toggle_interval.
+		MIN_VISIBILITY_TOGGLE_INTERVAL.
 
 		This function is dbus-accessible.
 		"""
@@ -2518,7 +2522,7 @@ class Cardapio(dbus.service.Object):
 		Toggles Cardapio's visibility and places the window near the mouse.
 
 		Requests are ignored if they come more often than
-		min_visibility_toggle_interval.
+		MIN_VISIBILITY_TOGGLE_INTERVAL.
 
 		This function is dbus-accessible.
 		"""
@@ -2535,12 +2539,12 @@ class Cardapio(dbus.service.Object):
 		screen.
 
 		Requests are ignored if they come more often than
-		min_visibility_toggle_interval.
+		MIN_VISIBILITY_TOGGLE_INTERVAL.
 
 		This function is dbus-accessible.
 		"""
 
-		if time() - self.last_visibility_toggle < Cardapio.min_visibility_toggle_interval:
+		if time() - self.last_visibility_toggle < Cardapio.MIN_VISIBILITY_TOGGLE_INTERVAL:
 			return
 
 		if self.visible: self.hide()
@@ -2700,8 +2704,8 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.panel_applet.handler_block_by_func(self.on_panel_size_changed)
-		glib.timeout_add(100, self.setup_panel_button)
-		glib.timeout_add(200, self.on_panel_size_change_done) # added this to avoid an infinite loop
+		glib.timeout_add(Cardapio.SETUP_PANEL_BUTTON_DELAY, self.setup_panel_button)
+		glib.timeout_add(Cardapio.PANEL_SIZE_CHANGE_IGNORE_INTERVAL, self.on_panel_size_change_done) # added this to avoid an infinite loop
 
 
 	def on_panel_size_change_done(self):
