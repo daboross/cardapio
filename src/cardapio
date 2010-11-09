@@ -94,7 +94,7 @@ if len(sys.argv) == 2:
 		# if there is - "show / hide" it near the proper side of the
 		# screen
 		else:
-			from docky.DockySettingsHelper import DockySettingsHelper
+			from docky.DockySettingsHelper import *
 
 			show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_point')
 
@@ -102,17 +102,13 @@ if len(sys.argv) == 2:
 				settings_helper = DockySettingsHelper()
 				dock_num = settings_helper.get_dock_for_this_helper()
 
-				if dock_num is None:
-					# doesn't work if we haven't found the launcher at all
-					fatal_error('Cardapio error!', 'Cannot find Cardapio launcher on your dock.')
+				x, y = settings_helper.get_best_position(dock_num)
+				show_hide(x, y)
 
-				else:
-					x, y = settings_helper.get_best_position(dock_num)
-					show_hide(x, y)
-
-			except LookupError:
-				# doesn't work if we've found the launcher on more than one dock
-				fatal_error('Cardapio error!', 'Too many Cardapio launchers on your dock.')
+			except LauncherError:
+				# doesn't work if we didn't find the launcher or found it on more
+                # than one dock
+				fatal_error('Cardapio error!', 'You should have exactly one Cardapio launcher on your docks.')
 
 else:
 

@@ -7,43 +7,46 @@ class DockySettingsHelper:
 	"""
 
 	# GConf root of Docky's settings
-	docky_gconf_root = '/apps/docky-2/Docky/Interface/DockPreferences/'
-	# list of docks available in settings (Dock1 - Dock6)
-	docks = map(lambda x: 'Dock' + str(x), range(1, 7))
+	docky_gconf_root = '/apps/docky-2/Docky'
+	docky_dcontroller_gconf_root = docky_gconf_root + '/DockController/'
+	docky_iface_gconf_root = docky_gconf_root + '/Interface/DockPreferences/'
 
 	# name of Cardapio's launcher
 	cardapio_desktop = 'cardapio.desktop'
 
 	gconf_client = gconf.client_get_default()
 
+	def __init__(self):
+		self.active_docks = self.gconf_client.get_list(self.docky_dcontroller_gconf_root + 'ActiveDocks', gconf.VALUE_STRING)
+
+	# NOTE: This method is cloned in cardapio_helper.py	
 	def get_dock_for_this_helper(self):
 		"""
 		Returns the name of the dock in which it finds the launcher for
-		Cardapio. If there's none, returns empty string. If there is
-		more than one dock, LookupError is raised.
+		Cardapio. If there's none or there is more than one dock,
+		LauncherError is raised.
 		"""
 
-		found = None
+		# TODO: I see what these lines are doing, but we should make them less cryptic!
+		docks = filter(lambda dock:
 
-		for dock in self.docks:
-			launchers = self.gconf_client.get_list(self.docky_gconf_root + dock + '/Launchers', 1)
-			for launcher in launchers:
-				if launcher.endswith(self.cardapio_desktop):
-					if found is not None:
-						raise LookupError
-					else:
-						found = dock
-						break
+			filter(lambda launcher:
+				launcher.endswith(self.cardapio_desktop),
+			self.gconf_client.get_list(self.docky_iface_gconf_root + dock + '/Launchers', gconf.VALUE_STRING)),
+			
+		self.active_docks)
 
-		return found
+		if len(docks) != 1:
+			raise LauncherError(len(docks))
 
+		return docks[0]
 
 	def get_icon_size(self, dock):
 		"""
 		Returns the IconSize property for chosen dock.
 		"""
 
-		return self.gconf_client.get_int(self.docky_gconf_root + dock + '/IconSize')
+		return self.gconf_client.get_int(self.docky_iface_gconf_root + dock + '/IconSize')
 
 
 	def get_zoom_percentage(self, dock):
@@ -53,8 +56,8 @@ class DockySettingsHelper:
 		factor (number 1).
 		"""
 
-		if(self.gconf_client.get_bool(self.docky_gconf_root + dock + '/ZoomEnabled')):
-			return self.gconf_client.get_float(self.docky_gconf_root + dock + '/ZoomPercent')
+		if(self.gconf_client.get_bool(self.docky_iface_gconf_root + dock + '/ZoomEnabled')):
+			return self.gconf_client.get_float(self.docky_iface_gconf_root + dock + '/ZoomPercent')
 		else:
 			return 1
 
@@ -64,7 +67,7 @@ class DockySettingsHelper:
 		Returns the Position property for chosen dock.
 		"""
 
-		return self.gconf_client.get_string(self.docky_gconf_root + dock + '/Position')
+		return self.gconf_client.get_string(self.docky_iface_gconf_root + dock + '/Position')
 
 
 	def get_horizontal_offset(self, dock):
@@ -74,7 +77,7 @@ class DockySettingsHelper:
 		mode.
 		"""
 
-		return 10 if self.gconf_client.get_bool(self.docky_gconf_root + dock + '/PanelMode') else 20
+		return 10 if self.gconf_client.get_bool(self.docky_iface_gconf_root + dock + '/PanelMode') else 20
 
 
 	def get_vertical_offset(self, position, dock):
@@ -86,9 +89,9 @@ class DockySettingsHelper:
 		"""
 
 		if position == 'Bottom':
-			return 55 if self.gconf_client.get_bool(self.docky_gconf_root + dock + '/PanelMode') else 90
+			return 55 if self.gconf_client.get_bool(self.docky_iface_gconf_root + dock + '/PanelMode') else 90
 		else:
-			return 30 if self.gconf_client.get_bool(self.docky_gconf_root + dock + '/PanelMode') else 60
+			return 30 if self.gconf_client.get_bool(self.docky_iface_gconf_root + dock + '/PanelMode') else 60
 
 
 	def get_best_position(self, dock_num):
@@ -123,3 +126,9 @@ class DockySettingsHelper:
 		return x, y
 
 
+
+# NOTE: This class is cloned in cardapio_helper.py
+class LauncherError(Exception):
+
+	def __init__(self, launcher_count):
+		self.launcher_count = launcher_count
