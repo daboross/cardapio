@@ -3960,7 +3960,12 @@ class Cardapio(dbus.service.Object):
 				self.launch_desktop(path, hide)
 				return
 
-			else:
+			gio_file_info = gio.File(path).query_info('standard::content-type')
+			content_type = gio_file_info.get_content_type()
+
+			# only show the executable dialog for executable text files and scripts
+			if content_type[:5] == 'text/' or content_type == 'application/x-shellscript':
+
 				# show "Run in Terminal", "Display", "Cancel", "Run"
 				response = self.show_executable_file_dialog(path)
 
