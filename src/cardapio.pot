@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-11-12 15:57+0100\n"
+"POT-Creation-Date: 2010-11-12 19:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -150,7 +150,7 @@ msgid "Show additional results"
 msgstr ""
 
 #: cardapio.py:1848
-msgid "Show additional search results in the a file browser"
+msgid "Show additional search results in a file browser"
 msgstr ""
 
 #: cardapio.py:2824 cardapio.py:3200

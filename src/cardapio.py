@@ -1845,7 +1845,7 @@ class Cardapio(dbus.service.Object):
 			if base_text and filename.lower().find(base_text) == -1: continue
 
 			if count >= limit: 
-				self.add_app_button(_('Show additional results'), 'system-file-manager', self.subfolders_section_contents, 'xdg', path, tooltip = _('Show additional search results in the a file browser'), app_list = None)
+				self.add_app_button(_('Show additional results'), 'system-file-manager', self.subfolders_section_contents, 'xdg', path, tooltip = _('Show additional search results in a file browser'), app_list = None)
 				break
 
 			count += 1
