@@ -3,10 +3,10 @@ import gtk
 
 class DockySettingsHelper:
 	"""
-	Parser of Docky's GConf settings.
+	Helper class for dealing with Docky's GConf settings.
 	"""
 
-	# GConf root of Docky's settings
+	# GConf keys of Docky's settings
 	docky_gconf_root = '/apps/docky-2/Docky'
 	docky_dcontroller_gconf_root = docky_gconf_root + '/DockController/'
 	docky_iface_gconf_root = docky_gconf_root + '/Interface/DockPreferences/'
@@ -16,8 +16,11 @@ class DockySettingsHelper:
 
 	gconf_client = gconf.client_get_default()
 
+
 	def __init__(self):
+		# sets the names of user's active docks
 		self.active_docks = self.gconf_client.get_list(self.docky_dcontroller_gconf_root + 'ActiveDocks', gconf.VALUE_STRING)
+
 
 	# NOTE: This method is cloned in cardapio_helper.py	
 	def get_dock_for_this_helper(self):
@@ -27,19 +30,25 @@ class DockySettingsHelper:
 		LauncherError is raised.
 		"""
 
-		# TODO: I see what these lines are doing, but we should make them less cryptic!
-		docks = filter(lambda dock:
+		docks_with_cardapio = []
 
-			filter(lambda launcher:
-				launcher.endswith(self.cardapio_desktop),
-			self.gconf_client.get_list(self.docky_iface_gconf_root + dock + '/Launchers', gconf.VALUE_STRING)),
-			
-		self.active_docks)
+		for dock in self.active_docks:
 
-		if len(docks) != 1:
-			raise LauncherError(len(docks))
+			dock_launchers = self.gconf_client.get_list(self.docky_iface_gconf_root + dock + '/Launchers', gconf.VALUE_STRING)
+			cardapio_launchers = filter(lambda launcher: launcher.endswith(self.cardapio_desktop), dock_launchers)
 
-		return docks[0]
+			# multiple Cardapio launchers on one dock
+			if(len(cardapio_launchers) > 1):
+				raise LauncherError(True)
+			elif len(cardapio_launchers) == 1:
+				docks_with_cardapio.append(dock)
+
+		# multiple docks with Cardapio launchers
+		if len(docks_with_cardapio) != 1:
+			raise LauncherError(len(docks_with_cardapio) > 1)
+
+		return docks_with_cardapio[0]
+
 
 	def get_icon_size(self, dock):
 		"""
@@ -95,6 +104,11 @@ class DockySettingsHelper:
 
 
 	def get_best_position(self, dock_num):
+		"""
+		Determines the best (x, y) position for Cardapio in docky-mode.
+		Takes things like Docky's orientation, it's size or zoom mode
+		into account.
+		"""
 
 		# properties of our dock
 		icon_size = self.get_icon_size(dock_num)
@@ -129,6 +143,10 @@ class DockySettingsHelper:
 
 # NOTE: This class is cloned in cardapio_helper.py
 class LauncherError(Exception):
+	"""
+	Exception raised when there are none or multiple Cardapio launchers on
+	Docky's docks. The "multiple" flag says whether there were many or none.
+	"""
 
-	def __init__(self, launcher_count):
-		self.launcher_count = launcher_count
+	def __init__(self, multiple):
+		self.multiple = multiple

@@ -2154,6 +2154,7 @@ class Cardapio(dbus.service.Object):
 				self.consider_showing_no_results_text()
 
 		else:
+
 			self.set_section_is_empty(plugin.section_slab)
 
 			if (self.selected_section is None) or (self.selected_section == plugin.section_slab):

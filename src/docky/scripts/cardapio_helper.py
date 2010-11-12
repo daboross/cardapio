@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-#
 #    Cardapio is an alternative Gnome menu applet, launcher, and much more!
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -17,17 +16,17 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import atexit
-import gobject
-
-import dbus
-import gconf
-
-
 try:
+
+	import atexit
+	import gobject
+
 	from dockmanager.dockmanager import DockManagerItem, DockManagerSink, DOCKITEM_IFACE
 	from signal import signal, SIGTERM
 	from sys import exit
+
+	import gconf
+	import dbus
 
 except ImportError, e:
 	exit()
@@ -35,10 +34,10 @@ except ImportError, e:
 
 class DockySettingsHelper:
 	"""
-	Parser of Docky's GConf settings.
+	Helper class for dealing with Docky's GConf settings.
 	"""
 
-	# GConf root of Docky's settings
+	# GConf keys of Docky's settings
 	docky_gconf_root = '/apps/docky-2/Docky'
 	docky_dcontroller_gconf_root = docky_gconf_root + '/DockController/'
 	docky_iface_gconf_root = docky_gconf_root + '/Interface/DockPreferences/'
@@ -50,6 +49,7 @@ class DockySettingsHelper:
 
 
 	def __init__(self):
+		# sets the names of user's active docks
 		self.active_docks = self.gconf_client.get_list(self.docky_dcontroller_gconf_root + 'ActiveDocks', gconf.VALUE_STRING)
 
 
@@ -61,18 +61,24 @@ class DockySettingsHelper:
 		LauncherError is raised.
 		"""
 
-		docks = filter(lambda dock:
+		docks_with_cardapio = []
 
-			filter(lambda launcher:
-				launcher.endswith(self.cardapio_desktop),
-			self.gconf_client.get_list(self.docky_iface_gconf_root + dock + '/Launchers', gconf.VALUE_STRING)),
+		for dock in self.active_docks:
 
-		self.active_docks)
+			dock_launchers = self.gconf_client.get_list(self.docky_iface_gconf_root + dock + '/Launchers', gconf.VALUE_STRING)
+			cardapio_launchers = filter(lambda launcher: launcher.endswith(self.cardapio_desktop), dock_launchers)
 
-		if len(docks) != 1:
-			raise LauncherError(len(docks))
+			# multiple Cardapio launchers on one dock
+			if(len(cardapio_launchers) > 1):
+				raise LauncherError(True)
+			elif len(cardapio_launchers) == 1:
+				docks_with_cardapio.append(dock)
 
-		return docks[0]
+		# multiple docks with Cardapio launchers
+		if len(docks_with_cardapio) != 1:
+			raise LauncherError(len(docks_with_cardapio) > 1)
+
+		return docks_with_cardapio[0]
 
 
 	def get_main_dock(self):
@@ -93,6 +99,11 @@ class DockySettingsHelper:
 
 
 	def add_launcher(self, dock, launcher):
+		"""
+		Adds a new launcher to one of Docky's docks by pushing it into
+		it's GConf settings.
+		"""
+
 		launchers = settings_helper.gconf_client.get_list(self.docky_iface_gconf_root + dock + '/Launchers', gconf.VALUE_STRING)
 		launchers.insert(0, launcher)
 
@@ -102,19 +113,32 @@ class DockySettingsHelper:
 
 # NOTE: This class is cloned in DockySettingsHelper.py
 class LauncherError(Exception):
+	"""
+	Exception raised when there are none or multiple Cardapio launchers on
+	Docky's docks. The "multiple" flag says whether there were many or none.
+	"""
 
-	def __init__(self, launcher_count):
-		self.launcher_count = launcher_count
-
+	def __init__(self, multiple):
+		self.multiple = multiple
 
 
 class MainDockError(Exception):
+	"""
+	Exception raised when the DockySettingsHelper is unable to find the
+	main dock of Docky.
+	"""
+
 	pass
 
+# TODO: duplication of DockySettingsHelper code - here (helper) and inside
+# main Cardapio
+# TODO: is there a better way to put a new launcher on Docky from code?
+# TODO: is there a way to restart Docky from code? our launcher appears
+# after a restart of Docky because Docky's not watching it's GConf settings
 
 # initialization phase that happens when Docky loads our helper;
 # if there's no launcher for Cardapio on docks, this tries to
-# add it programatically (will require Docky's restart though)
+# add one
 
 settings_helper = DockySettingsHelper()
 
@@ -126,7 +150,7 @@ try:
 except LauncherError, e:
 	# if he has more - it's his problem; if he has none on the
 	# other hand...
-	if e.launcher_count == 0:
+	if not e.multiple:
 
 		try:
 
@@ -142,6 +166,9 @@ except LauncherError, e:
 
 
 class CardapioItem(DockManagerItem):
+	"""
+	Main Cardapio's helper class.
+	"""
 
 	def __init__(self, sink, path):
 		DockManagerItem.__init__(self, sink, path)
@@ -177,6 +204,7 @@ class CardapioItem(DockManagerItem):
 			bus_object = self.bus.get_object(connection_name, self.cardapio_object_path)
 			self.cardapio = dbus.Interface(bus_object, self.cardapio_iface_name)
 
+
   	def menu_pressed(self, menu_id):
 
 		if self.cardapio is None:
@@ -192,6 +220,9 @@ class CardapioItem(DockManagerItem):
 
 
 class CardapioSink(DockManagerSink):
+	"""
+	Sink of Cardapio's helper.
+	"""
 
 	iface_name = "org.freedesktop.DBus.Properties"
 	desktop_name = "cardapio.desktop"
@@ -203,6 +234,7 @@ class CardapioSink(DockManagerSink):
 
 
 
+# run the helper
 cardapio_sink = CardapioSink()
 
 def cleanup():

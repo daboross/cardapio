@@ -85,6 +85,9 @@ if len(sys.argv) == 2:
 			show_hide()
 
 
+	# TODO: take window decoration into account dynamically (it's there only
+	# outside of panel mode)
+	# TODO: take the new Docky's option - "show hover" - into account
 	elif sys.argv[1] == 'docky-mode':
 
 		# if there's no other instance - start hidden Cardapio
@@ -106,8 +109,8 @@ if len(sys.argv) == 2:
 				show_hide(x, y)
 
 			except LauncherError:
-				# doesn't work if we didn't find the launcher or found it on more
-                # than one dock
+				# doesn't work if we didn't find the launcher or found more
+                # than one
 				fatal_error('Cardapio error!', 'You should have exactly one Cardapio launcher on your docks.')
 
 else:
