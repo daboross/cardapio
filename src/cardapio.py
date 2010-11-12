@@ -3322,6 +3322,7 @@ class Cardapio(dbus.service.Object):
 		self.subfolder_stack = []
 
 
+	# MODEL/VIEW SEPARATION EFFORT: mix of view and model
 	def add_app_button(self, button_str, icon_name, parent_widget, command_type, command, tooltip = '', app_list = None):
 		"""
 		Adds a new button to the app pane
@@ -3434,6 +3435,7 @@ class Cardapio(dbus.service.Object):
 		return button
 
 
+	# MODEL/VIEW SEPARATION EFFORT: view
 	def add_application_section(self, section_title = None):
 		"""
 		Adds a new slab to the applications pane
@@ -3466,6 +3468,7 @@ class Cardapio(dbus.service.Object):
 		return section_slab, section_contents, label
 
 
+	# MODEL/VIEW SEPARATION EFFORT: view
 	def get_icon_pixbuf(self, icon_value, icon_size, fallback_icon = 'application-x-executable'):
 		"""
 		Returns a GTK Image from a given icon name and size. The icon name can be
@@ -3509,6 +3512,7 @@ class Cardapio(dbus.service.Object):
 		return icon_pixbuf
 
 
+	# MODEL/VIEW SEPARATION EFFORT: view
 	def get_icon_name_from_theme(self, icon_name):
 		"""
 		Find out if this icon exists in the theme (such as 'gtk-open'), or if
@@ -3531,6 +3535,7 @@ class Cardapio(dbus.service.Object):
 		return None
 
 
+	# MODEL/VIEW SEPARATION EFFORT: view
 	def get_icon_name_from_path(self, path):
 		"""
 		Gets the icon name for a given path using GIO
@@ -3556,6 +3561,7 @@ class Cardapio(dbus.service.Object):
 		return None
 
 
+	# MODEL/VIEW SEPARATION EFFORT: view
 	def get_icon_name_from_gio_icon(self, gio_icon, icon_size = None):
 		"""
 		Gets the icon name from a GIO icon object
@@ -3578,6 +3584,7 @@ class Cardapio(dbus.service.Object):
 		return None
 
 
+	# MODEL/VIEW SEPARATION EFFORT: controller
 	def add_tree_to_app_list(self, tree, parent_widget, app_list, recursive = True):
 		"""
 		Adds all the apps in a subtree of Gnome's menu as buttons in a given
@@ -3595,6 +3602,7 @@ class Cardapio(dbus.service.Object):
 				self.add_tree_to_app_list(node, parent_widget, app_list)
 
 
+	# MODEL/VIEW SEPARATION EFFORT: view
 	def read_gtk_theme_info(self):
 		"""
 		Reads colors and other info from the GTK theme so that the app better
@@ -3613,6 +3621,7 @@ class Cardapio(dbus.service.Object):
 		self.scrollbar_width = scrollbar.style_get_property('slider-width')
 
 
+	# MODEL/VIEW SEPARATION EFFORT: controller
 	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
 	def launch_edit_app(self, *dummy):
 		"""
@@ -3622,6 +3631,7 @@ class Cardapio(dbus.service.Object):
 		self.launch_raw('alacarte')
 
 
+	# MODEL/VIEW SEPARATION EFFORT: controller
 	def on_pin_this_app_clicked(self, widget):
 		"""
 		Handle the pinning action
@@ -3633,6 +3643,7 @@ class Cardapio(dbus.service.Object):
 		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
 
 
+	# MODEL/VIEW SEPARATION EFFORT: controller
 	def on_unpin_this_app_clicked(self, widget):
 		"""
 		Handle the unpinning action
@@ -3644,6 +3655,7 @@ class Cardapio(dbus.service.Object):
 		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
 
 
+	# MODEL/VIEW SEPARATION EFFORT: controller
 	def on_add_to_side_pane_clicked(self, widget):
 		"""
 		Handle the "add to sidepane" action
@@ -3658,6 +3670,7 @@ class Cardapio(dbus.service.Object):
 		self.get_object('SideappSubdivider').queue_resize() # required! or sidepane will obscure the mode switcher button
 
 
+	# MODEL/VIEW SEPARATION EFFORT: controller
 	def on_remove_from_side_pane_clicked(self, widget):
 		"""
 		Handle the "remove from sidepane" action
