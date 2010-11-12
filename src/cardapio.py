@@ -1658,6 +1658,10 @@ class Cardapio(dbus.service.Object):
 		Handler for when the user types something in the search entry
 		"""
 
+		# MODEL/VIEW SEPARATION EFFORT: everything in here should be
+		# model/controller stuff. View stuff should go on separate, well-defined
+		# calls that are made from here.
+
 		text = self.search_entry.get_text().strip()
 
 		if text and text == self.current_query: return
@@ -1670,13 +1674,17 @@ class Cardapio(dbus.service.Object):
 		in_subfolder_search_mode = (text and text.find('/') != -1)
 
 		if not in_subfolder_search_mode:
-			self.fully_hide_all_sections()
 			self.subfolder_stack = []
+			# clean up the UI for every mode except subfolder_search, since it
+			# needs to know the topmost result:
+			self.fully_hide_all_sections()
 
+		# if showing the control center menu
 		if self.in_system_menu_mode:
 			self.search_menus(text, self.sys_list)
 			handled = True
 
+		# if doing a keyword search
 		elif text and text[0] == '?':
 			keyword, dummy, text = text.partition(' ')
 			self.current_query = text
@@ -1687,6 +1695,7 @@ class Cardapio(dbus.service.Object):
 			self.consider_showing_no_results_text()
 			handled = True
 
+		# if doing a subfolder search
 		elif in_subfolder_search_mode:
 			first_app_widget = self.get_first_visible_app()
 			selected_app_widget = self.get_selected_app()
@@ -1694,18 +1703,26 @@ class Cardapio(dbus.service.Object):
 			self.previously_focused_widget = None
 			handled = self.search_subfolders(text, first_app_widget, selected_app_widget)
 
+		# if none of these (or if the subfolder search tells you this is not a
+		# proper subfolder), then just run a regular search. This includes the
+		# regular menus, the system menus, and all active plugins
 		if not handled:
+			# search all menus (apps, places and system)
 			self.search_menus(text, self.app_list)
-			self.schedule_search_with_all_plugins(text)
 
-			if len(text) < self.settings['min search string length']:
-				for plugin in self.active_plugin_instances:
-					if plugin.hide_from_sidebar:
-						self.set_section_is_empty(plugin.section_slab)
-						plugin.section_slab.hide()
+			# if query is large enough
+			if len(text) >= self.settings['min search string length']:
+
+				# search with all plugins
+				self.schedule_search_with_all_plugins(text)
+
+			else:
+				# clean up plugin results
+				self.fully_hide_plugin_sections()
 
 		if len(text) == 0:
 			self.hide_all_transitory_sections(fully_hide = True)
+
 		else:
 			self.all_sections_sidebar_button.set_sensitive(True)
 			self.all_system_sections_sidebar_button.set_sensitive(True)
@@ -1827,7 +1844,10 @@ class Cardapio(dbus.service.Object):
 
 			if base_text and filename.lower().find(base_text) == -1: continue
 
-			if count >= limit: break
+			if count >= limit: 
+				self.add_app_button(_('Show additional results'), 'system-file-manager', self.subfolders_section_contents, 'xdg', path, tooltip = _('Show additional search results in the a file browser'), app_list = None)
+				break
+
 			count += 1
 
 			command = os.path.join(path, filename)
@@ -1835,7 +1855,7 @@ class Cardapio(dbus.service.Object):
 			if icon_name is None: icon_name = 'folder'
 
 			basename, dummy = os.path.splitext(filename)
-			button = self.add_app_button(filename, icon_name, self.subfolders_section_contents, 'xdg', command, tooltip = command, app_list = None)
+			self.add_app_button(filename, icon_name, self.subfolders_section_contents, 'xdg', command, tooltip = command, app_list = None)
 
 		if count:
 			self.subfolders_section_slab.show()
@@ -2134,7 +2154,6 @@ class Cardapio(dbus.service.Object):
 				self.consider_showing_no_results_text()
 
 		else:
-
 			self.set_section_is_empty(plugin.section_slab)
 
 			if (self.selected_section is None) or (self.selected_section == plugin.section_slab):
@@ -2202,7 +2221,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if self.is_search_entry_empty():
-			self.hide_all_transitory_sections()
+			self.hide_all_transitory_sections() # TODO: should fully_hide be True?
 			return
 
 		first_app_widget = self.get_first_visible_app()
@@ -4164,6 +4183,7 @@ class Cardapio(dbus.service.Object):
 		there is no text in the search entry
 		"""
 
+		# TODO: should fully_hide always be True here?
 		self.hide_section(self.subfolders_section_slab, fully_hide)
 		self.hide_section(self.session_section_slab, fully_hide)
 		self.hide_section(self.system_section_slab, fully_hide)
@@ -4175,12 +4195,13 @@ class Cardapio(dbus.service.Object):
 
 	def hide_section(self, section_slab, fully_hide = False):
 		"""
-		Hide a section slab
+		Hide a section slab. When fully_hide == False, the section is just
+		hidden from the GUI, but not marked as empty in the model. When
+		fully_hide = True, the section is both hidden in the GUI and marked
+		as empty in the model.
 		"""
 
-		if fully_hide:
-			self.set_section_is_empty(section_slab)
-
+		if fully_hide: self.set_section_is_empty(section_slab)
 		section_slab.hide()
 
 
@@ -4192,6 +4213,17 @@ class Cardapio(dbus.service.Object):
 		for section_slab in self.section_list:
 			self.set_section_is_empty(section_slab)
 			section_slab.hide()
+
+
+	def fully_hide_plugin_sections(self):
+		"""
+		Hide all plugin sections
+		"""
+
+		for plugin in self.active_plugin_instances:
+			if plugin.hide_from_sidebar:
+				self.set_section_is_empty(plugin.section_slab)
+				plugin.section_slab.hide()
 
 
 	def hide_transitory_plugin_sections(self, fully_hide = False):
