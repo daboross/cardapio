@@ -53,6 +53,7 @@ try:
 	import gettext
 	import logging
 	import commands
+	import platform
 	import keybinder
 	import subprocess
 	import dbus, dbus.service
@@ -149,7 +150,7 @@ def getoutput(shell_command):
 
 class Cardapio(dbus.service.Object):
 
-	distro_name = getoutput('lsb_release -is')
+	distro_name = platform.linux_distribution()[0]
 
 	MIN_VISIBILITY_TOGGLE_INTERVAL    = 0.200 # seconds (this is a bit of a hack to fix some focus problems)
 	PANEL_SIZE_CHANGE_IGNORE_INTERVAL = 200 # milliseconds
@@ -207,7 +208,7 @@ class Cardapio(dbus.service.Object):
 
 		logging.info('----------------- Cardapio launched -----------------')
 		logging.info('Cardapio version: %s' % Cardapio.version)
-		logging.info('Distribution: %s' % getoutput('lsb_release -ds'))
+		logging.info('Distribution: %s' % ' '.join(platform.linux_distribution()))
 
 		self.home_folder_path = os.path.abspath(os.path.expanduser('~'))
 
