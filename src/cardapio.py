@@ -3443,7 +3443,7 @@ class Cardapio(dbus.service.Object):
 
 		section_margin = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
 		section_margin.add(section_contents)
-		section_margin.set_padding(0, 0, 4, 0)
+		section_margin.set_padding(0, 0, 0, 0)
 
 		label = gtk.Label()
 		label.set_use_markup(True)
