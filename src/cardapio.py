@@ -46,7 +46,6 @@ try:
 	from locale import setlocale, LC_ALL
 	from xdg import BaseDirectory, DesktopEntry
 	from dbus.mainloop.glib import DBusGMainLoop
-	from distutils.sysconfig import get_python_lib
 
 except Exception, exception:
 	fatal_error('Fatal error loading Cardapio', exception)
