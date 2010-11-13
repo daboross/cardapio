@@ -24,8 +24,9 @@
 
 def fatal_error(title, errortext):
 	"""
-	This shows a last-resort error message, which does not depend on any external
-	modules. It only depends on Tkinter, which is part of Python's standard library.
+	This shows a last-resort error message, which does not depend on any
+	external modules. It only depends on Tkinter, which is part of Python's
+	standard library (although apparently not on Debian systems!)
 	"""
 
 	import Tkinter
