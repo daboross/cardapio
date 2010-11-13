@@ -22,26 +22,8 @@
 # TODO: add "most recent" and "most frequent" with a zeitgeist plugin
 # plus other TODO's elsewhere in the code...
 
-def fatal_error(title, errortext):
-	"""
-	This shows a last-resort error message, which does not depend on any
-	external modules. It only depends on Tkinter, which is part of Python's
-	standard library (although apparently not on Debian systems!)
-	"""
-
-	import Tkinter
-
-	label = Tkinter.Label(text = title, padx = 5, pady = 5, anchor = Tkinter.W, justify = Tkinter.LEFT)
-	label.pack()
-
-	text = Tkinter.Text(padx = 5, pady = 5, relief=Tkinter.FLAT, wrap=Tkinter.CHAR)
-	text.insert(Tkinter.INSERT, errortext, 'code')
-	text.pack()
-
-	Tkinter.mainloop()
-
-
 try:
+	from misc import *
 	import os
 	import re
 	import sys
@@ -53,7 +35,6 @@ try:
 	import urllib2
 	import gettext
 	import logging
-	import commands
 	import platform
 	import keybinder
 	import subprocess
@@ -133,18 +114,6 @@ _ = gettext.gettext
 import gtk.glade
 gtk.glade.bindtextdomain(APP, DIR)
 gtk.glade.textdomain(APP)
-
-
-def getoutput(shell_command):
-
-	try: 
-		return commands.getoutput(shell_command)
-		#return subprocess.check_output(shell_command, shell = True) # use this line with Python 2.7
-	except Exception, exception: 
-		logging.info('Exception when executing' + shell_command)
-		logging.info(exception)
-		return False
-
 
 
 # Main Cardapio class
@@ -638,8 +607,8 @@ class Cardapio(dbus.service.Object):
 			config_file.close()
 
 		default_side_pane_items = []
-		path = getoutput('which software-center')
-		if path and os.path.exists(path):
+		path = which('software-center')
+		if path is not None:
 			default_side_pane_items.append(
 				{
 					'name'      : _('Ubuntu Software Center'),
@@ -2875,8 +2844,8 @@ class Cardapio(dbus.service.Object):
 
 		self.add_app_button(_('Network'), 'network', section_contents, 'xdg', 'network://', tooltip = _('Browse the contents of the network'), app_list = self.app_list)
 
-		connect_to_server_app_path = getoutput('which nautilus-connect-server')
-		if connect_to_server_app_path:
+		connect_to_server_app_path = which('nautilus-connect-server')
+		if connect_to_server_app_path is not None:
 			self.add_app_button(_('Connect to Server'), 'network-server', section_contents, 'raw', connect_to_server_app_path, tooltip = _('Connect to a remote computer or shared disk'), app_list = self.app_list)
 
 		self.add_app_button(_('Trash'), 'user-trash', section_contents, 'xdg', 'trash:///', tooltip = _('Open the trash'), app_list = self.app_list)
@@ -4460,9 +4429,6 @@ class CardapioPluginInterface:
 		pass
 
 
-
-def return_true(*dummy): return True
-def return_false(*dummy): return False
 
 def AppletFactory(applet, iid):
 
