@@ -73,6 +73,7 @@ try:
 	import os
 	import gtk
 	import gio
+	from xdg import BaseDirectory
 
 except Exception, exception:
 	fatal_error('Fatal error loading Cardapio libraries', exception)

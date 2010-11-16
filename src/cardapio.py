@@ -45,7 +45,7 @@ try:
 	from pango import ELLIPSIZE_END
 	from threading import Lock, Thread
 	from locale import setlocale, LC_ALL
-	from xdg import BaseDirectory, DesktopEntry
+	from xdg import DesktopEntry
 	from dbus.mainloop.glib import DBusGMainLoop
 
 except Exception, exception:
