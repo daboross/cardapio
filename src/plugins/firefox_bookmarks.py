@@ -43,7 +43,6 @@ class CardapioPlugin (CardapioPluginInterface):
 			self.loaded = False
 			return
 		
-		
 		self.build_bookmark_list()
 		lock_path = os.path.join(self.prof_path,'lock')
 		
@@ -83,8 +82,7 @@ class CardapioPlugin (CardapioPluginInterface):
 				prof_folder = prof_list[prof_list.index('Name=default') + 2].split('=')[1]
 			
 			except ValueError:
-				self.c.write_to_log(self, 'Could not determine firefox profile folder',
-									is_error = True)
+				self.c.write_to_log(self, 'Could not determine firefox profile folder', is_error = True)
 				return
 			
 		self.prof_path = os.path.join(firefox_path,prof_folder)
@@ -109,21 +107,26 @@ class CardapioPlugin (CardapioPluginInterface):
 		c = sql_conn.execute(sql_query)
 		
 		self.item_list = []
-		for row in c:
-			item = {
-					'name'		 : _('%s') % row[0],
-					'tooltip'	  : _('Go To \"%s\"') % row[0] ,
-					'icon name'	: 'html', 
-					'type'		 : 'xdg',
-					'command'	  : '%s' % row[1],
-					'context menu' : None,
-					}
-			self.item_list.append(item)
+		try:
+			for row in c:
+				item = {
+						'name'		 : _('%s') % row[0],
+						'tooltip'	  : _('Go To \"%s\"') % row[0] ,
+						'icon name'	: 'html', 
+						'type'		 : 'xdg',
+						'command'	  : '%s' % row[1],
+						'context menu' : None,
+						}
+				self.item_list.append(item)
+
+		except Exception, exception:
+			self.c.write_to_log(self, exception, is_error = True)
 		
 		sql_conn.close()
 		os.remove(db_copy_path)
 		
 	#TODO: Find a way to update plugin when bookmarks change in Firefox
+	# Thiago> You can use GIO to watch the bookmarks file for this
 	
 	def on_lock_changed(self, monitor, file, other_file, event):
 		#Happens whenever Firefox is closed
