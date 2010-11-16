@@ -22,8 +22,9 @@
 # TODO: add "most recent" and "most frequent" with a zeitgeist plugin
 # plus other TODO's elsewhere in the code...
 
+from misc import *
+
 try:
-	from misc import *
 	import os
 	import re
 	import sys
@@ -1225,7 +1226,7 @@ class Cardapio(dbus.service.Object):
 		self.options_dialog.show()
 
 
-	def close_options_dialog(self, *dummy):
+	def on_options_dialog_closed(self, *dummy):
 		"""
 		Hides the Options Dialog
 		"""
@@ -3921,10 +3922,8 @@ class Cardapio(dbus.service.Object):
 
 			path = DesktopEntry.DesktopEntry(command).getExec()
 
-			# debugging bug 603485 (TODO: remove this line when finished debugging)
-			if 'wine' in path: 
-				logging.info('Launching Wine app (logging to debug bug #603485)')
-				logging.info('Command: ' + path)
+			# Ugly hack to bypass bug 603485
+			if 'wine' in path: path = path.replace('\\\\','\\')
 
 			# Strip parts of the path that contain %<a-Z>
 
