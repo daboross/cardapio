@@ -16,7 +16,7 @@ class CardapioPlugin (CardapioPluginInterface):
 
 	url = ''
 	help_text = ''
-	version = '1.0'
+	version = '1.1'
 
 	plugin_api_version = 1.39 
 
@@ -46,8 +46,8 @@ class CardapioPlugin (CardapioPluginInterface):
 		self.build_bookmark_list()
 		lock_path = os.path.join(self.prof_path,'lock')
 		
-		#The lock file may not exist at first, but the monitor will
-		#detect when it is created and deleted
+		# The lock file may not exist at first, but the monitor will
+		# detect when it is created and deleted
 		self.package_monitor = gio.File(lock_path).monitor_file()
 		self.package_monitor.connect('changed', self.on_lock_changed)
 		
@@ -66,7 +66,7 @@ class CardapioPlugin (CardapioPluginInterface):
 		
 		self.c.handle_search_result(self, results, self.current_query)
 	
-	def build_bookmark_list(self):
+	def build_bookmark_list(self, *dummy):
 		
 		firefox_path = os.path.join(os.environ['HOME'],".mozilla/firefox")
 		ini_file = open(os.path.join(firefox_path,'profiles.ini'))
@@ -90,11 +90,14 @@ class CardapioPlugin (CardapioPluginInterface):
 		db_path = os.path.join(self.prof_path, 'places.sqlite')
 		
 		if not os.path.exists(db_path):
-			self.c.write_to_log(self, 'Could not find the bookmarks database', is_error = True)
+			self.c.write_to_log(self, 'could not find the bookmarks database', is_error = true)
 			return
+
+		self.db_monitor = gio.File(db_path).monitor_file()
+		self.db_monitor.connect('changed', self.build_bookmark_list)
 		
-		#places.sqlite is locked when firefox is running, so we must make
-		#a temporary copy to read the bookmarks from
+		# places.sqlite is locked when firefox is running, so we must make
+		# a temporary copy to read the bookmarks from
 		db_copy_path = '%s.copy' % db_path
 		shutil.copy(db_path, db_copy_path)
 		
@@ -125,13 +128,11 @@ class CardapioPlugin (CardapioPluginInterface):
 		sql_conn.close()
 		os.remove(db_copy_path)
 		
-	#TODO: Find a way to update plugin when bookmarks change in Firefox
-	# Thiago> You can use GIO to watch the bookmarks file for this
-	
-	def on_lock_changed(self, monitor, file, other_file, event):
-		#Happens whenever Firefox is closed
+	def on_lock_changed(self, monitor, file_, other_file, event):
+		# Happens whenever Firefox is closed
 		if event == gio.FILE_MONITOR_EVENT_DELETED:
 			self.c.ask_for_reload_permission(self)	
 			
 	def on_reload_permission_granted(self):
 		self.build_bookmark_list()	
+
