@@ -72,6 +72,7 @@ try:
 	import re
 	import os
 	import gtk
+	import gio
 
 except Exception, exception:
 	fatal_error('Fatal error loading Cardapio libraries', exception)
@@ -92,6 +93,7 @@ class IconHelper:
 		if os.path.exists(uninstalled_icon_path):
 			self.icon_theme.append_search_path(uninstalled_icon_path)
 
+		self._listener = return_true
 		self.icon_theme.connect('changed', self._on_icon_theme_changed)
 
 
@@ -220,7 +222,6 @@ class IconHelper:
 		Rebuild the Cardapio UI whenever the icon theme changes
 		"""
 
-		#self.schedule_rebuild
 		self._listener()
 
 
