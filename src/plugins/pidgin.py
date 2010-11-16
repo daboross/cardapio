@@ -1,12 +1,3 @@
-import_error = None
-try:
-	from operator import itemgetter
-	from dbus.exceptions import DBusException
-
-except Exception, exception:
-	import_error = exception
-
-
 class CardapioPlugin(CardapioPluginInterface):
 
 	"""
@@ -34,7 +25,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('Pidgin')
 	description = _('Search for online Pidgin buddies')
-	version = '0.92'
+	version = '0.93'
 
 	url = ''
 	help_text = ''
@@ -57,12 +48,19 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.cardapio = cardapio_proxy
 
-		if import_error:
+		try:
+			from operator import itemgetter
+			from dbus.exceptions import DBusException
+
+		except Exception, exception:
 			self.cardapio.write_to_log(self, 'Could not import certain modules', is_error = True)
-			self.cardapio.write_to_log(self, import_error, is_error = True)
+			self.cardapio.write_to_log(self, exception, is_error = True)
 			self.loaded = False
 			return
 		
+		self.itemgetter    = itemgetter
+		self.DBusException = DBusException
+
 		# Pidgin's D-Bus constants
 		self.dpidgin_bus_name = 'im.pidgin.purple.PurpleService'
 		self.dpidgin_object_path = '/im/pidgin/purple/PurpleObject'
@@ -75,7 +73,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 			self.loaded = True
 
-		except DBusException as ex:
+		except self.DBusException as ex:
 			self.cardapio.write_to_log(self, 'Pidgin plugin initialization error: {0}'.format(str(ex)), is_error = True)
 			self.loaded = False
 
@@ -198,7 +196,7 @@ class DBusGatherBuddiesCallback:
 		buddies = self.gather_buddies(accounts)
 		# sort (we rely on alphabetical order of icon names) and crop
 		# the results before triggering further processing of them
-		self.result_callback(sorted(buddies, key=itemgetter(3, 2))[:self.result_limit], self.text)
+		self.result_callback(sorted(buddies, key=self.itemgetter(3, 2))[:self.result_limit], self.text)
 
 	def gather_buddies(self, accounts):
 		"""

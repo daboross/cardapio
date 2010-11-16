@@ -1,22 +1,4 @@
 import_error = None
-try:
-	import json
-	import gio
-	import urllib
-
-	import base64
-	import hashlib
-	import hmac
-	import time
-
-	from xml.etree import ElementTree
-
-	from locale import getdefaultlocale
-
-except Exception, exception:
-	import_error = exception
-
-
 class CardapioPlugin(CardapioPluginInterface):
 
 	"""
@@ -43,7 +25,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('Amazon')
 	description = _('Search for results in Amazon')
-	version = '0.92'
+	version = '0.93'
 
 	url = ''
 	help_text = ''
@@ -66,13 +48,32 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.cardapio = cardapio_proxy
 
-		if import_error:
+		try:
+			import gio
+			import urllib
+			import base64
+			import hashlib
+			import hmac
+			import time
+			from locale import getdefaultlocale
+			from xml.etree.ElementTree import fromstring
+
+		except Exception, exception:
 			self.cardapio.write_to_log(self, 'Could not import certain modules', is_error = True)
-			self.cardapio.write_to_log(self, import_error, is_error = True)
+			self.cardapio.write_to_log(self, exception, is_error = True)
 			self.loaded = False
 			return
+
+		self.gio              = gio
+		self.urllib           = urllib
+		self.base64           = base64
+		self.hashlib          = hashlib
+		self.hmac             = hmac
+		self.time             = time
+		self.getdefaultlocale = getdefaultlocale
+		self.fromstring       = fromstring
 		
-		self.cancellable = gio.Cancellable()
+		self.cancellable = self.gio.Cancellable()
 
 		# my API keys
 		self.aws_access_key = 'AKIAIW35CYEJ653CJJHQ'
@@ -116,7 +117,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		default = 'ecs.amazonaws.com'
 
 		# get and parse the language code
-		lang_code = getdefaultlocale()[0]
+		lang_code = self.getdefaultlocale()[0]
 
 		if lang_code is None:
 			return default
@@ -154,7 +155,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
 
 		# asynchronous and cancellable IO call
-		self.current_stream = gio.File(final_url)
+		self.current_stream = self.gio.File(final_url)
 		self.current_stream.load_contents_async(self.show_search_results,
 			cancellable = self.cancellable,
 			user_data = (text, result_limit))
@@ -168,11 +169,11 @@ class CardapioPlugin(CardapioPluginInterface):
 		# additional required API arguments
 		copy_args = self.api_base_args.copy()
 		copy_args['Keywords'] = text
-		copy_args['Timestamp'] = time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())
+		copy_args['Timestamp'] = self.time.strftime('%Y-%m-%dT%H:%M:%SZ', self.time.gmtime())
 
 		# turn the argument map into a list of encoded request parameter strings
 		query_list = map(
-			lambda (k, v): (k + "=" + urllib.quote(v)),
+			lambda (k, v): (k + "=" + self.urllib.quote(v)),
 			copy_args.items()
 		)
 
@@ -189,11 +190,11 @@ class CardapioPlugin(CardapioPluginInterface):
 {1}""".format(self.locale_url, query_string)
 
 		# create HMAC for the string (using SHA-256 and our secret API key)
-		hm = hmac.new(key = self.aws_secret_access_key,
+		hm = self.hmac.new(key = self.aws_secret_access_key,
        		msg = string_to_sign,
-         	digestmod = hashlib.sha256)
+         	digestmod = self.hashlib.sha256)
 		# final step... convert the HMAC to base64, then encode it
-		signature = urllib.quote(base64.b64encode(hm.digest()))
+		signature = self.urllib.quote(self.base64.b64encode(hm.digest()))
 
 		return query_string + '&Signature=' + signature
 
@@ -213,7 +214,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			if len(xml_body) == 0:
 				return
 
-			root = ElementTree.fromstring(xml_body)
+			root = self.fromstring(xml_body)
 
 			# strip the namespaces from all the parsed items
 			for el in root.getiterator():
@@ -262,7 +263,7 @@ class CardapioPlugin(CardapioPluginInterface):
 				'type'         : 'xdg',
 				# TODO: cardapio later unquotes this and then quotes it again;
 				# it's screwing my quotation
-				'command'      : self.web_base_url.format(urllib.urlencode(search_more_args)),
+				'command'      : self.web_base_url.format(self.urllib.urlencode(search_more_args)),
 				'context menu' : None
 			})
 

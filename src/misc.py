@@ -15,6 +15,19 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+try:
+	import re
+	import os
+	import gtk
+	import gio
+	import logging
+	import commands
+	from xdg import BaseDirectory
+
+except Exception, exception:
+	fatal_error('Fatal error loading Cardapio libraries', exception)
+	sys.exit(1)
+
 def fatal_error(title, errortext):
 	"""
 	This shows a last-resort error message, which does not depend on any
@@ -33,12 +46,12 @@ def fatal_error(title, errortext):
 	Tkinter.mainloop()
 
 
+
 def which(filename):
 	"""
 	Searches the folders in the OS's PATH variable, looking for a file called
 	"filename". If found, returns the full path. Otherwise, returns None.
 	"""
-	import os
 
 	for path in os.environ["PATH"].split(os.pathsep):
 		if os.access(os.path.join(path, filename), os.X_OK):
@@ -46,13 +59,12 @@ def which(filename):
 	return None
 
 
+
 def getoutput(shell_command):
 	"""
 	Returns the output (from stdout) of a shell command. If an error occurs,
 	returns False.
 	"""
-	import commands
-	import logging
 
 	try: 
 		return commands.getoutput(shell_command)
@@ -67,17 +79,6 @@ def return_true(*dummy): return True
 def return_false(*dummy): return False
 
 
-
-try:
-	import re
-	import os
-	import gtk
-	import gio
-	from xdg import BaseDirectory
-
-except Exception, exception:
-	fatal_error('Fatal error loading Cardapio libraries', exception)
-	sys.exit(1)
 
 class IconHelper:
 

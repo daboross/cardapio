@@ -1,15 +1,3 @@
-import_error = None
-try:
-	from gio import File, Cancellable
-	from urllib2 import quote
-	from simplejson import loads
-	from locale import getdefaultlocale
-	from glib import GError
-
-except Exception, exception:
-	import_error = exception
-
-
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = _('Cardapio Team')
@@ -18,9 +6,9 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.39'
+	version            = '1.41'
 
-	plugin_api_version = 1.40
+	plugin_api_version = 1.39
 
 	search_delay_type  = 'remote'
 
@@ -36,13 +24,27 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.c = cardapio_proxy
 
-		if import_error:
+		try:
+			from gio import File, Cancellable
+			from urllib2 import quote
+			from simplejson import loads
+			from locale import getdefaultlocale
+			from glib import GError
+
+		except Exception, exception:
 			self.c.write_to_log(self, 'Could not import certain modules', is_error = True)
-			self.c.write_to_log(self, import_error, is_error = True)
+			self.c.write_to_log(self, exception, is_error = True)
 			self.loaded = False
 			return
 		
-		language, encoding = getdefaultlocale()
+		self.File             = File
+		self.Cancellable      = Cancellable
+		self.quote            = quote
+		self.loads            = loads
+		self.getdefaultlocale = getdefaultlocale
+		self.GError           = GError
+
+		language, encoding = self.getdefaultlocale()
 		google_results_language_format = language.split('_')[0]
 		google_interface_language_format = language.replace('_', '-')
 
@@ -62,7 +64,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.query_url = 'http://ajax.googleapis.com/ajax/services/search/web?v=1.0&rsz={0}&lr=lang_%s&q={1}' % google_results_language_format
 
-		self.search_controller = Cancellable()
+		self.search_controller = self.Cancellable()
 
 		self.action_command = "xdg-open 'http://www.google.com/search?q=%%s&hl=%s&lr=lang_%s'" % (google_interface_language_format, google_results_language_format)
 		self.action = {
@@ -87,7 +89,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		# proceeding...
 
 		self.current_query = text
-		text = quote(text)
+		text = self.quote(text)
 
 		# The google search API only supports two sizes for the result list,
 		# that is: small (4 results) or large (8 results). So this plugin
@@ -96,7 +98,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		query = self.query_url.format('large' if result_limit >= 8 else 'small', text)
 
-		self.stream = File(query)
+		self.stream = self.File(query)
 
 		self.search_controller.reset()
 		self.stream.load_contents_async(self.handle_search_result, cancellable = self.search_controller)
@@ -113,13 +115,13 @@ class CardapioPlugin(CardapioPluginInterface):
 		try:
 			response = self.stream.load_contents_finish(response)[0]
 
-		except GError, e:
+		except self.GError, e:
 			# no need to worry if there's no response: maybe there's no internet
 			# connection...
 			self.c.handle_search_error(self, 'no response')
 			return
 
-		raw_results = loads(response)
+		raw_results = self.loads(response)
 
 		parsed_results = [] 
 

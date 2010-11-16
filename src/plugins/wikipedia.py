@@ -1,15 +1,3 @@
-import_error = None
-try:
-	import json
-	import gio
-	import urllib
-
-	from glib import GError
-
-except Exception, exception:
-	import_error = exception
-
-
 # TODO: it would be nice to localize this but it's hard; the Wikipedia's API
 # has no locale parameter and the only way to look for results in other
 # language is to change the URL from http://en.wikipedia.org/ to
@@ -30,7 +18,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('Wikipedia')
 	description = _('Search for results in Wikipedia')
-	version = '0.94'
+	version = '0.95'
 
 	url = ''
 	help_text = ''
@@ -53,13 +41,24 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.cardapio = cardapio_proxy
 
-		if import_error:
+		try:
+			import json
+			import gio
+			import urllib
+			from glib import GError
+
+		except Exception, exception:
 			self.cardapio.write_to_log(self, 'Could not import certain modules', is_error = True)
-			self.cardapio.write_to_log(self, import_error, is_error = True)
+			self.cardapio.write_to_log(self, exception, is_error = True)
 			self.loaded = False
 			return
 		
-		self.cancellable = gio.Cancellable()
+		self.json   = json
+		self.gio    = gio
+		self.urllib = urllib
+		self.GError = GError
+
+		self.cancellable = self.gio.Cancellable()
 
 		# Wikipedia's unofficial API arguments (search truncated to
 		# maximum four results, formatted as json)
@@ -87,12 +86,12 @@ class CardapioPlugin(CardapioPluginInterface):
 		current_args['limit'] = result_limit
 		current_args['search'] = text
 
-		final_url = self.api_base_url.format(urllib.urlencode(current_args))
+		final_url = self.api_base_url.format(self.urllib.urlencode(current_args))
 
 		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
 
 		# asynchronous and cancellable IO call
-		self.current_stream = gio.File(final_url)
+		self.current_stream = self.gio.File(final_url)
 		self.current_stream.load_contents_async(self.show_search_results,
 			cancellable = self.cancellable,
 			user_data = text)
@@ -110,8 +109,8 @@ class CardapioPlugin(CardapioPluginInterface):
 			if len(json_body) == 0:
 				return
 
-			response = json.loads(json_body)
-		except (ValueError, GError) as ex:
+			response = self.json.loads(json_body)
+		except (ValueError, self.GError) as ex:
 			self.cardapio.handle_search_error(self, 'error while obtaining data: {0}'.format(str(ex)))
 			return
 
@@ -127,7 +126,7 @@ class CardapioPlugin(CardapioPluginInterface):
 				# of a URL so we need to encode the special characters; unfortunately,
 				# Python's 2.* urllib.quote throws an exception when it's given unicode
 				# argument - what now?
-				item_url = self.web_base_url.format(urllib.quote(item))
+				item_url = self.web_base_url.format(self.urllib.quote(item))
 				items.append({
 					'name'         : item,
 					'tooltip'      : item_url,

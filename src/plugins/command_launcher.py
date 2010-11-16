@@ -1,13 +1,3 @@
-import_error = None
-try:
-	from os.path import basename
-	from os import environ
-	from glob import iglob
-
-except Exception, exception:
-	import_error = exception
-
-
 class CardapioPlugin (CardapioPluginInterface):
 
 	author             = 'Cardapio team' 
@@ -16,7 +6,7 @@ class CardapioPlugin (CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.11'
+	version            = '1.13'
 
 	plugin_api_version = 1.39
 
@@ -40,13 +30,22 @@ class CardapioPlugin (CardapioPluginInterface):
 		'''
 		self.c = cardapio_proxy
 		
-		if import_error:
+		try:
+			from os.path import basename
+			from os import environ
+			from glob import iglob
+
+		except Exception, exception:
 			self.c.write_to_log(self, 'Could not import certain modules', is_error = True)
-			self.c.write_to_log(self, import_error, is_error = True)
+			self.c.write_to_log(self, exception, is_error = True)
 			self.loaded = False
 			return
+
+		self.basename = basename
+		self.environ  = environ
+		self.iglob    = iglob
 		
-		self.pathlist = environ['PATH'].split(':')
+		self.pathlist = self.environ['PATH'].split(':')
 
 		self.in_a_terminal         = _('Execute \'%s\' In Terminal')
 		self.in_a_terminal_tooltip = _('Execute the command \'%s\' inside a new terminal window')
@@ -73,13 +72,13 @@ class CardapioPlugin (CardapioPluginInterface):
 		for path in self.pathlist:
 			if num_results >= result_limit: break
 
-			cmd_iter = (iglob('%s/%s*' % (path, cmdname)))
+			cmd_iter = (self.iglob('%s/%s*' % (path, cmdname)))
 
 			while True:
 				if num_results >= result_limit: break
 
 				try:
-					cmd = basename(cmd_iter.next())
+					cmd = self.basename(cmd_iter.next())
 					cmdargs = cmd + args
 					item = {
 						'name'          : '%s%s' % (cmd, args),

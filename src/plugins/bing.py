@@ -1,15 +1,3 @@
-import_error = None
-try:
-	import json
-	import gio
-	import urllib
-
-	from glib import GError
-
-except Exception, exception:
-	import_error = exception
-
-
 class CardapioPlugin(CardapioPluginInterface):
 	"""
 	Plugin based on Microsoft's Bing API. Basics of the API are described in
@@ -23,7 +11,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	author = 'Pawel Bara'
 	name = _('Bing')
 	description = _("Perform a search using Microsoft's Bing")
-	version = '0.94'
+	version = '0.95'
 
 	url = ''
 	help_text = ''
@@ -46,13 +34,24 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.cardapio = cardapio_proxy
 
-		if import_error:
+		try:
+			import json
+			import gio
+			import urllib
+			from glib import GError
+
+		except Exception, exception:
 			self.cardapio.write_to_log(self, 'Could not import certain modules', is_error = True)
-			self.cardapio.write_to_log(self, import_error, is_error = True)
+			self.cardapio.write_to_log(self, exception, is_error = True)
 			self.loaded = False
 			return
+
+		self.json   = json
+		self.gio    = gio
+		self.urllib = urllib
+		self.GError = GError
 		
-		self.cancellable = gio.Cancellable()
+		self.cancellable = self.gio.Cancellable()
 
 		# Bing's API arguments (my AppID and a request for a web search)
 		self.api_base_args = {
@@ -80,12 +79,12 @@ class CardapioPlugin(CardapioPluginInterface):
 		current_args['web.count'] = result_limit
 
 		current_args['query'] = text
-		final_url = self.api_base_url.format(urllib.urlencode(current_args))
+		final_url = self.api_base_url.format(self.urllib.urlencode(current_args))
 
 		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
 
 		# asynchronous and cancellable IO call
-		self.current_stream = gio.File(final_url)
+		self.current_stream = self.gio.File(final_url)
 		self.current_stream.load_contents_async(self.show_search_results,
 			cancellable = self.cancellable,
 			user_data = text)
@@ -103,8 +102,8 @@ class CardapioPlugin(CardapioPluginInterface):
 			if len(json_body) == 0:
 				return
 
-			response = json.loads(json_body)
-		except (ValueError, GError) as ex:
+			response = self.json.loads(json_body)
+		except (ValueError, self.GError) as ex:
 			self.cardapio.handle_search_error(self, 'error while obtaining data: {0}'.format(str(ex)))
 			return
 
@@ -137,7 +136,7 @@ class CardapioPlugin(CardapioPluginInterface):
 				'type'         : 'xdg',
 				# TODO: cardapio later unquotes this and then quotes it again;
 				# it's screwing my quotation
-				'command'      : self.web_base_url.format(urllib.urlencode(search_more_args)),
+				'command'      : self.web_base_url.format(self.urllib.urlencode(search_more_args)),
 				'context menu' : None
 			})
 

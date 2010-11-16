@@ -1,13 +1,3 @@
-import_error = None
-
-try:
-	import os
-	import gio
-	from vboxapi import VirtualBoxManager
-	
-except Exception, exception:
-	import_error = exception
-
 class CardapioPlugin (CardapioPluginInterface):
 
 	author = 'Clifton Mulkey'
@@ -17,7 +7,7 @@ class CardapioPlugin (CardapioPluginInterface):
 	# not used in the GUI yet:
 	url = ''
 	help_text = ''
-	version = '1.23'
+	version = '1.24'
 
 	plugin_api_version = 1.39
 
@@ -42,11 +32,19 @@ class CardapioPlugin (CardapioPluginInterface):
 		
 		self.c = cardapio_proxy
 		
-		if import_error:
-			self.c.write_to_log(self, "Error importing some modules: %s" % import_error, is_error = True)
+		try:
+			import os
+			import gio
+			from vboxapi import VirtualBoxManager
+			
+		except Exception, exception:
+			self.c.write_to_log(self, "Error importing some modules: %s" % exception, is_error = True)
 			self.loaded = False
 			return
 		
+		self.os                = os
+		self.gio               = gio
+			
 		try:
 			subprocess.Popen(['VBoxManage'], stdout = subprocess.PIPE)
 			
@@ -60,8 +58,8 @@ class CardapioPlugin (CardapioPluginInterface):
 		
 		machine_path = self.vboxmgr.vbox.systemProperties.defaultMachineFolder
 		
-		if os.path.exists(machine_path):
-			self.package_monitor = gio.File(machine_path).monitor_directory()
+		if self.os.path.exists(machine_path):
+			self.package_monitor = self.gio.File(machine_path).monitor_directory()
 			self.package_monitor.connect('changed', self.on_vms_changed)
 
 		else:
@@ -112,8 +110,8 @@ class CardapioPlugin (CardapioPluginInterface):
 			
 	def on_vms_changed(self, monitor, file, other_file, event):
 		
-		if event in [gio.FILE_MONITOR_EVENT_CREATED, 
-					 gio.FILE_MONITOR_EVENT_DELETED]:
+		if event in [self.gio.FILE_MONITOR_EVENT_CREATED, 
+					 self.gio.FILE_MONITOR_EVENT_DELETED]:
 			
 			self.c.ask_for_reload_permission(self)
 			

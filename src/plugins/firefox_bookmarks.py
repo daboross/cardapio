@@ -1,14 +1,3 @@
-import_error = None
-try:
-	import os
-	import sqlite3
-	import shutil
-	import gio
-	
-except Exception, exception:
-	import_error = exception
-	
-
 class CardapioPlugin (CardapioPluginInterface):
 	author = 'Cardapio Team'
 	name = _('Firefox Bookmarks')
@@ -16,7 +5,7 @@ class CardapioPlugin (CardapioPluginInterface):
 
 	url = ''
 	help_text = ''
-	version = '1.1'
+	version = '1.2'
 
 	plugin_api_version = 1.39 
 
@@ -37,18 +26,29 @@ class CardapioPlugin (CardapioPluginInterface):
 		'''
 		self.c = cardapio_proxy
 		
-		if import_error:
+		try:
+			import os
+			import sqlite3
+			import shutil
+			import gio
+			
+		except Exception, exception:
 			self.c.write_to_log(self, 'Could not import certain modules', is_error = True)
-			self.c.write_to_log(self, import_error, is_error = True)
+			self.c.write_to_log(self, exception, is_error = True)
 			self.loaded = False
 			return
+
+		self.os      = os
+		self.sqlite3 = sqlite3
+		self.shutil  = shutil
+		self.gio     = gio
 		
 		self.build_bookmark_list()
-		lock_path = os.path.join(self.prof_path,'lock')
+		lock_path = self.os.path.join(self.prof_path,'lock')
 		
 		# The lock file may not exist at first, but the monitor will
 		# detect when it is created and deleted
-		self.package_monitor = gio.File(lock_path).monitor_file()
+		self.package_monitor = self.gio.File(lock_path).monitor_file()
 		self.package_monitor.connect('changed', self.on_lock_changed)
 		
 	   	self.loaded = True # set to true if everything goes well
@@ -68,8 +68,8 @@ class CardapioPlugin (CardapioPluginInterface):
 	
 	def build_bookmark_list(self, *dummy):
 		
-		firefox_path = os.path.join(os.environ['HOME'],".mozilla/firefox")
-		ini_file = open(os.path.join(firefox_path,'profiles.ini'))
+		firefox_path = self.os.path.join(self.os.environ['HOME'],".mozilla/firefox")
+		ini_file = open(self.os.path.join(firefox_path,'profiles.ini'))
 		prof_list = ini_file.read().split()
 		ini_file.close()
 		
@@ -85,23 +85,23 @@ class CardapioPlugin (CardapioPluginInterface):
 				self.c.write_to_log(self, 'Could not determine firefox profile folder', is_error = True)
 				return
 			
-		self.prof_path = os.path.join(firefox_path,prof_folder)
+		self.prof_path = self.os.path.join(firefox_path,prof_folder)
 		
-		db_path = os.path.join(self.prof_path, 'places.sqlite')
+		db_path = self.os.path.join(self.prof_path, 'places.sqlite')
 		
-		if not os.path.exists(db_path):
+		if not self.os.path.exists(db_path):
 			self.c.write_to_log(self, 'could not find the bookmarks database', is_error = true)
 			return
 
-		self.db_monitor = gio.File(db_path).monitor_file()
+		self.db_monitor = self.gio.File(db_path).monitor_file()
 		self.db_monitor.connect('changed', self.build_bookmark_list)
 		
 		# places.sqlite is locked when firefox is running, so we must make
 		# a temporary copy to read the bookmarks from
 		db_copy_path = '%s.copy' % db_path
-		shutil.copy(db_path, db_copy_path)
+		self.shutil.copy(db_path, db_copy_path)
 		
-		sql_conn = sqlite3.connect(db_copy_path)
+		sql_conn = self.sqlite3.connect(db_copy_path)
 
 		sql_query = "SELECT moz_bookmarks.title, moz_places.url \
 					 FROM moz_bookmarks, moz_places  \
@@ -126,11 +126,11 @@ class CardapioPlugin (CardapioPluginInterface):
 			self.c.write_to_log(self, exception, is_error = True)
 		
 		sql_conn.close()
-		os.remove(db_copy_path)
+		self.os.remove(db_copy_path)
 		
 	def on_lock_changed(self, monitor, file_, other_file, event):
 		# Happens whenever Firefox is closed
-		if event == gio.FILE_MONITOR_EVENT_DELETED:
+		if event == self.gio.FILE_MONITOR_EVENT_DELETED:
 			self.c.ask_for_reload_permission(self)	
 			
 	def on_reload_permission_granted(self):

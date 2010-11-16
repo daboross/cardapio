@@ -1,12 +1,3 @@
-import_error = None
-try:
-	from os.path import split
-	from urllib2 import quote, splittype
-
-except Exception, exception:
-	import_error = exception
-
-
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = _('Cardapio Team')
@@ -15,7 +6,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.42'
+	version            = '1.43'
 
 	plugin_api_version = 1.39
 
@@ -33,11 +24,19 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.c = cardapio_proxy
 
-		if import_error:
+		try:
+			from os.path import split
+			from urllib2 import quote, splittype
+
+		except Exception, exception:
 			self.c.write_to_log(self, 'Could not import certain modules', is_error = True)
-			self.c.write_to_log(self, import_error, is_error = True)
+			self.c.write_to_log(self, exception, is_error = True)
 			self.loaded = False
 			return
+		
+		self.split     = split
+		self.quote     = quote
+		self.splittype = splittype
 		
 		self.tracker = None
 		bus = dbus.SessionBus()
@@ -65,7 +64,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	def search(self, text, result_limit):
 
 		self.current_query = text
-		text = quote(text).lower()
+		text = self.quote(text).lower()
 
 		self.tracker.SparqlQuery(
 			"""
@@ -99,8 +98,8 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		for result in results:
 
-			dummy, canonical_path = splittype(result[0])
-			parent_name, child_name = split(canonical_path)
+			dummy, canonical_path = self.splittype(result[0])
+			parent_name, child_name = self.split(canonical_path)
 			icon_name = result[1]
 
 			formatted_result = {

@@ -1,27 +1,3 @@
-import_error = None
-
-try:
-	import xapian
-	import sys
-	import apt
-	import os
-	import gio
-
-	software_center_path = '/usr/share/software-center'
-
-	if not os.path.exists(software_center_path):
-		raise Exception('Could not find the software center path')
-
-	sys.path.append(software_center_path)
-
-	from softwarecenter.enums import XAPIAN_VALUE_POPCON, XAPIAN_VALUE_ICON, XAPIAN_VALUE_SUMMARY 
-	from softwarecenter.db.database import StoreDatabase
-	from softwarecenter.view.appview import AppViewFilter
-
-except Exception, exception:
-	import_error = exception
-
-
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = 'Cardapio team'
@@ -30,7 +6,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '1.23'
+	version            = '1.24'
 
 	plugin_api_version = 1.39
 
@@ -58,11 +34,39 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.c = cardapio_proxy
 		self.loaded = False
 		
-		if import_error:
+		try:
+			import xapian
+			import sys
+			import apt
+			import os
+			import gio
+
+			software_center_path = '/usr/share/software-center'
+
+			if not os.path.exists(software_center_path):
+				raise Exception('Could not find the software center path')
+
+			sys.path.append(software_center_path)
+
+			from softwarecenter.enums import XAPIAN_VALUE_POPCON, XAPIAN_VALUE_ICON, XAPIAN_VALUE_SUMMARY 
+			from softwarecenter.db.database import StoreDatabase
+			from softwarecenter.view.appview import AppViewFilter
+
+		except Exception, exception:
 			self.c.write_to_log(self, 'Could not import certain modules', is_error = True)
-			self.c.write_to_log(self, import_error, is_error = True)
+			self.c.write_to_log(self, exception, is_error = True)
 			return
 			
+		self.xapian               = xapian
+		self.apt                  = apt
+		self.os                   = os
+		self.gio                  = gio
+		self.XAPIAN_VALUE_ICON    = XAPIAN_VALUE_ICON
+		self.XAPIAN_VALUE_SUMMARY = XAPIAN_VALUE_SUMMARY 
+		self.XAPIAN_VALUE_POPCON  = XAPIAN_VALUE_POPCON
+		self.StoreDatabase        = StoreDatabase
+		self.AppViewFilter        = AppViewFilter
+
 		try:
 			
 			ubuntu_ver = subprocess.Popen(["lsb_release", "-r"], stdout=subprocess.PIPE).communicate()[0]
@@ -72,10 +76,10 @@ class CardapioPlugin(CardapioPluginInterface):
 			self.c.write_to_log(self, 'Could not detect Ubuntu version. Defaulting to 10.04', is_warning = True)
 			is_maverick = False
 
-		self.cache = apt.Cache() # this line is really slow! around 0.28s on my computer!
+		self.cache = self.apt.Cache() # this line is really slow! around 0.28s on my computer!
 		db_path = '/var/cache/software-center/xapian'
 
-		if not os.path.exists(db_path):
+		if not self.os.path.exists(db_path):
 			self.c.write_to_log(self, 'Could not find the database path', is_error = True)
 			return
 
@@ -113,8 +117,8 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		dpkg_path = '/var/lib/dpkg/lock'
 
-		if os.path.exists(dpkg_path):
-			self.package_monitor = gio.File(dpkg_path).monitor_file()
+		if self.os.path.exists(dpkg_path):
+			self.package_monitor = self.gio.File(dpkg_path).monitor_file()
 			self.package_monitor.connect('changed', self.on_packages_changed)
 
 		else:
@@ -132,23 +136,23 @@ class CardapioPlugin(CardapioPluginInterface):
 		
 		query = self.db.get_query_list_from_search_entry(text)
 		
-		enquire = xapian.Enquire(self.db.xapiandb)
+		enquire = self.xapian.Enquire(self.db.xapiandb)
 		enquire.set_query(query[1])
-		enquire.set_sort_by_value_then_relevance(XAPIAN_VALUE_POPCON)
+		enquire.set_sort_by_value_then_relevance(self.XAPIAN_VALUE_POPCON)
 		matches = enquire.get_mset(0, len(self.db))
 
 		i = 0
 		for m in matches:
 			if not i < result_limit : break
 			
-			doc = m[xapian.MSET_DOCUMENT]
+			doc = m[self.xapian.MSET_DOCUMENT]
 			pkgname = self.db.get_pkgname(doc)
-			summary = doc.get_value(XAPIAN_VALUE_SUMMARY)
+			summary = doc.get_value(self.XAPIAN_VALUE_SUMMARY)
 
 			name = doc.get_data()
 
 			if self.apps_filter.filter(doc, pkgname) and summary:
-				icon_name = os.path.splitext(doc.get_value(XAPIAN_VALUE_ICON))[0]
+				icon_name = self.os.path.splitext(doc.get_value(self.XAPIAN_VALUE_ICON))[0]
 
 				tooltip = self.default_tooltip_str % name 
 
@@ -188,7 +192,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def on_packages_changed(self, monitor, file, other_file, event):
 
-		if event == gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
+		if event == self.gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
 			self.c.ask_for_reload_permission(self)
 			
 	def open_softwarecenter_search(self, text):

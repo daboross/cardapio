@@ -1,13 +1,3 @@
-import_error = None
-try:
-	import urllib2, os
-	from zeitgeist.client import ZeitgeistClient
-	from zeitgeist import datamodel
-
-except Exception, exception:
-	import_error = exception
-
-
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = _('Cardapio Team')
@@ -16,7 +6,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '0.991'
+	version            = '0.992'
 
 	plugin_api_version = 1.39
 
@@ -38,11 +28,20 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.loaded = False
 
-		if import_error:
+		try:
+			import urllib2, os
+			from zeitgeist.client import ZeitgeistClient
+			from zeitgeist import datamodel
+
+		except Exception, exception:
 			self.cardapio.write_to_log(self, 'Could not import certain modules', is_error = True)
-			self.cardapio.write_to_log(self, import_error, is_error = True)
+			self.cardapio.write_to_log(self, exception, is_error = True)
 			return
 		
+		self.urllib2         = urllib2
+		self.os              = os
+		self.datamodel       = datamodel
+
 		if 'ZeitgeistClient' not in globals():
 			self.c.write_to_log(self, 'Could not import Zeitgeist', is_error = True)
 			return
@@ -82,9 +81,9 @@ class CardapioPlugin(CardapioPluginInterface):
 			'context menu' : None,
 			}
 
-		self.time_range = datamodel.TimeRange.always()
+		self.time_range = self.datamodel.TimeRange.always()
 
-		self.event_template = datamodel.Event()
+		self.event_template = self.datamodel.Event()
 		self.loaded = True
 
 
@@ -108,7 +107,7 @@ class CardapioPlugin(CardapioPluginInterface):
 				self.handle_search_result, 
 				timerange = self.time_range, 
 				num_events = result_limit,
-				result_type = datamodel.ResultType.MostRecentSubjects
+				result_type = self.datamodel.ResultType.MostRecentSubjects
 				)
 
 
@@ -132,7 +131,7 @@ class CardapioPlugin(CardapioPluginInterface):
 				pass
 
 			if fts_results:
-				all_events = map(datamodel.Event, fts_results)
+				all_events = map(self.datamodel.Event, fts_results)
 
 		parsed_results = [] 
 		all_events += events
@@ -144,8 +143,8 @@ class CardapioPlugin(CardapioPluginInterface):
 
 			for subject in event.get_subjects():
 
-				dummy, canonical_path = urllib2.splittype(subject.uri)
-				parent_name, child_name = os.path.split(canonical_path)
+				dummy, canonical_path = self.urllib2.splittype(subject.uri)
+				parent_name, child_name = self.os.path.split(canonical_path)
 
 				if len(urls_seen) >= self.result_limit: break
 				if canonical_path in urls_seen: continue

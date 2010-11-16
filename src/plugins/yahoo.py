@@ -1,10 +1,3 @@
-import json
-import gio
-import urllib
-
-from glib import GError
-from locale import getdefaultlocale
-
 class CardapioPlugin(CardapioPluginInterface):
 
 	"""
@@ -31,7 +24,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.39
+	plugin_api_version = 1.40
 
 	search_delay_type = 'remote'
 
@@ -49,14 +42,33 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		self.cardapio = cardapio_proxy
 
-		self.cancellable = gio.Cancellable()
+		try:
+			import json
+			import gio
+			import urllib
+			from glib import GError
+			from locale import getdefaultlocale
+
+		except Exception, exception:
+			self.c.write_to_log(self, 'Could not import certain modules', is_error = True)
+			self.c.write_to_log(self, exception, is_error = True)
+			self.loaded = False
+			return
+
+		self.json             = json
+		self.gio              = gio
+		self.urllib           = urllib
+		self.GError           = GError
+		self.getdefaultlocale = getdefaultlocale
+
+		self.cancellable = self.gio.Cancellable()
 
 		# we'll try to get locale here; we'll pass it as an argument for every
 		# Yahoo search; for some locales this will work, for others (most of
 		# them probably) it'll just be ignored; we could try to obey this table...
 		# http://developer.yahoo.com/search/boss/boss_guide/supp_regions_lang.html
 		# ... but I think it's an overkill
-		locale_code = getdefaultlocale()[0].lower()
+		locale_code = self.getdefaultlocale()[0].lower()
 		language, region = locale_code[:2], locale_code[3:]
 
 		# Yahoo's API arguments (my AppID and a request for a search with
@@ -87,12 +99,12 @@ class CardapioPlugin(CardapioPluginInterface):
 		current_args = self.api_base_args.copy()
 		current_args['count'] = result_limit
 
-		final_url = self.api_base_url.format(urllib.quote(text, ''), urllib.urlencode(current_args))
+		final_url = self.api_base_url.format(self.urllib.quote(text, ''), self.urllib.urlencode(current_args))
 
 		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
 
 		# asynchronous and cancellable IO call
-		self.current_stream = gio.File(final_url)
+		self.current_stream = self.gio.File(final_url)
 		self.current_stream.load_contents_async(self.show_search_results,
 			cancellable = self.cancellable,
 			user_data = text)
@@ -110,8 +122,8 @@ class CardapioPlugin(CardapioPluginInterface):
 			if len(json_body) == 0:
 				return
 
-			response = json.loads(json_body)
-		except (ValueError, GError) as ex:
+			response = self.json.loads(json_body)
+		except (ValueError, self.GError) as ex:
 			self.cardapio.handle_search_error(self, 'error while obtaining data: {0}'.format(str(ex)))
 			return
 
@@ -144,7 +156,7 @@ class CardapioPlugin(CardapioPluginInterface):
 				'type'         : 'xdg',
 				# TODO: cardapio later unquotes this and then quotes it again;
 				# it's screwing my quotation
-				'command'      : self.web_base_url.format(urllib.urlencode(search_more_args)),
+				'command'      : self.web_base_url.format(self.urllib.urlencode(search_more_args)),
 				'context menu' : None
 			})
 

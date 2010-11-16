@@ -232,10 +232,21 @@ class Cardapio(dbus.service.Object):
 		if __package__ is not None:
 			self.package_root = __package__ + '.'
 
+		logging.info('Setting up DBus...')
 		self.setup_dbus()
+		logging.info('               ...done setting up DBus!')
+
+		logging.info('Setting up UI...')
 		self.setup_base_ui() # must be the first ui-related method to be called
+		logging.info('             ...done setting up UI!')
+
+		logging.info('Setting up Plugins...')
 		self.setup_plugins()
+		logging.info('                  ...done setting up Plugins!')
+
+		logging.info('Building UI...')
 		self.build_ui()
+		logging.info('           ...done building UI!')
 
 		self.schedule_search_with_all_plugins('')
 
@@ -250,6 +261,8 @@ class Cardapio(dbus.service.Object):
 			gnome_program_init('', self.version) # Prints a warning to the screen. Ignore it.
 			client = gnome_ui_master_client()
 			client.connect('save-yourself', self.quit)
+
+		logging.info('==> Done initializing Cardapio!')
 
 
 	def on_mainwindow_destroy(self, *dummy):
@@ -355,16 +368,12 @@ class Cardapio(dbus.service.Object):
 			]
 
 		for plugin_dir in plugin_dirs:
-
 			for root, dir_, files in os.walk(plugin_dir):
-
 				for file_ in files:
-
 					if len(file_) > 3 and file_[-3:] == '.py' and file_[0] != '_':
-
 						basename = file_[:-3]
-
 						plugin_class = self.get_plugin_class(basename)
+
 						if type(plugin_class) is str: continue
 
 						self.plugin_database[basename] = {
@@ -381,7 +390,7 @@ class Cardapio(dbus.service.Object):
 		# TODO: figure out how to make Python unmap all the memory that gets
 		# freed when the garbage collector releases the inactive plugins
 
-
+	
 	def activate_plugins_from_settings(self):
 		"""
 		Initializes plugins in the database if the user's settings say so.
