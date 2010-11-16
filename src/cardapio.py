@@ -1770,7 +1770,7 @@ class Cardapio(dbus.service.Object):
 					else: widget = first_app_widget
 
 					if widget.app_info['type'] != 'xdg': return False
-					path = self.escape_quotes(self.unescape(widget.app_info['command']))
+					path = self.escape_quotes(self.unescape_url(widget.app_info['command']))
 
 					path_type, path = urllib2.splittype(path)
 					if path_type and path_type != 'file': return False
@@ -2468,8 +2468,8 @@ class Cardapio(dbus.service.Object):
 		offset_x = (main_window_width - message_width) / 2
 		offset_y = (main_window_height - message_height) / 2
 
-		coordinates, inversion = self.choose_coordinates_for_window(self.message_window)
-		self.message_window.move(coordinates[0] + offset_x, coordinates[1] + offset_y)
+		x, y = self.choose_coordinates_for_window(self.message_window)
+		self.message_window.move(x + offset_x, y + offset_y)
 
 		self.message_window.set_keep_above(True)
 		self.show_window_on_top(self.message_window)
@@ -2962,7 +2962,7 @@ class Cardapio(dbus.service.Object):
 		folder_path = os.path.expanduser(folder_path.replace('$HOME', '~')).strip(' \n\r\t')
 
 		dummy, canonical_path = urllib2.splittype(folder_path)
-		canonical_path = self.unescape(canonical_path)
+		canonical_path = self.unescape_url(canonical_path)
 
 		icon_name = self.icon_helper.get_icon_name_from_path(folder_path)
 		if icon_name is None: icon_name = folder_icon
@@ -3325,7 +3325,7 @@ class Cardapio(dbus.service.Object):
 
 		# save some metadata for easy access
 		button.app_info = {
-			'name'         : self.unescape(button_str),
+			'name'         : self.unescape_url(button_str),
 			'tooltip'      : tooltip,
 			'icon name'    : icon_name,
 			'command'      : command,
@@ -3347,7 +3347,7 @@ class Cardapio(dbus.service.Object):
 		else:
 			button = gtk.ToggleButton()
 
-		button_str = self.unescape(button_str)
+		button_str = self.unescape_url(button_str)
 
 		label = gtk.Label(button_str)
 
@@ -3381,7 +3381,7 @@ class Cardapio(dbus.service.Object):
 		align.add(hbox)
 
 		if tooltip:
-			tooltip = self.unescape(tooltip)
+			tooltip = self.unescape_url(tooltip)
 			button.set_tooltip_text(tooltip)
 
 		button.add(align)
@@ -3551,7 +3551,7 @@ class Cardapio(dbus.service.Object):
 
 		dummy, path = urllib2.splittype(self.clicked_app['command'])
 		if os.path.isfile(path): path, dummy = os.path.split(path)
-		path = self.unescape(path)
+		path = self.unescape_url(path)
  		self.create_subfolder_stack(path)
 		self.search_entry.set_text(self.subfolder_stack[-1][1] + '/')
 
@@ -3644,7 +3644,7 @@ class Cardapio(dbus.service.Object):
 			if path_type not in ('computer', 'network', 'trash') and extension != '.desktop':
 
 				# only show if path that exists
-				if os.path.exists(self.unescape(canonical_path)):
+				if os.path.exists(self.unescape_url(canonical_path)):
 					self.open_folder_menuitem.show()
 					self.peek_inside_menuitem.show()
 
@@ -3793,9 +3793,7 @@ class Cardapio(dbus.service.Object):
 		if os.path.exists(command):
 
 			path = DesktopEntry.DesktopEntry(command).getExec()
-
-			# Ugly hack to bypass bug 603485
-			if 'wine' in path: path = path.replace('\\\\','\\')
+			path = self.unescape_string(path)
 
 			# Strip parts of the path that contain %<a-Z>
 
@@ -3821,7 +3819,7 @@ class Cardapio(dbus.service.Object):
 		Open a url, file or folder
 		"""
 
-		path = self.escape_quotes(self.unescape(path))
+		path = self.escape_quotes(self.unescape_url(path))
 		path_type, dummy = urllib2.splittype(path)
 
 		# if the file is executable, ask what to do
@@ -3916,12 +3914,20 @@ class Cardapio(dbus.service.Object):
 		return text
 
 
-	def unescape(self, text):
+	def unescape_url(self, text):
 		"""
 		Clear all sorts of escaping from a URL, like %20 -> [space]
 		"""
 
 		return urllib2.unquote(str(text)) # NOTE: it is possible that with python3 we will have to change this line
+
+
+	def unescape_string(self, text):
+		"""
+		Clear all sorts of escaping from a string, like slash slash -> slash
+		"""
+
+		return text.decode('string-escape')
 
 
 	def untoggle_and_show_all_sections(self):
