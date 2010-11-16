@@ -1807,7 +1807,7 @@ class Cardapio(dbus.service.Object):
 		limit = self.settings['long search results limit']
 		base_text = base_text.lower()
 		
-		for filename in os.listdir(path):
+		for filename in sorted(os.listdir(path), key = str.lower):
 
 			# ignore hidden files
 			if filename[0] == '.': continue

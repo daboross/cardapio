@@ -66,3 +66,155 @@ def getoutput(shell_command):
 def return_true(*dummy): return True
 def return_false(*dummy): return False
 
+
+
+try:
+	import re
+
+except Exception, exception:
+	fatal_error('Fatal error loading Cardapio libraries', exception)
+	sys.exit(1)
+
+class IconHelper:
+
+	def __init__(self):
+
+		self.icon_extension_types = re.compile('.*\.(png|xpm|svg)$')
+		self.icon_theme = gtk.icon_theme_get_default()
+
+		uninstalled_icon_path = '/usr/share/app-install/icons/'
+		if os.path.exists(uninstalled_icon_path):
+			self.icon_theme.append_search_path(uninstalled_icon_path)
+
+		self.icon_theme.connect('changed', self._on_icon_theme_changed)
+
+
+	def get_icon_pixbuf(self, icon_value, icon_size, fallback_icon = 'application-x-executable'):
+		"""
+		Returns a GTK Image from a given icon name and size. The icon name can be
+		either a path or a named icon from the GTK theme.
+		"""
+
+		# TODO: speed this up as much as possible!
+
+		if not icon_value:
+			icon_value = fallback_icon
+
+		icon_pixbuf = None
+		icon_name = icon_value
+
+		if os.path.isabs(icon_value):
+			if os.path.isfile(icon_value):
+				try: icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icon_value, icon_size, icon_size)
+				except: pass
+			icon_name = os.path.basename(icon_value)
+
+		if self.icon_extension_types.match(icon_name) is not None:
+			icon_name = icon_name[:-4]
+
+		if icon_pixbuf is None:
+			cleaned_icon_name = self.get_icon_name_from_theme(icon_name)
+			if cleaned_icon_name is not None:
+				try: icon_pixbuf = self.icon_theme.load_icon(cleaned_icon_name, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
+				except: pass
+
+		if icon_pixbuf is None:
+			for dir_ in BaseDirectory.xdg_data_dirs:
+				for subdir in ('pixmaps', 'icons'):
+					path = os.path.join(dir_, subdir, icon_value)
+					if os.path.isfile(path):
+						try: icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, icon_size, icon_size)
+						except: pass
+
+		if icon_pixbuf is None:
+			icon_pixbuf = self.icon_theme.load_icon(fallback_icon, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
+
+		return icon_pixbuf
+
+
+	def get_icon_name_from_theme(self, icon_name):
+		"""
+		Find out if this icon exists in the theme (such as 'gtk-open'), or if
+		it's a mimetype (such as audio/mpeg, which has an icon audio-mpeg), or
+		if it has a generic mime icon (such as audio-x-generic)
+		"""
+
+		# replace slashed with dashes for mimetype icons
+		cleaned_icon_name = icon_name.replace('/', '-')
+
+		if self.icon_theme.has_icon(cleaned_icon_name):
+			return cleaned_icon_name
+
+		# try generic mimetype
+		gen_type = cleaned_icon_name.split('-')[0]
+		cleaned_icon_name = gen_type + '-x-generic'
+		if self.icon_theme.has_icon(cleaned_icon_name):
+			return cleaned_icon_name
+
+		return None
+
+
+	def get_icon_name_from_path(self, path):
+		"""
+		Gets the icon name for a given path using GIO
+		"""
+
+		info = None
+
+		try:
+			file_ = gio.File(path)
+			info = file_.query_info('standard::icon')
+
+		except Exception, exception:
+			logging.warn('Could not get icon for %s' % path)
+			logging.warn(exception)
+			return None
+
+		if info is not None:
+			icons = info.get_icon().get_property('names')
+			for icon_name in icons:
+				if self.icon_theme.has_icon(icon_name):
+					return icon_name
+
+		return None
+
+
+	def get_icon_name_from_gio_icon(self, gio_icon, icon_size = None):
+		"""
+		Gets the icon name from a GIO icon object
+		"""
+
+		if icon_size == None: icon_size = self.icon_size_app
+
+		try:
+			names = self.icon_theme.lookup_by_gicon(gio_icon, icon_size, 0)
+			if names: return names.get_filename()
+
+		except: pass
+
+		try:
+			for name in gio_icon.get_names():
+				if self.icon_theme.has_icon(name): return name
+
+		except: pass
+
+		return None
+
+
+	def register_icon_theme_listener(self, listener):
+		"""
+		Registed a function to be called when we detect that the icon theme has
+		changed
+		"""
+		self._listener = listener
+
+
+	def _on_icon_theme_changed(self, icon_theme):
+		"""
+		Rebuild the Cardapio UI whenever the icon theme changes
+		"""
+
+		#self.schedule_rebuild
+		self._listener()
+
+
