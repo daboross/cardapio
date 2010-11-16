@@ -1807,12 +1807,15 @@ class Cardapio(dbus.service.Object):
 		limit = self.settings['long search results limit']
 		base_text = base_text.lower()
 		
-		for filename in sorted(os.listdir(path), key = str.lower):
+		if base_text:
+			matches = [f for f in os.listdir(path) if f.lower().find(base_text) != -1]
+		else:
+			matches = os.listdir(path)
+
+		for filename in sorted(matches, key = str.lower):
 
 			# ignore hidden files
 			if filename[0] == '.': continue
-
-			if base_text and filename.lower().find(base_text) == -1: continue
 
 			if count >= limit: 
 				self.add_app_button(_('Show additional results'), 'system-file-manager', self.subfolders_section_contents, 'xdg', path, tooltip = _('Show additional search results in a file browser'), app_list = None)
