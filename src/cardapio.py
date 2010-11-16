@@ -782,16 +782,9 @@ class Cardapio(dbus.service.Object):
 			if 'set_name' in dir(widget):
 				widget.set_name(gtk.Buildable.get_name(widget))
 
-		self.icon_theme = gtk.icon_theme_get_default()
+		self.icon_helper = IconHelper()
+		self.icon_helper.register_icon_theme_listener(self.schedule_rebuild)
 
-		uninstalled_icon_path = '/usr/share/app-install/icons/'
-		if os.path.exists(uninstalled_icon_path):
-			self.icon_theme.append_search_path(uninstalled_icon_path)
-
-		self.icon_theme.connect('changed', self.on_icon_theme_changed)
-		self.icon_size_app = gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
-		self.icon_size_category = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
-		self.icon_size_menu = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
 		self.drag_allowed_cursor = gtk.gdk.Cursor(gtk.gdk.FLEUR)
 
 		self.section_label_attributes = self.get_object('SectionName').get_attributes()
@@ -909,7 +902,7 @@ class Cardapio(dbus.service.Object):
 
 		label_text = self.settings['applet label']
 		self.panel_button.set_label(label_text)
-		button_icon_pixbuf = self.get_icon_pixbuf(self.settings['applet icon'], self.get_best_icon_size_for_panel(), 'distributor-logo')
+		button_icon_pixbuf = self.icon_helper.get_icon_pixbuf(self.settings['applet icon'], self.get_best_icon_size_for_panel(), 'distributor-logo')
 		button_icon = gtk.image_new_from_pixbuf(button_icon_pixbuf)
 		self.panel_button.set_image(button_icon)
 
@@ -1218,7 +1211,7 @@ class Cardapio(dbus.service.Object):
 
 			if is_required : title = '<b>%s</b>' % name
 
-			icon_pixbuf = self.get_icon_pixbuf(plugin_info['category icon'], icon_size, 'package-x-generic')
+			icon_pixbuf = self.icon_helper.get_icon_pixbuf(plugin_info['category icon'], icon_size, 'package-x-generic')
 
 			self.plugin_tree_model.append([basename, name, name, is_active, is_core, not is_required, icon_pixbuf])
 
@@ -1538,14 +1531,6 @@ class Cardapio(dbus.service.Object):
 			return True
 
 
-	def on_icon_theme_changed(self, icon_theme):
-		"""
-		Rebuild the Cardapio UI whenever the icon theme changes
-		"""
-
-		self.schedule_rebuild()
-
-
 	def on_gtk_settings_changed(self, gobj, property_changed):
 		"""
 		Rebuild the Cardapio UI whenever the color scheme or gtk theme change
@@ -1824,7 +1809,7 @@ class Cardapio(dbus.service.Object):
 			count += 1
 
 			command = os.path.join(path, filename)
-			icon_name = self.get_icon_name_from_path(command)
+			icon_name = self.icon_helper.get_icon_name_from_path(command)
 			if icon_name is None: icon_name = 'folder'
 
 			basename, dummy = os.path.splitext(filename)
@@ -2100,10 +2085,10 @@ class Cardapio(dbus.service.Object):
 				icon_name = None
 
 			if icon_name is not None:
-				icon_name = self.get_icon_name_from_theme(icon_name)
+				icon_name = self.icon_helper.get_icon_name_from_theme(icon_name)
 
 			elif result['type'] == 'xdg':
-				icon_name = self.get_icon_name_from_path(result['command'])
+				icon_name = self.icon_helper.get_icon_name_from_path(result['command'])
 
 			if icon_name is None:
 				icon_name = fallback_icon
@@ -2837,7 +2822,7 @@ class Cardapio(dbus.service.Object):
 			if volume is None: continue
 
 			name = volume.get_name()
-			icon_name = self.get_icon_name_from_gio_icon(volume.get_icon())
+			icon_name = self.icon_helper.get_icon_name_from_gio_icon(volume.get_icon())
 
 			try    : command = str(volume.get_mount().get_root().get_uri())
 			except : command = ''
@@ -2979,7 +2964,7 @@ class Cardapio(dbus.service.Object):
 		dummy, canonical_path = urllib2.splittype(folder_path)
 		canonical_path = self.unescape(canonical_path)
 
-		icon_name = self.get_icon_name_from_path(folder_path)
+		icon_name = self.icon_helper.get_icon_name_from_path(folder_path)
 		if icon_name is None: icon_name = folder_icon
 		self.add_app_button(folder_name, icon_name, self.places_section_contents, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
 
@@ -3367,7 +3352,7 @@ class Cardapio(dbus.service.Object):
 		label = gtk.Label(button_str)
 
 		if button_type == Cardapio.APP_BUTTON:
-			icon_size_pixels = self.icon_size_app
+			icon_size_pixels = self.icon_helper.icon_size_app
 			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
 
 			# TODO: figure out how to set max width so that it is the best for
@@ -3378,12 +3363,12 @@ class Cardapio(dbus.service.Object):
 			#label.set_max_width_chars(20)
 
 		elif button_type == Cardapio.CATEGORY_BUTTON or button_type == Cardapio.SIDEPANE_BUTTON:
-			icon_size_pixels = self.icon_size_category
+			icon_size_pixels = self.icon_helper.icon_size_category
 
 		else:
-			icon_size_pixels = self.icon_size_app
+			icon_size_pixels = self.icon_helper.icon_size_app
 
-		icon_pixbuf = self.get_icon_pixbuf(icon_name, icon_size_pixels)
+		icon_pixbuf = self.icon_helper.get_icon_pixbuf(icon_name, icon_size_pixels)
 		icon = gtk.image_new_from_pixbuf(icon_pixbuf)
 
 		hbox = gtk.HBox()
@@ -3440,122 +3425,6 @@ class Cardapio(dbus.service.Object):
 		self.application_pane.pack_start(section_slab, expand = False, fill = False)
 
 		return section_slab, section_contents, label
-
-
-	# MODEL/VIEW SEPARATION EFFORT: view
-	def get_icon_pixbuf(self, icon_value, icon_size, fallback_icon = 'application-x-executable'):
-		"""
-		Returns a GTK Image from a given icon name and size. The icon name can be
-		either a path or a named icon from the GTK theme.
-		"""
-
-		# TODO: speed this up as much as possible!
-
-		if not icon_value:
-			icon_value = fallback_icon
-
-		icon_pixbuf = None
-		icon_name = icon_value
-
-		if os.path.isabs(icon_value):
-			if os.path.isfile(icon_value):
-				try: icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(icon_value, icon_size, icon_size)
-				except: pass
-			icon_name = os.path.basename(icon_value)
-
-		if self.icon_extension_types.match(icon_name) is not None:
-			icon_name = icon_name[:-4]
-
-		if icon_pixbuf is None:
-			cleaned_icon_name = self.get_icon_name_from_theme(icon_name)
-			if cleaned_icon_name is not None:
-				try: icon_pixbuf = self.icon_theme.load_icon(cleaned_icon_name, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
-				except: pass
-
-		if icon_pixbuf is None:
-			for dir_ in BaseDirectory.xdg_data_dirs:
-				for subdir in ('pixmaps', 'icons'):
-					path = os.path.join(dir_, subdir, icon_value)
-					if os.path.isfile(path):
-						try: icon_pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(path, icon_size, icon_size)
-						except: pass
-
-		if icon_pixbuf is None:
-			icon_pixbuf = self.icon_theme.load_icon(fallback_icon, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
-
-		return icon_pixbuf
-
-
-	# MODEL/VIEW SEPARATION EFFORT: view
-	def get_icon_name_from_theme(self, icon_name):
-		"""
-		Find out if this icon exists in the theme (such as 'gtk-open'), or if
-		it's a mimetype (such as audio/mpeg, which has an icon audio-mpeg), or
-		if it has a generic mime icon (such as audio-x-generic)
-		"""
-
-		# replace slashed with dashes for mimetype icons
-		cleaned_icon_name = icon_name.replace('/', '-')
-
-		if self.icon_theme.has_icon(cleaned_icon_name):
-			return cleaned_icon_name
-
-		# try generic mimetype
-		gen_type = cleaned_icon_name.split('-')[0]
-		cleaned_icon_name = gen_type + '-x-generic'
-		if self.icon_theme.has_icon(cleaned_icon_name):
-			return cleaned_icon_name
-
-		return None
-
-
-	# MODEL/VIEW SEPARATION EFFORT: view
-	def get_icon_name_from_path(self, path):
-		"""
-		Gets the icon name for a given path using GIO
-		"""
-
-		info = None
-
-		try:
-			file_ = gio.File(path)
-			info = file_.query_info('standard::icon')
-
-		except Exception, exception:
-			logging.warn('Could not get icon for %s' % path)
-			logging.warn(exception)
-			return None
-
-		if info is not None:
-			icons = info.get_icon().get_property('names')
-			for icon_name in icons:
-				if self.icon_theme.has_icon(icon_name):
-					return icon_name
-
-		return None
-
-
-	# MODEL/VIEW SEPARATION EFFORT: view
-	def get_icon_name_from_gio_icon(self, gio_icon, icon_size = None):
-		"""
-		Gets the icon name from a GIO icon object
-		"""
-
-		if icon_size == None: icon_size = self.icon_size_app
-
-		try:
-			names = self.icon_theme.lookup_by_gicon(gio_icon, icon_size, 0)
-			if names: return names.get_filename()
-
-		except: pass
-
-		try:
-			for name in gio_icon.get_names():
-				if self.icon_theme.has_icon(name): return name
-
-		except: pass
-
-		return None
 
 
 	# MODEL/VIEW SEPARATION EFFORT: controller
@@ -3822,7 +3691,7 @@ class Cardapio(dbus.service.Object):
 			i += 1
 
 			if item_info['icon name'] is not None:
-				icon_pixbuf = self.get_icon_pixbuf(item_info['icon name'], self.icon_size_menu)
+				icon_pixbuf = self.icon_helper.get_icon_pixbuf(item_info['icon name'], self.icon_helper.icon_size_menu)
 				icon = gtk.image_new_from_pixbuf(icon_pixbuf)
 				menu_item.set_image(icon)
 
@@ -3854,7 +3723,7 @@ class Cardapio(dbus.service.Object):
 		Set up drag action (not much goes on here...)
 		"""
 
-		icon_pixbuf = self.get_icon_pixbuf(button.app_info['icon name'], self.icon_size_app)
+		icon_pixbuf = self.icon_helper.get_icon_pixbuf(button.app_info['icon name'], self.icon_helper.icon_size_app)
 		button.drag_source_set_icon_pixbuf(icon_pixbuf)
 
 

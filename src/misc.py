@@ -70,6 +70,8 @@ def return_false(*dummy): return False
 
 try:
 	import re
+	import os
+	import gtk
 
 except Exception, exception:
 	fatal_error('Fatal error loading Cardapio libraries', exception)
@@ -81,6 +83,10 @@ class IconHelper:
 
 		self.icon_extension_types = re.compile('.*\.(png|xpm|svg)$')
 		self.icon_theme = gtk.icon_theme_get_default()
+
+		self.icon_size_app = gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
+		self.icon_size_category = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
+		self.icon_size_menu = gtk.icon_size_lookup(gtk.ICON_SIZE_MENU)[0]
 
 		uninstalled_icon_path = '/usr/share/app-install/icons/'
 		if os.path.exists(uninstalled_icon_path):
