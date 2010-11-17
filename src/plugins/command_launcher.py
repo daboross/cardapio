@@ -31,8 +31,7 @@ class CardapioPlugin (CardapioPluginInterface):
 		self.c = cardapio_proxy
 		
 		try:
-			from os.path import basename
-			from os import environ
+			import os
 			from glob import iglob
 
 		except Exception, exception:
@@ -41,11 +40,10 @@ class CardapioPlugin (CardapioPluginInterface):
 			self.loaded = False
 			return
 
-		self.basename = basename
-		self.environ  = environ
-		self.iglob    = iglob
+		self.os    = os
+		self.iglob = iglob
 		
-		self.pathlist = self.environ['PATH'].split(':')
+		self.pathlist = os.environ['PATH'].split(':')
 
 		self.in_a_terminal         = _('Execute \'%s\' In Terminal')
 		self.in_a_terminal_tooltip = _('Execute the command \'%s\' inside a new terminal window')
@@ -72,67 +70,66 @@ class CardapioPlugin (CardapioPluginInterface):
 		for path in self.pathlist:
 			if num_results >= result_limit: break
 
-			cmd_iter = (self.iglob('%s/%s*' % (path, cmdname)))
+			cmd_iter = self.iglob('%s/%s*' % (path, cmdname))
 
-			while True:
-				if num_results >= result_limit: break
+			while num_results < result_limit:
 
-				try:
-					cmd = self.basename(cmd_iter.next())
-					cmdargs = cmd + args
-					item = {
-						'name'          : '%s%s' % (cmd, args),
-						'tooltip'       : 'Run \'%s%s\'' % (cmd, args),
-						'icon name'     : cmd,
-						'type'          : 'raw',
-						'command'       : '%s%s' % (cmd, args),
-						'context menu'  : [
-							{
-							'name'      : self.in_a_terminal % cmdargs,
-							'tooltip'   : self.in_a_terminal_tooltip % cmdargs,
-							'icon name' : 'utilities-terminal',
-							'type'      : 'raw',
-							'command'   : 'gnome-terminal -x bash -c \"%s%s ; bash\"' % (cmd, args)
-							},
-							{
-							'name'      : self.as_root % cmdargs,
-							'tooltip'   : self.as_root_tooltip % cmdargs,
-							'icon name' : cmd,
-							'type'      : 'raw',
-							'command'   : 'gksudo \"%s%s\"' % (cmd, args)
-							}]
-						}
-					results.append(item)
-					num_results += 1
+				try: cmd = self.os.path.basename(cmd_iter.next())
+				except StopIteration: break
 
-				except StopIteration:
-					break
+				cmdargs = cmd + args
+				item = {
+					'name'          : cmdargs,
+					'tooltip'       : 'Run \'%s\'' % cmdargs,
+					'icon name'     : cmd,
+					'type'          : 'raw',
+					'command'       : cmdargs,
+					'context menu'  : [
+						{
+						'name'      : self.in_a_terminal % cmdargs,
+						'tooltip'   : self.in_a_terminal_tooltip % cmdargs,
+						'icon name' : 'utilities-terminal',
+						'type'      : 'raw',
+						'command'   : 'gnome-terminal -x bash -c \"%s ; bash\"' % cmdargs
+						},
+						{
+						'name'      : self.as_root % cmdargs,
+						'tooltip'   : self.as_root_tooltip % cmdargs,
+						'icon name' : cmd,
+						'type'      : 'raw',
+						'command'   : 'gksudo \"%s\"' % cmdargs
+						}]
+					}
+				results.append(item)
+				num_results += 1
 					
 		results.sort(key = lambda r: r['name'])
 					
-		if not results:
-			results.append({
-				'name'          : text,
-				'tooltip'       : 'Run \'%s\'' % text,
-				'icon name'     : 'system-run',
-				'type'          : 'raw',
-				'command'       : text,
-				'context menu'  : [
-					{
-					'name'      : self.in_a_terminal % text,
-					'tooltip'   : self.in_a_terminal_tooltip % text,
-					'icon name' : 'utilities-terminal',
-					'type'      : 'raw',
-					'command'   : 'gnome-terminal -x bash -c \"%s ; bash\"' % text
-					},
-					{
-					'name'      : self.as_root % text,
-					'tooltip'   : self.as_root_tooltip % text,
-					'icon name' : 'system-run',
-					'type'      : 'raw',
-					'command'   : 'gksudo \"%s\"' % text
-					}]
-				})
+		# Thiago> if the command was not found, don't display anything
+		#
+		# if not results:
+		# 	results.append({
+		# 		'name'          : text,
+		# 		'tooltip'       : 'Run \'%s\'' % text,
+		# 		'icon name'     : 'system-run',
+		# 		'type'          : 'raw',
+		# 		'command'       : text,
+		# 		'context menu'  : [
+		# 			{
+		# 			'name'      : self.in_a_terminal % text,
+		# 			'tooltip'   : self.in_a_terminal_tooltip % text,
+		# 			'icon name' : 'utilities-terminal',
+		# 			'type'      : 'raw',
+		# 			'command'   : 'gnome-terminal -x bash -c \"%s ; bash\"' % text
+		# 			},
+		# 			{
+		# 			'name'      : self.as_root % text,
+		# 			'tooltip'   : self.as_root_tooltip % text,
+		# 			'icon name' : 'system-run',
+		# 			'type'      : 'raw',
+		# 			'command'   : 'gksudo \"%s\"' % text
+		# 			}]
+		# 		})
 
 		self.c.handle_search_result(self, results, self.current_query)
 

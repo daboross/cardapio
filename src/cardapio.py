@@ -451,9 +451,8 @@ class Cardapio(dbus.service.Object):
 			all_plugin_settings[basename]['keyword'] = keyword
 			all_plugin_settings[basename]['show only with keyword'] = show_only_with_keyword
 
-			plugin.basename               = basename
-			plugin.is_running             = False
-			plugin.show_only_with_keyword = show_only_with_keyword
+			plugin.__is_running             = False
+			plugin.__show_only_with_keyword = show_only_with_keyword
 
 			if plugin.search_delay_type is not None:
 				plugin.search_delay_type = plugin.search_delay_type.partition(' search update delay')[0]
@@ -1794,7 +1793,7 @@ class Cardapio(dbus.service.Object):
 		if path is None: return False
 
 		if path == '/': parent_name = _('Filesystem Root')
-		else: dummy, parent_name = os.path.split(path)
+		else: parent_name = os.path.basename(path)
 		self.subfolders_label.set_text(parent_name)
 
 		count = 0
@@ -1933,7 +1932,7 @@ class Cardapio(dbus.service.Object):
 		if specific_plugin is not None:
 
 			plugin = specific_plugin
-			plugin.is_running = True
+			plugin.__is_running = True
 
 			try:
 				self.show_plugin_loading_text(plugin)
@@ -1950,13 +1949,13 @@ class Cardapio(dbus.service.Object):
 
 		for plugin in self.active_plugin_instances:
 
-			if plugin.search_delay_type != delay_type or plugin.show_only_with_keyword:
+			if plugin.search_delay_type != delay_type or plugin.__show_only_with_keyword:
 				continue
 
 			if plugin.hide_from_sidebar and text_is_too_small:
 				continue
 
-			plugin.is_running = True
+			plugin.__is_running = True
 
 			try:
 				self.show_plugin_loading_text(plugin)
@@ -2016,7 +2015,7 @@ class Cardapio(dbus.service.Object):
 
 		for plugin in self.active_plugin_instances:
 
-			if not plugin.is_running: continue
+			if not plugin.__is_running: continue
 			if plugin.search_delay_type != delay_type: continue
 
 			try:
@@ -2049,7 +2048,7 @@ class Cardapio(dbus.service.Object):
 		Handler for when a plugin returns an error
 		"""
 
-		plugin.is_running = False
+		plugin.__is_running = False
 		self.plugin_write_to_log(plugin, text, is_error = True)
 
 		# must be outside the lock!
@@ -2063,7 +2062,7 @@ class Cardapio(dbus.service.Object):
 
 		plugin.section_slab.hide() # for added performance
 
-		plugin.is_running = False
+		plugin.__is_running = False
 		self.plugins_still_searching -= 1
 
 		if plugin.hide_from_sidebar and len(self.current_query) < self.settings['min search string length']:
@@ -2165,7 +2164,7 @@ class Cardapio(dbus.service.Object):
 
 		for plugin in self.active_plugin_instances:
 
-			if not plugin.is_running: continue
+			if not plugin.__is_running: continue
 
 			try:
 				plugin.cancel()
