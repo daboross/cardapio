@@ -75,6 +75,13 @@ def getoutput(shell_command):
 		return False
 
 
+import gc
+
+def get_memory_usage():
+	gc.collect()
+	return getoutput("ps -A -o rss -o cmd | awk '/cardapio / && !/awk/ {print $1}'")
+
+
 def return_true(*dummy): return True
 def return_false(*dummy): return False
 

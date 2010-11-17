@@ -73,11 +73,16 @@ class CardapioPlugin (CardapioPluginInterface):
 		prof_list = ini_file.read().split()
 		ini_file.close()
 		
+		# this was a nested "try" statement, but apparently that caused a memory
+		# leak (wtf!?)
+		exception_thrown = False
 		try:
 			prof_folder = prof_list[prof_list.index('Default=1') - 1].split('=')[1]
 			
 		except ValueError:
+			exception_thrown = True
 			
+		if exception_thrown:
 			try:
 				prof_folder = prof_list[prof_list.index('Name=default') + 2].split('=')[1]
 			
@@ -108,11 +113,14 @@ class CardapioPlugin (CardapioPluginInterface):
 					 WHERE moz_bookmarks.fk = moz_places.id AND moz_places.url NOT LIKE 'place:%'"
 					 
 		c = sql_conn.execute(sql_query)
-		
-		self.item_list = []
+		 
+		# preinitialize the list or there may be a memory leak (wtf!?)
+		if c > 0 : self.item_list = [{}]*c.rowcount
+		else     : self.item_list = []
+
 		try:
-			for row in c:
-				item = {
+			for i in xrange(c.rowcount):
+				self.item_list[i] = {
 						'name'		 : _('%s') % row[0],
 						'tooltip'	  : _('Go To \"%s\"') % row[0] ,
 						'icon name'	: 'html', 
@@ -120,7 +128,6 @@ class CardapioPlugin (CardapioPluginInterface):
 						'command'	  : '%s' % row[1],
 						'context menu' : None,
 						}
-				self.item_list.append(item)
 
 		except Exception, exception:
 			self.c.write_to_log(self, exception, is_error = True)

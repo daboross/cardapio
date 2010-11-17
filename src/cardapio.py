@@ -25,6 +25,7 @@
 from misc import *
 
 try:
+	import gc
 	import os
 	import re
 	import sys
@@ -395,9 +396,6 @@ class Cardapio(dbus.service.Object):
 		"""
 		Initializes plugins in the database if the user's settings say so.
 		"""
-
-		for plugin in self.active_plugin_instances:
-			del(plugin)
 
 		self.active_plugin_instances = []
 		self.keyword_to_plugin_mapping = {}
@@ -869,7 +867,7 @@ class Cardapio(dbus.service.Object):
 		self.safe_cardapio_proxy.ask_for_reload_permission = self.plugin_ask_for_reload_permission
 
 		self.build_plugin_database()
-		self.activate_plugins_from_settings()
+		self.activate_plugins_from_settings() # investigate memory usage here
 
 
 	def get_best_icon_size_for_panel(self):
@@ -1065,7 +1063,7 @@ class Cardapio(dbus.service.Object):
 			self.view_mode_button.hide()
 
 		self.add_subfolders_slab()
-		self.add_all_reorderable_slabs()
+		self.add_all_reorderable_slabs() # possible memory leak here
 
 		# MODEL/VIEW SEPARATION EFFORT:
 		# the methods below mix the model with the view
@@ -1096,6 +1094,8 @@ class Cardapio(dbus.service.Object):
 			self.set_message_window_visible(True)
 
 		self.build_ui()
+
+		gc.collect()
 
 		for plugin in self.active_plugin_instances:
 			glib.idle_add(plugin.on_reload_permission_granted)
@@ -1204,9 +1204,12 @@ class Cardapio(dbus.service.Object):
 		self.plugin_tree_model.clear()
 
 		# place active plugins at the top of the list, in order
+
 		plugin_list = []
 		plugin_list += [basename for basename in self.settings['active plugins']]
-		plugin_list += [basename for basename in self.plugin_database if basename not in plugin_list]
+
+		inactive_plugins = [basename for basename in self.plugin_database if basename not in plugin_list]
+		plugin_list += sorted(inactive_plugins) # TODO: sort by regular name instead of basename
 
 		for basename in plugin_list:
 
@@ -1223,7 +1226,7 @@ class Cardapio(dbus.service.Object):
 
 			self.plugin_tree_model.append([basename, name, name, is_active, is_core, not is_required, icon_pixbuf])
 
-		self.update_plugin_description()
+		#self.update_plugin_description()
 		self.options_dialog.show()
 
 
@@ -1311,7 +1314,7 @@ class Cardapio(dbus.service.Object):
 		while gtk.events_pending():
 			gtk.main_iteration()
 
-		self.activate_plugins_from_settings()
+		self.activate_plugins_from_settings() # investigate memory usage here
 		self.options_dialog.window.set_cursor(None)
 
 		self.schedule_rebuild()
@@ -1693,6 +1696,7 @@ class Cardapio(dbus.service.Object):
 		self.consider_showing_no_results_text()
 
 
+
 	def search_menus(self, text, app_list):
 		"""
 		Start a menu search
@@ -1976,9 +1980,8 @@ class Cardapio(dbus.service.Object):
 
 		container = plugin.section_contents.parent
 
-		if container is None:
-			# plugin was deactivated while waiting for search result
-			return False
+		# if plugin was deactivated while waiting for search result
+		if container is None: return False
 
 		container.remove(plugin.section_contents)
 		plugin.section_contents = gtk.VBox()
@@ -2473,10 +2476,15 @@ class Cardapio(dbus.service.Object):
 		main_window_width, main_window_height = self.window.get_size()
 		message_width, message_height = self.message_window.get_size()
 
+		x, y = self.window.get_position()
+		x, y, invert_xaxis, invert_yaxis = self.get_coordinates_inside_screen(self.window, x, y)
+
 		offset_x = (main_window_width - message_width) / 2
 		offset_y = (main_window_height - message_height) / 2
 
-		x, y = self.choose_coordinates_for_window(self.message_window)
+		if invert_xaxis: offset_x = -offset_x
+		if invert_yaxis: offset_y = -offset_y
+
 		self.message_window.move(x + offset_x, y + offset_y)
 
 		self.message_window.set_keep_above(True)
@@ -2595,6 +2603,8 @@ class Cardapio(dbus.service.Object):
 			self.search_entry.set_text(self.current_query)
 
 		self.cancel_all_plugins()
+
+		logging.info('Memory usage: ' + get_memory_usage())
 
 		return False # used for when hide() is called from a timer
 
@@ -3215,7 +3225,7 @@ class Cardapio(dbus.service.Object):
 		for basename in self.settings['active plugins']:
 
 			if basename == 'applications':
-				self.build_applications_list()
+				self.build_applications_list() # possible memory leak here
 				self.add_uncategorized_slab()
 				self.add_session_slab()
 				self.add_system_slab()
