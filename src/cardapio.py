@@ -2604,7 +2604,7 @@ class Cardapio(dbus.service.Object):
 
 		self.cancel_all_plugins()
 
-		logging.info('Memory usage: ' + get_memory_usage())
+		logging.info('(RSS = %s)' % get_memory_usage())
 
 		return False # used for when hide() is called from a timer
 
