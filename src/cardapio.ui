@@ -61,6 +61,7 @@
                                         <property name="top_padding">4</property>
                                         <child>
                                           <object class="GtkEntry" id="TopLeftSearchEntry">
+                                            <property name="width_request">1</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="invisible_char">•</property>
@@ -294,6 +295,7 @@
                                         <property name="top_padding">4</property>
                                         <child>
                                           <object class="GtkEntry" id="BottomLeftSearchEntry">
+                                            <property name="width_request">1</property>
                                             <property name="visible">True</property>
                                             <property name="can_focus">True</property>
                                             <property name="invisible_char">•</property>
@@ -349,6 +351,7 @@
                                 <property name="bottom_padding">4</property>
                                 <child>
                                   <object class="GtkEntry" id="TopRightSearchEntry">
+                                    <property name="width_request">1</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="invisible_char">•</property>
@@ -452,6 +455,7 @@
                                 <property name="top_padding">4</property>
                                 <child>
                                   <object class="GtkEntry" id="BottomRightSearchEntry">
+                                    <property name="width_request">1</property>
                                     <property name="visible">True</property>
                                     <property name="can_focus">True</property>
                                     <property name="invisible_char">•</property>
