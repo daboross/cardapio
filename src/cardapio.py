@@ -22,9 +22,9 @@
 # TODO: add "most recent" and "most frequent" with a zeitgeist plugin
 # plus other TODO's elsewhere in the code...
 
-from misc import *
-
 try:
+	from misc import *
+
 	import gc
 	import os
 	import re
@@ -39,6 +39,7 @@ try:
 	import logging
 	import platform
 	import keybinder
+	import traceback
 	import subprocess
 	import dbus, dbus.service
 
@@ -183,8 +184,21 @@ class Cardapio(dbus.service.Object):
 
 		self.home_folder_path = os.path.abspath(os.path.expanduser('~'))
 
-		self.read_config_file()
+		logging.info('Loading settings...')
+		try:
+			self.settings = SettingsHelper(self.config_folder_path)
+		except Exception, ex:
+			msg = 'unable to read settings: ' + str(ex)
 
+			# TODO: is this too much? maybe the fatal_error should also do
+			# the traceback?
+			logging.error(msg)
+			fatal_error('Settings error', msg)
+			traceback.print_exc()
+
+			sys.exit(1)
+		logging.info('               ...done loading!')
+			
 		self.panel_applet                  = panel_applet
 		self.panel_button                  = panel_button
 		self.last_visibility_toggle        = 0
@@ -216,6 +230,7 @@ class Cardapio(dbus.service.Object):
 		self.bookmark_monitor              = None
 		self.volume_monitor                = None
 
+		# TODO: this is now in the IconHelper and can be deleted here, right?
 		self.icon_extension_types = re.compile('.*\.(png|xpm|svg)$')
 
 		self.sys_tree = gmenu.lookup_tree('gnomecc.menu')
@@ -254,10 +269,6 @@ class Cardapio(dbus.service.Object):
 		if   show == Cardapio.SHOW_NEAR_MOUSE: self.show_hide_near_mouse()
 		elif show == Cardapio.SHOW_CENTERED  : self.show()
 
-		# this is useful so that the user can edit the config file on first-run
-		# without need to quit cardapio first:
-		self.save_config_file()
-
 		if gnome_program_init is not None:
 			gnome_program_init('', self.version) # Prints a warning to the screen. Ignore it.
 			client = gnome_ui_master_client()
@@ -279,7 +290,11 @@ class Cardapio(dbus.service.Object):
 		Saves the current state and quits
 		"""
 
-		self.save_config_file()
+		try:
+			self.settings.save()
+		except Exception, ex:
+			logging.error('error while saving settings: %s' % ex)
+
 		self.quit_now()
 
 
@@ -559,179 +574,6 @@ class Cardapio(dbus.service.Object):
 		elif not os.path.isdir(self.cache_folder_path):
 			logging.error('Error! Cannot create folder "%s" because a file with that name already exists!' % self.cache_folder_path)
 			self.quit_now()
-
-
-	def get_config_file(self, mode):
-		"""
-		Returns a file handler to Cardapio's config file.
-		"""
-
-		old_config_file_path = os.path.join(self.config_folder_path, 'config.ini')
-		config_file_path = os.path.join(self.config_folder_path, 'config.json')
-
-		if not os.path.exists(config_file_path):
-
-			if os.path.exists(old_config_file_path):
-				os.rename(old_config_file_path, config_file_path)
-				os.remove(os.path.join(self.config_folder_path, 'cardapio.log'))
-			else:
-				open(config_file_path, 'w+')
-
-		elif not os.path.isfile(config_file_path):
-			logging.error('Error! Cannot create file "%s" because a folder with that name already exists!' % config_file_path)
-			self.quit_now()
-
-		try:
-			config_file = open(config_file_path, mode)
-
-		except Exception, exception:
-			logging.error('Could not read config file "%s":' % config_file_path)
-			logging.error(exception)
-			config_file = None
-
-		return config_file
-
-
-	def read_config_file(self):
-		"""
-		Reads Cardapio's config file and builds the self.settings dict
-		"""
-
-		config_file = self.get_config_file('r')
-
-		self.settings = {}
-		s = {}
-
-		try:
-			s = json.load(config_file)
-
-		except Exception, exception:
-			logging.error('Could not read config file:')
-			logging.error(exception)
-
-		finally:
-			config_file.close()
-
-		default_side_pane_items = []
-		path = which('software-center')
-		if path is not None:
-			default_side_pane_items.append(
-				{
-					'name'      : _('Ubuntu Software Center'),
-					'icon name' : 'softwarecenter',
-					'tooltip'   : _('Lets you choose from thousands of free applications available for Ubuntu'),
-					'type'      : 'raw',
-					'command'   : 'software-center',
-				})
-
-		default_side_pane_items.append(
-			{
-				'name'      : _('Help and Support'),
-				'icon name' : 'help-contents',
-				'tooltip'   : _('Get help with %(distro_name)s') % {'distro_name':Cardapio.distro_name},
-				'type'      : 'raw',
-				'command'   : 'gnome-help',
-			})
-
-		self.read_config_option(s, 'window size'                , None                     ) # format: [px, px]
-		self.read_config_option(s, 'mini mode'                  , False                    ) # bool
-		self.read_config_option(s, 'splitter position'          , 0                        ) # int, position in pixels
-		self.read_config_option(s, 'show session buttons'       , False                    ) # bool
-		self.read_config_option(s, 'keep search results'        , False                    ) # bool
-		self.read_config_option(s, 'open on hover'              , False                    ) # bool
-		self.read_config_option(s, 'open categories on hover'   , False                    ) # bool
-		self.read_config_option(s, 'min search string length'   , 3                        ) # int, number of characters
-		self.read_config_option(s, 'menu rebuild delay'         , 3                        , force_update_from_version = [0,9,96]) # seconds
-		self.read_config_option(s, 'search results limit'       , 5                        ) # int, number of results
-		self.read_config_option(s, 'long search results limit'  , 15                       ) # int, number of results
-		self.read_config_option(s, 'local search update delay'  , 100                      , force_update_from_version = [0,9,96]) # msec
-		self.read_config_option(s, 'remote search update delay' , 250                      , force_update_from_version = [0,9,96]) # msec
-		self.read_config_option(s, 'local search timeout'       , 3000                     ) # msec
-		self.read_config_option(s, 'remote search timeout'      , 5000                     ) # msec
-		self.read_config_option(s, 'autohide delay'             , 250                      ) # msec
-		self.read_config_option(s, 'keybinding'                 , '<Super>space'           ) # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
-		self.read_config_option(s, 'applet label'               , _('Menu')                ) # string
-		self.read_config_option(s, 'applet icon'                , 'start-here'             , override_empty_str = True) # string (either a path to the icon, or an icon name)
-		self.read_config_option(s, 'pinned items'               , []                       )
-		self.read_config_option(s, 'side pane items'            , default_side_pane_items  )
-		self.read_config_option(s, 'active plugins'             , ['pinned', 'places', 'applications', 'tracker', 'google', 'command_launcher'])
-		self.read_config_option(s, 'plugin settings'            , {}                       )
-
-		# these are a bit of a hack:
-		self.read_config_option(s, 'handler for ftp paths'      , r"nautilus '%s'"         ) # a command line using %s
-		self.read_config_option(s, 'handler for sftp paths'     , r"nautilus '%s'"         ) # a command line using %s
-		self.read_config_option(s, 'handler for smb paths'      , r"nautilus '%s'"         ) # a command line using %s
-		# (see https://bugs.launchpad.net/bugs/593141)
-
-		self.settings['cardapio version'] = self.version
-
-
-		# clean up the config file whenever options are changed between versions
-
-		# 'side pane' used to be called 'system pane'
-		if 'system pane' in self.settings:
-			self.settings['side pane'] = self.settings['system pane']
-			self.settings.pop('system pane')
-
-		# 'None' used to be the 'applications' plugin
-		if None in self.settings['active plugins']:
-			i = self.settings['active plugins'].index(None)
-			self.settings['active plugins'][i] = 'applications'
-
-		# make sure required plugins are in the plugin list
-		for required_plugin in self.required_plugins:
-
-			if required_plugin not in self.settings['active plugins']:
-				self.settings['active plugins'] = [required_plugin] + self.settings['active plugins']
-
-		# make sure plugins only appear once in the plugin list
-		for plugin_name in self.settings['active plugins']:
-
-			while len([basename for basename in self.settings['active plugins'] if basename == plugin_name]) > 1:
-				self.settings['active plugins'].remove(plugin_name)
-
-
-	def read_config_option(self, user_settings, key, val, override_empty_str = False, force_update_from_version = None):
-		"""
-		Reads the config option 'key' from a the 'user_settings' dict, using
-		'val' as a fallback.
-		"""
-
-		if key in user_settings:
-			if override_empty_str and len(user_settings[key]) == 0:
-				self.settings[key] = val
-			else:
-				self.settings[key] = user_settings[key]
-		else:
-			self.settings[key] = val
-
-		if force_update_from_version is not None:
-
-			if 'cardapio version' in user_settings:
-				settings_version = [int(i) for i in user_settings['cardapio version'].split('.')]
-
-			else:
-				settings_version = 0
-
-			if settings_version <= force_update_from_version:
-
-				self.settings[key] = val
-
-
-	def save_config_file(self):
-		"""
-		Saves the self.settings dict into the config file
-		"""
-
-		config_file = self.get_config_file('w')
-
-		if config_file is None:
-			logging.error('Could not load config file for saving settings')
-			return
-
-		logging.info('Saving config file...')
-		json.dump(self.settings, config_file, sort_keys = True, indent = 4)
-		logging.info('                  ...done!')
 
 
 	def setup_base_ui(self):
@@ -1236,7 +1078,11 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.options_dialog.hide()
-		self.save_config_file()
+		try:
+			self.settings.save()
+		except Exception, ex:
+			logging.error('error while saving settings: %s' % ex)
+
 		return True
 
 
