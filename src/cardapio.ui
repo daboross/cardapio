@@ -555,6 +555,7 @@
                 <property name="height_request">4</property>
                 <property name="visible">True</property>
                 <signal name="button_press_event" handler="start_resize"/>
+                <signal name="button_release_event" handler="end_resize"/>
                 <child>
                   <placeholder/>
                 </child>
@@ -570,6 +571,7 @@
                 <property name="height_request">4</property>
                 <property name="visible">True</property>
                 <signal name="button_press_event" handler="start_resize"/>
+                <signal name="button_release_event" handler="end_resize"/>
                 <child>
                   <placeholder/>
                 </child>
@@ -587,6 +589,7 @@
                 <property name="width_request">4</property>
                 <property name="visible">True</property>
                 <signal name="button_press_event" handler="start_resize"/>
+                <signal name="button_release_event" handler="end_resize"/>
                 <child>
                   <placeholder/>
                 </child>
@@ -602,6 +605,7 @@
                 <property name="width_request">4</property>
                 <property name="visible">True</property>
                 <signal name="button_press_event" handler="start_resize"/>
+                <signal name="button_release_event" handler="end_resize"/>
                 <child>
                   <placeholder/>
                 </child>
@@ -620,6 +624,7 @@
                 <property name="height_request">4</property>
                 <property name="visible">True</property>
                 <signal name="button_press_event" handler="start_resize"/>
+                <signal name="button_release_event" handler="end_resize"/>
                 <child>
                   <placeholder/>
                 </child>
@@ -637,6 +642,7 @@
                 <property name="height_request">4</property>
                 <property name="visible">True</property>
                 <signal name="button_press_event" handler="start_resize"/>
+                <signal name="button_release_event" handler="end_resize"/>
                 <child>
                   <placeholder/>
                 </child>
@@ -656,6 +662,7 @@
                 <property name="height_request">4</property>
                 <property name="visible">True</property>
                 <signal name="button_press_event" handler="start_resize"/>
+                <signal name="button_release_event" handler="end_resize"/>
                 <child>
                   <placeholder/>
                 </child>
@@ -673,6 +680,7 @@
                 <property name="height_request">4</property>
                 <property name="visible">True</property>
                 <signal name="button_press_event" handler="start_resize"/>
+                <signal name="button_release_event" handler="end_resize"/>
                 <child>
                   <placeholder/>
                 </child>

@@ -397,6 +397,9 @@ class Cardapio(dbus.service.Object):
 		Initializes plugins in the database if the user's settings say so.
 		"""
 
+		for basename in self.plugin_database:
+			self.plugin_database[basename]['instance'] = None
+
 		self.active_plugin_instances = []
 		self.keyword_to_plugin_mapping = {}
 
@@ -1226,7 +1229,7 @@ class Cardapio(dbus.service.Object):
 
 			self.plugin_tree_model.append([basename, name, name, is_active, is_core, not is_required, icon_pixbuf])
 
-		#self.update_plugin_description()
+		self.update_plugin_description()
 		self.options_dialog.show()
 
 
@@ -1424,6 +1427,16 @@ class Cardapio(dbus.service.Object):
 		self.window.window.begin_resize_drag(edge, event.button, x, y, event.time)
 
 
+	def end_resize(self):
+		"""
+		This function is called when the user releases the mouse after resizing the
+		Cardapio window.
+		"""
+
+		self.save_dimensions()
+		self.unblock_focus_out_event()
+
+
 	def block_focus_out_event(self):
 		"""
 		Blocks the focus-out event
@@ -1526,7 +1539,7 @@ class Cardapio(dbus.service.Object):
 		If using 'open on hover', this hides the Cardapio window after a delay.
 		"""
 
-		if self.settings['open on hover']:
+		if self.settings['open on hover'] and not self.focus_out_blocked:
 			glib.timeout_add(self.settings['autohide delay'], self.hide_if_mouse_away)
 			self.save_dimensions()
 
@@ -1694,7 +1707,6 @@ class Cardapio(dbus.service.Object):
 			self.all_system_sections_sidebar_button.set_sensitive(True)
 
 		self.consider_showing_no_results_text()
-
 
 
 	def search_menus(self, text, app_list):
@@ -2496,6 +2508,15 @@ class Cardapio(dbus.service.Object):
 			gtk.main_iteration()
 
 
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = 'b')
+	def is_cardapio_decorated(self):
+		"""
+		Returns a flag saying whether Cardapio's window is decorated.
+		"""
+
+		return self.window.get_decorated()
+
+
 	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
 	def show_hide(self):
 		"""
@@ -2613,6 +2634,8 @@ class Cardapio(dbus.service.Object):
 		"""
 		Hide the window if the cursor is *not* on top of it
 		"""
+
+		if self.focus_out_blocked: return
 
 		root_window = gtk.gdk.get_default_root_window()
 		mouse_x, mouse_y, dummy = root_window.get_pointer()

@@ -78,6 +78,21 @@ class DockySettingsHelper:
 
 		return self.gconf_client.get_string(self.docky_iface_gconf_root + dock + '/Position')
 
+	def is_in_panel_mode(self, dock):
+		"""
+		Returns a flag saying whether the given dock is in panel mode.
+		"""
+
+		return self.gconf_client.get_bool(self.docky_iface_gconf_root + dock + '/PanelMode')
+
+	def is_showing_hovers(self):
+		"""
+		Returns a flag saying whether Docky is configured to show
+		hovers (tooltips).
+		"""
+
+		return self.gconf_client.get_bool(self.docky_gconf_root + '/Items/WnckDockItem/ShowHovers')
+
 
 	def get_horizontal_offset(self, dock):
 		"""
@@ -86,28 +101,36 @@ class DockySettingsHelper:
 		mode.
 		"""
 
-		return 10 if self.gconf_client.get_bool(self.docky_iface_gconf_root + dock + '/PanelMode') else 20
+		return 20 if self.is_in_panel_mode(dock) else 30
 
 
-	def get_vertical_offset(self, position, dock):
+	def get_vertical_offset(self, dock, position, is_decorated):
 		"""
 		Returns the vertical offset necessary to avoid overlapping of Cardapio launchers'
 		tooltip	with Cardapio's window. The offset depends on whether the dock is in panel
-		mode and on it's position (on top it's lower because the decoration bar pushes
-		Cardapio down only when it's near the bottom of the screen).
+		mode, whether it's showing hovers and whether Cardapio is decorated.
 		"""
+		
+		# initial offset
+		offset = 12 if self.is_in_panel_mode(dock) else 35
 
-		if position == 'Bottom':
-			return 55 if self.gconf_client.get_bool(self.docky_iface_gconf_root + dock + '/PanelMode') else 90
-		else:
-			return 30 if self.gconf_client.get_bool(self.docky_iface_gconf_root + dock + '/PanelMode') else 60
+		# higher if the launcher's on the bottom dock and Cardapio's decorated
+		if position == 'Bottom' and is_decorated:
+			offset += 25
+
+		# higher if Docky's showing hovers
+		if self.is_showing_hovers():
+			offset += 30
+
+		return offset
 
 
-	def get_best_position(self, dock_num):
+	def get_best_position(self, dock_num, is_decorated):
 		"""
 		Determines the best (x, y) position for Cardapio in docky-mode.
 		Takes things like Docky's orientation, it's size or zoom mode
-		into account.
+		into account. Also, requires a parameter saying whether Cardapio's
+		window is decorated.
 		"""
 
 		# properties of our dock
@@ -121,7 +144,7 @@ class DockySettingsHelper:
 
 		# offsets from screen's borders
 		horizontal_offset = self.get_horizontal_offset(dock_num)
-		vertical_offset = self.get_vertical_offset(position, dock_num)
+		vertical_offset = self.get_vertical_offset(dock_num, position, is_decorated)
 
 		# calculating final position...
 		if position == 'Bottom':
