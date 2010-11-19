@@ -825,6 +825,8 @@ class Cardapio(dbus.service.Object):
 		self.get_object('MarginBottomLeft').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_LEFT_CORNER))
 		self.get_object('MarginBottomRight').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_RIGHT_CORNER))
 
+		about_distro_label = _('_About %(distro_name)s') % {'distro_name' : Cardapio.distro_name}
+
 		self.context_menu_xml = '''
 			<popup name="button3">
 				<menuitem name="Item 1" verb="Properties" label="%s" pixtype="stock" pixname="gtk-properties"/>
@@ -839,8 +841,11 @@ class Cardapio(dbus.service.Object):
 				_('_Edit Menus'),
 				_('_About Cardapio'),
 				_('_About Gnome'),
-				_('_About %(distro_name)s') % {'distro_name' : Cardapio.distro_name}
+				about_distro_label
 			)
+
+		# dynamic translation of MenuItem defined in .ui file
+		self.get_object('AboutDistroMenuItem').set_label(about_distro_label)
 
 		self.context_menu_verbs = [
 			('Properties', self.open_options_dialog),
@@ -855,6 +860,8 @@ class Cardapio(dbus.service.Object):
 			self.window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
 			self.get_object('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
 		else:
+			self.get_object('AboutGnomeMenuItem').set_visible(False)
+			self.get_object('AboutDistroMenuItem').set_visible(False)
 			self.panel_applet.connect('destroy', self.quit)
 
 
@@ -1134,14 +1141,21 @@ class Cardapio(dbus.service.Object):
 		return response
 
 
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
-	def open_about_cardapio_dialog(self):
+	def open_about_gnome_dialog(self, widget):
 		"""
-		Opens the "About Cardapio" dialog. This method is d-bus
-		accessible.
+		Opens the "About Gnome" dialog.
 		"""
-		self.open_about_dialog(None, 'AboutCardapio')
-	
+
+		self.open_about_dialog(widget, 'AboutGnome')
+
+
+	def open_about_distro_dialog(self, widget):
+		"""
+		Opens the "About %distro%" dialog
+		"""
+
+		self.open_about_dialog(widget, 'AboutDistro')
+
 
 	def open_about_dialog(self, widget, verb = None):
 		"""
@@ -1188,11 +1202,10 @@ class Cardapio(dbus.service.Object):
 		widget.handler_unblock_by_func(self.on_options_changed)
 
 
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
 	def open_options_dialog(self, *dummy):
 		"""
 		Show the Options Dialog and populate its widgets with values from the
-		user's settings (self.settings). This method is d-bus accessible.
+		user's settings (self.settings).
 		"""
 
 		self.set_widget_from_option('OptionKeybinding', 'keybinding')
@@ -3515,10 +3528,9 @@ class Cardapio(dbus.service.Object):
 
 
 	# MODEL/VIEW SEPARATION EFFORT: controller
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
 	def launch_edit_app(self, *dummy):
 		"""
-		Opens Gnome's menu editor. This method is d-bus accessible.
+		Opens Gnome's menu editor.
 		"""
 
 		self.launch_raw('alacarte')

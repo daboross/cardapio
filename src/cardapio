@@ -101,19 +101,18 @@ if len(sys.argv) == 2:
 
 			try:
 				settings_helper = DockySettingsHelper()
-				dock_num = settings_helper.get_dock_for_this_helper()
+				dock_num = settings_helper.get_main_dock()
 
 				x, y = settings_helper.get_best_position(dock_num, is_decorated())
 				show_hide(x, y)
 
-			except LauncherError:
-				# doesn't work if we didn't find the launcher or found more than one
-				fatal_error('Cardapio error!', 'You should have exactly one Cardapio launcher on your docks.')
+			except MainDockError:
+				fatal_error('Cardapio error!', "Couldn't find the main dock of Docky!")
 
 else:
 
 	from cardapio import AppletFactory
 
-	gnomeapplet.bonobo_factory('OAFIID:GNOME_Cardapio_Factory', 
+	gnomeapplet.bonobo_factory('OAFIID:GNOME_Cardapio_Factory',
 			gnomeapplet.Applet.__gtype__, 'Cardapio', '0', AppletFactory)
 

@@ -1298,6 +1298,23 @@ Rebuilding…</property>
         <signal name="activate" handler="open_about_dialog"/>
       </object>
     </child>
+    <child>
+      <object class="GtkImageMenuItem" id="AboutGnomeMenuItem">
+        <property name="label">_About Gnome</property>
+        <property name="visible">True</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
+        <signal name="activate" handler="open_about_gnome_dialog"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="AboutDistroMenuItem">
+        <property name="visible">True</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
+        <signal name="activate" handler="open_about_distro_dialog"/>
+      </object>
+    </child>
   </object>
   <object class="GtkMenu" id="AppContextMenu">
     <property name="visible">True</property>
