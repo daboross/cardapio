@@ -737,7 +737,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <child>
-                  <object class="GtkAlignment" id="GeneralAppletOptionPane">
+                  <object class="GtkAlignment" id="GeneralOptionPane">
                     <property name="visible">True</property>
                     <property name="top_padding">10</property>
                     <property name="bottom_padding">10</property>
@@ -748,7 +748,7 @@
                         <property name="visible">True</property>
                         <property name="spacing">15</property>
                         <child>
-                          <object class="GtkFrame" id="GeneralOptionPane">
+                          <object class="GtkFrame" id="AppearanceOptionPane">
                             <property name="visible">True</property>
                             <property name="label_xalign">0</property>
                             <property name="shadow_type">none</property>
@@ -762,23 +762,27 @@
                                 <child>
                                   <object class="GtkTable" id="table1">
                                     <property name="visible">True</property>
-                                    <property name="n_rows">5</property>
+                                    <property name="n_rows">2</property>
                                     <property name="n_columns">2</property>
                                     <property name="column_spacing">5</property>
                                     <property name="row_spacing">5</property>
                                     <child>
-                                      <object class="GtkLabel" id="label6">
+                                      <object class="GtkCheckButton" id="OptionSessionButtons">
+                                        <property name="label" translatable="yes">Show session buttons in bottom pane</property>
                                         <property name="visible">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="label" translatable="yes">Shortcut key:</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
+                                        <property name="draw_indicator">True</property>
+                                        <signal name="toggled" handler="on_options_changed"/>
                                       </object>
                                       <packing>
+                                        <property name="right_attach">2</property>
                                         <property name="y_options"></property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkCheckButton" id="OptionSessionButtons">
-                                        <property name="label" translatable="yes">Show session buttons in bottom pane</property>
+                                      <object class="GtkCheckButton" id="OptionMiniMode">
+                                        <property name="label" translatable="yes">Reduce the size of Cardapio's main window</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
@@ -792,19 +796,49 @@
                                         <property name="y_options"></property>
                                       </packing>
                                     </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child type="label">
+                              <object class="GtkLabel" id="label4">
+                                <property name="visible">True</property>
+                                <property name="label" translatable="yes">&lt;b&gt;Appearance&lt;/b&gt;</property>
+                                <property name="use_markup">True</property>
+                              </object>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkFrame" id="GeneralOptionPane1">
+                            <property name="visible">True</property>
+                            <property name="label_xalign">0</property>
+                            <property name="shadow_type">none</property>
+                            <child>
+                              <object class="GtkAlignment" id="alignment2">
+                                <property name="visible">True</property>
+                                <property name="top_padding">5</property>
+                                <property name="bottom_padding">5</property>
+                                <property name="left_padding">10</property>
+                                <property name="right_padding">5</property>
+                                <child>
+                                  <object class="GtkTable" id="table4">
+                                    <property name="visible">True</property>
+                                    <property name="n_rows">3</property>
+                                    <property name="n_columns">2</property>
+                                    <property name="column_spacing">5</property>
+                                    <property name="row_spacing">5</property>
                                     <child>
-                                      <object class="GtkCheckButton" id="OptionKeepResults">
-                                        <property name="label" translatable="yes">Keep search results when Cardapio is hidden</property>
+                                      <object class="GtkLabel" id="label2">
                                         <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="receives_default">False</property>
-                                        <property name="draw_indicator">True</property>
-                                        <signal name="toggled" handler="on_options_changed"/>
+                                        <property name="xalign">0</property>
+                                        <property name="label" translatable="yes">Shortcut key:</property>
                                       </object>
                                       <packing>
-                                        <property name="right_attach">2</property>
-                                        <property name="top_attach">2</property>
-                                        <property name="bottom_attach">3</property>
                                         <property name="y_options"></property>
                                       </packing>
                                     </child>
@@ -822,125 +856,24 @@
                                       </packing>
                                     </child>
                                     <child>
+                                      <object class="GtkCheckButton" id="OptionKeepResults">
+                                        <property name="label" translatable="yes">Keep search results when Cardapio is hidden</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
+                                        <property name="draw_indicator">True</property>
+                                        <signal name="toggled" handler="on_options_changed"/>
+                                      </object>
+                                      <packing>
+                                        <property name="right_attach">2</property>
+                                        <property name="top_attach">1</property>
+                                        <property name="bottom_attach">2</property>
+                                        <property name="y_options"></property>
+                                      </packing>
+                                    </child>
+                                    <child>
                                       <object class="GtkCheckButton" id="OptionOpenCategoriesOnHover">
                                         <property name="label" translatable="yes">Open categories when cursor hovers them</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="receives_default">False</property>
-                                        <property name="draw_indicator">True</property>
-                                        <signal name="toggled" handler="on_options_changed"/>
-                                      </object>
-                                      <packing>
-                                        <property name="right_attach">2</property>
-                                        <property name="top_attach">3</property>
-                                        <property name="bottom_attach">4</property>
-                                        <property name="y_options"></property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkCheckButton" id="OptionMiniMode">
-                                        <property name="label" translatable="yes">Reduce the size of Cardapio's main window</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="receives_default">False</property>
-                                        <property name="draw_indicator">True</property>
-                                        <signal name="toggled" handler="on_options_changed"/>
-                                      </object>
-                                      <packing>
-                                        <property name="right_attach">2</property>
-                                        <property name="top_attach">4</property>
-                                        <property name="bottom_attach">5</property>
-                                        <property name="y_options"></property>
-                                      </packing>
-                                    </child>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
-                            <child type="label">
-                              <object class="GtkLabel" id="label4">
-                                <property name="visible">True</property>
-                                <property name="label" translatable="yes">&lt;b&gt;Main window&lt;/b&gt;</property>
-                                <property name="use_markup">True</property>
-                              </object>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkFrame" id="AppletOptionPane">
-                            <property name="visible">True</property>
-                            <property name="label_xalign">0</property>
-                            <property name="shadow_type">none</property>
-                            <child>
-                              <object class="GtkAlignment" id="alignment5">
-                                <property name="visible">True</property>
-                                <property name="top_padding">5</property>
-                                <property name="bottom_padding">5</property>
-                                <property name="left_padding">10</property>
-                                <property name="right_padding">5</property>
-                                <child>
-                                  <object class="GtkTable" id="table2">
-                                    <property name="visible">True</property>
-                                    <property name="n_rows">3</property>
-                                    <property name="n_columns">2</property>
-                                    <property name="column_spacing">5</property>
-                                    <property name="row_spacing">5</property>
-                                    <child>
-                                      <object class="GtkLabel" id="LabelAppletLabel">
-                                        <property name="visible">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="label" translatable="yes">Applet label:</property>
-                                      </object>
-                                      <packing>
-                                        <property name="y_options"></property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkEntry" id="OptionAppletLabel">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="invisible_char">•</property>
-                                        <signal name="focus_out_event" handler="on_options_changed"/>
-                                      </object>
-                                      <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="right_attach">2</property>
-                                        <property name="y_options"></property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel" id="LabelAppletIcon">
-                                        <property name="visible">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="label" translatable="yes">Applet icon:</property>
-                                      </object>
-                                      <packing>
-                                        <property name="top_attach">1</property>
-                                        <property name="bottom_attach">2</property>
-                                        <property name="y_options"></property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkEntry" id="OptionAppletIcon">
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="invisible_char">•</property>
-                                        <signal name="focus_out_event" handler="on_options_changed"/>
-                                      </object>
-                                      <packing>
-                                        <property name="left_attach">1</property>
-                                        <property name="right_attach">2</property>
-                                        <property name="top_attach">1</property>
-                                        <property name="bottom_attach">2</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkCheckButton" id="OptionOpenOnHover">
-                                        <property name="label" translatable="yes">Open menu when cursor hovers the applet</property>
                                         <property name="visible">True</property>
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
@@ -959,9 +892,9 @@
                               </object>
                             </child>
                             <child type="label">
-                              <object class="GtkLabel" id="label8">
+                              <object class="GtkLabel" id="label3">
                                 <property name="visible">True</property>
-                                <property name="label" translatable="yes">&lt;b&gt;Panel applet&lt;/b&gt;</property>
+                                <property name="label" translatable="yes">&lt;b&gt;Behavior&lt;/b&gt;</property>
                                 <property name="use_markup">True</property>
                               </object>
                             </child>
@@ -985,10 +918,104 @@
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="GtkAlignment" id="AppletOptionPane">
+                    <property name="visible">True</property>
+                    <property name="top_padding">10</property>
+                    <property name="bottom_padding">10</property>
+                    <property name="left_padding">5</property>
+                    <property name="right_padding">5</property>
+                    <child>
+                      <object class="GtkTable" id="table2">
+                        <property name="visible">True</property>
+                        <property name="n_rows">3</property>
+                        <property name="n_columns">2</property>
+                        <property name="column_spacing">5</property>
+                        <property name="row_spacing">5</property>
+                        <child>
+                          <object class="GtkLabel" id="LabelAppletLabel">
+                            <property name="visible">True</property>
+                            <property name="xalign">0</property>
+                            <property name="label" translatable="yes">Label:</property>
+                          </object>
+                          <packing>
+                            <property name="y_options"></property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkEntry" id="OptionAppletLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="invisible_char">•</property>
+                            <signal name="focus_out_event" handler="on_options_changed"/>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                            <property name="x_options">GTK_FILL</property>
+                            <property name="y_options"></property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel" id="LabelAppletIcon">
+                            <property name="visible">True</property>
+                            <property name="xalign">0</property>
+                            <property name="label" translatable="yes">Icon:</property>
+                          </object>
+                          <packing>
+                            <property name="top_attach">1</property>
+                            <property name="bottom_attach">2</property>
+                            <property name="y_options"></property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkEntry" id="OptionAppletIcon">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="invisible_char">•</property>
+                            <signal name="focus_out_event" handler="on_options_changed"/>
+                          </object>
+                          <packing>
+                            <property name="left_attach">1</property>
+                            <property name="right_attach">2</property>
+                            <property name="top_attach">1</property>
+                            <property name="bottom_attach">2</property>
+                            <property name="y_options"></property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkCheckButton" id="OptionOpenOnHover">
+                            <property name="label" translatable="yes">Open menu when cursor hovers the applet</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">False</property>
+                            <property name="draw_indicator">True</property>
+                            <signal name="toggled" handler="on_options_changed"/>
+                          </object>
+                          <packing>
+                            <property name="right_attach">2</property>
+                            <property name="top_attach">2</property>
+                            <property name="bottom_attach">3</property>
+                            <property name="x_options">GTK_FILL</property>
+                            <property name="y_options"></property>
+                          </packing>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="position">1</property>
+                    <property name="tab_fill">False</property>
+                  </packing>
                 </child>
                 <child type="tab">
-                  <placeholder/>
+                  <object class="GtkLabel" id="label6">
+                    <property name="visible">True</property>
+                    <property name="label" translatable="yes">Applet</property>
+                  </object>
+                  <packing>
+                    <property name="position">1</property>
+                    <property name="tab_fill">False</property>
+                  </packing>
                 </child>
                 <child>
                   <object class="GtkAlignment" id="PluginsOptionPane">
