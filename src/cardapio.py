@@ -977,6 +977,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.setup_ui_from_gui_settings()
+		self.toggle_mini_mode_ui(update_window_size = False)
 		#self.restore_dimensions()
 
 
@@ -1019,8 +1020,6 @@ class Cardapio(dbus.service.Object):
 				if 'has_hover_handler' in dir(category_button) and category_button.has_hover_handler:
 					category_button.handler_block_by_func(self.on_sidebar_button_hovered)
 					category_button.has_hover_handler = False
-
-		self.toggle_mini_mode_ui()
 
 
 	def build_ui(self):
@@ -1188,7 +1187,8 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		widget = self.get_object(widget_str)
-		widget.handler_block_by_func(self.on_options_changed)
+		try    : widget.handler_block_by_func(self.on_options_changed)
+		except : pass
 
 		if type(widget) is gtk.Entry:
 			widget.set_text(self.settings[option_str])
@@ -1199,7 +1199,8 @@ class Cardapio(dbus.service.Object):
 		else:
 			logging.error('Widget %s (%s) was not written' % (widget_str, type(widget)))
 
-		widget.handler_unblock_by_func(self.on_options_changed)
+		try    : widget.handler_unblock_by_func(self.on_options_changed)
+		except : pass
 
 
 	def open_options_dialog(self, *dummy):
@@ -1215,7 +1216,7 @@ class Cardapio(dbus.service.Object):
 		self.set_widget_from_option('OptionKeepResults', 'keep search results')
 		self.set_widget_from_option('OptionOpenOnHover', 'open on hover')
 		self.set_widget_from_option('OptionOpenCategoriesOnHover', 'open categories on hover')
-		self.set_widget_from_option('OptionMiniMode', 'mini mode')
+		self.set_widget_from_option('OptionMiniMode', 'mini mode') # using a different handler
 
 		icon_size = gtk.icon_size_lookup(4)[0] # 4 because it's that same as in the UI file
 
@@ -2434,7 +2435,7 @@ class Cardapio(dbus.service.Object):
 		Save Cardapio's size into the user preferences
 		"""
 
-		self.settings['window size'] = self.window.get_size()
+		self.settings['window size'] = list(self.window.get_size())
 		if not self.settings['mini mode']:
 			self.settings['splitter position'] = self.main_splitter.get_position()
 
@@ -2450,7 +2451,14 @@ class Cardapio(dbus.service.Object):
 	#	self.restore_dimensions()
 
 	
-	def toggle_mini_mode_ui(self):
+	def on_mini_mode_button_toggled(self, widget):
+
+		self.settings['mini mode'] = self.get_object('OptionMiniMode').get_active()
+		self.toggle_mini_mode_ui(update_window_size = True)
+		return True
+
+
+	def toggle_mini_mode_ui(self, update_window_size):
 
 		category_buttons = self.category_pane.get_children() +\
 				self.system_category_pane.get_children() + self.sidepane.get_children()
@@ -2480,7 +2488,9 @@ class Cardapio(dbus.service.Object):
 
 			# TODO: make splitter unmoveable
 			# TODO: make splitter clickable
-			# TODO: fix the top margin of the side pane
+
+			if update_window_size:
+				self.settings['window size'][0] -= self.main_splitter.get_position()
 
 		else:
 
@@ -2496,6 +2506,9 @@ class Cardapio(dbus.service.Object):
 			self.get_object('CategoryMargin').set_padding(*self.fullsize_mode_padding)
 			
 			self.main_splitter.set_position(self.settings['splitter position'])
+
+			if update_window_size:
+				self.settings['window size'][0] += self.main_splitter.get_position()
 
 
 	def set_message_window_visible(self, state = True):

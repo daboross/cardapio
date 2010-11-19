@@ -787,7 +787,7 @@
                                         <property name="can_focus">True</property>
                                         <property name="receives_default">False</property>
                                         <property name="draw_indicator">True</property>
-                                        <signal name="toggled" handler="on_options_changed"/>
+                                        <signal name="toggled" handler="on_mini_mode_button_toggled"/>
                                       </object>
                                       <packing>
                                         <property name="right_attach">2</property>
@@ -922,8 +922,8 @@
                     <property name="visible">True</property>
                     <property name="top_padding">10</property>
                     <property name="bottom_padding">10</property>
-                    <property name="left_padding">5</property>
-                    <property name="right_padding">5</property>
+                    <property name="left_padding">10</property>
+                    <property name="right_padding">10</property>
                     <child>
                       <object class="GtkTable" id="table2">
                         <property name="visible">True</property>
