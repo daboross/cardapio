@@ -796,7 +796,9 @@ class Cardapio(dbus.service.Object):
 
 		self.drag_allowed_cursor = gtk.gdk.Cursor(gtk.gdk.FLEUR)
 
+		# grab some widget properties from the ui file
 		self.section_label_attributes = self.get_object('SectionName').get_attributes()
+		self.fullsize_mode_padding = self.get_object('CategoryMargin').get_padding()
 
 		# make sure buttons have icons!
 		self.gtk_settings = gtk.settings_get_default()
@@ -2445,10 +2447,14 @@ class Cardapio(dbus.service.Object):
 			for category_button in category_buttons:
 				category_button.child.child.get_children()[1].hide()
 
+			self.get_object('ViewLabel').set_size_request(0, 0) # required! otherwise a weird margin appears
 			self.get_object('ViewLabel').hide()
 			self.get_object('ControlCenterLabel').hide()
 			self.get_object('ControlCenterArrow').hide()
 			self.get_object('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
+
+			padding = self.fullsize_mode_padding
+			self.get_object('CategoryMargin').set_padding(0, padding[1], padding[2], padding[3])
 
 			self.get_object('TopLeftSearchSlabMargin').hide()    # these are required, to make sure the splitter
 			self.get_object('BottomLeftSearchSlabMargin').hide() # ...moves all the way to the left
@@ -2468,10 +2474,13 @@ class Cardapio(dbus.service.Object):
 			for category_button in category_buttons:
 				category_button.child.child.get_children()[1].show()
 
+			self.get_object('ViewLabel').set_size_request(-1, -1)
 			self.get_object('ViewLabel').show()
 			self.get_object('ControlCenterLabel').show()
 			self.get_object('ControlCenterArrow').show()
 			self.get_object('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+
+			self.get_object('CategoryMargin').set_padding(*self.fullsize_mode_padding)
 			
 			self.main_splitter.set_position(self.settings['splitter position'])
 
