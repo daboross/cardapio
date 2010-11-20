@@ -241,7 +241,6 @@ class IconHelper:
 
 class SettingsHelper:
 
-
 	def __init__(self, config_folder_path):
 		"""
 		Reads Cardapio's config file and builds the settings dictionary.
