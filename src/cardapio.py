@@ -2446,17 +2446,18 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		# TODO: collapse to mini mode when main_splitter is clicked (but not dragged)
-			
-		if event.type == gtk.gdk.BUTTON_PRESS:
+		#if event.type == gtk.gdk.BUTTON_PRESS:
 
-			if event.button == 1:
-
-				if self.settings['mini mode']:
-					# block any other type of clicking when in mini mode
-					return True
+		if event.button == 1:
+			if self.settings['mini mode']:
+				# block any other type of clicking when in mini mode
+				return True
 
 	
 	def on_mini_mode_button_toggled(self, widget):
+		"""
+		Handler for the minimode checkbox in the preferences window
+		"""
 
 		self.settings['mini mode'] = self.get_object('OptionMiniMode').get_active()
 		self.toggle_mini_mode_ui(update_window_size = True)
@@ -2464,6 +2465,9 @@ class Cardapio(dbus.service.Object):
 
 
 	def toggle_mini_mode_ui(self, update_window_size):
+		"""
+		Collapses the sidebar into a row of small buttons (i.e. minimode)
+		"""
 
 		category_buttons = self.category_pane.get_children() +\
 				self.system_category_pane.get_children() + self.sidepane.get_children()
