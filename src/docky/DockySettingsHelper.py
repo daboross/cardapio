@@ -22,32 +22,21 @@ class DockySettingsHelper:
 		self.active_docks = self.gconf_client.get_list(self.docky_dcontroller_gconf_root + 'ActiveDocks', gconf.VALUE_STRING)
 
 
-	# NOTE: This method is cloned in cardapio_helper.py	
-	def get_dock_for_this_helper(self):
+	def get_main_dock(self):
 		"""
-		Returns the name of the dock in which it finds the launcher for
-		Cardapio. If there's none or there is more than one dock,
-		LauncherError is raised.
+		Returns the name of the main Docky's dock (the one that keeps the
+		unknown launchers). If there's none, raises MainDockError and if
+		there are more, returns the first one's name.
 		"""
 
-		docks_with_cardapio = []
+		main_docks = filter(lambda dock:
+			self.gconf_client.get_bool(self.docky_iface_gconf_root + dock + '/WindowManager'),
+		self.active_docks)
 
-		for dock in self.active_docks:
+		if len(main_docks) == 0:
+			raise MainDockError
 
-			dock_launchers = self.gconf_client.get_list(self.docky_iface_gconf_root + dock + '/Launchers', gconf.VALUE_STRING)
-			cardapio_launchers = filter(lambda launcher: launcher.endswith(self.cardapio_desktop), dock_launchers)
-
-			# multiple Cardapio launchers on one dock
-			if(len(cardapio_launchers) > 1):
-				raise LauncherError(True)
-			elif len(cardapio_launchers) == 1:
-				docks_with_cardapio.append(dock)
-
-		# multiple docks with Cardapio launchers
-		if len(docks_with_cardapio) != 1:
-			raise LauncherError(len(docks_with_cardapio) > 1)
-
-		return docks_with_cardapio[0]
+		return main_docks[0]
 
 
 	def get_icon_size(self, dock):
@@ -79,6 +68,22 @@ class DockySettingsHelper:
 		return self.gconf_client.get_string(self.docky_iface_gconf_root + dock + '/Position')
 
 
+	def is_in_panel_mode(self, dock):
+		"""
+		Returns a flag saying whether the given dock is in panel mode.
+		"""
+
+		return self.gconf_client.get_bool(self.docky_iface_gconf_root + dock + '/PanelMode')
+
+
+	def is_showing_hover(self):
+		"""
+		Returns a flag saying whether Docky's icon has a hover.
+		"""
+
+		return self.gconf_client.get_string(self.docky_gconf_root + '/Items/DockyItem/HoverText') != ''
+
+
 	def get_horizontal_offset(self, dock):
 		"""
 		Returns the horizontal offset necessary to avoid overlapping of Cardapio launchers'
@@ -86,28 +91,36 @@ class DockySettingsHelper:
 		mode.
 		"""
 
-		return 10 if self.gconf_client.get_bool(self.docky_iface_gconf_root + dock + '/PanelMode') else 20
+		return 20 if self.is_in_panel_mode(dock) else 30
 
 
-	def get_vertical_offset(self, position, dock):
+	def get_vertical_offset(self, dock, position, is_decorated):
 		"""
 		Returns the vertical offset necessary to avoid overlapping of Cardapio launchers'
 		tooltip	with Cardapio's window. The offset depends on whether the dock is in panel
-		mode and on it's position (on top it's lower because the decoration bar pushes
-		Cardapio down only when it's near the bottom of the screen).
+		mode, whether the icon of Docky has a hover and whether Cardapio is decorated.
 		"""
 
-		if position == 'Bottom':
-			return 55 if self.gconf_client.get_bool(self.docky_iface_gconf_root + dock + '/PanelMode') else 90
-		else:
-			return 30 if self.gconf_client.get_bool(self.docky_iface_gconf_root + dock + '/PanelMode') else 60
+		# initial offset
+		offset = 12 if self.is_in_panel_mode(dock) else 35
+
+		# higher if the launcher's on the bottom dock and Cardapio's decorated
+		if position == 'Bottom' and is_decorated:
+			offset += 25
+
+		# higher if Docky's icon has a hover
+		if self.is_showing_hover():
+			offset += 30
+
+		return offset
 
 
-	def get_best_position(self, dock_num):
+	def get_best_position(self, dock_num, is_decorated):
 		"""
 		Determines the best (x, y) position for Cardapio in docky-mode.
 		Takes things like Docky's orientation, it's size or zoom mode
-		into account.
+		into account. Also, requires a parameter saying whether Cardapio's
+		window is decorated.
 		"""
 
 		# properties of our dock
@@ -121,7 +134,7 @@ class DockySettingsHelper:
 
 		# offsets from screen's borders
 		horizontal_offset = self.get_horizontal_offset(dock_num)
-		vertical_offset = self.get_vertical_offset(position, dock_num)
+		vertical_offset = self.get_vertical_offset(dock_num, position, is_decorated)
 
 		# calculating final position...
 		if position == 'Bottom':
@@ -141,12 +154,10 @@ class DockySettingsHelper:
 
 
 
-# NOTE: This class is cloned in cardapio_helper.py
-class LauncherError(Exception):
+class MainDockError(Exception):
 	"""
-	Exception raised when there are none or multiple Cardapio launchers on
-	Docky's docks. The "multiple" flag says whether there were many or none.
+	Exception raised when the DockySettingsHelper is unable to find the
+	main dock of Docky.
 	"""
 
-	def __init__(self, multiple):
-		self.multiple = multiple
+	pass

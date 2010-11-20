@@ -121,7 +121,7 @@ class CardapioPlugin (CardapioPluginInterface):
 		try:
 			for i in xrange(c.rowcount):
 				self.item_list[i] = {
-						'name'		 : _('%s') % row[0],
+						'name'		 : '%s' % row[0],
 						'tooltip'	  : _('Go To \"%s\"') % row[0] ,
 						'icon name'	: 'html', 
 						'type'		 : 'xdg',

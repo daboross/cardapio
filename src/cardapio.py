@@ -412,6 +412,9 @@ class Cardapio(dbus.service.Object):
 		Initializes plugins in the database if the user's settings say so.
 		"""
 
+		for basename in self.plugin_database:
+			self.plugin_database[basename]['instance'] = None
+
 		self.active_plugin_instances = []
 		self.keyword_to_plugin_mapping = {}
 
@@ -635,7 +638,9 @@ class Cardapio(dbus.service.Object):
 
 		self.drag_allowed_cursor = gtk.gdk.Cursor(gtk.gdk.FLEUR)
 
+		# grab some widget properties from the ui file
 		self.section_label_attributes = self.get_object('SectionName').get_attributes()
+		self.fullsize_mode_padding = self.get_object('CategoryMargin').get_padding()
 
 		# make sure buttons have icons!
 		self.gtk_settings = gtk.settings_get_default()
@@ -662,6 +667,8 @@ class Cardapio(dbus.service.Object):
 		self.get_object('MarginBottomLeft').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_LEFT_CORNER))
 		self.get_object('MarginBottomRight').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_RIGHT_CORNER))
 
+		about_distro_label = _('_About %(distro_name)s') % {'distro_name' : Cardapio.distro_name}
+
 		self.context_menu_xml = '''
 			<popup name="button3">
 				<menuitem name="Item 1" verb="Properties" label="%s" pixtype="stock" pixname="gtk-properties"/>
@@ -676,8 +683,11 @@ class Cardapio(dbus.service.Object):
 				_('_Edit Menus'),
 				_('_About Cardapio'),
 				_('_About Gnome'),
-				_('_About %(distro_name)s') % {'distro_name' : Cardapio.distro_name}
+				about_distro_label
 			)
+
+		# dynamic translation of MenuItem defined in .ui file
+		self.get_object('AboutDistroMenuItem').set_label(about_distro_label)
 
 		self.context_menu_verbs = [
 			('Properties', self.open_options_dialog),
@@ -692,6 +702,8 @@ class Cardapio(dbus.service.Object):
 			self.window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
 			self.get_object('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
 		else:
+			self.get_object('AboutGnomeMenuItem').set_visible(False)
+			self.get_object('AboutDistroMenuItem').set_visible(False)
 			self.panel_applet.connect('destroy', self.quit)
 
 
@@ -807,6 +819,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.setup_ui_from_gui_settings()
+		self.toggle_mini_mode_ui(update_window_size = False)
 		#self.restore_dimensions()
 
 
@@ -849,8 +862,6 @@ class Cardapio(dbus.service.Object):
 				if 'has_hover_handler' in dir(category_button) and category_button.has_hover_handler:
 					category_button.handler_block_by_func(self.on_sidebar_button_hovered)
 					category_button.has_hover_handler = False
-
-		self.toggle_mini_mode_ui()
 
 
 	def build_ui(self):
@@ -971,14 +982,21 @@ class Cardapio(dbus.service.Object):
 		return response
 
 
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
-	def open_about_cardapio_dialog(self):
+	def open_about_gnome_dialog(self, widget):
 		"""
-		Opens the "About Cardapio" dialog. This method is d-bus
-		accessible.
+		Opens the "About Gnome" dialog.
 		"""
-		self.open_about_dialog(None, 'AboutCardapio')
-	
+
+		self.open_about_dialog(widget, 'AboutGnome')
+
+
+	def open_about_distro_dialog(self, widget):
+		"""
+		Opens the "About %distro%" dialog
+		"""
+
+		self.open_about_dialog(widget, 'AboutDistro')
+
 
 	def open_about_dialog(self, widget, verb = None):
 		"""
@@ -1011,7 +1029,8 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		widget = self.get_object(widget_str)
-		widget.handler_block_by_func(self.on_options_changed)
+		try    : widget.handler_block_by_func(self.on_options_changed)
+		except : pass
 
 		if type(widget) is gtk.Entry:
 			widget.set_text(self.settings[option_str])
@@ -1022,14 +1041,14 @@ class Cardapio(dbus.service.Object):
 		else:
 			logging.error('Widget %s (%s) was not written' % (widget_str, type(widget)))
 
-		widget.handler_unblock_by_func(self.on_options_changed)
+		try    : widget.handler_unblock_by_func(self.on_options_changed)
+		except : pass
 
 
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
 	def open_options_dialog(self, *dummy):
 		"""
 		Show the Options Dialog and populate its widgets with values from the
-		user's settings (self.settings). This method is d-bus accessible.
+		user's settings (self.settings).
 		"""
 
 		self.set_widget_from_option('OptionKeybinding', 'keybinding')
@@ -1039,7 +1058,7 @@ class Cardapio(dbus.service.Object):
 		self.set_widget_from_option('OptionKeepResults', 'keep search results')
 		self.set_widget_from_option('OptionOpenOnHover', 'open on hover')
 		self.set_widget_from_option('OptionOpenCategoriesOnHover', 'open categories on hover')
-		self.set_widget_from_option('OptionMiniMode', 'mini mode')
+		self.set_widget_from_option('OptionMiniMode', 'mini mode') # using a different handler
 
 		icon_size = gtk.icon_size_lookup(4)[0] # 4 because it's that same as in the UI file
 
@@ -1068,7 +1087,7 @@ class Cardapio(dbus.service.Object):
 
 			self.plugin_tree_model.append([basename, name, name, is_active, is_core, not is_required, icon_pixbuf])
 
-		#self.update_plugin_description()
+		self.update_plugin_description()
 		self.options_dialog.show()
 
 
@@ -1270,6 +1289,16 @@ class Cardapio(dbus.service.Object):
 		self.window.window.begin_resize_drag(edge, event.button, x, y, event.time)
 
 
+	def end_resize(self):
+		"""
+		This function is called when the user releases the mouse after resizing the
+		Cardapio window.
+		"""
+
+		self.save_dimensions()
+		self.unblock_focus_out_event()
+
+
 	def block_focus_out_event(self):
 		"""
 		Blocks the focus-out event
@@ -1372,7 +1401,7 @@ class Cardapio(dbus.service.Object):
 		If using 'open on hover', this hides the Cardapio window after a delay.
 		"""
 
-		if self.settings['open on hover']:
+		if self.settings['open on hover'] and not self.focus_out_blocked:
 			glib.timeout_add(self.settings['autohide delay'], self.hide_if_mouse_away)
 			self.save_dimensions()
 
@@ -1540,7 +1569,6 @@ class Cardapio(dbus.service.Object):
 			self.all_system_sections_sidebar_button.set_sensitive(True)
 
 		self.consider_showing_no_results_text()
-
 
 
 	def search_menus(self, text, app_list):
@@ -2253,7 +2281,7 @@ class Cardapio(dbus.service.Object):
 		Save Cardapio's size into the user preferences
 		"""
 
-		self.settings['window size'] = self.window.get_size()
+		self.settings['window size'] = list(self.window.get_size())
 		if not self.settings['mini mode']:
 			self.settings['splitter position'] = self.main_splitter.get_position()
 
@@ -2269,7 +2297,14 @@ class Cardapio(dbus.service.Object):
 	#	self.restore_dimensions()
 
 	
-	def toggle_mini_mode_ui(self):
+	def on_mini_mode_button_toggled(self, widget):
+
+		self.settings['mini mode'] = self.get_object('OptionMiniMode').get_active()
+		self.toggle_mini_mode_ui(update_window_size = True)
+		return True
+
+
+	def toggle_mini_mode_ui(self, update_window_size):
 
 		category_buttons = self.category_pane.get_children() +\
 				self.system_category_pane.get_children() + self.sidepane.get_children()
@@ -2279,10 +2314,14 @@ class Cardapio(dbus.service.Object):
 			for category_button in category_buttons:
 				category_button.child.child.get_children()[1].hide()
 
+			self.get_object('ViewLabel').set_size_request(0, 0) # required! otherwise a weird margin appears
 			self.get_object('ViewLabel').hide()
 			self.get_object('ControlCenterLabel').hide()
 			self.get_object('ControlCenterArrow').hide()
 			self.get_object('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
+
+			padding = self.fullsize_mode_padding
+			self.get_object('CategoryMargin').set_padding(0, padding[1], padding[2], padding[3])
 
 			self.get_object('TopLeftSearchSlabMargin').hide()    # these are required, to make sure the splitter
 			self.get_object('BottomLeftSearchSlabMargin').hide() # ...moves all the way to the left
@@ -2295,19 +2334,27 @@ class Cardapio(dbus.service.Object):
 
 			# TODO: make splitter unmoveable
 			# TODO: make splitter clickable
-			# TODO: fix the top margin of the side pane
+
+			if update_window_size:
+				self.settings['window size'][0] -= self.main_splitter.get_position()
 
 		else:
 
 			for category_button in category_buttons:
 				category_button.child.child.get_children()[1].show()
 
+			self.get_object('ViewLabel').set_size_request(-1, -1)
 			self.get_object('ViewLabel').show()
 			self.get_object('ControlCenterLabel').show()
 			self.get_object('ControlCenterArrow').show()
 			self.get_object('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+
+			self.get_object('CategoryMargin').set_padding(*self.fullsize_mode_padding)
 			
 			self.main_splitter.set_position(self.settings['splitter position'])
+
+			if update_window_size:
+				self.settings['window size'][0] += self.main_splitter.get_position()
 
 
 	def set_message_window_visible(self, state = True):
@@ -2340,6 +2387,15 @@ class Cardapio(dbus.service.Object):
 		gtk.gdk.flush()
 		while gtk.events_pending():
 			gtk.main_iteration()
+
+
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = 'b')
+	def is_cardapio_decorated(self):
+		"""
+		Returns a flag saying whether Cardapio's window is decorated.
+		"""
+
+		return self.window.get_decorated()
 
 
 	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
@@ -2459,6 +2515,8 @@ class Cardapio(dbus.service.Object):
 		"""
 		Hide the window if the cursor is *not* on top of it
 		"""
+
+		if self.focus_out_blocked: return
 
 		root_window = gtk.gdk.get_default_root_window()
 		mouse_x, mouse_y, dummy = root_window.get_pointer()
@@ -3329,10 +3387,9 @@ class Cardapio(dbus.service.Object):
 
 
 	# MODEL/VIEW SEPARATION EFFORT: controller
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
 	def launch_edit_app(self, *dummy):
 		"""
-		Opens Gnome's menu editor. This method is d-bus accessible.
+		Opens Gnome's menu editor.
 		"""
 
 		self.launch_raw('alacarte')
