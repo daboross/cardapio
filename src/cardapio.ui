@@ -39,6 +39,7 @@
                   <object class="GtkHPaned" id="MainSplitter">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
+                    <signal name="button_press_event" handler="on_main_splitter_clicked"/>
                     <child>
                       <object class="GtkAlignment" id="SidePaneMargin">
                         <property name="visible">True</property>

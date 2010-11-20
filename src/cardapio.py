@@ -2440,15 +2440,20 @@ class Cardapio(dbus.service.Object):
 			self.settings['splitter position'] = self.main_splitter.get_position()
 
 
-	# TODO: collapse to mini mode when main_splitter is clicked (but not dragged)
-	#
-	#def on_main_splitter_clicked(self, *dummy):
-	#	"""
-	#	Toggle mini mode
-	#	"""
-	#	self.settings['mini mode'] = not self.settings['mini mode']
-	#	self.toggle_mini_mode_ui()
-	#	self.restore_dimensions()
+	def on_main_splitter_clicked(self, widget, event):
+		"""
+		Make sure user can't move the splitter when in mini mode
+		"""
+
+		# TODO: collapse to mini mode when main_splitter is clicked (but not dragged)
+			
+		if event.type == gtk.gdk.BUTTON_PRESS:
+
+			if event.button == 1:
+
+				if self.settings['mini mode']:
+					# block any other type of clicking when in mini mode
+					return True
 
 	
 	def on_mini_mode_button_toggled(self, widget):
@@ -2485,9 +2490,6 @@ class Cardapio(dbus.service.Object):
 			# hack to make sure the viewport resizes to the minisize correctly
 			self.get_object('SideappViewport').hide()
 			self.get_object('SideappViewport').show()
-
-			# TODO: make splitter unmoveable
-			# TODO: make splitter clickable
 
 			if update_window_size:
 				self.settings['window size'][0] -= self.main_splitter.get_position()
