@@ -14,7 +14,7 @@ all:
 	@echo "make buildsrc - Generate a deb source package"
 	@echo "make clean - Get rid of scratch and byte files"
 
-install:
+install: install_docky_helper
 	python -m compileall src/
 	python -m compileall src/plugins/
 	python -m compileall src/docky/
@@ -56,12 +56,25 @@ clean:
 	$(MAKE) -f $(CURDIR)/debian/rules clean
 	find . -name '*.pyc' -delete
 
-uninstall:
+uninstall: uninstall_docky_helper
 	rm -rf $(PREFIX)/lib/cardapio
 	rm -rf $(PREFIX)/bin/cardapio
 	rm -rf $(PREFIX)/share/pixmaps/cardapio*
 	rm $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
 	find $(PREFIX)/share/locale -name '*cardapio.mo' -delete
+
+install_docky_helper:
+	if test -d $(PREFIX)/share/dockmanager; then \
+		cp -f src/docky/cardapio_helper.py.info $(PREFIX)/share/dockmanager/metadata/; \
+		cp -f src/docky/cardapio_helper.py $(PREFIX)/share/dockmanager/scripts/; \
+		chmod +x $(PREFIX)/share/dockmanager/scripts/cardapio_helper.py; \
+	fi
+
+uninstall_docky_helper:
+	if test -d $(PREFIX)/share/dockmanager; then\
+		rm -rf $(PREFIX)/share/dockmanager/metadata/cardapio_helper.py.info; \
+		rm -rf $(PREFIX)/share/dockmanager/scripts/cardapio_helper.py; \
+	fi
 
 oldinstall:
 	$(PYTHON) setup.py install --root $(DESTDIR) --install-layout=deb $(COMPILE)
