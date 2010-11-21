@@ -84,30 +84,36 @@ if len(sys.argv) == 2:
 
 			show_hide()
 
+	elif sys.argv[1] == 'docky-install':
 
-	elif sys.argv[1] == 'docky-mode':
+		from docky.DockySettingsHelper import install_cardapio_launcher
+		install_cardapio_launcher()
+
+	elif sys.argv[1] == 'docky-uninstall':
+
+		from docky.DockySettingsHelper import remove_cardapio_launcher
+		remove_cardapio_launcher()
+
+	elif sys.argv[1] == 'docky-open':
 
 		# if there's no other instance - start hidden Cardapio
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
 			start_cardapio(show = Cardapio.DONT_SHOW)
 
-		# if there is - "show / hide" it near the proper side of the
-		# screen
-		else:
-			from docky.DockySettingsHelper import *
+		from docky.DockySettingsHelper import *
 
-			show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_point')
-			is_decorated = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('is_cardapio_decorated')
+		show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_point')
+		is_decorated = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('is_cardapio_decorated')
 
-			try:
-				settings_helper = DockySettingsHelper()
-				dock_num = settings_helper.get_main_dock()
+		try:
+			settings_helper = DockySettingsHelper()
+			dock_num = settings_helper.get_main_dock()
 
-				x, y = settings_helper.get_best_position(dock_num, is_decorated())
-				show_hide(x, y)
+			x, y = settings_helper.get_best_position(dock_num, is_decorated())
+			show_hide(x, y)
 
-			except MainDockError:
-				fatal_error('Cardapio error!', "Couldn't find the main dock of Docky!")
+		except MainDockError:
+			fatal_error('Cardapio error!', "Couldn't find the main dock of Docky!")
 
 else:
 
