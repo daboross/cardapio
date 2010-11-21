@@ -190,8 +190,6 @@ class Cardapio(dbus.service.Object):
 		except Exception, ex:
 			msg = 'unable to read settings: ' + str(ex)
 
-			# TODO: is this too much? maybe the fatal_error should also do
-			# the traceback?
 			logging.error(msg)
 			fatal_error('Settings error', msg)
 			traceback.print_exc()
@@ -229,9 +227,6 @@ class Cardapio(dbus.service.Object):
 		self.plugins_still_searching       = 0
 		self.bookmark_monitor              = None
 		self.volume_monitor                = None
-
-		# TODO: this is now in the IconHelper and can be deleted here, right?
-		self.icon_extension_types = re.compile('.*\.(png|xpm|svg)$')
 
 		self.sys_tree = gmenu.lookup_tree('gnomecc.menu')
 		self.have_control_center = (self.sys_tree.root is not None)
@@ -714,7 +709,6 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.safe_cardapio_proxy = Cardapio.SafeCardapioProxy()
-		self.safe_cardapio_proxy.settings = self.settings
 		self.safe_cardapio_proxy.write_to_log = self.plugin_write_to_log
 		self.safe_cardapio_proxy.handle_search_result = self.plugin_handle_search_result
 		self.safe_cardapio_proxy.handle_search_error = self.plugin_handle_search_error
@@ -4110,9 +4104,6 @@ class CardapioPluginInterface:
 		The constructor is given a single parameter, which is an object used to
 		communicate with Cardapio. This object has the following members:
 
-		   - settings - this is a dict containing the same things that you will
-		     find in the config.json
-
 		   - write_to_log - this is a function that lets you write to Cardapio's
 		     log file, like this: write_to_log(self, 'hi there')
 
@@ -4129,8 +4120,6 @@ class CardapioPluginInterface:
 			 internal databases, though, so this is not always applicable. This
 			 is used, for example, with the software_center plugin. (see
  		     on_reload_permission_granted below for more info)
-
-		Note: DO NOT WRITE ANYTHING IN THE settings DICT!!
 		"""
 		pass
 
