@@ -1,3 +1,27 @@
+cardapio (0.9.157-ubuntu1-maverick1) maverick; urgency=low
+
+   * Now with new "mini mode"!
+   * Now with Docky support!
+   * Now with faster startup times, and smaller memory usage!
+   * Several bugs fixed
+   * Renamed config file to ~/.config/Cardapio/config.json
+   * Moved log file to ~/.cache/Cardapio/cardapio.log
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 21 Nov 2010 23:01:00 -0000
+
+
+cardapio (0.9.157-ubuntu1-lucid1) lucid; urgency=low
+
+   * Now with new "mini mode"!
+   * Now with Docky support!
+   * Now with faster startup times, and smaller memory usage!
+   * Several bugs fixed
+   * Renamed config file to ~/.config/Cardapio/config.json
+   * Moved log file to ~/.cache/Cardapio/cardapio.log
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 21 Nov 2010 23:01:00 -0000
+
+
 cardapio (0.9.156-ubuntu1-maverick1) maverick; urgency=low
 
    * Hopefully fixed a bug with the Places menu, where it showed the same place
