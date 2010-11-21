@@ -100,19 +100,20 @@ if len(sys.argv) == 2:
 		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
 			start_cardapio(show = Cardapio.DONT_SHOW)
 
-		from docky.DockySettingsHelper import *
+		else:
+			from docky.DockySettingsHelper import *
 
-		show_hide_near_point = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_point')
+			try:
+				settings_helper = DockySettingsHelper()
+				dock_num = settings_helper.get_main_dock()
 
-		try:
-			settings_helper = DockySettingsHelper()
-			dock_num = settings_helper.get_main_dock()
+				x, y, force_anchor_right, force_anchor_bottom = settings_helper.get_best_position(dock_num)
 
-			x, y, force_anchor_right, force_anchor_bottom = settings_helper.get_best_position(dock_num)
-			show_hide_near_point(x, y, force_anchor_right, force_anchor_bottom)
+				show_hide_near_point = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_point')
+				show_hide_near_point(x, y, force_anchor_right, force_anchor_bottom)
 
-		except MainDockError:
-			fatal_error('Cardapio error!', "Couldn't find the main dock of Docky!")
+			except MainDockError:
+				fatal_error('Cardapio error!', "Couldn't find the main dock of Docky!")
 
 else:
 
