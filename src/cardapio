@@ -78,11 +78,11 @@ if len(sys.argv) == 2:
 		# mouse pointer
 		else:
 			if sys.argv[1] == 'show-near-mouse':
-				show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_mouse')
+				show_hide_near_mouse = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_mouse')
+				show_hide_near_mouse()
 			else:
 				show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide')
-
-			show_hide()
+				show_hide()
 
 	elif sys.argv[1] == 'docky-install':
 
@@ -102,15 +102,14 @@ if len(sys.argv) == 2:
 
 		from docky.DockySettingsHelper import *
 
-		show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_point')
-		is_decorated = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('is_cardapio_decorated')
+		show_hide_near_point = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_point')
 
 		try:
 			settings_helper = DockySettingsHelper()
 			dock_num = settings_helper.get_main_dock()
 
-			x, y = settings_helper.get_best_position(dock_num, is_decorated())
-			show_hide(x, y)
+			x, y, force_anchor_right, force_anchor_bottom = settings_helper.get_best_position(dock_num)
+			show_hide_near_point(x, y, force_anchor_right, force_anchor_bottom)
 
 		except MainDockError:
 			fatal_error('Cardapio error!', "Couldn't find the main dock of Docky!")

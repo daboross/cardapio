@@ -38,8 +38,7 @@ if __name__ == "__main__":
 	mainloop = gobject.MainLoop(is_running=True)
 
 	atexit.register (cleanup)
-	signal(SIGTERM, lambda signum, stack_frame: exit(1))
+	signal(SIGTERM, lambda signum, stack_frame: exit(0))
 
 	mainloop.run()
 
-	subprocess.Popen('zenity --info --text=5', shell = True)
