@@ -18,7 +18,6 @@
 #
 
 from sys import exit
-import atexit
 import gobject
 import os
 import subprocess

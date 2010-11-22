@@ -52,6 +52,7 @@ class CardapioPlugin (CardapioPluginInterface):
 		self.package_monitor.connect('changed', self.on_lock_changed)
 		
 	   	self.loaded = True # set to true if everything goes well
+
 	   	
 	def search(self, text, result_limit):
 		results = []
@@ -66,6 +67,7 @@ class CardapioPlugin (CardapioPluginInterface):
 		
 		self.c.handle_search_result(self, results, self.current_query)
 	
+
 	def build_bookmark_list(self, *dummy):
 		
 		firefox_path = self.os.path.join(self.os.environ['HOME'],".mozilla/firefox")
@@ -112,35 +114,31 @@ class CardapioPlugin (CardapioPluginInterface):
 					 FROM moz_bookmarks, moz_places  \
 					 WHERE moz_bookmarks.fk = moz_places.id AND moz_places.url NOT LIKE 'place:%'"
 					 
-		c = sql_conn.execute(sql_query)
-		bookmarks = c.fetchall()
-		 
-		# preinitialize the list or there may be a memory leak (wtf!?)
-		if c > 0 : self.item_list = [{}] * len(bookmarks)
-		else     : self.item_list = []
+		self.item_list = []
 
-		i = 0
 		try:
-			for i in xrange(len(bookmarks)):
-				self.item_list[i] = {
-						'name'		 : '%s' % bookmarks[i][0],
-						'tooltip'	  : _('Go To \"%s\"') % bookmarks[i][0] ,
-						'icon name'	: 'html', 
-						'type'		 : 'xdg',
-						'command'	  : '%s' % bookmarks[i][1],
+			for bookmark in sql_conn.execute(sql_query):
+				self.item_list.append({
+						'name'         : '%s' % bookmark[0],
+						'tooltip'      : _('Go To \"%s\"') % bookmark[0] ,
+						'icon name'    : 'html',
+						'type'         : 'xdg',
+						'command'      : '%s' % bookmark[1],
 						'context menu' : None,
-						}
+						})
 
 		except Exception, exception:
 			self.c.write_to_log(self, exception, is_error = True)
-		
+
 		sql_conn.close()
 		self.os.remove(db_copy_path)
 		
+
 	def on_lock_changed(self, monitor, file_, other_file, event):
 		# Happens whenever Firefox is closed
 		if event == self.gio.FILE_MONITOR_EVENT_DELETED:
 			self.c.ask_for_reload_permission(self)	
+
 			
 	def on_reload_permission_granted(self):
 		self.build_bookmark_list()	
