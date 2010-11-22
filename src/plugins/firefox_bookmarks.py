@@ -113,19 +113,21 @@ class CardapioPlugin (CardapioPluginInterface):
 					 WHERE moz_bookmarks.fk = moz_places.id AND moz_places.url NOT LIKE 'place:%'"
 					 
 		c = sql_conn.execute(sql_query)
+		bookmarks = c.fetchall()
 		 
 		# preinitialize the list or there may be a memory leak (wtf!?)
-		if c > 0 : self.item_list = [{}]*c.rowcount
+		if c > 0 : self.item_list = [{}] * len(bookmarks)
 		else     : self.item_list = []
 
+		i = 0
 		try:
-			for i in xrange(c.rowcount):
+			for i in xrange(len(bookmarks)):
 				self.item_list[i] = {
-						'name'		 : '%s' % row[0],
-						'tooltip'	  : _('Go To \"%s\"') % row[0] ,
+						'name'		 : '%s' % bookmarks[i][0],
+						'tooltip'	  : _('Go To \"%s\"') % bookmarks[i][0] ,
 						'icon name'	: 'html', 
 						'type'		 : 'xdg',
-						'command'	  : '%s' % row[1],
+						'command'	  : '%s' % bookmarks[i][1],
 						'context menu' : None,
 						}
 
