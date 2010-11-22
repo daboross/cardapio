@@ -116,6 +116,7 @@ class CardapioPlugin (CardapioPluginInterface):
 					 
 		self.item_list = []
 
+		# the memory leak is inside this try statement
 		try:
 			for bookmark in sql_conn.execute(sql_query):
 				self.item_list.append({
