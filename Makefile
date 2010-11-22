@@ -15,6 +15,11 @@ all:
 	@echo "make clean - Get rid of scratch and byte files"
 
 install: install_docky_helper
+	# Test if the user has the keybinder module...
+	# (useful for people who compile by hand)
+	python -c 'import keybinder' 
+	# ...OK! Keybinder found!
+	
 	python -m compileall src/
 	python -m compileall src/plugins/
 	python -m compileall src/docky/
