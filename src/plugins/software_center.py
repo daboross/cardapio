@@ -40,6 +40,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			import apt
 			import os
 			import gio
+			import platform
 
 			software_center_path = '/usr/share/software-center'
 
@@ -67,14 +68,8 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.StoreDatabase        = StoreDatabase
 		self.AppViewFilter        = AppViewFilter
 
-		try:
-			
-			ubuntu_ver = subprocess.Popen(["lsb_release", "-r"], stdout=subprocess.PIPE).communicate()[0]
-			is_maverick = ubuntu_ver.find("10.10") != -1
-			
-		except Exception:
-			self.c.write_to_log(self, 'Could not detect Ubuntu version. Defaulting to 10.04', is_warning = True)
-			is_maverick = False
+		distro = platform.linux_distribution()
+		is_maverick = (distro == ('Ubuntu', '10.10', 'maverick'))
 
 		self.cache = self.apt.Cache() # this line is really slow! around 0.28s on my computer!
 		db_path = '/var/cache/software-center/xapian'
@@ -88,6 +83,8 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.apps_filter = AppViewFilter(self.db, self.cache)
 		self.apps_filter.set_not_installed_only(True)
 		self.apps_filter.set_only_packages_without_applications(True)
+
+		self.action = None
 
 		if is_maverick:
 			self.c.write_to_log(self, 'Detected Ubuntu 10.10')
@@ -119,13 +116,25 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		if self.os.path.exists(dpkg_path):
 			self.package_monitor = self.gio.File(dpkg_path).monitor_file()
-			self.package_monitor.connect('changed', self.on_packages_changed)
+			self.package_monitor_handler = self.package_monitor.connect('changed', self.on_packages_changed)
 
 		else:
 			self.c.write_to_log(self, 'Path does not exist:' + dpkg_path, is_warning = True)
 			self.c.write_to_log(self, 'Will not be able to monitor for package changes', is_warning = True)
+			self.package_monitor = None
 		
 		self.loaded = True # set to true if everything goes well
+
+
+	def __del__(self):
+
+		# handle objects that somehow seem to leak memory
+
+		if self.package_monitor is not None:
+			if self.package_monitor.handler_is_connected(self.package_monitor_handler):
+				self.package_monitor.disconnect(self.package_monitor_handler)
+
+		self.action = None # for some reason this has to be cleared to prevent a memory leak (wtf)
 
 
 	def search(self, text, result_limit):
@@ -195,6 +204,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		if event == self.gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
 			self.c.ask_for_reload_permission(self)
 			
+
 	def open_softwarecenter_search(self, text):
 		try:
 			subprocess.Popen(["software-center", "search:%s"  % text])

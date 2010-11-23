@@ -10,13 +10,13 @@ class CardapioPlugin (CardapioPluginInterface):
 	plugin_api_version = 1.39 
 
 	search_delay_type = None
-	category_name = _('Firefox Bookmarks')
-	category_icon = 'firefox'
-	category_tooltip   = _('Web bookmarks in Firefox')
+	category_name     = _('Firefox Bookmarks')
+	category_icon     = 'firefox'
+	category_tooltip  = _('Web bookmarks in Firefox')
 	
 	fallback_icon	  = 'html'
 
-	hide_from_sidebar = True 		
+	hide_from_sidebar = True
 
 
 	def __init__(self, cardapio_proxy):
@@ -45,15 +45,26 @@ class CardapioPlugin (CardapioPluginInterface):
 		
 		self.build_bookmark_list()
 		lock_path = self.os.path.join(self.prof_path,'lock')
-		
+
 		# The lock file may not exist at first, but the monitor will
 		# detect when it is created and deleted
-		self.package_monitor = self.gio.File(lock_path).monitor_file()
-		self.package_monitor.connect('changed', self.on_lock_changed)
+		self.file_monitor = self.gio.File(lock_path).monitor_file()
+		self.file_monitor_handler = self.file_monitor.connect('changed', self.on_lock_changed)
 		
 	   	self.loaded = True # set to true if everything goes well
 
 	   	
+	def __del__(self):
+
+		# handle objects that somehow seem to leak memory
+
+		if self.file_monitor is not None:
+			if self.file_monitor.handler_is_connected(self.file_monitor_handler):
+				self.file_monitor.disconnect(self.file_monitor_handler)
+
+		self.item_list = None # for some reason this has to be cleared to prevent a memory leak (wtf)
+
+
 	def search(self, text, result_limit):
 		results = []
 		self.current_query = text
@@ -62,6 +73,8 @@ class CardapioPlugin (CardapioPluginInterface):
 		for item in self.item_list:
 			if len(results) >= result_limit: break
 			
+			if item['name'] is None: continue
+
 			if item['name'].lower().find(text) != -1:
 				results.append(item)
 		
@@ -75,8 +88,7 @@ class CardapioPlugin (CardapioPluginInterface):
 		prof_list = ini_file.read().split()
 		ini_file.close()
 		
-		# this was a nested "try" statement, but apparently that caused a memory
-		# leak (wtf!?)
+		# this was a nested "try" statement, but apparently that caused a memory leak (wtf!?)
 		exception_thrown = False
 		try:
 			prof_folder = prof_list[prof_list.index('Default=1') - 1].split('=')[1]
@@ -116,15 +128,14 @@ class CardapioPlugin (CardapioPluginInterface):
 					 
 		self.item_list = []
 
-		# the memory leak is inside this try statement
 		try:
 			for bookmark in sql_conn.execute(sql_query):
 				self.item_list.append({
-						'name'         : '%s' % bookmark[0],
-						'tooltip'      : _('Go To \"%s\"') % bookmark[0] ,
+						'name'         : bookmark[0],
+						'tooltip'      : _('Go To \"%s\"') % bookmark[0],
 						'icon name'    : 'html',
 						'type'         : 'xdg',
-						'command'      : '%s' % bookmark[1],
+						'command'      : bookmark[1],
 						'context menu' : None,
 						})
 

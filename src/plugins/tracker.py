@@ -59,7 +59,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			'context menu' : None,
 			}
 
-		if getoutput('tracker-info -V | grep 0.9'):
+		if get_output('tracker-info -V | grep 0.9'):
 			self.tracker_case_insensitive = True
 			self.sparql_query = """
 					SELECT ?uri ?mime

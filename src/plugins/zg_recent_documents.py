@@ -67,7 +67,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			self.c.write_to_log(self, exception, is_error = True)
 			return 
 
-		self.have_sezen = getoutput('which sezen')
+		self.have_sezen = which('sezen')
 		if not self.have_sezen:
 			self.c.write_to_log(self, 'Sezen not found, so you will not see the "Show additional results" button.', is_warning = True)
 

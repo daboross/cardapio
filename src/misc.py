@@ -60,7 +60,7 @@ def which(filename):
 
 
 
-def getoutput(shell_command):
+def get_output(shell_command):
 	"""
 	Returns the output (from stdout) of a shell command. If an error occurs,
 	returns False.
@@ -79,7 +79,7 @@ import gc
 
 def get_memory_usage():
 	gc.collect()
-	return getoutput("ps -A -o rss -o cmd | awk '/cardapio / && !/awk/ {print $1}'")
+	return get_output("ps -A -o rss -o cmd | awk '/cardapio / && !/awk/ {print $1}'")
 
 
 def return_true(*dummy): return True

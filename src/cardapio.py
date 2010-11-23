@@ -336,7 +336,6 @@ class Cardapio(dbus.service.Object):
 				'version'           : self.version,
 				'category name'     : None,
 				'category icon'     : 'applications-other',
-				'hide from sidebar' : False,
 				'instance'          : None,
 				}
 
@@ -347,7 +346,6 @@ class Cardapio(dbus.service.Object):
 				'version'           : self.version,
 				'category name'     : None,
 				'category icon'     : 'folder',
-				'hide from sidebar' : False,
 				'instance'          : None,
 				}
 
@@ -358,7 +356,6 @@ class Cardapio(dbus.service.Object):
 				'version'           : self.version,
 				'category name'     : None,
 				'category icon'     : 'emblem-favorite',
-				'hide from sidebar' : False,
 				'instance'          : None,
 				}
 
@@ -383,7 +380,6 @@ class Cardapio(dbus.service.Object):
 							'version'           : plugin_class.version,
 							'category name'     : plugin_class.category_name,
 							'category icon'     : plugin_class.category_icon,
-							'hide from sidebar' : plugin_class.hide_from_sidebar,
 							'instance'          : None,
 							}
 
@@ -397,6 +393,8 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		for basename in self.plugin_database:
+			plugin = self.plugin_database[basename]['instance']
+			if plugin is not None: plugin.__del__()
 			self.plugin_database[basename]['instance'] = None
 
 		self.active_plugin_instances = []
@@ -460,6 +458,8 @@ class Cardapio(dbus.service.Object):
 			self.active_plugin_instances.append(plugin)
 			self.plugin_database[basename]['instance'] = plugin
 			self.keyword_to_plugin_mapping[keyword] = plugin
+
+		gc.collect()
 
 
 	def plugin_write_to_log(self, plugin, text, is_debug = False, is_warning = False, is_error = False):
@@ -977,7 +977,6 @@ class Cardapio(dbus.service.Object):
 
 		self.setup_ui_from_gui_settings()
 		self.toggle_mini_mode_ui(update_window_size = False)
-		#self.restore_dimensions()
 
 
 	def setup_ui_from_gui_settings(self):
@@ -1073,7 +1072,7 @@ class Cardapio(dbus.service.Object):
 			self.view_mode_button.hide()
 
 		self.add_subfolders_slab()
-		self.add_all_reorderable_slabs() # possible memory leak here
+		self.add_all_reorderable_slabs()
 
 		# MODEL/VIEW SEPARATION EFFORT:
 		# the methods below mix the model with the view
@@ -1706,15 +1705,25 @@ class Cardapio(dbus.service.Object):
 			# search all menus (apps, places and system)
 			self.search_menus(text, self.app_list)
 
-			# if query is large enough
-			if len(text) >= self.settings['min search string length']:
+			# search with all plugins
+			self.schedule_search_with_all_plugins(text)
 
-				# search with all plugins
-				self.schedule_search_with_all_plugins(text)
+			# NOTE: To fix a bug where plugins with hide_from_sidebar=False were
+			# not being placed on the sidebar, I replaced the block below for
+			# the line above. I'm just wondering if there are any unforeseen
+			# side effects, though. So I'm leaving the block below in the code
+			# for a few versions as a reminder. If nothing pops up, we can just
+			# remove it.
 
-			else:
-				# clean up plugin results
-				self.fully_hide_plugin_sections()
+			## if query is large enough
+			#if len(text) >= self.settings['min search string length']:
+			#
+			#	# search with all plugins
+			#	self.schedule_search_with_all_plugins(text)
+			#
+			#else:
+			#	# clean up plugin results
+			#	self.fully_hide_plugin_sections()
 
 		if len(text) == 0:
 			self.hide_all_transitory_sections(fully_hide = True)
@@ -1977,7 +1986,7 @@ class Cardapio(dbus.service.Object):
 
 			return False # Required!
 
-		text_is_too_small = (len(text) < self.settings['min search string length'])
+		query_is_too_short = (len(text) < self.settings['min search string length'])
 		number_of_results = self.settings['search results limit']
 
 		for plugin in self.active_plugin_instances:
@@ -1985,7 +1994,7 @@ class Cardapio(dbus.service.Object):
 			if plugin.search_delay_type != delay_type or plugin.__show_only_with_keyword:
 				continue
 
-			if plugin.hide_from_sidebar and text_is_too_small:
+			if plugin.hide_from_sidebar and query_is_too_short:
 				continue
 
 			plugin.__is_running = True
@@ -2097,7 +2106,9 @@ class Cardapio(dbus.service.Object):
 		plugin.__is_running = False
 		self.plugins_still_searching -= 1
 
-		if plugin.hide_from_sidebar and len(self.current_query) < self.settings['min search string length']:
+		query_is_too_short = (len(self.current_query) < self.settings['min search string length'])
+
+		if plugin.hide_from_sidebar and query_is_too_short:
 
 			# Handle the case where user presses backspace *very* quickly, and the
 			# search starts when len(text) > min_search_string_length, but after
@@ -3296,7 +3307,7 @@ class Cardapio(dbus.service.Object):
 		for basename in self.settings['active plugins']:
 
 			if basename == 'applications':
-				self.build_applications_list() # possible memory leak here
+				self.build_applications_list()
 				self.add_uncategorized_slab()
 				self.add_session_slab()
 				self.add_system_slab()
@@ -4454,5 +4465,6 @@ __builtin__.CardapioPluginInterface = CardapioPluginInterface
 __builtin__.dbus        = dbus
 __builtin__.logging     = logging
 __builtin__.subprocess  = subprocess
-__builtin__.getoutput   = getoutput
+__builtin__.get_output   = get_output
 __builtin__.fatal_error = fatal_error
+__builtin__.which       = which
