@@ -132,7 +132,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.156'
+	version = '0.9.157'
 
 	core_plugins = [
 			'applications',
@@ -267,7 +267,7 @@ class Cardapio(dbus.service.Object):
 		if gnome_program_init is not None:
 			gnome_program_init('', self.version) # Prints a warning to the screen. Ignore it.
 			client = gnome_ui_master_client()
-			client.connect('save-yourself', self.quit)
+			client.connect('save-yourself', self.save_and_quit)
 
 		logging.info('==> Done initializing Cardapio!')
 
@@ -277,10 +277,10 @@ class Cardapio(dbus.service.Object):
 		Handler for when the Cardapio window is destroyed
 		"""
 
-		self.quit()
+		self.save_and_quit()
 
 
-	def quit(self, *dummy):
+	def save_and_quit(self, *dummy):
 		"""
 		Saves the current state and quits
 		"""
@@ -289,15 +289,14 @@ class Cardapio(dbus.service.Object):
 			self.settings.save()
 		except Exception, ex:
 			logging.error('error while saving settings: %s' % ex)
+		self.quit()
 
-		self.quit_now()
 
-
-	def quit_now(self):
+	def quit(self, *dummy):
 		"""
-		Quits without saving the current state (usually called if 
-		there's an error)
+		Quits without saving the current state.
 		"""
+
 		logging.info('Exiting...')
 		gtk.main_quit()
 
@@ -562,7 +561,7 @@ class Cardapio(dbus.service.Object):
 
 		elif not os.path.isdir(self.config_folder_path):
 			logging.error('Error! Cannot create folder "%s" because a file with that name already exists!' % self.config_folder_path)
-			self.quit_now()
+			self.quit()
 
 		self.cache_folder_path = os.path.join(DesktopEntry.xdg_cache_home, 'Cardapio')
 
@@ -571,7 +570,7 @@ class Cardapio(dbus.service.Object):
 
 		elif not os.path.isdir(self.cache_folder_path):
 			logging.error('Error! Cannot create folder "%s" because a file with that name already exists!' % self.cache_folder_path)
-			self.quit_now()
+			self.quit()
 
 
 	def setup_base_ui(self):
@@ -699,7 +698,7 @@ class Cardapio(dbus.service.Object):
 		else:
 			self.get_object('AboutGnomeMenuItem').set_visible(False)
 			self.get_object('AboutDistroMenuItem').set_visible(False)
-			self.panel_applet.connect('destroy', self.quit)
+			self.panel_applet.connect('destroy', self.save_and_quit)
 
 
 	def setup_plugins(self):
@@ -1409,6 +1408,8 @@ class Cardapio(dbus.service.Object):
 		if self.panel_applet:
 			# keep window alive if in panel mode
 			return True
+
+		self.save_and_quit()
 
 
 	def on_gtk_settings_changed(self, gobj, property_changed):
@@ -2186,7 +2187,7 @@ class Cardapio(dbus.service.Object):
 		return x, y
 
 
-	def get_coordinates_inside_screen(self, window, x, y):
+	def get_coordinates_inside_screen(self, window, x, y, force_anchor_right = False, force_anchor_bottom = False):
 		"""
 		If the window won't fit on the usable screen, given its size and
 		proposed coordinates, the method will rotate it over its x, y, or x=y
@@ -2204,25 +2205,32 @@ class Cardapio(dbus.service.Object):
 		max_window_x, max_window_y = x + window_width, y + window_height
 		max_screen_x, max_screen_y = screen_x + screen_width, screen_y + screen_height
 
-		x_inverted = False
-		y_inverted = False
+		anchor_right  = False
+		anchor_bottom = False
 
 		# if the window won't fit horizontally, rotate it over its y axis
-		if max_window_x > max_screen_x:
-			x_inverted = True
-			x -= window_width
+		if force_anchor_right or max_window_x > max_screen_x:
+			anchor_right = True
 
 		# if the window won't fit vertically, rotate it over its x axis
-		if max_window_y > max_screen_y:
-			y_inverted = True
-			y -= window_height
+		if force_anchor_bottom or max_window_y > max_screen_y:
+			anchor_bottom = True
 
 		# just to be sure - never hide behind top and left borders
 		# of the usable screen!
+
 		if x < screen_x: x = screen_x
 		if y < screen_y: y = screen_y
 
-		return x, y, x_inverted, y_inverted
+		if anchor_right and x - window_width < screen_x: 
+			anchor_right = False
+			x = screen_x
+
+		if anchor_bottom and y - window_height < screen_y: 
+			anchor_bottom = False
+			y = screen_y
+
+		return x, y, anchor_right, anchor_bottom
 
 
 	def get_screen_dimensions(self):
@@ -2245,7 +2253,7 @@ class Cardapio(dbus.service.Object):
 			return (0, 0, gtk.gdk.screen_width(), gtk.gdk.screen_height())
 
 
-	def restore_dimensions(self, x = None, y = None):
+	def restore_dimensions(self, x = None, y = None, force_anchor_right = False, force_anchor_bottom = False):
 		"""
 		Resize Cardapio according to the user preferences
 		"""
@@ -2256,7 +2264,20 @@ class Cardapio(dbus.service.Object):
 		if x is None or y is None:
 			x, y = self.choose_coordinates_for_window(self.window)
 
-		x, y, x_inverted, y_inverted = self.get_coordinates_inside_screen(self.window, x, y)
+		x, y, anchor_right, anchor_bottom = self.get_coordinates_inside_screen(self.window, x, y, force_anchor_right, force_anchor_bottom)
+
+		if anchor_right:
+			if anchor_bottom: 
+				self.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_EAST)
+			else: 
+				self.window.set_gravity(gtk.gdk.GRAVITY_NORTH_EAST)
+
+		else:
+			if anchor_bottom: 
+				self.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
+			else: 
+				self.window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
+
 		self.window.move(x, y)
 
 		if self.settings['mini mode']:
@@ -2267,7 +2288,7 @@ class Cardapio(dbus.service.Object):
 
 		# decide which search bar to show (top or bottom) depending
 		# on the y = 0 axis window invert
-		self.setup_search_entry(place_at_top = not y_inverted)
+		self.setup_search_entry(place_at_top = not anchor_bottom)
 
 
 	def save_dimensions(self, *dummy):
@@ -2369,15 +2390,10 @@ class Cardapio(dbus.service.Object):
 		main_window_width, main_window_height = self.window.get_size()
 		message_width, message_height = self.message_window.get_size()
 
-		x, y = self.window.get_position()
-		x, y, invert_xaxis, invert_yaxis = self.get_coordinates_inside_screen(self.window, x, y)
-
-		offset_x = (main_window_width - message_width) / 2
+		offset_x = (main_window_width  - message_width) / 2
 		offset_y = (main_window_height - message_height) / 2
 
-		if invert_xaxis: offset_x = -offset_x
-		if invert_yaxis: offset_y = -offset_y
-
+		x, y = self.window.get_position()
 		self.message_window.move(x + offset_x, y + offset_y)
 
 		self.message_window.set_keep_above(True)
@@ -2387,15 +2403,6 @@ class Cardapio(dbus.service.Object):
 		gtk.gdk.flush()
 		while gtk.events_pending():
 			gtk.main_iteration()
-
-
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = 'b')
-	def is_cardapio_decorated(self):
-		"""
-		Returns a flag saying whether Cardapio's window is decorated.
-		"""
-
-		return self.window.get_decorated()
 
 
 	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
@@ -2428,8 +2435,8 @@ class Cardapio(dbus.service.Object):
 		return self.show_hide_near_point(mouse_x, mouse_y)
 
 
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = 'ii', out_signature = None)
-	def show_hide_near_point(self, x = None, y = None):
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = 'iibb', out_signature = None)
+	def show_hide_near_point(self, x = None, y = None, force_anchor_right = False, force_anchor_bottom = False):
 		"""
 		Toggles Cardapio's visibility and places the window at the given (x,y)
 		location -- or as close as possible so that the window still fits on the
@@ -2448,12 +2455,12 @@ class Cardapio(dbus.service.Object):
 		else: 
 			if x is not None: x = int(x)
 			if y is not None: y = int(y)
-			self.show(x, y)
+			self.show(x, y, force_anchor_right, force_anchor_bottom)
 
 		return True
 	
 
-	def show(self, x = None, y = None):
+	def show(self, x = None, y = None, force_anchor_right = False, force_anchor_bottom = False):
 		"""
 		Shows the Cardapio window.
 
@@ -2464,7 +2471,7 @@ class Cardapio(dbus.service.Object):
 
 		self.auto_toggle_panel_button(True)
 
-		self.restore_dimensions(x,y)
+		self.restore_dimensions(x, y, force_anchor_right = False, force_anchor_bottom = False)
 
 		self.window.set_focus(self.search_entry)
 		self.show_window_on_top(self.window)

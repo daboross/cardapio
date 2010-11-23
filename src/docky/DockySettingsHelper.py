@@ -92,10 +92,10 @@ class DockySettingsHelper:
 		mode.
 		"""
 
-		return 20 if self.is_in_panel_mode(dock) else 30
+		return 5 if self.is_in_panel_mode(dock) else 15
 
 
-	def get_vertical_offset(self, dock, position, is_decorated):
+	def get_vertical_offset(self, dock, position):
 		"""
 		Returns the vertical offset necessary to avoid overlapping of Cardapio launchers'
 		tooltip	with Cardapio's window. The offset depends on whether the dock is in panel
@@ -103,20 +103,13 @@ class DockySettingsHelper:
 		"""
 
 		# initial offset
-		offset = 12 if self.is_in_panel_mode(dock) else 35
-
-		# higher if the launcher's on the bottom dock and Cardapio's decorated
-		if position == 'Bottom' and is_decorated:
-			offset += 25
-
-		# higher if Docky's icon has a hover
-		if self.is_showing_hover():
-			offset += 30
+		#offset = 20 if self.is_in_panel_mode(dock) else 35
+		offset = 5 if self.is_in_panel_mode(dock) else 15
 
 		return offset
 
 
-	def get_best_position(self, dock_num, is_decorated):
+	def get_best_position(self, dock_num):
 		"""
 		Determines the best (x, y) position for Cardapio in docky-mode.
 		Takes things like Docky's orientation, it's size or zoom mode
@@ -135,31 +128,40 @@ class DockySettingsHelper:
 
 		# offsets from screen's borders
 		horizontal_offset = self.get_horizontal_offset(dock_num)
-		vertical_offset = self.get_vertical_offset(dock_num, position, is_decorated)
+		vertical_offset = self.get_vertical_offset(dock_num, position)
+
+		# place cardapio slightly off so it's easier to interact with it
+		half_zoomed_icon_size = icon_size * zoom_percent / 3
+		# (ideally, i would like to place it flush with the docky window, so
+		# for example it would be flush with the leftmost edge of docky when
+		# docky is on the bottom edge of the screen. But there's no way to find
+		# out where docky's left edge is...)
+
+		force_anchor_right = False
+		force_anchor_bottom = False
 
 		# calculating final position...
 		if position == 'Bottom':
-			x = mouse_x
-			y = screen_height - (icon_size * zoom_percent + vertical_offset)
+			x = mouse_x - half_zoomed_icon_size 
+			y = screen_height - icon_size - vertical_offset
+			force_anchor_bottom = True
 		elif position == 'Top':
-			x = mouse_x
-			y = icon_size * zoom_percent + vertical_offset
+			x = mouse_x - half_zoomed_icon_size 
+			y = icon_size + vertical_offset
 		elif position == 'Left':
-			x = icon_size * zoom_percent + horizontal_offset
-			y = mouse_y
+			x = icon_size  + horizontal_offset
+			y = mouse_y - half_zoomed_icon_size 
 		elif position == 'Right':
-			x = screen_width - (icon_size * zoom_percent + horizontal_offset)
-			y = mouse_y
+			x = screen_width - icon_size - horizontal_offset
+			y = mouse_y - half_zoomed_icon_size
+			force_anchor_right = True
 
-		return x, y
+		return x, y, force_anchor_right, force_anchor_bottom
 
 
 def install_cardapio_launcher():
 	"""
 	Sets Docky up so that Cardapio is launched whenever the dock icon is clicked.
-
-	Returns True if the Cardapio launcher has been setup, and False if it was already
-	set to the correct value.
 	"""
 	gconf_client = gconf.client_get_default()
 	new_command = which('cardapio') + ' docky-open'
@@ -173,15 +175,15 @@ def install_cardapio_launcher():
 	else:
 		gconf_client.set_string(DockySettingsHelper.docky_gconf_root  + '/Items/DockyItem/OldDockyItemCommand', '')
 
-	gconf_client.set_string(DockySettingsHelper.docky_gconf_root  + '/Items/DockyItem/DockyItemCommand', new_command)
+	try:
+		gconf_client.set_string(DockySettingsHelper.docky_gconf_root  + '/Items/DockyItem/DockyItemCommand', new_command)
+	except:
+		pass
 	
 
 def remove_cardapio_launcher():
 	"""
-	Sets Docky up so that Cardapio is launched whenever the dock icon is clicked.
-
-	Returns True if the Cardapio launcher has been setup, and False if it was already
-	set to the correct value.
+	Resets Docky to its initial state, before Cardapio ever loaded.
 	"""
 	gconf_client = gconf.client_get_default()
 
@@ -194,7 +196,10 @@ def remove_cardapio_launcher():
 	else:
 		gconf_client.set_string(DockySettingsHelper.docky_gconf_root  + '/Items/DockyItem/DockyItemCommand', '')
 
-	gconf_client.unset(DockySettingsHelper.docky_gconf_root  + '/Items/DockyItem/OldDockyItemCommand')
+	try:
+		gconf_client.unset(DockySettingsHelper.docky_gconf_root  + '/Items/DockyItem/OldDockyItemCommand')
+	except:
+		pass
 	
 
 class MainDockError(Exception):

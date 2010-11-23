@@ -101,7 +101,7 @@ class CardapioPlugin (CardapioPluginInterface):
 				'tooltip'      : tooltip % {'name': vm.name, 'os': vm.OSTypeId},
 				'icon name'    : 'VBox',
 				'type'         : 'raw',
-				'command'      : 'VBoxManage startvm %s' % vm.name,
+				'command'      : 'VBoxManage startvm \"%s\"' % vm.name,
 				'context menu' : None,
 			}
 			
