@@ -84,15 +84,6 @@ if len(sys.argv) == 2:
 				show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide')
 				show_hide()
 
-	elif sys.argv[1] == 'docky-install':
-
-		from docky.DockySettingsHelper import install_cardapio_launcher
-		install_cardapio_launcher()
-
-	elif sys.argv[1] == 'docky-uninstall':
-
-		from docky.DockySettingsHelper import remove_cardapio_launcher
-		remove_cardapio_launcher()
 
 	elif sys.argv[1] == 'docky-open':
 

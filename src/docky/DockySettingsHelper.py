@@ -1,6 +1,5 @@
 import gconf
 import gtk
-from misc import which
 
 class DockySettingsHelper:
 	"""
@@ -157,49 +156,6 @@ class DockySettingsHelper:
 			force_anchor_right = True
 
 		return x, y, force_anchor_right, force_anchor_bottom
-
-
-def install_cardapio_launcher():
-	"""
-	Sets Docky up so that Cardapio is launched whenever the dock icon is clicked.
-	"""
-	gconf_client = gconf.client_get_default()
-	new_command = which('cardapio') + ' docky-open'
-
-	current_command = gconf_client.get_string(DockySettingsHelper.docky_gconf_root  + '/Items/DockyItem/DockyItemCommand')
-	if current_command == new_command: return
-
-	if current_command is not None:
-		if 'cardapio' not in current_command:
-			gconf_client.set_string(DockySettingsHelper.docky_gconf_root  + '/Items/DockyItem/OldDockyItemCommand', current_command)
-	else:
-		gconf_client.set_string(DockySettingsHelper.docky_gconf_root  + '/Items/DockyItem/OldDockyItemCommand', '')
-
-	try:
-		gconf_client.set_string(DockySettingsHelper.docky_gconf_root  + '/Items/DockyItem/DockyItemCommand', new_command)
-	except:
-		pass
-	
-
-def remove_cardapio_launcher():
-	"""
-	Resets Docky to its initial state, before Cardapio ever loaded.
-	"""
-	gconf_client = gconf.client_get_default()
-
-	current_command = gconf_client.get_string(DockySettingsHelper.docky_gconf_root  + '/Items/DockyItem/DockyItemCommand')
-	if current_command != which('cardapio') + ' docky-open': return
-
-	old_command = gconf_client.get_string(DockySettingsHelper.docky_gconf_root  + '/Items/DockyItem/OldDockyItemCommand')
-	if old_command is not None and old_command != '':
-		gconf_client.set_string(DockySettingsHelper.docky_gconf_root  + '/Items/DockyItem/DockyItemCommand', old_command)
-	else:
-		gconf_client.set_string(DockySettingsHelper.docky_gconf_root  + '/Items/DockyItem/DockyItemCommand', '')
-
-	try:
-		gconf_client.unset(DockySettingsHelper.docky_gconf_root  + '/Items/DockyItem/OldDockyItemCommand')
-	except:
-		pass
 	
 
 class MainDockError(Exception):
