@@ -1,0 +1,3 @@
+The subfolders in this directory represent different packages in the 
+Cardapio PPA. Nothing else should ever be committed at this level of 
+the folder hierarchy.
