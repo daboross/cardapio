@@ -15,25 +15,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-try:
-	import cardapio
-
-	import re
-	import os
-	import gtk
-	import gio
-	import sys
-	import json
-	import logging
-	import commands
-	from xdg import BaseDirectory
-
-except Exception, exception:
-	fatal_error('Fatal error loading Cardapio libraries', exception)
-	sys.exit(1)
-
-
-
+# this function should be the first thing loaded
 def fatal_error(title, errortext):
 	"""
 	This shows a last-resort error message, which does not depend on any
@@ -50,6 +32,24 @@ def fatal_error(title, errortext):
 	text.pack()
 
 	Tkinter.mainloop()
+
+
+try:
+	import cardapio
+
+	import re
+	import os
+	import gtk
+	import gio
+	import sys
+	import json
+	import logging
+	import commands
+	from xdg import BaseDirectory
+
+except Exception, exception:
+	fatal_error('Fatal error loading Cardapio libraries', exception)
+	sys.exit(1)
 
 
 

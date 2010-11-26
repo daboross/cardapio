@@ -24,7 +24,6 @@
 
 try:
 	from misc import *
-
 	import gc
 	import os
 	import re
