@@ -135,6 +135,8 @@ class CardapioPlugin(CardapioPluginInterface):
 				self.package_monitor.disconnect(self.package_monitor_handler)
 
 		self.action = None # for some reason this has to be cleared to prevent a memory leak (wtf)
+		self.db = None
+		self.cache = None
 
 
 	def search(self, text, result_limit):
