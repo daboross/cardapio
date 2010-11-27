@@ -1403,7 +1403,7 @@ class Cardapio(dbus.service.Object):
 		nothing. If in launcher mode, this terminates Cardapio.
 		"""
 
-		if self.panel_applet:
+		if self.panel_applet is not None:
 			# keep window alive if in panel mode
 			return True
 
@@ -2223,7 +2223,7 @@ class Cardapio(dbus.service.Object):
 			anchor_right = True
 
 			# make sure Cardapio doesn't overlap the panel button when being flipped
-			if self.panel_button:
+			if self.panel_button is not None:
 				dummy, dummy, applet_width, applet_height = self.panel_button.get_allocation()
 				x += applet_width
 
@@ -2232,7 +2232,7 @@ class Cardapio(dbus.service.Object):
 			anchor_bottom = True
 
 		# make sure Cardapio doesn't overlap the panel button when NOT being flipped
-		elif self.panel_button:
+		elif self.panel_button is not None:
 			dummy, dummy, applet_width, applet_height = self.panel_button.get_allocation()
 			y += applet_height
 
@@ -2554,7 +2554,7 @@ class Cardapio(dbus.service.Object):
 		cursor_in_window_x = (window_x <= mouse_x <= window_x + window_width)
 		cursor_in_window_y = (window_y <= mouse_y <= window_y + window_height)
 
-		if self.panel_button:
+		if self.panel_button is not None:
 			panel = self.panel_button.get_toplevel().window
 			panel_x, panel_y = panel.get_origin()
 			applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
@@ -3817,7 +3817,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		try:
-			if self.panel_applet:
+			if self.panel_applet is not None:
 				# allow launched apps to use Ubuntu's AppMenu
 				os.environ['UBUNTU_MENUPROXY'] = 'libappmenu.so'
 
