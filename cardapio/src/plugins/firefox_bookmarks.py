@@ -43,13 +43,10 @@ class CardapioPlugin (CardapioPluginInterface):
 		self.shutil  = shutil
 		self.gio     = gio
 		
-		
 		self.build_bookmark_list()
 		
-		# The lock file may not exist at first, but the monitor will
-		# detect when it is created and deleted
 		self.file_monitor = self.gio.File(self.db_path).monitor_file()
-		self.file_monitor_handler = self.file_monitor.connect('changed', self.c.ask_for_reload_permission)
+		self.file_monitor_handler = self.file_monitor.connect('changed', self.on_bookmarks_changed)
 		
 	   	self.loaded = True # set to true if everything goes well
 
@@ -142,6 +139,9 @@ class CardapioPlugin (CardapioPluginInterface):
 		sql_conn.close()
 		self.os.remove(db_copy_path)
 		
+		
+	def on_bookmarks_changed(self, monitor, _file, other_file, event):
+		self.c.ask_for_reload_permission(self)
 			
 	def on_reload_permission_granted(self):
 		self.build_bookmark_list()	
