@@ -2222,9 +2222,19 @@ class Cardapio(dbus.service.Object):
 		if force_anchor_right or max_window_x > max_screen_x:
 			anchor_right = True
 
+			# make sure Cardapio doesn't overlap the panel button when being flipped
+			if self.panel_button:
+				dummy, dummy, applet_width, applet_height = self.panel_button.get_allocation()
+				x += applet_width
+
 		# if the window won't fit vertically, rotate it over its x axis
 		if force_anchor_bottom or max_window_y > max_screen_y:
 			anchor_bottom = True
+
+		# make sure Cardapio doesn't overlap the panel button when NOT being flipped
+		elif self.panel_button:
+			dummy, dummy, applet_width, applet_height = self.panel_button.get_allocation()
+			y += applet_height
 
 		# just to be sure - never hide behind top and left borders
 		# of the usable screen!
@@ -2545,7 +2555,6 @@ class Cardapio(dbus.service.Object):
 		cursor_in_window_y = (window_y <= mouse_y <= window_y + window_height)
 
 		if self.panel_button:
-
 			panel = self.panel_button.get_toplevel().window
 			panel_x, panel_y = panel.get_origin()
 			applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
