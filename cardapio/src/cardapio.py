@@ -179,7 +179,7 @@ class Cardapio(dbus.service.Object):
 
 		logging.info('----------------- Cardapio launched -----------------')
 		logging.info('Cardapio version: %s' % Cardapio.version)
-		logging.info('Distribution: %s' % ' '.join(platform.linux_distribution()))
+		logging.info('Distribution: %s' % platform.platform())
 
 		self.home_folder_path = os.path.abspath(os.path.expanduser('~'))
 
@@ -2516,6 +2516,8 @@ class Cardapio(dbus.service.Object):
 		"""
 		Hides the Cardapio window.
 		"""
+
+		if not self.visible: return
 
 		self.auto_toggle_panel_button(False)
 
