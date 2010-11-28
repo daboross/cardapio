@@ -361,7 +361,7 @@ class Cardapio(dbus.service.Object):
 		self.plugin_database['pinned'] = {
 				'name'              : _('Pinned items'),
 				'author'            : _('Cardapio Team'),
-				'description'       : _('Displays your favorite items'),
+				'description'       : _('Displays the items that you marked as "pinned" using the context menu'),
 				'version'           : self.version,
 				'category name'     : None,
 				'category icon'     : 'emblem-favorite',

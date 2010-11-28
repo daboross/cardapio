@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-11-24 23:11+0100\n"
+"POT-Creation-Date: 2010-11-28 21:40+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,93 +17,93 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: cardapio.py:343
+#: cardapio.py:342
 msgid "Application menu"
 msgstr ""
 
-#: cardapio.py:344 cardapio.py:354 cardapio.py:364 plugins/google.py:3
+#: cardapio.py:343 cardapio.py:353 cardapio.py:363 plugins/google.py:3
 #: plugins/google_localized.py:3 plugins/tracker.py:3 plugins/tracker_fts.py:3
 #: plugins/zg_recent_documents.py:3
 msgid "Cardapio Team"
 msgstr ""
 
-#: cardapio.py:345
+#: cardapio.py:344
 msgid "Displays installed applications"
 msgstr ""
 
-#: cardapio.py:353
+#: cardapio.py:352
 msgid "Places menu"
 msgstr ""
 
-#: cardapio.py:355
+#: cardapio.py:354
 msgid "Displays a list of folders"
 msgstr ""
 
-#: cardapio.py:363 cardapio.py:3078
+#: cardapio.py:362 cardapio.py:3091
 msgid "Pinned items"
 msgstr ""
 
-#: cardapio.py:365
-msgid "Displays your favorite items"
+#: cardapio.py:364
+msgid "Displays the items that you marked as \"pinned\" using the context menu"
 msgstr ""
 
-#: cardapio.py:664
+#: cardapio.py:663
 #, python-format
 msgid "_About %(distro_name)s"
 msgstr ""
 
-#: cardapio.py:676
+#: cardapio.py:675
 msgid "_Properties"
 msgstr ""
 
-#: cardapio.py:677
+#: cardapio.py:676
 msgid "_Edit Menus"
 msgstr ""
 
-#: cardapio.py:678 cardapio.ui:1321
+#: cardapio.py:677 cardapio.ui:1321
 msgid "_About Cardapio"
 msgstr ""
 
-#: cardapio.py:679
+#: cardapio.py:678
 msgid "_About Gnome"
 msgstr ""
 
-#: cardapio.py:873
+#: cardapio.py:872
 msgid "No results to show"
 msgstr ""
 
-#: cardapio.py:874
+#: cardapio.py:873
 #, python-format
 msgid "No results to show in \"%(category_name)s\""
 msgstr ""
 
-#: cardapio.py:875
+#: cardapio.py:874
 msgid "Searching..."
 msgstr ""
 
-#: cardapio.py:876
+#: cardapio.py:875
 msgid "Search timed out"
 msgstr ""
 
-#: cardapio.py:888 cardapio.py:895
+#: cardapio.py:887 cardapio.py:894
 msgid "All"
 msgstr ""
 
-#: cardapio.py:888 cardapio.py:895
+#: cardapio.py:887 cardapio.py:894
 msgid "Show all categories"
 msgstr ""
 
-#: cardapio.py:960
+#: cardapio.py:959
 #, python-format
 msgid "Do you want to run \"%(file_name)s\" or display its contents?"
 msgstr ""
 
-#: cardapio.py:961
+#: cardapio.py:960
 #, python-format
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr ""
 
-#: cardapio.py:1133
+#: cardapio.py:1132
 #, python-format
 msgid ""
 "<b>Plugin:</b> %(name)s %(version)s\n"
@@ -111,15 +111,15 @@ msgid ""
 "<b>Description:</b> %(description)s"
 msgstr ""
 
-#: cardapio.py:1134
+#: cardapio.py:1133
 msgid "This is a community-supported plugin"
 msgstr ""
 
-#: cardapio.py:1677
+#: cardapio.py:1676
 msgid "Filesystem Root"
 msgstr ""
 
-#: cardapio.py:1696 plugins/amazon.py:260 plugins/bing.py:133
+#: cardapio.py:1695 plugins/amazon.py:260 plugins/bing.py:133
 #: plugins/ebay.py:227 plugins/ebay.py:243 plugins/google.py:67
 #: plugins/google_localized.py:71 plugins/tracker.py:54
 #: plugins/tracker_fts.py:53 plugins/yahoo.py:153 plugins/you_tube.py:140
@@ -127,119 +127,119 @@ msgstr ""
 msgid "Show additional results"
 msgstr ""
 
-#: cardapio.py:1696
+#: cardapio.py:1695
 msgid "Show additional search results in a file browser"
 msgstr ""
 
-#: cardapio.py:2722 cardapio.py:3098
+#: cardapio.py:2730 cardapio.py:3111
 msgid "Uncategorized"
 msgstr ""
 
-#: cardapio.py:2722
+#: cardapio.py:2730
 msgid "Other configuration tools"
 msgstr ""
 
-#: cardapio.py:2773
+#: cardapio.py:2781
 msgid "Network"
 msgstr ""
 
-#: cardapio.py:2773
+#: cardapio.py:2781
 msgid "Browse the contents of the network"
 msgstr ""
 
-#: cardapio.py:2777
+#: cardapio.py:2785
 msgid "Connect to Server"
 msgstr ""
 
-#: cardapio.py:2777
+#: cardapio.py:2785
 msgid "Connect to a remote computer or shared disk"
 msgstr ""
 
-#: cardapio.py:2779
+#: cardapio.py:2787
 msgid "Trash"
 msgstr ""
 
-#: cardapio.py:2779
+#: cardapio.py:2787
 msgid "Open the trash"
 msgstr ""
 
-#: cardapio.py:2791
+#: cardapio.py:2799
 msgid "Home"
 msgstr ""
 
-#: cardapio.py:2791
+#: cardapio.py:2799
 msgid "Open your personal folder"
 msgstr ""
 
-#: cardapio.py:2807
+#: cardapio.py:2815
 msgid "Desktop"
 msgstr ""
 
-#: cardapio.py:2962
+#: cardapio.py:2970
 msgid "Lock Screen"
 msgstr ""
 
-#: cardapio.py:2963
+#: cardapio.py:2971
 msgid "Protect your computer from unauthorized use"
 msgstr ""
 
-#: cardapio.py:2969
+#: cardapio.py:2977
 msgid "Log Out..."
 msgstr ""
 
-#: cardapio.py:2970
+#: cardapio.py:2978
 msgid "Log out of this session to log in as a different user"
 msgstr ""
 
-#: cardapio.py:2976
+#: cardapio.py:2984
 msgid "Shut Down..."
 msgstr ""
 
-#: cardapio.py:2977
+#: cardapio.py:2985
 msgid "Shut down the system"
 msgstr ""
 
-#: cardapio.py:3057
+#: cardapio.py:3070
 msgid "Places"
 msgstr ""
 
-#: cardapio.py:3057
+#: cardapio.py:3070
 msgid "Access documents and folders"
 msgstr ""
 
-#: cardapio.py:3067
+#: cardapio.py:3080
 msgid "Folder Contents"
 msgstr ""
 
-#: cardapio.py:3067
+#: cardapio.py:3080
 msgid "Look inside folders"
 msgstr ""
 
-#: cardapio.py:3078
+#: cardapio.py:3091
 msgid "Your favorite items"
 msgstr ""
 
-#: cardapio.py:3088
+#: cardapio.py:3101
 msgid "Side Pane"
 msgstr ""
 
-#: cardapio.py:3088
+#: cardapio.py:3101
 msgid "Items pinned to the side pane"
 msgstr ""
 
-#: cardapio.py:3098
+#: cardapio.py:3111
 msgid "Items that are not under any menu category"
 msgstr ""
 
-#: cardapio.py:3108
+#: cardapio.py:3121
 msgid "Session"
 msgstr ""
 
-#: cardapio.py:3118
+#: cardapio.py:3131
 msgid "System"
 msgstr ""
 
-#: cardapio.py:4249
+#: cardapio.py:4262
 msgid "Access applications, folders, system settings, etc."
 msgstr ""
 
@@ -345,7 +345,7 @@ msgstr ""
 msgid "Web bookmarks in Firefox"
 msgstr ""
 
-#: plugins/firefox_bookmarks.py:135
+#: plugins/firefox_bookmarks.py:129
 #, python-format
 msgid "Go To \"%s\""
 msgstr ""
