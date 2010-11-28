@@ -3015,6 +3015,11 @@ class Cardapio(dbus.service.Object):
 		name to the left pane, under the View label.
 		"""
 
+		# TODO (IMPORTANT) : There's still a small(ish) memory leak here. This
+		# is quite bad because it can accumulate over time, especially as the
+		# menu gets rebuilt everytime the system's package list is updated (when
+		# using the software center plugin) or when an app installed/removed.
+
 		if system_menu:
 			category_pane = self.system_category_pane
 			app_list = self.sys_list
