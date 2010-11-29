@@ -942,7 +942,13 @@ class Cardapio(dbus.service.Object):
 		gc.collect()
 
 		for plugin in self.active_plugin_instances:
-			glib.idle_add(plugin.on_reload_permission_granted)
+
+			# trying to be too clever here, ended up causing a memory leak:
+			#glib.idle_add(plugin.on_reload_permission_granted)
+
+			# so now I'm back to doing this the regular way:
+			plugin.on_reload_permission_granted
+			# (leak solved!)
 
 		self.schedule_search_with_all_plugins('')
 
