@@ -1,0 +1,220 @@
+class CardapioPlugin (CardapioPluginInterface):
+	author = 'Cardapio Team'
+	name = _('Web Bookmarks')
+	description = _('Search for Web Bookmarks')
+
+	url                = ''
+	help_text          = ''
+	version            = '1.0'
+
+	plugin_api_version = 1.39
+
+	search_delay_type  = None
+	category_name      = _('Web Bookmarks')
+	category_icon      = 'html'
+	category_tooltip   = _('Web bookmarks')
+
+	fallback_icon      = 'html'
+
+	hide_from_sidebar  = False
+
+
+	def __init__(self, cardapio_proxy):
+		'''	
+		This method is called when the plugin is enabled.
+		Nothing much to be done here except initialize variables and set loaded to True
+		'''
+		self.c = cardapio_proxy
+		
+		try:
+			import os
+			import sqlite3
+			import shutil
+			import gio
+			
+		except Exception, exception:
+			self.c.write_to_log(self, 'Could not import certain modules', is_error = True)
+			self.c.write_to_log(self, exception, is_error = True)
+			self.loaded = False
+			return
+
+		self.os      = os
+		self.sqlite3 = sqlite3
+		self.shutil  = shutil
+		self.gio     = gio
+		
+		self.loaded = False #plugin will not be loaded if no supported browsers are found
+		
+		## Look for firefox and setup bookmark list and file monitor if found
+		self.ff_monitor = None
+		self.ff_list = []
+		firefox_path = self.os.path.join(self.os.environ['HOME'],".mozilla/firefox")
+		if self.os.path.exists(self.os.path.join(firefox_path,'profiles.ini')):
+			
+			self.load_firefox_bm()
+			
+			self.ff_monitor = self.gio.File(self.ff_db_path).monitor_file()
+			self.ff_monitor_handler = self.ff_monitor.connect('changed', self.on_ff_bookmark_change)
+			self.loaded = True
+			self.c.write_to_log(self, 'Found Firefox Browser Installed')
+			
+		
+		## Look for chromium and setup bookmark list and file monitor if found	
+		self.chromium_monitor = None
+		self.chromium_list = []
+		chromium_path = self.os.path.join(self.os.environ['HOME'],".config/chromium/Default")
+		self.chromium_bm_path = self.os.path.join(chromium_path,'Bookmarks')
+		
+		if self.os.path.exists(self.chromium_bm_path):
+			self.load_chromium_bm()
+			
+			self.chromium_monitor = self.gio.File(self.chromium_bm_path).monitor_file()
+			self.chromium_monitor_handler = self.chromium_monitor.connect('changed', self.on_chromium_bookmark_change)
+			self.loaded = True
+			self.c.write_to_log(self, 'Found Chromium Browser Installed')
+	
+	   	
+	def __del__(self):
+
+		# handle objects that somehow seem to leak memory
+
+		if self.ff_monitor is not None:
+			if self.ff_monitor.handler_is_connected(self.ff_monitor_handler):
+				self.ff_monitor.disconnect(self.ff_monitor_handler)
+
+		self.ff_list = None # for some reason this has to be cleared to prevent a memory leak (wtf)
+
+		if self.chromium_monitor is not None:
+			if self.chromium_monitor.handler_is_connected(self.chromium_monitor_handler):
+				self.chromium_monitor.disconnect(self.chromium_monitor_handler)
+
+		self.chromium_list = None # for some reason this has to be cleared to prevent a memory leak (wtf)
+
+	def search(self, text, result_limit):
+		results = []
+		self.current_query = text
+		text = text.lower()
+		
+		if text == "": result_limit = 1000 #no result limit when plugin  is on sidebar
+		
+		for item in self.ff_list:
+			if item['name'] is None: item['name'] = item['command']
+			if item['name'].lower().find(text) != -1:
+				results.append(item)
+				
+		for item in self.chromium_list:
+			if item['name'] is None: item['name'] = item['command']
+			if item['name'].lower().find(text) != -1:
+				results.append(item)
+			
+		results.sort(key = lambda r: r['name'])
+		
+		self.c.handle_search_result(self, results[:result_limit], self.current_query)
+	
+
+	def load_firefox_bm(self, *dummy):
+		
+		firefox_path = self.os.path.join(self.os.environ['HOME'],".mozilla/firefox")
+		ini_file = open(self.os.path.join(firefox_path,'profiles.ini'))
+		
+		prof_list = ini_file.read().split()
+		ini_file.close()
+		
+		# this was a nested "try" statement, but apparently that caused a memory leak (wtf!?)
+		exception_thrown = False
+		try:
+			prof_folder = prof_list[prof_list.index('Default=1') - 1].split('=')[1]
+			
+		except ValueError:
+			exception_thrown = True
+			
+		if exception_thrown:
+			try:
+				prof_folder = prof_list[prof_list.index('Name=default') + 2].split('=')[1]
+			
+			except ValueError:
+				self.c.write_to_log(self, 'Could not determine firefox profile folder', is_error = True)
+				return
+			
+		prof_path = self.os.path.join(firefox_path,prof_folder)
+		
+		self.ff_db_path = self.os.path.join(prof_path, 'places.sqlite')
+		
+		
+		if not self.os.path.exists(self.ff_db_path):
+			self.c.write_to_log(self, 'could not find the  firefox bookmarks database', is_error = true)
+			return
+
+		
+		# places.sqlite is locked when firefox is running, so we must make
+		# a temporary copy to read the bookmarks from
+		db_copy_path = '%s.copy' % self.ff_db_path
+		self.shutil.copy(self.ff_db_path, db_copy_path)
+		
+		sql_conn = self.sqlite3.connect(db_copy_path)
+
+		sql_query = "SELECT moz_bookmarks.title, moz_places.url \
+					 FROM moz_bookmarks, moz_places  \
+					 WHERE moz_bookmarks.fk = moz_places.id AND moz_places.url NOT LIKE 'place:%'"
+					 
+		self.ff_list = []
+
+		try:
+			for bookmark in sql_conn.execute(sql_query):
+				self.ff_list.append({
+						'name'         : bookmark[0],
+						'tooltip'      : _('Go To \"%s\"') % bookmark[0],
+						'icon name'    : 'html',
+						'type'         : 'xdg',
+						'command'      : bookmark[1],
+						'context menu' : None,
+						})
+
+		except Exception, exception:
+			self.c.write_to_log(self, exception, is_error = True)
+
+		sql_conn.close()
+		self.os.remove(db_copy_path)
+		
+	def load_chromium_bm(self):
+
+		try: 
+			f = open(self.chromium_bm_path)
+			
+			read_queue = ["","",""]
+			bm_list = []
+			
+			for line in f:
+				read_queue.pop(0)
+				read_queue.append(line)
+				
+				if line.find("\"url\": ") != -1:
+					bm_list.append([read_queue[0],line])
+				
+			f.close()
+		except Exception, exception:
+			self.c.write_to_log(self, "Error reading chromium bookmark file", is_error = True)
+			self.c.write_to_log(self, exception, is_error = True)
+			return
+				 
+		self.chromium_list = []
+
+		for line in bm_list:
+			name = line[0].split("\"")[3]
+			self.chromium_list.append({
+					'name'         : name,
+					'tooltip'      : _('Go To \"%s\"') % name,
+					'icon name'    : 'html',
+					'type'         : 'xdg',
+					'command'      : line[1].split("\"")[3],
+					'context menu' : None,
+					})
+
+	
+	def on_ff_bookmark_change(self, monitor, _file, other_file, event):
+		self.load_firefox_bm()
+		
+	def on_chromium_bookmark_change(self, monitor, _file, other_file, event):
+		self.load_chromium_bm()
+		
+
