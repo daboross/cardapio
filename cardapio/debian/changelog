@@ -1,3 +1,31 @@
+cardapio (0.9.160-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fixed another memory leak
+   * Fixed bug in Firefox plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 28 Nov 2010 23:01:00 +0100
+
+cardapio (0.9.160-ubuntu1-lucid1) lucid; urgency=low
+
+   * Fixed another memory leak
+   * Fixed bug in Firefox plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 28 Nov 2010 23:01:00 +0100
+
+cardapio (0.9.159-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fixed another memory leak
+   * Fixed bug in Firefox plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 28 Nov 2010 23:01:00 +0100
+
+cardapio (0.9.159-ubuntu1-lucid1) lucid; urgency=low
+
+   * Fixed another memory leak
+   * Fixed bug in Firefox plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 28 Nov 2010 23:01:00 +0100
+
 cardapio (0.9.158-ubuntu2-maverick1) maverick; urgency=low
 
    * Fixed memory leak in Firefox and Software Center plugin

@@ -131,7 +131,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.158'
+	version = '0.9.160'
 
 	core_plugins = [
 			'applications',
@@ -3022,11 +3022,6 @@ class Cardapio(dbus.service.Object):
 		label and a hbox to be filled with apps). This also adds the section
 		name to the left pane, under the View label.
 		"""
-
-		# TODO (IMPORTANT) : There's still a small(ish) memory leak here. This
-		# is quite bad because it can accumulate over time, especially as the
-		# menu gets rebuilt everytime the system's package list is updated (when
-		# using the software center plugin) or when an app installed/removed.
 
 		if system_menu:
 			category_pane = self.system_category_pane
