@@ -181,8 +181,8 @@ class CardapioPlugin(CardapioPluginInterface):
 								'name'      : self.context_menu_action_name % name,
 								'tooltip'   : self.context_menu_action_tooltip,
 								'icon name' : 'gtk-save',
-								'type'      : 'xdg',
-								'command'   : "apt:%s" % pkgname,
+								'type'      : 'raw',
+								'command'   : 'apturl-gtk apt:%s' % pkgname,
 							},
 						]
 					}
