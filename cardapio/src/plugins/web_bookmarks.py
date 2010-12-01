@@ -179,7 +179,14 @@ class CardapioPlugin (CardapioPluginInterface):
 						'icon name'    : 'firefox',
 						'type'         : 'xdg',
 						'command'      : bookmark[1],
-						'context menu' : None,
+						'context menu' : [
+							{
+							'name'         : _('Open in Firefox'),
+							'tooltip'      : _('Go To \"%s\" in Firefox') % bookmark[0],
+							'icon name'    : 'chromium',
+							'type'         : 'raw',
+							'command'      : 'firefox \"%s\"' % bookmark[1]
+							}]
 						})
 
 		except Exception, exception:
@@ -219,7 +226,14 @@ class CardapioPlugin (CardapioPluginInterface):
 					'icon name'    : 'chromium',
 					'type'         : 'xdg',
 					'command'      : line[1].split("\"")[3],
-					'context menu' : None,
+					'context menu' : [
+						{
+						'name'         : _('Open in Chromium'),
+						'tooltip'      : _('Go To \"%s\" in Chromium') % name,
+						'icon name'    : 'chromium',
+						'type'         : 'raw',
+						'command'      : 'chromium-browser \"%s\"' %line[1].split("\"")[3]
+						}]
 					})
 
 	
