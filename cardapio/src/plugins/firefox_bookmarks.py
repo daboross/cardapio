@@ -141,8 +141,8 @@ class CardapioPlugin (CardapioPluginInterface):
 		
 		
 	def on_bookmarks_changed(self, monitor, _file, other_file, event):
-		self.c.ask_for_reload_permission(self)
-			
-	def on_reload_permission_granted(self):
+#		self.c.ask_for_reload_permission(self)
+#			
+#	def on_reload_permission_granted(self):
 		self.build_bookmark_list()	
 
