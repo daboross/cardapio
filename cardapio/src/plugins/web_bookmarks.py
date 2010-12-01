@@ -51,12 +51,18 @@ class CardapioPlugin (CardapioPluginInterface):
 		firefox_path = self.os.path.join(self.os.environ['HOME'],".mozilla/firefox")
 		if self.os.path.exists(self.os.path.join(firefox_path,'profiles.ini')):
 			
-			self.load_firefox_bm()
+			try:
+				self.load_firefox_bm()
 			
-			self.ff_monitor = self.gio.File(self.ff_db_path).monitor_file()
-			self.ff_monitor_handler = self.ff_monitor.connect('changed', self.on_ff_bookmark_change)
-			self.loaded = True
-			self.c.write_to_log(self, 'Found Firefox Browser Installed')
+				self.ff_monitor = self.gio.File(self.ff_db_path).monitor_file()
+				self.ff_monitor_handler = self.ff_monitor.connect('changed', self.on_ff_bookmark_change)
+				self.loaded = True
+				self.c.write_to_log(self, 'Found Firefox Browser Installed')
+			
+			except Exception, e:
+				self.c.write_to_log(self, "Error loading firefox bookmarks", is_error = True)
+				self.c.write_to_log(self, e, is_error = True)
+				self.ff_list = []
 			
 		
 		## Look for chromium and setup bookmark list and file monitor if found	
@@ -66,13 +72,17 @@ class CardapioPlugin (CardapioPluginInterface):
 		self.chromium_bm_path = self.os.path.join(chromium_path,'Bookmarks')
 		
 		if self.os.path.exists(self.chromium_bm_path):
-			self.load_chromium_bm()
+			try:
+				self.load_chromium_bm()
+				self.chromium_monitor = self.gio.File(self.chromium_bm_path).monitor_file()
+				self.chromium_monitor_handler = self.chromium_monitor.connect('changed', self.on_chromium_bookmark_change)
+				self.loaded = True
+				self.c.write_to_log(self, 'Found Chromium Browser Installed')
 			
-			self.chromium_monitor = self.gio.File(self.chromium_bm_path).monitor_file()
-			self.chromium_monitor_handler = self.chromium_monitor.connect('changed', self.on_chromium_bookmark_change)
-			self.loaded = True
-			self.c.write_to_log(self, 'Found Chromium Browser Installed')
-	
+			except Exception, e:
+				self.c.write_to_log(self, "Error loading chromium bookmarks", is_error = True)
+				self.c.write_to_log(self, e, is_error = True)
+				self.chromium_list = []
 	   	
 	def __del__(self):
 
@@ -137,8 +147,7 @@ class CardapioPlugin (CardapioPluginInterface):
 				prof_folder = prof_list[prof_list.index('Name=default') + 2].split('=')[1]
 			
 			except ValueError:
-				self.c.write_to_log(self, 'Could not determine firefox profile folder', is_error = True)
-				return
+				raise Exception('Could not determine firefox profile folder')				
 			
 		prof_path = self.os.path.join(firefox_path,prof_folder)
 		
@@ -146,8 +155,7 @@ class CardapioPlugin (CardapioPluginInterface):
 		
 		
 		if not self.os.path.exists(self.ff_db_path):
-			self.c.write_to_log(self, 'could not find the  firefox bookmarks database', is_error = true)
-			return
+			raise Exception('could not find the firefox bookmarks database')
 
 		
 		# places.sqlite is locked when firefox is running, so we must make
@@ -198,9 +206,8 @@ class CardapioPlugin (CardapioPluginInterface):
 				
 			f.close()
 		except Exception, exception:
-			self.c.write_to_log(self, "Error reading chromium bookmark file", is_error = True)
-			self.c.write_to_log(self, exception, is_error = True)
-			return
+			 raise Exception("Error reading chromium bookmark file")
+			
 				 
 		self.chromium_list = []
 
@@ -217,9 +224,18 @@ class CardapioPlugin (CardapioPluginInterface):
 
 	
 	def on_ff_bookmark_change(self, monitor, _file, other_file, event):
-		self.load_firefox_bm()
+		try:
+			self.load_firefox_bm()
+		except Exception, e:
+			self.c.write_to_log(self, "Error reloading firefox bookmarks", is_error = True)
+			self.c.write_to_log(self, e, is_error = True)
+			self.ff_list = []
 		
 	def on_chromium_bookmark_change(self, monitor, _file, other_file, event):
-		self.load_chromium_bm()
-		
+		try:
+			self.load_chromium_bm()
+		except Exception, e:
+			self.c.write_to_log(self, "Error reloading chromium bookmarks", is_error = True)
+			self.c.write_to_log(self, e, is_error = True)
+			self.chromium_list = []
 
