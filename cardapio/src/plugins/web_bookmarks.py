@@ -91,6 +91,10 @@ class CardapioPlugin (CardapioPluginInterface):
 		self.chromium_list = None # for some reason this has to be cleared to prevent a memory leak (wtf)
 
 	def search(self, text, result_limit):
+		#First we get results from every browser's plugin list
+		#then we sort alphabetically
+		#then we enforce the results limit when passing to the search handler
+		
 		results = []
 		self.current_query = text
 		text = text.lower()
@@ -107,9 +111,9 @@ class CardapioPlugin (CardapioPluginInterface):
 			if item['name'].lower().find(text) != -1:
 				results.append(item)
 			
-		results.sort(key = lambda r: r['name'])
+		results.sort(key = lambda r: r['name']) 
 		
-		self.c.handle_search_result(self, results[:result_limit], self.current_query)
+		self.c.handle_search_result(self, results[:result_limit], self.current_query) 
 	
 
 	def load_firefox_bm(self, *dummy):
@@ -164,7 +168,7 @@ class CardapioPlugin (CardapioPluginInterface):
 				self.ff_list.append({
 						'name'         : bookmark[0],
 						'tooltip'      : _('Go To \"%s\"') % bookmark[0],
-						'icon name'    : 'html',
+						'icon name'    : 'firefox',
 						'type'         : 'xdg',
 						'command'      : bookmark[1],
 						'context menu' : None,
@@ -181,15 +185,16 @@ class CardapioPlugin (CardapioPluginInterface):
 		try: 
 			f = open(self.chromium_bm_path)
 			
-			read_queue = ["","",""]
+			read_queue = ["",""]
 			bm_list = []
 			
 			for line in f:
-				read_queue.pop(0)
-				read_queue.append(line)
 				
 				if line.find("\"url\": ") != -1:
 					bm_list.append([read_queue[0],line])
+				
+				read_queue.pop(0)
+				read_queue.append(line)
 				
 			f.close()
 		except Exception, exception:
@@ -204,7 +209,7 @@ class CardapioPlugin (CardapioPluginInterface):
 			self.chromium_list.append({
 					'name'         : name,
 					'tooltip'      : _('Go To \"%s\"') % name,
-					'icon name'    : 'html',
+					'icon name'    : 'chromium',
 					'type'         : 'xdg',
 					'command'      : line[1].split("\"")[3],
 					'context menu' : None,
