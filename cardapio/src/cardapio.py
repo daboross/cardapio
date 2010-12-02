@@ -22,8 +22,15 @@
 # TODO: add "most recent" and "most frequent" with a zeitgeist plugin
 # plus other TODO's elsewhere in the code...
 
+# this import is outside of the "try" block because it defines
+# the function fatal_error(), which is used in the "except"
+from misc import *
+
 try:
-	from misc import *
+	from icons import *
+	from settings import *
+	from hacks import *
+
 	import gc
 	import os
 	import re
