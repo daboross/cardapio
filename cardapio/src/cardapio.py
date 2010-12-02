@@ -2304,7 +2304,10 @@ class Cardapio(dbus.service.Object):
 			else: 
 				self.window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
 
-		self.window.move(x, y)
+		if gtk.ver[0] == 2 and gtk.ver[1] <= 22:
+			gtk_window_move_with_gravity(self.window, x, y)
+		else:
+			self.window.move(x, y)
 
 		if self.settings['mini mode']:
 			self.main_splitter.set_position(0)

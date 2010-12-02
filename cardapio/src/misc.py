@@ -52,7 +52,6 @@ except Exception, exception:
 	sys.exit(1)
 
 
-
 # note - this is duplicated in cardapio_helper.py
 def which(filename):
 	"""
@@ -64,7 +63,6 @@ def which(filename):
 		if os.access(os.path.join(path, filename), os.X_OK):
 			return "%s/%s" % (path, filename)
 	return None
-
 
 
 def get_output(shell_command):
@@ -82,7 +80,6 @@ def get_output(shell_command):
 		return False
 
 
-
 import gc
 
 def get_memory_usage():
@@ -90,10 +87,37 @@ def get_memory_usage():
 	return get_output("ps -A -o rss -o cmd | awk '/cardapio / && !/awk/ {print $1}'")
 
 
+def gtk_window_move_with_gravity(window, x, y):
+	"""
+	For some reason, GTK 2.20.x in Ubuntu 10.04 (Lucid) does not 
+	respect the set_gravity command, so here we fix that.
+	"""
+
+	gravity = window.get_gravity()
+	width, height = window.get_size()
+
+	if gravity == gtk.gdk.GRAVITY_NORTH_WEST:
+		pass
+
+	elif gravity == gtk.gdk.GRAVITY_NORTH_EAST:
+		x -= width
+
+	elif gravity == gtk.gdk.GRAVITY_SOUTH_WEST:
+		y -= height
+
+	elif gravity == gtk.gdk.GRAVITY_SOUTH_EAST:
+		x -= width
+		y -= height
+
+	# NOTE: There are other gravity constants in GDK, but we do not implement
+	# them here because they're not used in Cardapio.
+
+	window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
+	window.move(x, y)
+
 
 def return_true(*dummy): return True
 def return_false(*dummy): return False
-
 
 
 class IconHelper:
@@ -241,7 +265,6 @@ class IconHelper:
 		"""
 
 		self._listener()
-
 
 
 class SettingsHelper:
@@ -444,7 +467,6 @@ class SettingsHelper:
 		"""
 
 		self.settings[name] = value;
-
 
 
 class FatalSettingsError(Exception):
