@@ -25,6 +25,12 @@ install: install_docky_helper
 	cp -f src/cardapio.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/misc.py $(PREFIX)/lib/cardapio/
 	cp -f src/misc.pyc $(PREFIX)/lib/cardapio/
+	cp -f src/icons.py $(PREFIX)/lib/cardapio/
+	cp -f src/icons.pyc $(PREFIX)/lib/cardapio/
+	cp -f src/settings.py $(PREFIX)/lib/cardapio/
+	cp -f src/settings.pyc $(PREFIX)/lib/cardapio/
+	cp -f src/hacks.py $(PREFIX)/lib/cardapio/
+	cp -f src/hacks.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/cardapio.ui $(PREFIX)/lib/cardapio/
 	cp -f res/cardapio.desktop $(PREFIX)/lib/cardapio/
 
