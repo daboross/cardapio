@@ -45,6 +45,33 @@ class CardapioPlugin (CardapioPluginInterface):
 		
 		self.loaded = False #plugin will not be loaded if no supported browsers are found
 		
+		# search for browsers installed and do initial load of bookmark lists
+		self.init_browser_lists()
+	   	
+	
+	def __del__(self):
+
+		# handle objects that somehow seem to leak memory
+
+		if self.ff_monitor is not None:
+			if self.ff_monitor.handler_is_connected(self.ff_monitor_handler):
+				self.ff_monitor.disconnect(self.ff_monitor_handler)
+
+		self.ff_list = None # for some reason this has to be cleared to prevent a memory leak (wtf)
+
+		if self.chromium_monitor is not None:
+			if self.chromium_monitor.handler_is_connected(self.chromium_monitor_handler):
+				self.chromium_monitor.disconnect(self.chromium_monitor_handler)
+
+		self.chromium_list = None # for some reason this has to be cleared to prevent a memory leak (wtf)
+		
+		if self.chrome_monitor is not None:
+			if self.chrome_monitor.handler_is_connected(self.chrome_monitor_handler):
+				self.chrome_monitor.disconnect(self.chrome_monitor_handler)
+
+		self.chrome_list = None # for some reason this has to be cleared to prevent a memory leak (wtf)
+
+	def init_browser_lists(self):
 		## Look for firefox and setup bookmark list and file monitor if found
 		self.ff_monitor = None
 		self.ff_list = []
@@ -102,29 +129,8 @@ class CardapioPlugin (CardapioPluginInterface):
 				self.c.write_to_log(self, "Error loading Google-Chrome bookmarks", is_error = True)
 				self.c.write_to_log(self, e, is_error = True)
 				self.chrome_list = []
-	   	
-	def __del__(self):
-
-		# handle objects that somehow seem to leak memory
-
-		if self.ff_monitor is not None:
-			if self.ff_monitor.handler_is_connected(self.ff_monitor_handler):
-				self.ff_monitor.disconnect(self.ff_monitor_handler)
-
-		self.ff_list = None # for some reason this has to be cleared to prevent a memory leak (wtf)
-
-		if self.chromium_monitor is not None:
-			if self.chromium_monitor.handler_is_connected(self.chromium_monitor_handler):
-				self.chromium_monitor.disconnect(self.chromium_monitor_handler)
-
-		self.chromium_list = None # for some reason this has to be cleared to prevent a memory leak (wtf)
-		
-		if self.chrome_monitor is not None:
-			if self.chrome_monitor.handler_is_connected(self.chrome_monitor_handler):
-				self.chrome_monitor.disconnect(self.chrome_monitor_handler)
-
-		self.chrome_list = None # for some reason this has to be cleared to prevent a memory leak (wtf)
-
+	
+	
 	def search(self, text, result_limit):
 		#First we get results from every browser's plugin list
 		#then we sort alphabetically
@@ -135,27 +141,25 @@ class CardapioPlugin (CardapioPluginInterface):
 		text = text.lower()
 		
 		if text == "": result_limit = 1000 #no result limit when plugin  is on sidebar
+				
+		self.search_bm_list(text, self.ff_list, results)
 		
-		for item in self.ff_list:
-			if item['name'] is None: item['name'] = item['command']
-			if item['name'].lower().find(text) != -1:
-				results.append(item)
-				
-		for item in self.chromium_list:
-			if item['name'] is None: item['name'] = item['command']
-			if item['name'].lower().find(text) != -1:
-				results.append(item)
-				
-		for item in self.chrome_list:
-			if item['name'] is None: item['name'] = item['command']
-			if item['name'].lower().find(text) != -1:
-				results.append(item)
+		self.search_bm_list(text, self.chromium_list, results)
+		
+		self.search_bm_list(text, self.chrome_list, results)
 			
 		results.sort(key = lambda r: r['name']) 
 		
 		self.c.handle_search_result(self, results[:result_limit], self.current_query) 
 	
-
+	
+	def search_bm_list(self, text, bm_list, results):
+		for item in bm_list:
+			if item['name'] is None: item['name'] = item['command']
+			if item['name'].lower().find(text) != -1:
+				results.append(item)
+	
+	
 	def load_firefox_bm(self, *dummy):
 		
 		firefox_path = self.os.path.join(self.os.environ['HOME'],".mozilla/firefox")
@@ -225,6 +229,7 @@ class CardapioPlugin (CardapioPluginInterface):
 		sql_conn.close()
 		self.os.remove(db_copy_path)
 		
+	
 	def load_chromium_bm(self):
 
 		try: 
@@ -266,6 +271,7 @@ class CardapioPlugin (CardapioPluginInterface):
 						}]
 					})
 
+	
 	#of course its very similar to the chromium function, but there are enough
 	#variables and strings that need to be different so I didn't try to
 	#implement it as the same function
@@ -310,6 +316,7 @@ class CardapioPlugin (CardapioPluginInterface):
 						}]
 					})
 	
+	
 	def on_ff_bookmark_change(self, monitor, _file, other_file, event):
 		try:
 			self.load_firefox_bm()
@@ -318,6 +325,7 @@ class CardapioPlugin (CardapioPluginInterface):
 			self.c.write_to_log(self, e, is_error = True)
 			self.ff_list = []
 		
+	
 	def on_chromium_bookmark_change(self, monitor, _file, other_file, event):
 		try:
 			self.load_chromium_bm()
@@ -326,6 +334,7 @@ class CardapioPlugin (CardapioPluginInterface):
 			self.c.write_to_log(self, e, is_error = True)
 			self.chromium_list = []
 
+	
 	def on_chrome_bookmark_change(self, monitor, _file, other_file, event):
 		try:
 			self.load_chrome_bm()
