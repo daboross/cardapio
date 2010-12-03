@@ -83,6 +83,25 @@ class CardapioPlugin (CardapioPluginInterface):
 				self.c.write_to_log(self, "Error loading chromium bookmarks", is_error = True)
 				self.c.write_to_log(self, e, is_error = True)
 				self.chromium_list = []
+				
+		## Look for google chrome and setup bookmark list and file monitor if found	
+		self.chrome_monitor = None
+		self.chrome_list = []
+		chrome_path = self.os.path.join(self.os.environ['HOME'],".config/google-chrome/Default")
+		self.chrome_bm_path = self.os.path.join(chrome_path,'Bookmarks')
+		
+		if self.os.path.exists(self.chrome_bm_path):
+			try:
+				self.load_chrome_bm()
+				self.chrome_monitor = self.gio.File(self.chrome_bm_path).monitor_file()
+				self.chrome_monitor_handler = self.chrome_monitor.connect('changed', self.on_chrome_bookmark_change)
+				self.loaded = True
+				self.c.write_to_log(self, 'Found Google-Chrome Browser Installed')
+			
+			except Exception, e:
+				self.c.write_to_log(self, "Error loading Google-Chrome bookmarks", is_error = True)
+				self.c.write_to_log(self, e, is_error = True)
+				self.chrome_list = []
 	   	
 	def __del__(self):
 
@@ -99,6 +118,12 @@ class CardapioPlugin (CardapioPluginInterface):
 				self.chromium_monitor.disconnect(self.chromium_monitor_handler)
 
 		self.chromium_list = None # for some reason this has to be cleared to prevent a memory leak (wtf)
+		
+		if self.chrome_monitor is not None:
+			if self.chrome_monitor.handler_is_connected(self.chrome_monitor_handler):
+				self.chrome_monitor.disconnect(self.chrome_monitor_handler)
+
+		self.chrome_list = None # for some reason this has to be cleared to prevent a memory leak (wtf)
 
 	def search(self, text, result_limit):
 		#First we get results from every browser's plugin list
@@ -117,6 +142,11 @@ class CardapioPlugin (CardapioPluginInterface):
 				results.append(item)
 				
 		for item in self.chromium_list:
+			if item['name'] is None: item['name'] = item['command']
+			if item['name'].lower().find(text) != -1:
+				results.append(item)
+				
+		for item in self.chrome_list:
 			if item['name'] is None: item['name'] = item['command']
 			if item['name'].lower().find(text) != -1:
 				results.append(item)
@@ -236,6 +266,49 @@ class CardapioPlugin (CardapioPluginInterface):
 						}]
 					})
 
+	#of course its very similar to the chromium function, but there are enough
+	#variables and strings that need to be different so I didn't try to
+	#implement it as the same function
+	def load_chrome_bm(self):
+
+		try: 
+			f = open(self.chrome_bm_path)
+			
+			read_queue = ["",""]
+			bm_list = []
+			
+			for line in f:
+				
+				if line.find("\"url\": ") != -1:
+					bm_list.append([read_queue[0],line])
+				
+				read_queue.pop(0)
+				read_queue.append(line)
+				
+			f.close()
+		except Exception, exception:
+			 raise Exception("Error reading google chrome bookmark file")
+			
+				 
+		self.chrome_list = []
+	
+		for line in bm_list:
+			name = line[0].split("\"")[3]
+			self.chrome_list.append({
+					'name'         : name,
+					'tooltip'      : _('Go To \"%s\"') % name,
+					'icon name'    : 'google-chrome',
+					'type'         : 'xdg',
+					'command'      : line[1].split("\"")[3],
+					'context menu' : [
+						{
+						'name'         : _('Open in Google Chrome'),
+						'tooltip'      : _('Go To \"%s\" in Google Chrome') % name,
+						'icon name'    : 'google-chrome',
+						'type'         : 'raw',
+						'command'      : 'google-chrome \"%s\"' %line[1].split("\"")[3]
+						}]
+					})
 	
 	def on_ff_bookmark_change(self, monitor, _file, other_file, event):
 		try:
@@ -253,3 +326,10 @@ class CardapioPlugin (CardapioPluginInterface):
 			self.c.write_to_log(self, e, is_error = True)
 			self.chromium_list = []
 
+	def on_chrome_bookmark_change(self, monitor, _file, other_file, event):
+		try:
+			self.load_chrome_bm()
+		except Exception, e:
+			self.c.write_to_log(self, "Error reloading google chrome bookmarks", is_error = True)
+			self.c.write_to_log(self, e, is_error = True)
+			self.chrome_list = []
