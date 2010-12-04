@@ -114,6 +114,11 @@ class SettingsHelper:
 			i = self.settings['active plugins'].index(None)
 			self.settings['active plugins'][i] = 'applications'
 
+		# 'firefox_bookmarks.py' has been replaced by 'web_bookmarks.py'
+		if 'firefox_bookmarks' in self.settings['active plugins']:
+			i = self.settings['active plugins'].index('firefox_bookmarks')
+			self.settings['active plugins'][i] = 'web_bookmarks'
+
 		# make sure required plugins are in the plugin list
 		for required_plugin in cardapio.Cardapio.required_plugins:
 			if required_plugin not in self.settings['active plugins']:
