@@ -3,7 +3,7 @@ import os
 
 package_data = ['ui/cardapio.ui', 'ui/options.ui']
 
-data_files = [('lib/bonobo/servers', ['src/cardapio.server'])]
+data_files = [('lib/bonobo/servers', ['src/gnomepanel/cardapio.server'])]
 
 for root, dir, files in os.walk('locale'):
     for file_ in files:
