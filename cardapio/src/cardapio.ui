@@ -15,7 +15,7 @@
     <property name="mnemonics_visible">False</property>
     <signal name="destroy_event" handler="on_mainwindow_destroy"/>
     <signal name="destroy" handler="on_mainwindow_destroy"/>
-    <signal name="size_allocate" handler="unblock_focus_out_event"/>
+    <signal name="size_allocate" handler="end_resize"/>
     <signal name="button_press_event" handler="on_mainwindow_button_pressed"/>
     <signal name="focus_out_event" handler="on_mainwindow_focus_out"/>
     <signal name="key_press_event" handler="on_mainwindow_after_key_pressed" after="yes"/>

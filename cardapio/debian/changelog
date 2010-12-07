@@ -1,3 +1,23 @@
+cardapio (0.9.161-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fixed bottom-panel problem with Lucid (bug 680674)
+   * Replaced Firefox plugin with new Web plugin for Firefox, Chrome, Chromium
+   * Web plugin is also updates bookmarks without reloading Cardapio
+   * Made Software Center plugin skip the Software Center when using the 
+     context menu option "install appname"
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 4 Dec 2010 23:01:00 +0100
+
+cardapio (0.9.161-ubuntu1-lucid1) lucid; urgency=low
+
+   * Fixed bottom-panel problem with Lucid (bug 680674)
+   * Replaced Firefox plugin with new Web plugin for Firefox, Chrome, Chromium
+   * Web plugin is also updates bookmarks without reloading Cardapio
+   * Made Software Center plugin skip the Software Center when using the 
+     context menu option "install appname"
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 4 Dec 2010 23:01:00 +0100
+
 cardapio (0.9.160-ubuntu1-maverick1) maverick; urgency=low
 
    * Fixed another memory leak

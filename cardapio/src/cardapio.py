@@ -138,7 +138,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.160'
+	version = '0.9.161'
 
 	core_plugins = [
 			'applications',
@@ -1293,7 +1293,7 @@ class Cardapio(dbus.service.Object):
 		self.window.window.begin_resize_drag(edge, event.button, x, y, event.time)
 
 
-	def end_resize(self):
+	def end_resize(self, *dummy):
 		"""
 		This function is called when the user releases the mouse after resizing the
 		Cardapio window.
