@@ -64,7 +64,7 @@ install: install_docky_helper
 	ln -fs $(PREFIX)/lib/cardapio/cardapio $(PREFIX)/bin/cardapio
 	
 	mkdir -p $(DESTDIR)/usr/lib/bonobo/servers
-	cp -f src/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/
+	cp -f res/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/
 
 buildsrc:
 	debuild -S
