@@ -14,12 +14,12 @@ Anyways, here is all you need to know about Cardapio plugins:
 
     ~
 
-2) Every plugin must contain a class called CardapioPlugin, which inherits from CardapioPluginInterface. However, you should not load the cardapio module yourself. Instead, Cardapio adds a few things to Python's built-ins to make your life easier. These are:
+2) Every plugin must contain a class called CardapioPlugin, which inherits from CardapioPluginInterface. However, you should not import the cardapio module yourself. Instead, Cardapio adds a few things to Python's built-ins to make your life easier. These are:
  a) the CardapioPluginInterface class
  b) the gettext function _  (underscore) for translations
  c) the dbus module
  d) the subprocess module
-So you can just use these without ever loading them in any way.
+So you can just use these without ever importing them in any way. I repeat: no need to "import Cardapio" or "import dbus" and such.
 
     ~
 
@@ -27,8 +27,8 @@ So you can just use these without ever loading them in any way.
  a) Use tabs, not spaces.
  b) Use single quotes, except for strings that have single quotes in them, like "you're funny".
  c) Use gettext's underscore function _('some text') for every string that is displayed in the GUI.
- d) Do not use gettext for strings that are saved to the log. Also, these should be in English.
- e) Catch all exceptions and save them to the log with the write_to_log method. Make sure exceptions do not crash Cardapio.
+ d) Do not use gettext for error messages or strings that are saved to the log. Also, these should be in English.
+ e) Catch all exceptions and save them to the log with the write_to_log method.
 
     ~
 
@@ -47,11 +47,11 @@ class CardapioPlugin (CardapioPluginInterface):
     author = 'plugin author'
     name = _('plugin name')
     description = _('plugin description')
-    version = '0.1.2.3'
 
     # not yet used:
     url = 'http://www.pluginurl.com'
     help_text = 'a larger description of the plugin'
+    version = '0.1.2.3'
 
     plugin_api_version = 1.39 # must be 1.39 to work with the current version of Cardapio
 
@@ -61,10 +61,10 @@ class CardapioPlugin (CardapioPluginInterface):
     # - None - if there should be no delay between when the user types and when
     # the plugin is called. Use only for VERY lightweight and fast plugins.
     #
-    # - 'local' - if the delay should be small (as set in the config.ini, in 
+    # - 'local' - if the delay should be small (as set in the config.json, in 
     # milliseconds)
     #
-    # - 'remote' - if the delay should be slightly larger (as set in the config.ini, 
+    # - 'remote' - if the delay should be slightly larger (as set in the config.json, 
     # in milliseconds)
 
     # the category name under which the plugin search results will appear
@@ -75,6 +75,9 @@ class CardapioPlugin (CardapioPluginInterface):
     # (icons can be gtk icons, named icons from the icon theme, or even
     # filesystem paths)
 
+    # the tooltip that will be shown when the cursor hovers the category button
+    category_tooltip = ''
+
     # the icon that will be used for all search items for which Cardapio cannot
     # find the assigned icon
     fallback_icon = ''
@@ -83,10 +86,17 @@ class CardapioPlugin (CardapioPluginInterface):
     # in the search field (like the tracker and google plugins, for example)
     hide_from_sidebar = True
 
+    # the default keyword used to restrict the search to this plugin. Leaving this 
+    # blank is the same as using the filename without the .py
+    default_keyword = ''
+    # (more info see: https://blueprints.launchpad.net/cardapio/+spec/letters-to-use-only-specific-search-method)
+
     # Finally, Cardapio may add some variables to the plugin instance, and so you
     # should not used these names in your plugin code. Right now, these are:
-    #    self.is_running
-    #    (more will possibly come, but not for plugin_api_version 1.2, which is frozen)
+    #    self.__is_running
+    #    self.__show_only_with_keyword
+    #    (More will probably come, but they will always start with two underscores. 
+    #    So avoid using this naming scheme.)
 
 #          ~
 
@@ -104,9 +114,6 @@ class CardapioPlugin (CardapioPluginInterface):
 		The constructor is given a single parameter, which is an object used to
 		communicate with Cardapio. This object has the following members:
 
-		   - settings - this is a dict containing the same things that you will
-		     find in the config.ini
-
 		   - write_to_log - this is a function that lets you write to Cardapio's
 		     log file, like this: write_to_log(self, 'hi there')
 
@@ -123,8 +130,6 @@ class CardapioPlugin (CardapioPluginInterface):
 			 internal databases, though, so this is not always applicable. This
 			 is used, for example, with the software_center plugin. (see
  		     on_reload_permission_granted below for more info)
-
-		Note: DO NOT WRITE ANYTHING IN THE settings DICT!!
 		"""
 
         # Do stuff here. For example:
@@ -256,7 +261,7 @@ class CardapioPlugin (CardapioPluginInterface):
         Cardapio then decides at what time it is best to give the plugin the
         reload permission. Usually this can take up to 10s, to allow several
         plugins to reload at the same time. Then, Cardapio shows the "Data has
-        changed" window.  
+        changed" window.
         
         2) Cardapio calls on_reload_permission_granted to tell the plugin that
         it can reload its database 
@@ -275,4 +280,3 @@ class CardapioPlugin (CardapioPluginInterface):
 
 
 That's it!
-
