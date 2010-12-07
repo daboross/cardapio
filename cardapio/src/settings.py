@@ -185,7 +185,7 @@ class SettingsHelper:
 		with self.get_config_file('w') as config_file:
 			logging.info('Saving config file...')
 			json.dump(self.settings, config_file, sort_keys = True, indent = 4)
-			logging.info('                  ...done!')
+			logging.info('...done saving config file!')
 
 
 	def read_config_option(self, user_settings, key, val, override_empty_str = False, force_update_from_version = None):

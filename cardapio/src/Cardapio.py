@@ -165,12 +165,17 @@ class Cardapio(dbus.service.Object):
 	SHOW_CENTERED   = 1
 	SHOW_NEAR_MOUSE = 2
 
+	#APPLET_TYPE_NONE  = None (Just use None instead of APPLET_TYPE_NONE)
+	APPLET_TYPE_GNOME2 = 1
+	APPLET_TYPE_AWN    = 2
+	APPLET_TYPE_DOCKY  = None
+
 	REMOTE_PROTOCOLS = ['ftp', 'sftp', 'smb']
 
 	class SafeCardapioProxy:
 		pass
 
-	def __init__(self, show = False, panel_applet = None, panel_button = None, debug = False):
+	def __init__(self, show = False, applet_type = None, debug = False, **kwargs):
 		"""
 		Creates a instance of Cardapio.
 		"""
@@ -178,8 +183,8 @@ class Cardapio(dbus.service.Object):
 		self.create_xdg_folders()
 		logging_filename = os.path.join(self.cache_folder_path, 'cardapio.log')
 
-		if debug == True: logging_level = logging.DEBUG
-		else: logging_level = logging.INFO
+		if debug : logging_level = logging.DEBUG
+		else     : logging_level = logging.INFO
 
 		logging_format = r'%(relativeCreated)- 10d %(levelname)- 10s %(message)s'
 
@@ -203,11 +208,7 @@ class Cardapio(dbus.service.Object):
 			traceback.print_exc()
 			sys.exit(1)
 
-		logging.info('               ...done loading!')
-			
-		self.panel_applet                  = panel_applet
-		self.panel_button                  = panel_button
-		self.last_visibility_toggle        = 0
+		logging.info('...done loading settings!')
 
 		self.visible                       = False
 		self.app_list                      = []    # used for searching the regular menus
@@ -235,6 +236,7 @@ class Cardapio(dbus.service.Object):
 		self.plugins_still_searching       = 0
 		self.bookmark_monitor              = None
 		self.volume_monitor                = None
+		self.last_visibility_toggle        = 0
 
 		self.sys_tree = gmenu.lookup_tree('gnomecc.menu')
 		self.have_control_center = (self.sys_tree.root is not None)
@@ -251,21 +253,25 @@ class Cardapio(dbus.service.Object):
 		if __package__ is not None:
 			self.package_root = __package__ + '.'
 
+		logging.info('Setting up panel variables...')
+		self.setup_panel_variables(applet_type, kwargs)
+		logging.info('...done setting up panel variables!')
+			
 		logging.info('Setting up DBus...')
 		self.setup_dbus()
-		logging.info('               ...done setting up DBus!')
+		logging.info('...done setting up DBus!')
 
 		logging.info('Setting up UI...')
 		self.setup_base_ui() # must be the first ui-related method to be called
-		logging.info('             ...done setting up UI!')
+		logging.info('...done setting up UI!')
 
 		logging.info('Setting up Plugins...')
 		self.setup_plugins()
-		logging.info('                  ...done setting up Plugins!')
+		logging.info('...done setting up Plugins!')
 
 		logging.info('Building UI...')
 		self.build_ui()
-		logging.info('           ...done building UI!')
+		logging.info('...done building UI!')
 
 		self.schedule_search_with_all_plugins('')
 
@@ -317,6 +323,43 @@ class Cardapio(dbus.service.Object):
 		DBusGMainLoop(set_as_default=True)
 		self.bus = dbus.SessionBus()
 		dbus.service.Object.__init__(self, self.bus, Cardapio.bus_obj_str)
+
+
+	def setup_panel_variables(self, applet_type, keywords):
+		"""
+		Prepares Cardapio's internal variables to handle all different types of
+		panel. Note that the "keywords" arguments is a dict containing the
+		*kwargs passed to __init__.
+		"""
+
+		self.applet_type = applet_type
+
+		try: 
+			if applet_type == Cardapio.APPLET_TYPE_GNOME2:
+				self.panel_applet = keywords['panel_applet']
+				self.panel_button = keywords['panel_button']
+
+			elif applet_type == Cardapio.APPLET_TYPE_AWN:
+				self.panel_applet = keywords['panel_applet']
+				self.panel_button = None
+
+		except Exception, exception:
+			fatal_error('Fatal error loading applet variables', exception)
+			sys.exit(1)
+
+
+	def get_applet_gdk_window(self):
+		"""
+		Returns the gdk.Window associated to the panel applet (or None).
+		"""
+
+		if self.applet_type == Cardapio.APPLET_TYPE_GNOME2:
+			return self.panel_button.get_toplevel().window
+
+		if self.applet_type == Cardapio.APPLET_TYPE_AWN:
+			return self.panel_applet.window
+
+		return None
 
 
 	def get_plugin_class(self, basename):
@@ -701,14 +744,15 @@ class Cardapio(dbus.service.Object):
 			('AboutDistro', self.open_about_dialog)
 		]
 
-		if self.panel_applet is None:
-			self.window.set_decorated(True)
-			self.window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
-			self.get_object('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
-		else:
+		if self.applet_type == Cardapio.APPLET_TYPE_GNOME2:
 			self.get_object('AboutGnomeMenuItem').set_visible(False)
 			self.get_object('AboutDistroMenuItem').set_visible(False)
 			self.panel_applet.connect('destroy', self.save_and_quit)
+
+		else:
+			self.window.set_decorated(True)
+			self.window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
+			self.get_object('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
 
 
 	def setup_plugins(self):
@@ -732,10 +776,8 @@ class Cardapio(dbus.service.Object):
 		Returns the best icon size for the current panel size
 		"""
 
-		panel = self.panel_button.get_toplevel().window
-
-		if panel is None:
-			return gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
+		panel = self.get_applet_gdk_window()
+		if panel is None: return gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
 
 		panel_width, panel_height = panel.get_size()
 		orientation = self.panel_applet.get_orient()
@@ -758,7 +800,7 @@ class Cardapio(dbus.service.Object):
 		return panel_size
 
 
-	def setup_panel_button(self):
+	def setup_gnome2_panel_button(self):
 		"""
 		Sets up the look and feel of the Cardapio applet button
 		"""
@@ -796,7 +838,7 @@ class Cardapio(dbus.service.Object):
 		menubar.remove(self.panel_button)
 		menubar.add(self.panel_button)
 
-		menubar.connect('button-press-event', self.on_panel_button_pressed)
+		menubar.connect('button-press-event', self.on_gnome2_panel_button_pressed)
 
 		if 'applet_press_handler' in dir(self):
 			try:
@@ -805,7 +847,7 @@ class Cardapio(dbus.service.Object):
 				self.panel_button.disconnect(self.applet_leave_handler)
 			except: pass
 
-		if self.settings['open on hover']:
+		if self.settings['open on hover'] and self.applet_type != None:
 			self.applet_press_handler = self.panel_button.connect('button-press-event', self.on_panel_button_toggled, True)
 			self.applet_enter_handler = self.panel_button.connect('enter-notify-event', self.on_applet_cursor_enter)
 			self.applet_leave_handler = self.panel_button.connect('leave-notify-event', self.on_mainwindow_cursor_leave)
@@ -838,8 +880,8 @@ class Cardapio(dbus.service.Object):
 		self.keybinding = self.settings['keybinding']
 		keybinder.bind(self.keybinding, self.show_hide)
 
-		if self.panel_button is not None:
-			self.setup_panel_button()
+		if self.applet_type == Cardapio.APPLET_TYPE_GNOME2:
+			self.setup_gnome2_panel_button()
 
 		if self.settings['show session buttons']:
 			self.get_object('SessionPane').show()
@@ -911,8 +953,12 @@ class Cardapio(dbus.service.Object):
 		self.no_results_slab, dummy, self.no_results_label = self.add_application_section('Dummy text')
 		self.hide_no_results_text()
 
-		if self.panel_applet is None:
+		if self.applet_type in (None, Cardapio.APPLET_TYPE_DOCKY):
 			self.get_object('AppletOptionPane').hide()
+
+		elif self.applet_type is Cardapio.APPLET_TYPE_AWN:
+			self.get_object('LabelAppletLabel').hide()
+			self.get_object('OptionAppletLabel').hide()
 
 		if not self.have_control_center:
 			self.view_mode_button.hide()
@@ -1368,7 +1414,7 @@ class Cardapio(dbus.service.Object):
 
 		self.save_dimensions()
 
-		if self.panel_applet is not None:
+		if self.applet_type == Cardapio.APPLET_TYPE_GNOME2:
 
 			cursor_x, cursor_y, dummy = self.panel_applet.window.get_pointer()
 			dummy, dummy, applet_w, applet_h = self.panel_applet.get_allocation()
@@ -1379,7 +1425,7 @@ class Cardapio(dbus.service.Object):
 			# So by ignoring this focus-out we actually make sure that Cardapio
 			# will be hidden after all. Silly.
 
-			if self.panel_applet is not None and (0 <= cursor_x <= applet_w and 0 <= cursor_y <= applet_h):
+			if 0 <= cursor_x <= applet_w and 0 <= cursor_y <= applet_h:
 				return
 
 		# If the last app was opened in the background, make sure Cardapio
@@ -1409,9 +1455,10 @@ class Cardapio(dbus.service.Object):
 		If using 'open on hover', this hides the Cardapio window after a delay.
 		"""
 
+		if self.applet_type is None: return
+
 		if self.settings['open on hover'] and not self.focus_out_blocked:
 			glib.timeout_add(self.settings['autohide delay'], self.hide_if_mouse_away)
-			self.save_dimensions()
 
 
 	def on_mainwindow_delete_event(self, widget, event):
@@ -1420,7 +1467,7 @@ class Cardapio(dbus.service.Object):
 		nothing. If in launcher mode, this terminates Cardapio.
 		"""
 
-		if self.panel_applet is not None:
+		if self.applet_type is not None:
 			# keep window alive if in panel mode
 			return True
 
@@ -2201,15 +2248,20 @@ class Cardapio(dbus.service.Object):
 		window_width, window_height = window.get_size()
 		screen_x, screen_y, screen_width, screen_height = self.get_screen_dimensions()
 
-		if self.panel_applet is None:
-
-			x = (screen_width - window_width)/2
-			y = (screen_height - window_height)/2
-
-		else:
+		if self.applet_type == Cardapio.APPLET_TYPE_GNOME2:
 
 			panel = self.panel_button.get_toplevel().window
 			x, y = panel.get_origin()
+
+		elif self.applet_type == Cardapio.APPLET_TYPE_AWN:
+
+			panel = self.panel_applet.window
+			x, y = panel.get_origin()
+
+		else:
+			x = (screen_width - window_width)/2
+			y = (screen_height - window_height)/2
+
 
 		return x, y
 
@@ -2240,7 +2292,7 @@ class Cardapio(dbus.service.Object):
 			anchor_right = True
 
 			# make sure Cardapio doesn't overlap the panel button when being flipped
-			if self.panel_button is not None:
+			if self.applet_type in (Cardapio.APPLET_TYPE_GNOME2, Cardapio.APPLET_TYPE_AWN):
 				dummy, dummy, applet_width, applet_height = self.panel_button.get_allocation()
 				x += applet_width
 
@@ -2249,7 +2301,7 @@ class Cardapio(dbus.service.Object):
 			anchor_bottom = True
 
 		# make sure Cardapio doesn't overlap the panel button when NOT being flipped
-		elif self.panel_button is not None:
+		elif self.applet_type in (Cardapio.APPLET_TYPE_GNOME2, Cardapio.APPLET_TYPE_AWN):
 			dummy, dummy, applet_width, applet_height = self.panel_button.get_allocation()
 			y += applet_height
 
@@ -2576,20 +2628,17 @@ class Cardapio(dbus.service.Object):
 		cursor_in_window_x = (window_x <= mouse_x <= window_x + window_width)
 		cursor_in_window_y = (window_y <= mouse_y <= window_y + window_height)
 
-		if self.panel_button is not None:
-			panel = self.panel_button.get_toplevel().window
+		if self.applet_type == Cardapio.APPLET_TYPE_GNOME2:
+			panel = self.get_applet_gdk_window()
 			panel_x, panel_y = panel.get_origin()
 			applet_x, applet_y, applet_width, applet_height = self.panel_button.get_allocation()
 			applet_x += panel_x
 			applet_y += panel_y
 			cursor_in_applet_x = (applet_x <= mouse_x <= applet_x + applet_width)
 			cursor_in_applet_y = (applet_y <= mouse_y <= applet_y + applet_height)
+			if cursor_in_applet_x and cursor_in_applet_y: return
 
-		else:
-			cursor_in_applet_x = cursor_in_applet_y = True
-
-		if (cursor_in_window_x and cursor_in_window_y) or (cursor_in_applet_x and cursor_in_applet_y):
-			return
+		if cursor_in_window_x and cursor_in_window_y: return
 
 		self.hide()
 
@@ -2610,7 +2659,7 @@ class Cardapio(dbus.service.Object):
 		window.window.focus()
 
 
-	def on_panel_button_pressed(self, widget, event):
+	def on_gnome2_panel_button_pressed(self, widget, event):
 		"""
 		Show the context menu when the user right-clicks the panel applet
 		"""
@@ -2647,26 +2696,26 @@ class Cardapio(dbus.service.Object):
 				return True # required! or we get strange focus problems
 
 
-	def on_panel_size_changed(self, widget, allocation):
+	def on_gnome2_panel_size_changed(self, widget, allocation):
 		"""
 		Resize the panel applet when the panel size is changed
 		"""
 
-		self.panel_applet.handler_block_by_func(self.on_panel_size_changed)
-		glib.timeout_add(Cardapio.SETUP_PANEL_BUTTON_DELAY, self.setup_panel_button)
-		glib.timeout_add(Cardapio.PANEL_SIZE_CHANGE_IGNORE_INTERVAL, self.on_panel_size_change_done) # added this to avoid an infinite loop
+		self.panel_applet.handler_block_by_func(self.on_gnome2_panel_size_changed)
+		glib.timeout_add(Cardapio.SETUP_PANEL_BUTTON_DELAY, self.setup_gnome2_panel_button)
+		glib.timeout_add(Cardapio.PANEL_SIZE_CHANGE_IGNORE_INTERVAL, self.on_gnome2_panel_size_change_done) # added this to avoid an infinite loop
 
 
-	def on_panel_size_change_done(self):
+	def on_gnome2_panel_size_change_done(self):
 		"""
 		Restore a signal handler that we had deactivated
 		"""
 
-		self.panel_applet.handler_unblock_by_func(self.on_panel_size_changed)
+		self.panel_applet.handler_unblock_by_func(self.on_gnome2_panel_size_changed)
 		return False # must return false to cancel the timer
 
 
-	def panel_change_orientation(self, *dummy):
+	def on_gnome2_panel_change_orientation(self, *dummy):
 		"""
 		Resize the panel applet when the panel orientation is changed
 		"""
@@ -2689,7 +2738,7 @@ class Cardapio(dbus.service.Object):
 			self.panel_button.child.set_alignment(0.5, 0)
 
 
-	def on_panel_change_background(self, widget, bg_type, color, pixmap):
+	def on_gnome2_panel_change_background(self, widget, bg_type, color, pixmap):
 		"""
 		Update the Cardapio applet background when the user changes
 		the panel background
@@ -2716,7 +2765,7 @@ class Cardapio(dbus.service.Object):
 		Toggle the panel applet when the user presses the keybinding
 		"""
 
-		if self.panel_applet is not None:
+		if self.applet_type == Cardapio.APPLET_TYPE_GNOME2:
 
 			if state: self.panel_button.select()
 			else: self.panel_button.deselect()
@@ -3839,7 +3888,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		try:
-			if self.panel_applet is not None:
+			if self.applet_type is not None: # TODO: Why is this check here? Makes no sense!
 				# allow launched apps to use Ubuntu's AppMenu
 				os.environ['UBUNTU_MENUPROXY'] = 'libappmenu.so'
 
@@ -4116,7 +4165,11 @@ def CardapioAppletFactory(applet, iid):
 
 	button = gtk.ImageMenuItem()
 
-	cardapio = Cardapio(show = Cardapio.DONT_SHOW, panel_button = button, panel_applet = applet)
+	cardapio = Cardapio(
+			show = Cardapio.DONT_SHOW, 
+			applet_type = Cardapio.APPLET_TYPE_GNOME2, 
+			panel_applet = applet, 
+			panel_button = button)
 
 	button.set_tooltip_text(_('Access applications, folders, system settings, etc.'))
 	button.set_always_show_image(True)
@@ -4154,14 +4207,14 @@ def CardapioAppletFactory(applet, iid):
 
 	applet.add(menubar)
 
-	applet.connect('size-allocate', cardapio.on_panel_size_changed)
-	applet.connect('change-orient', cardapio.panel_change_orientation)
-	applet.connect('change-background', cardapio.on_panel_change_background)
+	applet.connect('size-allocate', cardapio.on_gnome2_panel_size_changed)
+	applet.connect('change-orient', cardapio.on_gnome2_panel_change_orientation)
+	applet.connect('change-background', cardapio.on_gnome2_panel_change_background)
 
 	applet.set_applet_flags(gnomeapplet.EXPAND_MINOR)
 	applet.show_all()
 
-	cardapio.panel_change_orientation()
+	cardapio.on_gnome2_panel_change_orientation()
 
 	return True
 
