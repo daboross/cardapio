@@ -1,7 +1,7 @@
 from distutils.core import setup
 import os
 
-package_data = ['cardapio.ui']
+package_data = ['ui/cardapio.ui', 'ui/options.ui']
 
 data_files = [('lib/bonobo/servers', ['src/cardapio.server'])]
 
@@ -19,7 +19,7 @@ setup(
     name         = 'Cardapio',
     version      = '0.9.161',
     description  = 'A menu with search capabilities.',
-    author       = 'Thiago Teixeira',
+    author       = 'Cardapio Team',
     author_email = 'tvst@hotmail.com',
     url          = 'https://www.launchpad.net/cardapio',
     requires     = ['gtk', 'gtk.glade', 'gio', 'glib', 'gmenu', 'keybinder', 'gnomeapplet', 'dbus', 'dbus.service', 'dbus.mainloop.glib', 'xdg', 'gnome', 'simplejson', ],

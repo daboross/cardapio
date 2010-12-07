@@ -35,8 +35,6 @@ def fatal_error(title, errortext):
 
 
 try:
-	import cardapio
-
 	import os
 	import logging
 	import commands

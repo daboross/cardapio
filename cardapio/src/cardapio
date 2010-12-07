@@ -16,14 +16,24 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-from cardapio import Cardapio, fatal_error
-
-import os
+# these imports are outside of the "try" block because it defines
+# the function fatal_error(), which is used in the "except"
+from misc import fatal_error
 import sys
-import gtk
-import dbus
-import gnomeapplet
-from dbus.mainloop.glib import DBusGMainLoop
+
+try:
+	from Cardapio import Cardapio
+
+	import os
+	import gtk
+	import dbus
+	import gnomeapplet
+	from dbus.mainloop.glib import DBusGMainLoop
+
+except Exception, exception:
+	fatal_error('Fatal error loading Cardapio', exception)
+	sys.exit(1)
+
 
 def start_cardapio(show):
 	Cardapio(show = show)
@@ -43,14 +53,14 @@ if len(sys.argv) == 2:
 
 	if sys.argv[1] == 'run-in-window':
 
-		from cardapio import AppletFactory
+		from Cardapio import CardapioAppletFactory
 
 		# open new Cardapio instance
 		main_window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		main_window.set_title('Cardapio')
 		main_window.connect('destroy', gtk.main_quit)
 		app = gnomeapplet.Applet()
-		AppletFactory(app, None)
+		CardapioAppletFactory(app, None)
 		app.reparent(main_window)
 		main_window.show_all()
 		gtk.gdk.threads_enter()
@@ -108,8 +118,8 @@ if len(sys.argv) == 2:
 
 else:
 
-	from cardapio import AppletFactory
+	from Cardapio import CardapioAppletFactory
 
 	gnomeapplet.bonobo_factory('OAFIID:GNOME_Cardapio_Factory',
-			gnomeapplet.Applet.__gtype__, 'Cardapio', '0', AppletFactory)
+			gnomeapplet.Applet.__gtype__, 'Cardapio', '0', CardapioAppletFactory)
 

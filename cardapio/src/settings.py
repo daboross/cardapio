@@ -18,7 +18,7 @@
 from misc import *
 
 try:
-	import cardapio
+	import Cardapio
 
 	import os
 	import gtk
@@ -65,7 +65,7 @@ class SettingsHelper:
 			{
 				'name'      : _('Help and Support'),
 				'icon name' : 'help-contents',
-				'tooltip'   : _('Get help with %(distro_name)s') % { 'distro_name': cardapio.Cardapio.distro_name },
+				'tooltip'   : _('Get help with %(distro_name)s') % { 'distro_name': Cardapio.Cardapio.distro_name },
 				'type'      : 'raw',
 				'command'   : 'gnome-help',
 			})
@@ -100,7 +100,7 @@ class SettingsHelper:
 		self.read_config_option(s, 'handler for smb paths'      , r"nautilus '%s'"         ) # a command line using %s
 		# see https://bugs.launchpad.net/bugs/593141
 
-		self.settings['cardapio version'] = cardapio.Cardapio.version
+		self.settings['cardapio version'] = Cardapio.Cardapio.version
 
 		# clean up the config file whenever options are changed between versions
 
@@ -120,7 +120,7 @@ class SettingsHelper:
 			self.settings['active plugins'][i] = 'web_bookmarks'
 
 		# make sure required plugins are in the plugin list
-		for required_plugin in cardapio.Cardapio.required_plugins:
+		for required_plugin in Cardapio.Cardapio.required_plugins:
 			if required_plugin not in self.settings['active plugins']:
 				self.settings['active plugins'] = [required_plugin] + self.settings['active plugins']
 

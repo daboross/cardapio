@@ -18,11 +18,19 @@ install: install_docky_helper
 	python -m compileall src/
 	python -m compileall src/plugins/
 	python -m compileall src/docky/
-
+	
+	# remove old files which have been renamed
+	rm -rf $(PREFIX)/lib/cardapio/cardapio.py
+	rm -rf $(PREFIX)/lib/cardapio/cardapio.pyc
+	rm -rf $(PREFIX)/bin/cardapio/plugins/firefox_bookmarks.py
+	rm -rf $(PREFIX)/bin/cardapio/plugins/firefox_bookmarks.pyc
+	
 	mkdir -p $(PREFIX)/lib/cardapio
 	cp -f src/cardapio $(PREFIX)/lib/cardapio/
-	cp -f src/cardapio.py $(PREFIX)/lib/cardapio/
-	cp -f src/cardapio.pyc $(PREFIX)/lib/cardapio/
+	cp -f src/Cardapio.py $(PREFIX)/lib/cardapio/
+	cp -f src/Cardapio.pyc $(PREFIX)/lib/cardapio/
+	cp -f src/CardapioPluginInterface.py $(PREFIX)/lib/cardapio/
+	cp -f src/CardapioPluginInterface.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/misc.py $(PREFIX)/lib/cardapio/
 	cp -f src/misc.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/icons.py $(PREFIX)/lib/cardapio/
@@ -31,8 +39,11 @@ install: install_docky_helper
 	cp -f src/settings.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/hacks.py $(PREFIX)/lib/cardapio/
 	cp -f src/hacks.pyc $(PREFIX)/lib/cardapio/
-	cp -f src/cardapio.ui $(PREFIX)/lib/cardapio/
 	cp -f res/cardapio.desktop $(PREFIX)/lib/cardapio/
+
+	mkdir -p $(PREFIX)/lib/cardapio/ui
+	cp -f src/ui/cardapio.ui $(PREFIX)/lib/cardapio/ui/
+	cp -f src/ui/options.ui $(PREFIX)/lib/cardapio/ui/
 
 	mkdir -p $(PREFIX)/lib/cardapio/docky
 	cp -f src/docky/DockySettingsHelper* $(PREFIX)/lib/cardapio/docky/
@@ -66,7 +77,7 @@ uninstall: uninstall_docky_helper
 	rm -rf $(PREFIX)/lib/cardapio
 	rm -rf $(PREFIX)/bin/cardapio
 	rm -rf $(PREFIX)/share/pixmaps/cardapio*
-	rm $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
+	rm -f $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
 	find $(PREFIX)/share/locale -name '*cardapio.mo' -delete
 
 install_docky_helper:
