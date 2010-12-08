@@ -37,6 +37,12 @@ class CardapioAppletInterface:
 	def get_size(self):
 		pass
 
+	def get_origin(self):
+		"""
+		Returns the position of the applet with respect to the root window
+		"""
+		pass
+
 	def get_position(self):
 		pass
 

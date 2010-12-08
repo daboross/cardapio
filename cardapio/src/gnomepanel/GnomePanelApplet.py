@@ -104,11 +104,10 @@ class GnomePanelApplet(CardapioAppletInterface):
 		self.applet.connect('size-allocate', self._on_panel_size_changed)
 		self.applet.connect('change-orient', self._panel_change_orientation)
 		self.applet.connect('change-background', self._on_panel_change_background)
+		self.applet.connect('destroy', cardapio.save_and_quit)
 
 		self.applet.set_applet_flags(gnomeapplet.EXPAND_MINOR)
 		self.applet.show_all()
-
-		#self._panel_change_orientation()
 
 		return True
 
@@ -146,6 +145,11 @@ class GnomePanelApplet(CardapioAppletInterface):
 
 		alloc = self.get_allocation()
 		return alloc[2], alloc[3]
+
+	def get_origin(self):
+		panel = self.applet.get_window()
+		x, y = panel.get_origin()
+		return x,y
 
 	def get_position(self):
 		pass
