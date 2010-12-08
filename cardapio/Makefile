@@ -17,6 +17,7 @@ all:
 install: install_docky_helper
 	python -m compileall src/
 	python -m compileall src/plugins/
+	python -m compileall src/gnomepanel/
 	python -m compileall src/docky/
 	
 	# remove old files which have been renamed
@@ -29,6 +30,8 @@ install: install_docky_helper
 	cp -f src/cardapio $(PREFIX)/lib/cardapio/
 	cp -f src/Cardapio.py $(PREFIX)/lib/cardapio/
 	cp -f src/Cardapio.pyc $(PREFIX)/lib/cardapio/
+	cp -f src/CardapioAppletInterface.py $(PREFIX)/lib/cardapio/
+	cp -f src/CardapioAppletInterface.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/CardapioPluginInterface.py $(PREFIX)/lib/cardapio/
 	cp -f src/CardapioPluginInterface.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/misc.py $(PREFIX)/lib/cardapio/
@@ -44,6 +47,10 @@ install: install_docky_helper
 	mkdir -p $(PREFIX)/lib/cardapio/ui
 	cp -f src/ui/cardapio.ui $(PREFIX)/lib/cardapio/ui/
 	cp -f src/ui/options.ui $(PREFIX)/lib/cardapio/ui/
+
+	mkdir -p $(PREFIX)/lib/cardapio/gnomepanel
+	cp -f src/gnomepanel/GnomePanelApplet* $(PREFIX)/lib/cardapio/gnomepanel/
+	cp -f src/gnomepanel/__init__* $(PREFIX)/lib/cardapio/gnomepanel/
 
 	mkdir -p $(PREFIX)/lib/cardapio/docky
 	cp -f src/docky/DockySettingsHelper* $(PREFIX)/lib/cardapio/docky/

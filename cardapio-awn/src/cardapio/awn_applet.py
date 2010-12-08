@@ -57,6 +57,15 @@ class CardapioApplet:
 
 
 	def applet_clicked(self, widget):
+
+		x, y = self.applet.get_window().get_position()
+
+		pos_type = self.applet.get_pos_type()
+		force_anchor_bottom = (pos_type == gtk.POS_BOTTOM)
+		force_anchor_right  = (pos_type == gtk.POS_RIGHT)
+		print pos_type
+		print x, y, force_anchor_right, force_anchor_bottom
+
 		self.cardapio_app.show_hide()
 
 
