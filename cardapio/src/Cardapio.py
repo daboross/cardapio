@@ -335,6 +335,9 @@ class Cardapio(dbus.service.Object):
 		Prepares Cardapio's applet in any of the compatible panels.
 		"""
 
+		if self.panel_applet is None:
+			self.panel_applet = CardapioAppletInterface()
+
 		if self.panel_applet.panel_type == PANEL_TYPE_GNOME2:
 			self.get_object('AboutGnomeMenuItem').set_visible(False)
 			self.get_object('AboutDistroMenuItem').set_visible(False)

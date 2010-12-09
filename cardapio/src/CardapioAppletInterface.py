@@ -38,7 +38,7 @@ class CardapioAppletInterface:
 		"""
 		Returns the width and height of the applet
 		"""
-		pass
+		return 0,0
 
 
 	def get_position(self):
@@ -46,15 +46,15 @@ class CardapioAppletInterface:
 		Returns the position of the applet with respect to the screen (same as
 		get_origin in GTK)
 		"""
-		pass
+		return 0,0
 
 
 	def get_orientation(self):
 		"""
 		Returns the edge of the screen at which the panel is placed, using one
-		of ORIENT_UP, ORIENT_DOWN, ORIENT_LEFT, ORIENT_RIGHT.
+		of POS_TOP, POS_BOTTOM, ORIENT_LEFT, ORIENT_RIGHT.
 		"""
-		pass
+		return POS_TOP
 
 
 	def draw_toggled_state(self, state):
@@ -74,3 +74,4 @@ class CardapioAppletInterface:
 		x, y = self.get_position()
 		w, h = self.get_size()
 		return ((x <= mouse_x <= x + w) and (y <= mouse_y <= y + h))
+
