@@ -135,24 +135,45 @@ class GnomePanelApplet(CardapioAppletInterface):
 
 		return x, y, w, h
 
+
 	def get_allocation_estimate(self):
 		return self.button.get_allocation()
 
+
 	def get_size_estimate(self):
 		return self.button.get_allocation()
+
 
 	def get_size(self):
 
 		alloc = self.get_allocation()
 		return alloc[2], alloc[3]
 
+
 	def get_origin(self):
 		panel = self.applet.get_window()
 		x, y = panel.get_origin()
 		return x,y
 
+
 	def get_position(self):
-		pass
+
+		alloc = self.get_allocation()
+		return alloc[0], alloc[1]
+
+
+	def get_orientation(self):
+		"""
+		Returns the edge of the screen at which the panel is placed, using one
+		of ORIENT_UP, ORIENT_DOWN, ORIENT_LEFT, ORIENT_RIGHT.
+		"""
+
+		orientation = self.applet.get_orient()
+		if orientation == gnomeapplet.ORIENT_UP: return ORIENT_UP
+		if orientation == gnomeapplet.ORIENT_DOWN: return ORIENT_DOWN
+		if orientation == gnomeapplet.ORIENT_LEFT: return ORIENT_LEFT
+		return ORIENT_RIGHT
+
 
 	def _panel_change_orientation(self, *dummy):
 		"""

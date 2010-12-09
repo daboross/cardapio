@@ -2193,31 +2193,23 @@ class Cardapio(dbus.service.Object):
 		anchor_right  = False
 		anchor_bottom = False
 
+		orientation = self.panel_applet.get_orientation()
+		applet_width, applet_height = self.panel_applet.get_size()
+
 		# if the window won't fit horizontally, flip it over its y axis
-		if force_anchor_right or max_window_x > max_screen_x:
+		if max_window_x > max_screen_x: 
 			anchor_right = True
+			if orientation != ORIENT_LEFT: x += applet_width
 
-			# make sure Cardapio doesn't overlap the panel button when being y-flipped
-			if self.panel_applet.panel_type == PANEL_TYPE_GNOME2:
-				dummy, dummy, applet_width, applet_height = self.panel_button.get_allocation()
-				x += applet_width
+		# if the window won't fit horizontally, flip it over its x axis
+		if max_window_y > max_screen_y : anchor_bottom = True
+		elif orientation == ORIENT_UP : y += applet_height
 
-		# if the window won't fit vertically, flip it over its x axis
-		if force_anchor_bottom or max_window_y > max_screen_y:
-			anchor_bottom = True
+		if force_anchor_right : anchor_right  = True
+		if force_anchor_bottom: anchor_bottom = True
 
-		# make sure Cardapio doesn't overlap the panel button when NOT being x-flipped
-		#elif self.panel_applet.panel_type == PANEL_TYPE_GNOME2:
-		#	dummy, dummy, applet_width, applet_height = self.get_button().get_allocation()
-		#	y += applet_height
-		#
-		# NOTE:
-		# While the line above is useful when doing run-in-window, it's ugly
-		# with left/right panels -- so I removed it
-
-		# just to be sure: never hide behind top and left borders
-		# of the usable screen!
-
+		# just to be sure: never hide behind top and left borders of the usable
+		# screen!
 		if x < screen_x: x = screen_x
 		if y < screen_y: y = screen_y
 

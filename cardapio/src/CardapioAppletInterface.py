@@ -3,6 +3,11 @@ PANEL_TYPE_GNOME2 = 1
 PANEL_TYPE_AWN    = 2
 PANEL_TYPE_DOCKY  = None
 
+ORIENT_UP    = 0
+ORIENT_DOWN  = 1
+ORIENT_LEFT  = 2
+ORIENT_RIGHT = 3
+
 class CardapioAppletInterface:
 
 	panel_type = None
@@ -47,3 +52,9 @@ class CardapioAppletInterface:
 		pass
 
 
+	def get_orientation(self):
+		"""
+		Returns the edge of the screen at which the panel is placed, using one
+		of ORIENT_UP, ORIENT_DOWN, ORIENT_LEFT, ORIENT_RIGHT.
+		"""
+		pass
