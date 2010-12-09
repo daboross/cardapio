@@ -3,16 +3,16 @@ PANEL_TYPE_GNOME2 = 1
 PANEL_TYPE_AWN    = 2
 PANEL_TYPE_DOCKY  = None
 
-ORIENT_UP    = 0
-ORIENT_DOWN  = 1
-ORIENT_LEFT  = 2
-ORIENT_RIGHT = 3
+POS_TOP    = 0
+POS_BOTTOM = 1
+POS_LEFT   = 2
+POS_RIGHT  = 3
 
 class CardapioAppletInterface:
 
 	panel_type = None
 
-	def setup(self):
+	def setup(self, cardapio):
 		"""
 		This methods is called right after Cardapio loads its main variables, but
 		before it actually loads plugins and builds its GUI.
@@ -57,14 +57,6 @@ class CardapioAppletInterface:
 		pass
 
 
-	def has_mouse_cursor(self, mouse_x, mouse_y):
-		"""
-		Returns true if the given coordinates is on top of the applet, and False
-		otherwise.
-		"""
-		pass
-
-
 	def draw_toggled_state(self, state):
 		"""
 		Draws the panel applet in the toggled/untoggled state depending
@@ -73,3 +65,12 @@ class CardapioAppletInterface:
 		"""
 		pass
 
+
+	def has_mouse_cursor(self, mouse_x, mouse_y):
+		"""
+		Returns true if the given coordinates is on top of the applet, and False
+		otherwise.
+		"""
+		x, y = self.get_position()
+		w, h = self.get_size()
+		return ((x <= mouse_x <= x + w) and (y <= mouse_y <= y + h))

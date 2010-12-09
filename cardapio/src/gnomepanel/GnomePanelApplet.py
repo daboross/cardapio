@@ -144,21 +144,14 @@ class GnomePanelApplet(CardapioAppletInterface):
 	def get_orientation(self):
 		"""
 		Returns the edge of the screen at which the panel is placed, using one
-		of ORIENT_UP, ORIENT_DOWN, ORIENT_LEFT, ORIENT_RIGHT.
+		of POS_TOP, POS_BOTTOM, ORIENT_LEFT, ORIENT_RIGHT.
 		"""
 
 		orientation = self.applet.get_orient()
-		if orientation == gnomeapplet.ORIENT_UP: return ORIENT_UP
-		if orientation == gnomeapplet.ORIENT_DOWN: return ORIENT_DOWN
-		if orientation == gnomeapplet.ORIENT_LEFT: return ORIENT_LEFT
-		return ORIENT_RIGHT
-
-
-	def has_mouse_cursor(self, mouse_x, mouse_y):
-
-		x, y = self.get_position()
-		w, h = self.get_size()
-		return ((x <= mouse_x <= x + w) and (y <= mouse_y <= y + h))
+		if orientation == gnomeapplet.ORIENT_UP  : return POS_TOP 
+		if orientation == gnomeapplet.ORIENT_DOWN: return POS_BOTTOM 
+		if orientation == gnomeapplet.ORIENT_LEFT: return POS_LEFT
+		return POS_RIGHT
 
 
 	def draw_toggled_state(self, state):

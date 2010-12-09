@@ -163,7 +163,7 @@ class Cardapio(dbus.service.Object):
 	class SafeCardapioProxy:
 		pass
 
-	def __init__(self, show = False, panel_applet = None, debug = False, **kwargs):
+	def __init__(self, show = False, panel_applet = None, debug = False):
 		"""
 		Creates a instance of Cardapio.
 		"""
@@ -2134,11 +2134,11 @@ class Cardapio(dbus.service.Object):
 		# if the window won't fit horizontally, flip it over its y axis
 		if max_window_x > max_screen_x: 
 			anchor_right = True
-			if orientation != ORIENT_LEFT: x += applet_width
+			if orientation != POS_LEFT: x += applet_width
 
 		# if the window won't fit horizontally, flip it over its x axis
-		if max_window_y > max_screen_y : anchor_bottom = True
-		elif orientation == ORIENT_UP : y += applet_height
+		if max_window_y > max_screen_y: anchor_bottom = True
+		elif orientation == POS_TOP: y += applet_height
 
 		if force_anchor_right : anchor_right  = True
 		if force_anchor_bottom: anchor_bottom = True

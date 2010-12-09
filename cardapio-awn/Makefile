@@ -16,12 +16,15 @@ buildsrc:
 
 install:
 	mkdir -p $(PREFIX)/lib/cardapio
-	cp -f src/cardapio/awn_applet.py $(PREFIX)/lib/cardapio/
+	cp -f src/awn_applet_wrapper.py $(PREFIX)/lib/cardapio/
+	cp -f src/AwnApplet.py $(PREFIX)/lib/cardapio/
+	
 	mkdir -p /usr/share/avant-window-navigator/applets
 	cp -f src/cardapio.desktop /usr/share/avant-window-navigator/applets
 
 uninstall:
-	rm -rf $(PREFIX)/lib/cardapio/awn_applet.py
+	rm -rf $(PREFIX)/lib/cardapio/awn_applet_wrapper.py
+	rm -rf $(PREFIX)/lib/cardapio/AwnApplet.py
 	rm -rf /usr/share/avant-window-navigator/applets/cardapio.desktop
 
 
