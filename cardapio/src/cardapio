@@ -53,14 +53,14 @@ if len(sys.argv) == 2:
 
 	if sys.argv[1] == 'run-in-window':
 
-		from Cardapio import CardapioAppletFactory
+		from gnomepanel.GnomeAppletFactory import GnomeAppletFactory
 
 		# open new Cardapio instance
 		main_window = gtk.Window(gtk.WINDOW_TOPLEVEL)
 		main_window.set_title('Cardapio')
 		main_window.connect('destroy', gtk.main_quit)
 		app = gnomeapplet.Applet()
-		CardapioAppletFactory(app, None)
+		GnomeAppletFactory(app, None)
 		app.reparent(main_window)
 		main_window.show_all()
 		gtk.gdk.threads_enter()
@@ -118,8 +118,8 @@ if len(sys.argv) == 2:
 
 else:
 
-	from Cardapio import CardapioAppletFactory
+	from gnomepanel.GnomeAppletFactory import GnomeAppletFactory
 
 	gnomeapplet.bonobo_factory('OAFIID:GNOME_Cardapio_Factory',
-			gnomeapplet.Applet.__gtype__, 'Cardapio', '0', CardapioAppletFactory)
+			gnomeapplet.Applet.__gtype__, 'Cardapio', '0', GnomeAppletFactory)
 

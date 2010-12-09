@@ -14,7 +14,7 @@ class CardapioAppletInterface:
 
 	def setup(self):
 		"""
-		This function is called right after Cardapio loads its main variables, but
+		This methods is called right after Cardapio loads its main variables, but
 		before it actually loads plugins and builds its GUI.
 
 		IMPORTANT: Do not modify anything inside the "cardapio" variable! It is
@@ -24,31 +24,28 @@ class CardapioAppletInterface:
 		"""
 		pass
 
+
 	def update_from_user_settings(self, settings):
+		"""
+		This method updates the applet according to the settings in
+		settings['applet label'], settings['applet icon'], and settings['open on
+		hover']
+		"""
 		pass
 
-	def get_allocation_estimate(self):
-		pass
-
-	def get_size_estimate(self):
-		pass
-
-	def get_position_estimate(self):
-		pass
-
-	def get_allocation(self):
-		pass
 
 	def get_size(self):
+		"""
+		Returns the width and height of the applet
+		"""
 		pass
 
-	def get_origin(self):
-		"""
-		Returns the position of the applet with respect to the root window
-		"""
-		pass
 
 	def get_position(self):
+		"""
+		Returns the position of the applet with respect to the screen (same as
+		get_origin in GTK)
+		"""
 		pass
 
 
@@ -58,3 +55,21 @@ class CardapioAppletInterface:
 		of ORIENT_UP, ORIENT_DOWN, ORIENT_LEFT, ORIENT_RIGHT.
 		"""
 		pass
+
+
+	def has_mouse_cursor(self, mouse_x, mouse_y):
+		"""
+		Returns true if the given coordinates is on top of the applet, and False
+		otherwise.
+		"""
+		pass
+
+
+	def draw_toggled_state(self, state):
+		"""
+		Draws the panel applet in the toggled/untoggled state depending
+		on whether state is True/False. Note that this method should *only
+		draw*, but not handle toggling in any way.
+		"""
+		pass
+

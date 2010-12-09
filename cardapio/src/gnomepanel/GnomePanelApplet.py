@@ -114,7 +114,9 @@ class GnomePanelApplet(CardapioAppletInterface):
 
 	def update_from_user_settings(self, settings):
 		"""
-		Sets up the look and feel of the Cardapio applet button
+		This method updates the applet according to the settings in
+		settings['applet label'], settings['applet icon'], and settings['open on
+		hover'].
 		"""
 
 		self.applet_label  = settings['applet label']
@@ -123,43 +125,20 @@ class GnomePanelApplet(CardapioAppletInterface):
 		self._load_settings()
 
 
-	def get_allocation(self):
-
-		panel = self.button.get_toplevel().window
-
-		# Maybe I was using this to solve some bug...
-		#panel_x, panel_y = panel.get_origin()
-
-		x, y = panel.get_position()
-		w, h = panel.get_size()
-
-		return x, y, w, h
-
-
-	def get_allocation_estimate(self):
-		return self.button.get_allocation()
-
-
-	def get_size_estimate(self):
-		return self.button.get_allocation()
-
-
 	def get_size(self):
 
-		alloc = self.get_allocation()
-		return alloc[2], alloc[3]
+		# here we get the size of the toplevel window because that's actually
+		# just the small area of the panel where the applet will be drawn --
+		# *not* the entire panel as you would expect.
 
-
-	def get_origin(self):
-		panel = self.applet.get_window()
-		x, y = panel.get_origin()
-		return x,y
+		panel = self.button.get_toplevel().window
+		w, h = panel.get_size()
+		return  w, h
 
 
 	def get_position(self):
 
-		alloc = self.get_allocation()
-		return alloc[0], alloc[1]
+		return self.applet.get_window().get_origin()
 
 
 	def get_orientation(self):
@@ -173,6 +152,24 @@ class GnomePanelApplet(CardapioAppletInterface):
 		if orientation == gnomeapplet.ORIENT_DOWN: return ORIENT_DOWN
 		if orientation == gnomeapplet.ORIENT_LEFT: return ORIENT_LEFT
 		return ORIENT_RIGHT
+
+
+	def has_mouse_cursor(self, mouse_x, mouse_y):
+
+		x, y = self.get_position()
+		w, h = self.get_size()
+		return ((x <= mouse_x <= x + w) and (y <= mouse_y <= y + h))
+
+
+	def draw_toggled_state(self, state):
+		"""
+		Draws the panel applet in the toggled/untoggled state depending
+		on whether state is True/False. Note that this method should *only
+		draw*, but not handle toggling in any way.
+		"""
+
+		if state: self.button.select()
+		else: self.button.deselect()
 
 
 	def _panel_change_orientation(self, *dummy):
@@ -260,6 +257,30 @@ class GnomePanelApplet(CardapioAppletInterface):
 				self.cardapio_hide()
 
 
+	def _on_panel_button_toggled(self, widget, event, ignore_main_button):
+		"""
+		Show/Hide cardapio when the panel applet is clicked
+		"""
+
+		if event.type == gtk.gdk.BUTTON_PRESS:
+
+			if event.button == 1:
+
+				if not ignore_main_button:
+					self.cardapio.show_hide()
+
+				return True # required! or we get strange focus problems
+
+
+	def _on_applet_cursor_enter(self, widget, event):
+		"""
+		Handler for when the cursor enters the panel applet.
+		"""
+
+		self.cardapio.show_hide()
+		return True
+
+
 	def _load_settings(self):
 
 		self.button.set_label(self.applet_label)
@@ -304,13 +325,13 @@ class GnomePanelApplet(CardapioAppletInterface):
 				self.button.disconnect(self.applet_leave_handler)
 			except: pass
 
-		if self.open_on_hover and self.panel_type != None:
-			self.applet_press_handler = self.button.connect('button-press-event', self.cardapio.on_panel_button_toggled, True)
-			self.applet_enter_handler = self.button.connect('enter-notify-event', self.cardapio.on_applet_cursor_enter)
+		if self.open_on_hover:
+			self.applet_press_handler = self.button.connect('button-press-event', self._on_panel_button_toggled, True)
+			self.applet_enter_handler = self.button.connect('enter-notify-event', self._on_applet_cursor_enter)
 			self.applet_leave_handler = self.button.connect('leave-notify-event', self.cardapio.on_mainwindow_cursor_leave)
 
 		else:
-			self.applet_press_handler = self.button.connect('button-press-event', self.cardapio.on_panel_button_toggled, False)
+			self.applet_press_handler = self.button.connect('button-press-event', self._on_panel_button_toggled, False)
 			self.applet_enter_handler = self.button.connect('enter-notify-event', return_true)
 			self.applet_leave_handler = self.button.connect('leave-notify-event', return_true)
 
@@ -320,10 +341,11 @@ class GnomePanelApplet(CardapioAppletInterface):
 		Returns the best icon size for the current panel size
 		"""
 
-		panel = self.applet.get_window()
-		if panel is None: return gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
+		try:
+			panel_width, panel_height = self.get_size()
+		except:
+			return gtk.icon_size_lookup(gtk.ICON_SIZE_LARGE_TOOLBAR)[0]
 
-		panel_width, panel_height = panel.get_size()
 		orientation = self.applet.get_orient()
 
 		if orientation in (gnomeapplet.ORIENT_DOWN, gnomeapplet.ORIENT_UP):
