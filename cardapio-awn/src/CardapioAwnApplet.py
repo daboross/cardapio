@@ -26,7 +26,7 @@ from awn.extras import awnlib, __version__
 from Cardapio import Cardapio
 
 
-class AwnApplet(CardapioAppletInterface):
+class CardapioAwnApplet(CardapioAppletInterface):
 
 	cardapio_bus_name = 'org.varal.Cardapio'
 	cardapio_object_path = '/org/varal/Cardapio'
@@ -72,13 +72,19 @@ class AwnApplet(CardapioAppletInterface):
 
 
 	def get_size(self):
+
 		# TODO: check that this does indeed give us what we expect it does
-		return self.applet.get_window().get_size()
+		wh = self.applet.get_window().get_size()
+		print wh
+		return wh
 
 
 	def get_position(self):
+
 		# TODO: check that this does indeed give us what we expect it does
-		return self.applet.get_window().get_origin()
+		xy = self.applet.get_window().get_origin()
+		print xy
+		return xy
 
 
 	def get_orientation(self):

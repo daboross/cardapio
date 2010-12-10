@@ -2100,7 +2100,11 @@ class Cardapio(dbus.service.Object):
 		screen_x, screen_y, screen_width, screen_height = self.get_screen_dimensions()
 
 		if self.panel_applet.panel_type != None:
+			orientation = self.panel_applet.get_orientation()
 			x, y = self.panel_applet.get_position()
+			w, h = self.panel_applet.get_size()
+			if orientation == POS_LEFT: x += w
+			if orientation == POS_TOP : y += h
 
 		else:
 			x = (screen_width - window_width)/2
@@ -2132,16 +2136,17 @@ class Cardapio(dbus.service.Object):
 		anchor_bottom = False
 
 		orientation = self.panel_applet.get_orientation()
-		applet_width, applet_height = self.panel_applet.get_size()
+		w, h = self.panel_applet.get_size()
 
 		# if the window won't fit horizontally, flip it over its y axis
 		if max_window_x > max_screen_x: 
 			anchor_right = True
-			if orientation != POS_LEFT: x += applet_width
+			if orientation == POS_TOP or orientation == POS_BOTTOM: x += w 
 
 		# if the window won't fit horizontally, flip it over its x axis
-		if max_window_y > max_screen_y: anchor_bottom = True
-		elif orientation == POS_TOP: y += applet_height
+		if max_window_y > max_screen_y: 
+			anchor_bottom = True
+			if orientation == POS_LEFT or orientation == POS_RIGHT: y += h
 
 		if force_anchor_right : anchor_right  = True
 		if force_anchor_bottom: anchor_bottom = True

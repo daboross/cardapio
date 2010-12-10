@@ -14,10 +14,10 @@
 
 from awn.extras import awnlib, __version__
 
-from AwnApplet import AwnApplet
+from CardapioAwnApplet import CardapioAwnApplet
 
 if __name__ == "__main__":
-	awnlib.init_start(AwnApplet, {
+	awnlib.init_start(CardapioAwnApplet, {
 		"name"           : "Cardapio's applet",
 		"short"          : "cardapio",
 		"version"        : __version__,

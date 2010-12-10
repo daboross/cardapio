@@ -13,7 +13,7 @@ except Exception, exception:
 
 
 
-class GnomePanelApplet(CardapioAppletInterface):
+class CardapioGnomeApplet(CardapioAppletInterface):
 
 	PANEL_SIZE_CHANGE_IGNORE_INTERVAL = 200 # milliseconds
 	SETUP_PANEL_BUTTON_DELAY          = 100 # milliseconds (must be smaller than PANEL_SIZE_CHANGE_IGNORE_INTERVAL)
@@ -27,15 +27,6 @@ class GnomePanelApplet(CardapioAppletInterface):
 
 
 	def setup(self, cardapio):
-		"""
-		This function is called right after Cardapio loads its main variables, but
-		before it actually loads plugins and builds its GUI.
-
-		IMPORTANT: Do not modify anything inside the "cardapio" variable! It is
-		only passed here directly (instead of using a proxy like in the case of
-		plugins) because applets are written by "trusted" coders (since there
-		will only be 3 or 4 applets total)
-		"""
 
 		self.icon_helper = cardapio.icon_helper
 		self.cardapio = cardapio
@@ -113,11 +104,6 @@ class GnomePanelApplet(CardapioAppletInterface):
 
 
 	def update_from_user_settings(self, settings):
-		"""
-		This method updates the applet according to the settings in
-		settings['applet label'], settings['applet icon'], and settings['open on
-		hover'].
-		"""
 
 		self.applet_label  = settings['applet label']
 		self.applet_icon   = settings['applet icon']
@@ -132,34 +118,26 @@ class GnomePanelApplet(CardapioAppletInterface):
 		# *not* the entire panel as you would expect.
 
 		panel = self.button.get_toplevel().window
-		w, h = panel.get_size()
-		return  w, h
+		wh = panel.get_size()
+		return  wh
 
 
 	def get_position(self):
 
-		return self.applet.get_window().get_origin()
+		xy = self.applet.get_window().get_origin()
+		return xy
 
 
 	def get_orientation(self):
-		"""
-		Returns the edge of the screen at which the panel is placed, using one
-		of POS_TOP, POS_BOTTOM, ORIENT_LEFT, ORIENT_RIGHT.
-		"""
 
 		orientation = self.applet.get_orient()
-		if orientation == gnomeapplet.ORIENT_UP  : return POS_TOP 
-		if orientation == gnomeapplet.ORIENT_DOWN: return POS_BOTTOM 
-		if orientation == gnomeapplet.ORIENT_LEFT: return POS_LEFT
-		return POS_RIGHT
+		if orientation == gnomeapplet.ORIENT_UP  : return POS_BOTTOM # bottom and top are flipped for some reason
+		if orientation == gnomeapplet.ORIENT_DOWN: return POS_TOP    # bottom and top are flipped for some reason
+		if orientation == gnomeapplet.ORIENT_LEFT: return POS_RIGHT  # bottom and top are flipped for some reason
+		return POS_LEFT # bottom and top are flipped for some reason
 
 
 	def draw_toggled_state(self, state):
-		"""
-		Draws the panel applet in the toggled/untoggled state depending
-		on whether state is True/False. Note that this method should *only
-		draw*, but not handle toggling in any way.
-		"""
 
 		if state: self.button.select()
 		else: self.button.deselect()
@@ -225,8 +203,8 @@ class GnomePanelApplet(CardapioAppletInterface):
 		"""
 
 		self.applet.handler_block_by_func(self._on_panel_size_changed)
-		glib.timeout_add(GnomePanelApplet.SETUP_PANEL_BUTTON_DELAY, self._load_settings)
-		glib.timeout_add(GnomePanelApplet.PANEL_SIZE_CHANGE_IGNORE_INTERVAL, self._on_panel_size_change_done) # added this to avoid an infinite loop
+		glib.timeout_add(CardapioGnomeApplet.SETUP_PANEL_BUTTON_DELAY, self._load_settings)
+		glib.timeout_add(CardapioGnomeApplet.PANEL_SIZE_CHANGE_IGNORE_INTERVAL, self._on_panel_size_change_done) # added this to avoid an infinite loop
 
 
 	def _on_panel_button_pressed(self, widget, event):

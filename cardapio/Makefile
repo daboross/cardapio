@@ -49,8 +49,8 @@ install: install_docky_helper
 	cp -f src/ui/options.ui $(PREFIX)/lib/cardapio/ui/
 
 	mkdir -p $(PREFIX)/lib/cardapio/gnomepanel
-	cp -f src/gnomepanel/GnomePanelApplet* $(PREFIX)/lib/cardapio/gnomepanel/
-	cp -f src/gnomepanel/GnomeAppletFactory* $(PREFIX)/lib/cardapio/gnomepanel/
+	cp -f src/gnomepanel/CardapioGnomeApplet* $(PREFIX)/lib/cardapio/gnomepanel/
+	cp -f src/gnomepanel/CardapioGnomeAppletFactory* $(PREFIX)/lib/cardapio/gnomepanel/
 	cp -f src/gnomepanel/__init__* $(PREFIX)/lib/cardapio/gnomepanel/
 
 	mkdir -p $(PREFIX)/lib/cardapio/docky
