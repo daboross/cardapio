@@ -23,24 +23,28 @@ except Exception, exception:
 
 from awn.extras import awnlib, __version__
 
-from Cardapio import Cardapio
-
 
 class CardapioAwnApplet(CardapioAppletInterface):
 
-	cardapio_bus_name = 'org.varal.Cardapio'
-	cardapio_object_path = '/org/varal/Cardapio'
-	cardapio_iface_name = 'org.varal.Cardapio'
-
 	panel_type = PANEL_TYPE_AWN
+	ICON = 'cardapio-256'
 
 	def __init__(self, applet):
 
 		self.applet = applet
 
+		self.applet_press_handler = None
+		self.applet_enter_handler = None
+		self.applet_leave_handler = None
+
 		self.applet.tooltip.set('Cardapio')
 
-		self.cardapio = Cardapio(show = Cardapio.DONT_SHOW, panel_applet = self)
+		#self.cardapio = Cardapio(show = Cardapio.DONT_SHOW, panel_applet = self)
+
+
+	def setup(self, cardapio):
+
+		self.cardapio = cardapio
 
 		self.preferences = gtk.ImageMenuItem(gtk.STOCK_PREFERENCES)
 		self.edit = gtk.ImageMenuItem(gtk.STOCK_EDIT)
@@ -57,34 +61,66 @@ class CardapioAwnApplet(CardapioAppletInterface):
 		self.menu.insert(gtk.SeparatorMenuItem(), 3)
 		self.menu.show_all()
 
-		self.applet.connect('clicked', self._on_applet_clicked)
-
-
-	def setup(self, cardapio):
-		pass
-
 
 	def update_from_user_settings(self, settings):
 
+		if self.applet_press_handler is not None:
+			try:
+				self.applet.disconnect(self.applet_press_handler)
+				self.applet.disconnect(self.applet_enter_handler)
+				self.applet.disconnect(self.applet_leave_handler)
+			except: pass
+
 		if settings['open on hover']:
-			self.applet.connect('enter-notify-event', self._on_applet_cursor_enter)
-		# TODO: else?
+			self.applet_press_handler = self.applet.connect('clicked', self._on_applet_clicked, True)
+			self.applet_enter_handler = self.applet.connect('enter-notify-event', self._on_applet_cursor_enter)
+			self.applet_leave_handler = self.applet.connect('leave-notify-event', self.cardapio.on_mainwindow_cursor_leave)
+
+		else:
+			self.applet_press_handler = self.applet.connect('clicked', self._on_applet_clicked, False)
+			self.applet_enter_handler = self.applet.connect('enter-notify-event', return_true)
+			self.applet_leave_handler = self.applet.connect('leave-notify-event', return_true)
+
+		try:
+			self.applet.set_icon_name(settings['applet icon'])
+			return
+		except: pass
+
+		try: self.applet.set_icon_name(self.ICON)
+		except: pass
 
 
 	def get_size(self):
 
-		# TODO: check that this does indeed give us what we expect it does
-		wh = self.applet.get_window().get_size()
-		print wh
-		return wh
+		icon_size = self.applet.get_size()
+		offset = self.applet.get_offset()
+
+		offset_icon_size = offset + icon_size + 5 # 5 is a magic number from AWN
+
+		pos_type = self.applet.get_pos_type()
+		if pos_type == gtk.POS_TOP    : return icon_size, offset_icon_size
+		if pos_type == gtk.POS_BOTTOM : return icon_size, offset_icon_size
+		if pos_type == gtk.POS_LEFT   : return offset_icon_size, icon_size
+		else: return offset_icon_size, icon_size
 
 
 	def get_position(self):
 
-		# TODO: check that this does indeed give us what we expect it does
-		xy = self.applet.get_window().get_origin()
-		print xy
-		return xy
+		x, y = self.applet.get_window().get_origin()
+		dummy, dummy, w, h = self.applet.get_allocation()
+
+		extra_offset = self.applet.get_offset()
+		#extra_offset = self.applet.get_offset_at(mx + w / 2, my + h / 2)
+
+		icon_size = self.applet.get_size()
+		extra_offset += 5 # magic number from AWN
+
+		pos_type = self.applet.get_pos_type()
+
+		if   pos_type == gtk.POS_BOTTOM : y = y + h - icon_size - extra_offset #- mh
+		elif pos_type == gtk.POS_RIGHT  : x = x + w - icon_size - extra_offset #- mw
+
+		return x, y	
 
 
 	def get_orientation(self):
@@ -103,8 +139,12 @@ class CardapioAwnApplet(CardapioAppletInterface):
 	def draw_toggled_state(self, state):
 		pass
 
-	def _on_applet_clicked(self, widget):
-		self.cardapio.show_hide()
+
+	def _on_applet_clicked(self, widget, ignore_main_button):
+
+		if not ignore_main_button:
+			self.cardapio.show_hide()
+
 
 	def _on_applet_cursor_enter(self, widget, event):
 		self.cardapio.show_hide()

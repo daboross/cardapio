@@ -24,6 +24,9 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 
 		self.applet = applet
 		self.button = gtk.ImageMenuItem()
+		self.applet_press_handler = None
+		self.applet_enter_handler = None
+		self.applet_leave_handler = None
 
 
 	def setup(self, cardapio):
@@ -133,8 +136,8 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 		orientation = self.applet.get_orient()
 		if orientation == gnomeapplet.ORIENT_UP  : return POS_BOTTOM # bottom and top are flipped for some reason
 		if orientation == gnomeapplet.ORIENT_DOWN: return POS_TOP    # bottom and top are flipped for some reason
-		if orientation == gnomeapplet.ORIENT_LEFT: return POS_RIGHT  # bottom and top are flipped for some reason
-		return POS_LEFT # bottom and top are flipped for some reason
+		if orientation == gnomeapplet.ORIENT_LEFT: return POS_RIGHT  # left and right are flipped for some reason
+		return POS_LEFT # left and right are flipped for some reason
 
 
 	def draw_toggled_state(self, state):
@@ -256,7 +259,7 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 
 		self.button.set_label(self.applet_label)
 
-		button_icon_pixbuf = self.icon_helper.get_icon_pixbuf(self.applet_icon, self._get_best_icon_size_for_panel(), 'distributor-logo')
+		button_icon_pixbuf = self.icon_helper.get_icon_pixbuf(self.applet_icon, self._get_best_icon_size_for_panel(), 'start-here')
 		button_icon = gtk.image_new_from_pixbuf(button_icon_pixbuf)
 		self.button.set_image(button_icon)
 
@@ -289,7 +292,7 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 
 		menubar.connect('button-press-event', self._on_panel_button_pressed)
 
-		if 'applet_press_handler' in dir(self):
+		if self.applet_press_handler is not None:
 			try:
 				self.button.disconnect(self.applet_press_handler)
 				self.button.disconnect(self.applet_enter_handler)

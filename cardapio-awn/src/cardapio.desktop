@@ -9,7 +9,7 @@ Comment=Put Cardapio menu on your AWN dock
 X-AWN-Type=Applet
 X-AWN-AppletType=Python
 X-AWN-AppletCategory=Utility
-X-AWN-AppletExec=/usr/lib/cardapio/cardapio_awn_applet_wrapper.py
+X-AWN-AppletExec=/usr/lib/cardapio/CardapioAwnWrapper.py
 
 Exec=awn-applet -p %k
 Icon=cardapio-256

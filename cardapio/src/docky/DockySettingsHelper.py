@@ -144,12 +144,15 @@ class DockySettingsHelper:
 			x = mouse_x - half_zoomed_icon_size 
 			y = screen_height - icon_size - vertical_offset
 			force_anchor_bottom = True
+
 		elif position == 'Top':
 			x = mouse_x - half_zoomed_icon_size 
 			y = icon_size + vertical_offset
+
 		elif position == 'Left':
 			x = icon_size  + horizontal_offset
 			y = mouse_y - half_zoomed_icon_size 
+
 		elif position == 'Right':
 			x = screen_width - icon_size - horizontal_offset
 			y = mouse_y - half_zoomed_icon_size

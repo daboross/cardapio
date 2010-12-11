@@ -745,6 +745,9 @@ class Cardapio(dbus.service.Object):
 		self.keybinding = self.settings['keybinding']
 		keybinder.bind(self.keybinding, self.show_hide)
 
+		if not self.settings['applet icon']: 
+			self.settings['applet icon'] = 'start-here'
+
 		if self.panel_applet.panel_type is not None:
 			self.panel_applet.update_from_user_settings(self.settings)
 
@@ -2110,7 +2113,6 @@ class Cardapio(dbus.service.Object):
 			x = (screen_width - window_width)/2
 			y = (screen_height - window_height)/2
 
-
 		return x, y
 
 
@@ -2157,12 +2159,10 @@ class Cardapio(dbus.service.Object):
 		if y < screen_y: y = screen_y
 
 		if anchor_right and x - window_width < screen_x: 
-			anchor_right = False
-			x = screen_x
+			x = screen_x + screen_width
 
 		if anchor_bottom and y - window_height < screen_y: 
-			anchor_bottom = False
-			y = screen_y
+			y = screen_y + screen_height
 
 		return x, y, anchor_right, anchor_bottom
 
@@ -2201,18 +2201,14 @@ class Cardapio(dbus.service.Object):
 		x, y, anchor_right, anchor_bottom = self.get_coordinates_inside_screen(self.window, x, y, force_anchor_right, force_anchor_bottom)
 
 		if anchor_right:
-			if anchor_bottom: 
-				self.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_EAST)
-			else: 
-				self.window.set_gravity(gtk.gdk.GRAVITY_NORTH_EAST)
+			if anchor_bottom: self.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_EAST)
+			else: self.window.set_gravity(gtk.gdk.GRAVITY_NORTH_EAST)
 
 		else:
-			if anchor_bottom: 
-				self.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
-			else: 
-				self.window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
+			if anchor_bottom: self.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
+			else: self.window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
 
-		if gtk.ver[0] == 2 and gtk.ver[1] <= 22:
+		if gtk.ver[0] == 2 and gtk.ver[1] <= 21 and gtk.ver[2] < 5:
 			gtk_window_move_with_gravity(self.window, x, y)
 		else:
 			self.window.move(x, y)
