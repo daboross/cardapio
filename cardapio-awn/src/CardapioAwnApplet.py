@@ -108,7 +108,11 @@ class CardapioAwnApplet(CardapioAppletInterface):
 		dummy, dummy, w, h = self.applet.get_allocation()
 
 		extra_offset = self.applet.get_offset()
+
+		# TODO: Curved dock fix:
 		#extra_offset = self.applet.get_offset_at(mx + w / 2, my + h / 2)
+		# But what is mx, my in the context of Cardapio?
+		# (see: http://bazaar.launchpad.net/~awn-core/awn/trunk/annotate/head%3A/libawn/awn-utils.c#L228 )
 
 		icon_size = self.applet.get_size()
 		extra_offset += 5 # magic number from AWN
