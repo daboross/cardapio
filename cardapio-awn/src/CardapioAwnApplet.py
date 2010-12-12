@@ -39,8 +39,6 @@ class CardapioAwnApplet(CardapioAppletInterface):
 
 		self.applet.tooltip.set('Cardapio')
 
-		#self.cardapio = Cardapio(show = Cardapio.DONT_SHOW, panel_applet = self)
-
 
 	def setup(self, cardapio):
 
