@@ -23,15 +23,17 @@ class CardapioAwnWrapper:
 		cardapio = Cardapio(panel_applet = cardapio_awn_applet)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	awnlib.init_start(CardapioAwnWrapper, {
-		"name"           : "Cardapio's applet",
-		"short"          : "cardapio",
-		"version"        : __version__,
-		"description"    : "Replace your menu with Cardapio",
-		"theme"          : CardapioAwnApplet.ICON,
-		"author"         : "Cardapio Team",
-		"copyright-year" : "2010",
-		"authors"        : [ "Pawel Bara, Thiago Teixeira" ]
-	})
+		'name'           : "Cardapio's applet",
+		'short'          : 'cardapio',
+		'version'        : __version__,
+		'description'    : 'Replace your menu with Cardapio',
+		'theme'          : CardapioAwnApplet.ICON,
+		'author'         : 'Cardapio Team',
+		'copyright-year' : '2010',
+		'authors'        : [ 'Pawel Bara, Thiago Teixeira' ],
+	}, 
+	['no-tooltip']
+	)
 
