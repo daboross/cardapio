@@ -1,0 +1,42 @@
+cardapio-docky (0.9.158-ubuntu1-lucid1) lucid; urgency=low
+
+   * Small updates to the code to make it compatible with Cardapio 0.9.158
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 24 Nov 2010 23:01:00 +1000
+
+
+cardapio-docky (0.9.157-ubuntu3-maverick1) maverick; urgency=low
+
+   * First version of the package (take 2: trying to fix packaging)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 21 Nov 2010 23:01:00 +1000
+
+
+cardapio-docky (0.9.157-ubuntu3-lucid1) maverick; urgency=low
+
+   * First version of the package (take 2: trying to fix packaging)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 21 Nov 2010 23:01:00 +1000
+
+
+cardapio-docky (0.9.157-ubuntu2-lucid1) maverick; urgency=low
+
+   * First version of the package (take 2: trying to fix packaging)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 21 Nov 2010 23:01:00 +1000
+
+
+cardapio-docky (0.9.157-ubuntu2-maverick1) maverick; urgency=low
+
+   * First version of the package (take 2: trying to fix packaging)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 21 Nov 2010 23:01:00 +1000
+
+
+cardapio-docky (0.9.157-ubuntu1-maverick1) maverick; urgency=low
+
+   * First version of the package 
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 21 Nov 2010 23:01:00 +1000
+
+

@@ -1,3 +1,17 @@
+cardapio (0.9.162-ubuntu1-maverick1) maverick; urgency=low
+
+   * Added AWN support (see package cardapio-awn)
+   * Fixed miscellaneous bugs!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 13 Dec 2010 23:01:00 +0100
+
+cardapio (0.9.162-ubuntu1-lucid1) lucid; urgency=low
+
+   * Added AWN support (see package cardapio-awn)
+   * Fixed miscellaneous bugs!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 13 Dec 2010 23:01:00 +0100
+
 cardapio (0.9.161-ubuntu1-maverick1) maverick; urgency=low
 
    * Fixed bottom-panel problem with Lucid (bug 680674)

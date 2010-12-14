@@ -1,4 +1,4 @@
-Source: cardapio-docky
+Source: cardapio-awn
 Section: gnome
 Priority: extra
 Maintainer: tvst <tvst@hotmail.com>
@@ -6,10 +6,10 @@ Build-Depends: debhelper (>= 7), cdbs (>= 0.4.49)
 Standards-Version: 3.8.3
 Homepage: https://launchpad.net/cardapio
 
-Package: cardapio-docky
+Package: cardapio-awn
 Architecture: any
-Depends: cardapio (>= 0.9.157), docky
-Description: Cardapio helper for Docky
+Depends: cardapio (>= 0.9.162), avant-window-navigator (>= 0.4.0)
+Description: Cardapio applet for Avant Window Navigator
  Cardapio is a launcher that can work in two modes: as a panel applet 
  (in which case it is an alternative to Gnome's application menu 
  applet) or as a launcher (in which case it is a lightweight 
@@ -17,6 +17,5 @@ Description: Cardapio helper for Docky
  well-thought-out interface, supports tracker searching, and much more. 
  Give it a try today! 
  .
- This package installs a Docky helper that lets you easily add Cardapio 
- to your  Docky configuration. This can also be done by hand through 
- gconf, but this package aims to  automate the process.
+ This package installs an AWN applet that can be used to show/hide 
+ the Cardapio menu.
