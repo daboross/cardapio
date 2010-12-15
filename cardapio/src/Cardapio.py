@@ -311,7 +311,7 @@ class Cardapio(dbus.service.Object):
 		logging_format = r'%(relativeCreated)- 10d %(levelname)- 10s %(message)s'
 
 		# clear log file if too large
-		if os.path.getsize(logging_filename) > Cardapio.LOG_FILE_MAX_SIZE:
+		if os.path.exists(logging_filename) and os.path.getsize(logging_filename) > Cardapio.LOG_FILE_MAX_SIZE:
 			try:
 				logfile = open(logging_filename, 'w')
 				logfile.close()
