@@ -8,7 +8,7 @@ Homepage: https://launchpad.net/cardapio
 
 Package: cardapio-awn
 Architecture: any
-Depends: cardapio (>= 0.9.162), avant-window-navigator (>= 0.4.0)
+Depends: cardapio (>= 0.9.162), avant-window-navigator (>= 0.4.0) | avant-window-navigator-trunk (>= 0.4.0)
 Description: Cardapio applet for Avant Window Navigator
  Cardapio is a launcher that can work in two modes: as a panel applet 
  (in which case it is an alternative to Gnome's application menu 
