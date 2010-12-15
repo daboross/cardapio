@@ -1092,16 +1092,15 @@ class Cardapio(dbus.service.Object):
 		if modifier_key & gtk.gdk.SUPER_MASK   : modifier_string += '<super>'
 		if modifier_key & gtk.gdk.HYPER_MASK   : modifier_string += '<hyper>'
 		if modifier_key & gtk.gdk.META_MASK    : modifier_string += '<meta>'
+		if modifier_key & gtk.gdk.MOD1_MASK    : modifier_string += '<alt>'
 
-		# TODO: why is MOD2 always ON no matter what?!
-		# I had to comment this out! BUT it breaks the "Alt" key
-		#if modifier_key & gtk.gdk.MOD2_MASK   : modifier_string += '<mod2>'
-
-		# Are these needed at all?
-		#if modifier_key & gtk.gdk.MOD1_MASK   : modifier_string += '<mod1>'
-		#if modifier_key & gtk.gdk.MOD3_MASK   : modifier_string += '<mod3>'
-		#if modifier_key & gtk.gdk.MOD4_MASK   : modifier_string += '<mod4>'
-		#if modifier_key & gtk.gdk.MOD5_MASK   : modifier_string += '<mod5>'
+		# TODO: Are these needed? How to resolve the case where Super = Mod4, causing
+		# both keys to be detected at the same time?
+		# TODO: Why is MOD2 always ON no matter what?! (on one of my computers)
+		#if modifier_key & gtk.gdk.MOD2_MASK    : modifier_string += '<mod2>'
+		#if modifier_key & gtk.gdk.MOD3_MASK    : modifier_string += '<mod3>'
+		#if modifier_key & gtk.gdk.MOD4_MASK    : modifier_string += '<mod4>'
+		#if modifier_key & gtk.gdk.MOD5_MASK    : modifier_string += '<mod5>'
 
 		shortcut_string = modifier_string + main_key_string
 
