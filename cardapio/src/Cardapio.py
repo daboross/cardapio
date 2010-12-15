@@ -1100,7 +1100,6 @@ class Cardapio(dbus.service.Object):
 		if modifier_key & gtk.gdk.MOD4_MASK    : modifier_string += '<mod4>'
 		if modifier_key & gtk.gdk.MOD5_MASK    : modifier_string += '<mod5>'
 
-
 		shortcut_string = modifier_string + main_key_string
 
 		# cancel on "Escape"
