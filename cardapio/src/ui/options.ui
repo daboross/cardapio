@@ -2,7 +2,26 @@
 <interface>
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
+  <object class="GtkListStore" id="PluginListstore">
+    <columns>
+      <!-- column-name basename -->
+      <column type="gchararray"/>
+      <!-- column-name title -->
+      <column type="gchararray"/>
+      <!-- column-name name_for_search -->
+      <column type="gchararray"/>
+      <!-- column-name is_active -->
+      <column type="gboolean"/>
+      <!-- column-name is_core -->
+      <column type="gboolean"/>
+      <!-- column-name is_optional -->
+      <column type="gboolean"/>
+      <!-- column-name icon -->
+      <column type="GdkPixbuf"/>
+    </columns>
+  </object>
   <object class="GtkDialog" id="OptionsDialog">
+    <property name="events">GDK_KEY_PRESS_MASK | GDK_STRUCTURE_MASK</property>
     <property name="title" translatable="yes">Cardapio Properties</property>
     <property name="default_height">400</property>
     <property name="type_hint">normal</property>
@@ -113,7 +132,7 @@
                                 <child>
                                   <object class="GtkTable" id="table4">
                                     <property name="visible">True</property>
-                                    <property name="n_rows">3</property>
+                                    <property name="n_rows">5</property>
                                     <property name="n_columns">2</property>
                                     <property name="column_spacing">5</property>
                                     <property name="row_spacing">5</property>
@@ -124,6 +143,55 @@
                                         <property name="label" translatable="yes">Shortcut key:</property>
                                       </object>
                                       <packing>
+                                        <property name="y_options"></property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCheckButton" id="OptionKeepResults">
+                                        <property name="label" translatable="yes">Keep search results when Cardapio is hidden</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
+                                        <property name="draw_indicator">True</property>
+                                        <signal name="toggled" handler="on_options_changed"/>
+                                      </object>
+                                      <packing>
+                                        <property name="right_attach">2</property>
+                                        <property name="top_attach">3</property>
+                                        <property name="bottom_attach">4</property>
+                                        <property name="y_options"></property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkToggleButton" id="OptionGrabKeybinding">
+                                        <property name="label" translatable="yes">Grab new shortcut</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <signal name="toggled" handler="on_grab_new_shortcut_toggled"/>
+                                      </object>
+                                      <packing>
+                                        <property name="left_attach">1</property>
+                                        <property name="right_attach">2</property>
+                                        <property name="top_attach">1</property>
+                                        <property name="bottom_attach">2</property>
+                                        <property name="x_options">GTK_FILL</property>
+                                        <property name="y_options">GTK_FILL</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkCheckButton" id="OptionOpenCategoriesOnHover">
+                                        <property name="label" translatable="yes">Open categories when cursor hovers them</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">False</property>
+                                        <property name="draw_indicator">True</property>
+                                        <signal name="toggled" handler="on_options_changed"/>
+                                      </object>
+                                      <packing>
+                                        <property name="right_attach">2</property>
+                                        <property name="top_attach">4</property>
+                                        <property name="bottom_attach">5</property>
                                         <property name="y_options"></property>
                                       </packing>
                                     </child>
@@ -141,36 +209,13 @@
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkCheckButton" id="OptionKeepResults">
-                                        <property name="label" translatable="yes">Keep search results when Cardapio is hidden</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="receives_default">False</property>
-                                        <property name="draw_indicator">True</property>
-                                        <signal name="toggled" handler="on_options_changed"/>
-                                      </object>
-                                      <packing>
-                                        <property name="right_attach">2</property>
-                                        <property name="top_attach">1</property>
-                                        <property name="bottom_attach">2</property>
-                                        <property name="y_options"></property>
-                                      </packing>
+                                      <placeholder/>
                                     </child>
                                     <child>
-                                      <object class="GtkCheckButton" id="OptionOpenCategoriesOnHover">
-                                        <property name="label" translatable="yes">Open categories when cursor hovers them</property>
-                                        <property name="visible">True</property>
-                                        <property name="can_focus">True</property>
-                                        <property name="receives_default">False</property>
-                                        <property name="draw_indicator">True</property>
-                                        <signal name="toggled" handler="on_options_changed"/>
-                                      </object>
-                                      <packing>
-                                        <property name="right_attach">2</property>
-                                        <property name="top_attach">2</property>
-                                        <property name="bottom_attach">3</property>
-                                        <property name="y_options"></property>
-                                      </packing>
+                                      <placeholder/>
+                                    </child>
+                                    <child>
+                                      <placeholder/>
                                     </child>
                                   </object>
                                 </child>
@@ -479,23 +524,5 @@
     <action-widgets>
       <action-widget response="0">button1</action-widget>
     </action-widgets>
-  </object>
-  <object class="GtkListStore" id="PluginListstore">
-    <columns>
-      <!-- column-name basename -->
-      <column type="gchararray"/>
-      <!-- column-name title -->
-      <column type="gchararray"/>
-      <!-- column-name name_for_search -->
-      <column type="gchararray"/>
-      <!-- column-name is_active -->
-      <column type="gboolean"/>
-      <!-- column-name is_core -->
-      <column type="gboolean"/>
-      <!-- column-name is_optional -->
-      <column type="gboolean"/>
-      <!-- column-name icon -->
-      <column type="GdkPixbuf"/>
-    </columns>
   </object>
 </interface>
