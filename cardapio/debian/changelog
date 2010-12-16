@@ -1,3 +1,19 @@
+cardapio (0.9.163-ubuntu1-maverick1) maverick; urgency=low
+
+   * Added keybinding recorder button!
+   * AWN no longer shows tooltip for Cardapio
+   * Fixed cardapio-awn package to work with awn-trunk
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 15 Dec 2010 23:01:00 +0100
+
+cardapio (0.9.163-ubuntu1-lucid1) lucid; urgency=low
+
+   * Added keybinding recorder button!
+   * AWN no longer shows tooltip for Cardapio
+   * Fixed cardapio-awn package to work with awn-trunk
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 15 Dec 2010 23:01:00 +0100
+
 cardapio (0.9.162-ubuntu1-maverick1) maverick; urgency=low
 
    * Added AWN support (see package cardapio-awn)
