@@ -280,25 +280,27 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 		button_icon = gtk.image_new_from_pixbuf(button_icon_pixbuf)
 		self.button.set_image(button_icon)
 
-		if self.applet_label:
-			clean_imagemenuitem = gtk.ImageMenuItem()
-			default_spacing = clean_imagemenuitem.style_get_property('toggle-spacing')
+		clean_imagemenuitem = gtk.ImageMenuItem()
+		is_horizontal = (self.applet.get_orient() in (gnomeapplet.ORIENT_UP, gnomeapplet.ORIENT_DOWN))
 
-			gtk.rc_parse_string('''
-				style "cardapio-applet-style-with-space"
-				{
-					GtkImageMenuItem::toggle-spacing = %d
-				}
-				widget "*CardapioApplet" style:application "cardapio-applet-style-with-space"
-				''' % default_spacing)
+		if self.applet_label:
+			toggle_spacing = clean_imagemenuitem.style_get_property('toggle-spacing')
 		else:
-			gtk.rc_parse_string('''
-				style "cardapio-applet-style-no-space"
-				{
-					GtkImageMenuItem::toggle-spacing = 0
-				}
-				widget "*CardapioApplet" style:application "cardapio-applet-style-no-space"
-				''')
+			toggle_spacing = 0
+
+		if is_horizontal:
+			horizontal_padding = clean_imagemenuitem.style_get_property('horizontal-padding')
+		else:
+			horizontal_padding = 0
+
+		gtk.rc_parse_string('''
+			style "cardapio-applet-style"
+			{
+				GtkImageMenuItem::toggle-spacing = %d
+				GtkImageMenuItem::horizontal-padding = %d
+			}
+			widget "*CardapioApplet" style:application "cardapio-applet-style"
+			''' % (toggle_spacing, horizontal_padding))
 
 		# apparently this happens sometimes (maybe when the parent isn't realized yet?)
 		if self.button.parent is None: return
