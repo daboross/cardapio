@@ -2362,6 +2362,10 @@ class Cardapio(dbus.service.Object):
 			for category_button in category_buttons:
 				category_button.child.child.get_children()[1].hide()
 
+			self.session_button_locksys.child.child.get_children()[1].hide()
+			self.session_button_logout.child.child.get_children()[1].hide()
+			self.right_session_pane.set_homogeneous(False)
+
 			self.get_widget('ViewLabel').set_size_request(0, 0) # required! otherwise a weird margin appears
 			self.get_widget('ViewLabel').hide()
 			self.get_widget('ControlCenterLabel').hide()
@@ -2379,6 +2383,10 @@ class Cardapio(dbus.service.Object):
 			# hack to make sure the viewport resizes to the minisize correctly
 			self.get_widget('SideappViewport').hide()
 			self.get_widget('SideappViewport').show()
+			#self.left_session_pane.hide()
+			#self.left_session_pane.show()
+			#self.right_session_pane.hide()
+			#self.right_session_pane.show()
 
 			if update_window_size:
 				self.settings['window size'][0] -= self.main_splitter.get_position()
@@ -2387,6 +2395,10 @@ class Cardapio(dbus.service.Object):
 
 			for category_button in category_buttons:
 				category_button.child.child.get_children()[1].show()
+
+			self.session_button_locksys.child.child.get_children()[1].show()
+			self.session_button_logout.child.child.get_children()[1].show()
+			self.right_session_pane.set_homogeneous(True)
 
 			self.get_widget('ViewLabel').set_size_request(-1, -1)
 			self.get_widget('ViewLabel').show()
@@ -2881,6 +2893,11 @@ class Cardapio(dbus.service.Object):
 			button = self.add_button(item[0], item[2], item[4], tooltip = item[1], button_type = Cardapio.SESSION_BUTTON)
 			button.app_info = app_info
 			button.connect('clicked', self.on_app_button_clicked)
+			item.append(button)
+
+		self.session_button_locksys  = items[0][5]
+		self.session_button_logout   = items[1][5]
+		self.session_button_shutdown = items[2][5]
 
 
 	def build_applications_list(self):
@@ -3198,11 +3215,8 @@ class Cardapio(dbus.service.Object):
 			#label.set_ellipsize(ELLIPSIZE_END)
 			#label.set_max_width_chars(20)
 
-		elif button_type == Cardapio.CATEGORY_BUTTON or button_type == Cardapio.SIDEPANE_BUTTON:
-			icon_size_pixels = self.icon_helper.icon_size_category
-
 		else:
-			icon_size_pixels = self.icon_helper.icon_size_app
+			icon_size_pixels = self.icon_helper.icon_size_category
 
 		icon_pixbuf = self.icon_helper.get_icon_pixbuf(icon_name, icon_size_pixels)
 		icon = gtk.image_new_from_pixbuf(icon_pixbuf)
