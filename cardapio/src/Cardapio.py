@@ -1504,7 +1504,8 @@ class Cardapio(dbus.service.Object):
 		# model/controller stuff. View stuff should go on separate, well-defined
 		# calls that are made from here.
 
-		text = self.search_entry.get_text().strip()
+		text = self.search_entry.get_text()
+		text = unicode(text, 'utf-8').strip()
 
 		if text and text == self.current_query: return
 		self.current_query = text
@@ -3118,6 +3119,9 @@ class Cardapio(dbus.service.Object):
 		"""
 		Adds a new button to the app pane
 		"""
+
+		if type(button_str) is str:
+			button_str = unicode(button_str, 'utf-8')
 
 		# MODEL/VIEW SEPARATION EFFORT: view
 		button = self.add_button(button_str, icon_name, parent_widget, tooltip, button_type = Cardapio.APP_BUTTON)
