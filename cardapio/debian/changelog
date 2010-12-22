@@ -1,3 +1,15 @@
+cardapio (0.9.164-ubuntu1-maverick1) maverick; urgency=low
+
+   * Bug fixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 18 Dec 2010 23:01:00 +0100
+
+cardapio (0.9.164-ubuntu1-lucid1) lucid; urgency=low
+
+   * Bug fixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 18 Dec 2010 23:01:00 +0100
+
 cardapio (0.9.163-ubuntu1-maverick1) maverick; urgency=low
 
    * Added keybinding recorder button!
