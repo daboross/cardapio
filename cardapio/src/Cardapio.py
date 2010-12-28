@@ -346,13 +346,13 @@ class Cardapio(dbus.service.Object):
 			self.panel_applet = CardapioAppletInterface()
 
 		if self.panel_applet.panel_type == PANEL_TYPE_GNOME2:
-			self.get_widget('AboutGnomeMenuItem').set_visible(False)
-			self.get_widget('AboutDistroMenuItem').set_visible(False)
+			self.view.get_widget('AboutGnomeMenuItem').set_visible(False)
+			self.view.get_widget('AboutDistroMenuItem').set_visible(False)
 
 		else:
 			self.window.set_decorated(True)
 			self.window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
-			self.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
+			self.view.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
 
 		self.panel_applet.setup(self)
 
@@ -664,9 +664,9 @@ class Cardapio(dbus.service.Object):
 			self.panel_applet.update_from_user_settings(self.settings)
 
 		if self.settings['show session buttons']:
-			self.get_widget('SessionPane').show()
+			self.view.get_widget('SessionPane').show()
 		else:
-			self.get_widget('SessionPane').hide()
+			self.view.get_widget('SessionPane').hide()
 
 		# set up open-on-hover for categories
 
@@ -734,11 +734,11 @@ class Cardapio(dbus.service.Object):
 		self.hide_no_results_text()
 
 		if self.panel_applet.panel_type in (None, PANEL_TYPE_DOCKY):
-			self.get_widget('AppletOptionPane').hide()
+			self.view.get_widget('AppletOptionPane').hide()
 
 		elif self.panel_applet.panel_type is PANEL_TYPE_AWN:
-			self.get_widget('LabelAppletLabel').hide()
-			self.get_widget('OptionAppletLabel').hide()
+			self.view.get_widget('LabelAppletLabel').hide()
+			self.view.get_widget('OptionAppletLabel').hide()
 
 		if not self.have_control_center:
 			self.view_mode_button.hide()
@@ -767,9 +767,9 @@ class Cardapio(dbus.service.Object):
 
 		logging.info('Rebuilding UI')
 
-		if self.rebuild_timer is not None:
-			glib.source_remove(self.rebuild_timer)
-			self.rebuild_timer = None
+		if self.view.rebuild_timer is not None:
+			glib.source_remove(self.view.rebuild_timer)
+			self.view.rebuild_timer = None
 
 		if show_message:
 			self.set_message_window_visible(True)
@@ -802,13 +802,13 @@ class Cardapio(dbus.service.Object):
 		primary_text = '<big><b>' + _('Do you want to run "%(file_name)s" or display its contents?' % arg_dict) + '</b></big>'
 		secondary_text = _('"%(file_name)s" is an executable text file.' % arg_dict)
 
-		self.get_widget('ExecutableDialogPrimaryText').set_markup(primary_text)
-		self.get_widget('ExecutableDialogSecondaryText').set_text(secondary_text)
+		self.view.get_widget('ExecutableDialogPrimaryText').set_markup(primary_text)
+		self.view.get_widget('ExecutableDialogSecondaryText').set_text(secondary_text)
 
 		if gnome_execute_terminal_shell is None:
-			self.get_widget('ExecutableDialogRunInTerminal').hide()
+			self.view.get_widget('ExecutableDialogRunInTerminal').hide()
 
-		self.executable_file_dialog.set_focus(self.get_widget('ExecutableDialogCancel'))
+		self.executable_file_dialog.set_focus(self.view.get_widget('ExecutableDialogCancel'))
 
 		response = self.executable_file_dialog.run()
 		self.executable_file_dialog.hide()
@@ -862,7 +862,7 @@ class Cardapio(dbus.service.Object):
 		Set the value of the widget named 'widget_str' to 'option_str'
 		"""
 
-		widget = self.get_widget(widget_str)
+		widget = self.view.get_widget(widget_str)
 		try    : widget.handler_block_by_func(self.on_options_changed)
 		except : pass
 
@@ -945,14 +945,14 @@ class Cardapio(dbus.service.Object):
 		Dialog
 		"""
 
-		self.settings['keybinding'] = self.get_widget('OptionKeybinding').get_text()
-		self.settings['applet label'] = self.get_widget('OptionAppletLabel').get_text()
-		self.settings['applet icon'] = self.get_widget('OptionAppletIcon').get_text()
-		self.settings['show session buttons'] = self.get_widget('OptionSessionButtons').get_active()
-		self.settings['keep search results'] = self.get_widget('OptionKeepResults').get_active()
-		self.settings['open on hover'] = self.get_widget('OptionOpenOnHover').get_active()
-		self.settings['open categories on hover'] = self.get_widget('OptionOpenCategoriesOnHover').get_active()
-		self.settings['mini mode'] = self.get_widget('OptionMiniMode').get_active()
+		self.settings['keybinding'] = self.view.get_widget('OptionKeybinding').get_text()
+		self.settings['applet label'] = self.view.get_widget('OptionAppletLabel').get_text()
+		self.settings['applet icon'] = self.view.get_widget('OptionAppletIcon').get_text()
+		self.settings['show session buttons'] = self.view.get_widget('OptionSessionButtons').get_active()
+		self.settings['keep search results'] = self.view.get_widget('OptionKeepResults').get_active()
+		self.settings['open on hover'] = self.view.get_widget('OptionOpenOnHover').get_active()
+		self.settings['open categories on hover'] = self.view.get_widget('OptionOpenCategoriesOnHover').get_active()
+		self.settings['mini mode'] = self.view.get_widget('OptionMiniMode').get_active()
 		self.setup_ui_from_gui_settings()
 
 
@@ -968,12 +968,12 @@ class Cardapio(dbus.service.Object):
 				except: pass
 
 			self.key_grab_handler = self.options_dialog.connect('key-press-event', self.on_new_keybinding_press)
-			self.get_widget('OptionGrabKeybinding').set_label(_('Recording...'))
+			self.view.get_widget('OptionGrabKeybinding').set_label(_('Recording...'))
 
 		else:
 
 			self.options_dialog.disconnect(self.key_grab_handler)
-			self.get_widget('OptionGrabKeybinding').set_label(_('Grab new shortcut'))
+			self.view.get_widget('OptionGrabKeybinding').set_label(_('Grab new shortcut'))
 			self.on_options_changed()
 
 
@@ -1016,18 +1016,18 @@ class Cardapio(dbus.service.Object):
 
 		# cancel on "Escape"
 		if main_key == gtk.keysyms.Escape and not modifier_string:
-			self.get_widget('OptionKeybinding').set_text(self.settings['keybinding'])
-			self.get_widget('OptionGrabKeybinding').set_active(False)
+			self.view.get_widget('OptionKeybinding').set_text(self.settings['keybinding'])
+			self.view.get_widget('OptionGrabKeybinding').set_active(False)
 			return True
 
 		# clear on "BackSpace" or "Delete"
 		if main_key in (gtk.keysyms.BackSpace, gtk.keysyms.Delete) and not modifier_string:
-			self.get_widget('OptionKeybinding').set_text('')
-			self.get_widget('OptionGrabKeybinding').set_active(False)
+			self.view.get_widget('OptionKeybinding').set_text('')
+			self.view.get_widget('OptionGrabKeybinding').set_active(False)
 			return True
 
 		if main_key_string:
-			self.get_widget('OptionKeybinding').set_text(shortcut_string)
+			self.view.get_widget('OptionKeybinding').set_text(shortcut_string)
 
 			if main_key not in (
 					gtk.keysyms.Shift_L, gtk.keysyms.Shift_R, gtk.keysyms.Shift_Lock,
@@ -1039,7 +1039,7 @@ class Cardapio(dbus.service.Object):
 					# TODO: what else?
 					#gtk.keysyms.ISO_Level3_Shift, gtk.keysyms.ISO_Group_Shift, 
 					):
-				self.get_widget('OptionGrabKeybinding').set_active(False)
+				self.view.get_widget('OptionGrabKeybinding').set_active(False)
 
 		return True
 
@@ -1049,7 +1049,7 @@ class Cardapio(dbus.service.Object):
 		Writes information about the currently-selected plugin on the GUI
 		"""
 
-		model, iter_ = self.get_widget('PluginTreeView').get_selection().get_selected()
+		model, iter_ = self.view.get_widget('PluginTreeView').get_selection().get_selected()
 
 		if iter_ is None:
 			is_core = True
@@ -1063,7 +1063,7 @@ class Cardapio(dbus.service.Object):
 		description = _('<b>Plugin:</b> %(name)s %(version)s\n<b>Author:</b> %(author)s\n<b>Description:</b> %(description)s') % plugin_info
 		if not is_core  : description += '\n<small>(' + _('This is a community-supported plugin') + ')</small>'
 
-		label = self.get_widget('OptionPluginInfo')
+		label = self.view.get_widget('OptionPluginInfo')
 		dummy, dummy, width, dummy = label.get_allocation()
 		label.set_markup(description)
 		label.set_line_wrap(True)
@@ -1351,10 +1351,10 @@ class Cardapio(dbus.service.Object):
 		Rebuilds the Cardapio UI after a timer
 		"""
 
-		if self.rebuild_timer is not None:
-			glib.source_remove(self.rebuild_timer)
+		if self.view.rebuild_timer is not None:
+			glib.source_remove(self.view.rebuild_timer)
 
-		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.rebuild_ui)
+		self.view.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.rebuild_ui)
 
 
 	def on_view_mode_toggled(self, widget):
@@ -1938,10 +1938,10 @@ class Cardapio(dbus.service.Object):
 		database
 		"""
 
-		if self.rebuild_timer is not None:
-			glib.source_remove(self.rebuild_timer)
+		if self.view.rebuild_timer is not None:
+			glib.source_remove(self.view.rebuild_timer)
 
-		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.plugin_on_reload_permission_granted, plugin)
+		self.view.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.plugin_on_reload_permission_granted, plugin)
 
 
 	def plugin_on_reload_permission_granted(self, plugin):
@@ -1949,7 +1949,7 @@ class Cardapio(dbus.service.Object):
 		Tell the plugin that it may rebuild its database now
 		"""
 
-		self.rebuild_timer = None
+		self.view.rebuild_timer = None
 		plugin.on_reload_permission_granted()
 
 		return False
@@ -2254,7 +2254,7 @@ class Cardapio(dbus.service.Object):
 		Handler for the minimode checkbox in the preferences window
 		"""
 
-		self.settings['mini mode'] = self.get_widget('OptionMiniMode').get_active()
+		self.settings['mini mode'] = self.view.get_widget('OptionMiniMode').get_active()
 		self.toggle_mini_mode_ui(update_window_size = True)
 		return True
 
@@ -2276,23 +2276,23 @@ class Cardapio(dbus.service.Object):
 			self.session_button_logout.child.child.get_children()[1].hide()
 			self.right_session_pane.set_homogeneous(False)
 
-			self.get_widget('ViewLabel').set_size_request(0, 0) # required! otherwise a weird margin appears
-			self.get_widget('ViewLabel').hide()
-			self.get_widget('ControlCenterLabel').hide()
-			self.get_widget('ControlCenterArrow').hide()
-			self.get_widget('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
+			self.view.get_widget('ViewLabel').set_size_request(0, 0) # required! otherwise a weird margin appears
+			self.view.get_widget('ViewLabel').hide()
+			self.view.get_widget('ControlCenterLabel').hide()
+			self.view.get_widget('ControlCenterArrow').hide()
+			self.view.get_widget('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
 
 			padding = self.fullsize_mode_padding
-			self.get_widget('CategoryMargin').set_padding(0, padding[1], padding[2], padding[3])
+			self.view.get_widget('CategoryMargin').set_padding(0, padding[1], padding[2], padding[3])
 
-			self.get_widget('TopLeftSearchSlabMargin').hide()    # these are required, to make sure the splitter
-			self.get_widget('BottomLeftSearchSlabMargin').hide() # ...moves all the way to the left
-			sidepane_margin = self.get_widget('SidePaneMargin')
+			self.view.get_widget('TopLeftSearchSlabMargin').hide()    # these are required, to make sure the splitter
+			self.view.get_widget('BottomLeftSearchSlabMargin').hide() # ...moves all the way to the left
+			sidepane_margin = self.view.get_widget('SidePaneMargin')
 			#self.main_splitter.set_position(0)
 
 			# hack to make sure the viewport resizes to the minisize correctly
-			self.get_widget('SideappViewport').hide()
-			self.get_widget('SideappViewport').show()
+			self.view.get_widget('SideappViewport').hide()
+			self.view.get_widget('SideappViewport').show()
 			#self.left_session_pane.hide()
 			#self.left_session_pane.show()
 			#self.right_session_pane.hide()
@@ -2310,13 +2310,13 @@ class Cardapio(dbus.service.Object):
 			self.session_button_logout.child.child.get_children()[1].show()
 			self.right_session_pane.set_homogeneous(True)
 
-			self.get_widget('ViewLabel').set_size_request(-1, -1)
-			self.get_widget('ViewLabel').show()
-			self.get_widget('ControlCenterLabel').show()
-			self.get_widget('ControlCenterArrow').show()
-			self.get_widget('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+			self.view.get_widget('ViewLabel').set_size_request(-1, -1)
+			self.view.get_widget('ViewLabel').show()
+			self.view.get_widget('ControlCenterLabel').show()
+			self.view.get_widget('ControlCenterArrow').show()
+			self.view.get_widget('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
 
-			self.get_widget('CategoryMargin').set_padding(*self.fullsize_mode_padding)
+			self.view.get_widget('CategoryMargin').set_padding(*self.fullsize_mode_padding)
 			
 			self.main_splitter.set_position(self.settings['splitter position'])
 
@@ -2432,7 +2432,7 @@ class Cardapio(dbus.service.Object):
 
 		self.opened_last_app_in_background = False
 
-		if self.rebuild_timer is not None:
+		if self.view.rebuild_timer is not None:
 			# build the UI *after* showing the window, so the user gets the
 			# satisfaction of seeing the window pop up, even if it's incomplete...
 			self.rebuild_ui(show_message = True)
@@ -3007,25 +3007,25 @@ class Cardapio(dbus.service.Object):
 
 		place_at_left = not self.settings['mini mode']
 
-		self.get_widget('TopLeftSearchSlabMargin').hide()
-		self.get_widget('BottomLeftSearchSlabMargin').hide()
-		self.get_widget('TopRightSearchSlabMargin').hide()
-		self.get_widget('BottomRightSearchSlabMargin').hide()
+		self.view.get_widget('TopLeftSearchSlabMargin').hide()
+		self.view.get_widget('BottomLeftSearchSlabMargin').hide()
+		self.view.get_widget('TopRightSearchSlabMargin').hide()
+		self.view.get_widget('BottomRightSearchSlabMargin').hide()
 
 		if place_at_top:
 			if place_at_left:
-				self.search_entry = self.get_widget('TopLeftSearchEntry')
-				self.get_widget('TopLeftSearchSlabMargin').show()
+				self.search_entry = self.view.get_widget('TopLeftSearchEntry')
+				self.view.get_widget('TopLeftSearchSlabMargin').show()
 			else:
-				self.search_entry = self.get_widget('TopRightSearchEntry')
-				self.get_widget('TopRightSearchSlabMargin').show()
+				self.search_entry = self.view.get_widget('TopRightSearchEntry')
+				self.view.get_widget('TopRightSearchSlabMargin').show()
 		else:
 			if place_at_left:
-				self.search_entry = self.get_widget('BottomLeftSearchEntry')
-				self.get_widget('BottomLeftSearchSlabMargin').show()
+				self.search_entry = self.view.get_widget('BottomLeftSearchEntry')
+				self.view.get_widget('BottomLeftSearchSlabMargin').show()
 			else:
-				self.search_entry = self.get_widget('BottomRightSearchEntry')
-				self.get_widget('BottomRightSearchSlabMargin').show()
+				self.search_entry = self.view.get_widget('BottomRightSearchEntry')
+				self.view.get_widget('BottomRightSearchSlabMargin').show()
 
 		self.search_entry.handler_block_by_func(self.on_search_entry_changed)
 		self.search_entry.set_text(text)
@@ -3218,7 +3218,7 @@ class Cardapio(dbus.service.Object):
 		app_style = dummy_window.get_style()
 		self.style_app_button_bg = app_style.base[gtk.STATE_NORMAL]
 		self.style_app_button_fg = app_style.text[gtk.STATE_NORMAL]
-		self.get_widget('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
+		self.view.get_widget('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
 
 		scrollbar = gtk.VScrollbar()
 		self.scrollbar_width = scrollbar.style_get_property('slider-width')
@@ -3269,7 +3269,7 @@ class Cardapio(dbus.service.Object):
 		self.settings['side pane items'].append(self.clicked_app)
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 		self.sidepane.queue_resize() # required! or sidepane's allocation will be x,y,width,0 when first item is added
-		self.get_widget('SideappSubdivider').queue_resize() # required! or sidepane will obscure the mode switcher button
+		self.view.get_widget('SideappSubdivider').queue_resize() # required! or sidepane will obscure the mode switcher button
 
 
 	# MODEL/VIEW SEPARATION EFFORT: controller
@@ -3283,7 +3283,7 @@ class Cardapio(dbus.service.Object):
  		self.clear_pane(self.sidepane)
 		self.settings['side pane items'].remove(self.clicked_app)
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
-		self.get_widget('SideappSubdivider').queue_resize() # required! or an extra space will show up where but button used to be
+		self.view.get_widget('SideappSubdivider').queue_resize() # required! or an extra space will show up where but button used to be
 
 
 	def on_open_parent_folder_pressed(self, widget):
