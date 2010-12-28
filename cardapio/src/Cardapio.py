@@ -30,9 +30,9 @@ from misc import *
 import sys
 
 try:
-	from icons import *
 	from settings import *
 	from hacks import *
+	from CardapioGtkView import *
 	from CardapioPluginInterface import CardapioPluginInterface
 	from CardapioAppletInterface import *
 
@@ -191,6 +191,11 @@ class Cardapio(dbus.service.Object):
 
 		logging.info('...done loading settings!')
 
+		# starting the view / model+controller separation
+		self.cardapio_path = cardapio_path
+		self.APP = APP
+		self.view = CardapioGtkView(self)
+
 		self.home_folder_path = os.path.abspath(os.path.expanduser('~'))
 		self.visible                       = False
 		self.app_list                      = []    # used for searching the regular menus
@@ -241,7 +246,7 @@ class Cardapio(dbus.service.Object):
 		logging.info('...done setting up DBus!')
 
 		logging.info('Setting up UI...')
-		self.setup_base_ui() # must be the first ui-related method to be called
+		self.view.setup_base_ui() # must be the first ui-related method to be called
 		logging.info('...done setting up UI!')
 
 		logging.info('Setting up panel applet (if any)...')
@@ -411,7 +416,7 @@ class Cardapio(dbus.service.Object):
 				}
 
 		plugin_dirs = [
-			os.path.join(cardapio_path, 'plugins'),
+			os.path.join(self.cardapio_path, 'plugins'),
 			os.path.join(DesktopEntry.xdg_config_home, 'Cardapio', 'plugins')
 			]
 
@@ -612,101 +617,6 @@ class Cardapio(dbus.service.Object):
 		elif not os.path.isdir(self.cache_folder_path):
 			fatal_error('Error creating cache folder!', 'Cannot create folder "%s" because a file with that name already exists!' % self.cache_folder_path)
 			self.quit()
-
-
-	def setup_base_ui(self):
-		"""
-		Reads the GTK Builder interface file and sets up some UI details
-		"""
-
-		self.rebuild_timer = None
-
-		main_ui_filepath    = os.path.join(cardapio_path, 'ui', 'cardapio.ui')
-		options_ui_filepath = os.path.join(cardapio_path, 'ui', 'options.ui')
-
-		self.builder = gtk.Builder()
-		self.builder.set_translation_domain(APP)
-		self.builder.add_from_file(main_ui_filepath)
-		self.builder.add_from_file(options_ui_filepath)
-		self.builder.connect_signals(self)
-
-		self.get_widget = self.builder.get_object
-		self.window                    = self.get_widget('CardapioWindow')
-		self.message_window            = self.get_widget('MessageWindow')
-		self.about_dialog              = self.get_widget('AboutDialog')
-		self.options_dialog            = self.get_widget('OptionsDialog')
-		self.executable_file_dialog    = self.get_widget('ExecutableFileDialog')
-		self.application_pane          = self.get_widget('ApplicationPane')
-		self.category_pane             = self.get_widget('CategoryPane')
-		self.system_category_pane      = self.get_widget('SystemCategoryPane')
-		self.sidepane                  = self.get_widget('SideappPane')
-		self.scroll_adjustment         = self.get_widget('ScrolledWindow').get_vadjustment()
-		self.left_session_pane         = self.get_widget('LeftSessionPane')
-		self.right_session_pane        = self.get_widget('RightSessionPane')
-		self.context_menu              = self.get_widget('CardapioContextMenu')
-		self.app_context_menu          = self.get_widget('AppContextMenu')
-		self.app_menu_separator        = self.get_widget('AppMenuSeparator')
-		self.pin_menuitem              = self.get_widget('PinMenuItem')
-		self.unpin_menuitem            = self.get_widget('UnpinMenuItem')
-		self.add_side_pane_menuitem    = self.get_widget('AddSidePaneMenuItem')
-		self.remove_side_pane_menuitem = self.get_widget('RemoveSidePaneMenuItem')
-		self.open_folder_menuitem      = self.get_widget('OpenParentFolderMenuItem')
-		self.peek_inside_menuitem      = self.get_widget('PeekInsideMenuItem')
-		self.eject_menuitem            = self.get_widget('EjectMenuItem')
-		self.plugin_tree_model         = self.get_widget('PluginListstore')
-		self.plugin_checkbox_column    = self.get_widget('PluginCheckboxColumn')
-		self.view_mode_button          = self.get_widget('ViewModeButton')
-		self.main_splitter             = self.get_widget('MainSplitter')
-
-		self.search_entry              = self.get_widget('TopLeftSearchEntry') # start with any search entry -- doesn't matter which
-
-		# HACK: fix names of widgets to allow theming
-		# (glade doesn't seem to properly add names to widgets anymore...)
-		for widget in self.builder.get_objects():
-
-			# skip the about dialog or the app name will be overwritten!
-			if widget == self.about_dialog: continue
-
-			if 'set_name' in dir(widget):
-				widget.set_name(gtk.Buildable.get_name(widget))
-
-		self.icon_helper = IconHelper()
-		self.icon_helper.register_icon_theme_listener(self.schedule_rebuild)
-
-		self.drag_allowed_cursor = gtk.gdk.Cursor(gtk.gdk.FLEUR)
-
-		# dynamic translation of MenuItem defined in .ui file
-		about_distro_label = _('_About %(distro_name)s') % {'distro_name' : Cardapio.distro_name}
-		self.get_widget('AboutDistroMenuItem').set_label(about_distro_label)
-
-		# grab some widget properties from the ui file
-		self.section_label_attributes = self.get_widget('SectionName').get_attributes()
-		self.fullsize_mode_padding = self.get_widget('CategoryMargin').get_padding()
-
-		# make sure buttons have icons!
-		self.gtk_settings = gtk.settings_get_default()
-		self.gtk_settings.set_property('gtk-button-images', True)
-		self.gtk_settings.connect('notify', self.on_gtk_settings_changed)
-
-		self.window.set_keep_above(True)
-
-		# make edges draggable
-		self.get_widget('MarginLeft').realize()
-		self.get_widget('MarginRight').realize()
-		self.get_widget('MarginTop').realize()
-		self.get_widget('MarginTopLeft').realize()
-		self.get_widget('MarginTopRight').realize()
-		self.get_widget('MarginBottom').realize()
-		self.get_widget('MarginBottomLeft').realize()
-		self.get_widget('MarginBottomRight').realize()
-		self.get_widget('MarginLeft').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.LEFT_SIDE))
-		self.get_widget('MarginRight').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.RIGHT_SIDE))
-		self.get_widget('MarginTop').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.TOP_SIDE))
-		self.get_widget('MarginTopLeft').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.TOP_LEFT_CORNER))
-		self.get_widget('MarginTopRight').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.TOP_RIGHT_CORNER))
-		self.get_widget('MarginBottom').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_SIDE))
-		self.get_widget('MarginBottomLeft').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_LEFT_CORNER))
-		self.get_widget('MarginBottomRight').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_RIGHT_CORNER))
 
 
 	def setup_plugins(self):
