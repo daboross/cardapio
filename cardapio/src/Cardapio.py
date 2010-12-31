@@ -1128,9 +1128,9 @@ class Cardapio(dbus.service.Object):
 		Stop window from hiding when context menu is shown
 		"""
 
-		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
-			self.view.block_focus_out_event()
-			glib.timeout_add(Cardapio.FOCUS_BLOCK_INTERVAL, self.view.unblock_focus_out_event)
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
+		self.view.on_search_entry_button_pressed(widget, event)
 
 
 	def start_resize(self, widget, event):
@@ -3270,7 +3270,7 @@ class Cardapio(dbus.service.Object):
 
 			self.setup_context_menu(widget)
 			self.view.block_focus_out_event()
-			self.app_context_menu.popup(None, None, None, event.button, event.time)
+			self.view.app_context_menu.popup(None, None, None, event.button, event.time)
 
 
 	def setup_context_menu(self, widget):
@@ -3350,46 +3350,10 @@ class Cardapio(dbus.service.Object):
 		Sets up context menu items as requested by individual plugins
 		"""
 
-		self.plugin_clear_context_menu()
+		self.view.clear_plugin_context_menu()
 		if 'context menu' not in self.clicked_app: return
 		if self.clicked_app['context menu'] is None: return
-		self.plugin_fill_context_menu()
-
-
-	def plugin_clear_context_menu(self):
-		"""
-		Remove all plugin-dependent actions from the context menu
-		"""
-
-		for menu_item in self.app_context_menu:
-			if menu_item.name is not None and menu_item.name.startswith('PluginAction'):
-				self.app_context_menu.remove(menu_item)
-
-
-	def plugin_fill_context_menu(self):
-		"""
-		Add plugin-related actions to the context menu
-		"""
-
-		i = 0
-
-		for item_info in self.clicked_app['context menu']:
-
-			menu_item = gtk.ImageMenuItem(item_info['name'], True)
-			menu_item.set_tooltip_text(item_info['tooltip'])
-			menu_item.set_name('PluginAction' + str(i))
-			i += 1
-
-			if item_info['icon name'] is not None:
-				icon_pixbuf = self.icon_helper.get_icon_pixbuf(item_info['icon name'], self.icon_helper.icon_size_menu)
-				icon = gtk.image_new_from_pixbuf(icon_pixbuf)
-				menu_item.set_image(icon)
-
-			menu_item.app_info = item_info
-			menu_item.connect('activate', self.on_app_button_clicked)
-
-			menu_item.show_all()
-			self.app_context_menu.append(menu_item)
+		self.view.fill_plugin_context_menu(self.clicked_app['context menu'])
 
 
 	def on_app_button_focused(self, widget, event):

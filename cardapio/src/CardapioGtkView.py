@@ -73,7 +73,7 @@ class CardapioGtkView:
 		self.cardapio.left_session_pane         = self.get_widget('LeftSessionPane')
 		self.cardapio.right_session_pane        = self.get_widget('RightSessionPane')
 		self.context_menu              = self.get_widget('CardapioContextMenu')
-		self.cardapio.app_context_menu          = self.get_widget('AppContextMenu')
+		self.app_context_menu          = self.get_widget('AppContextMenu')
 		self.cardapio.app_menu_separator        = self.get_widget('AppMenuSeparator')
 		self.cardapio.pin_menuitem              = self.get_widget('PinMenuItem')
 		self.cardapio.unpin_menuitem            = self.get_widget('UnpinMenuItem')
@@ -189,6 +189,17 @@ class CardapioGtkView:
 			self.context_menu.popup(None, None, None, event.button, event.time)
 
 
+	def on_search_entry_button_pressed(self, widget, event):
+		"""
+		Stop window from hiding when context menu is shown
+		"""
+
+		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
+			self.view.block_focus_out_event()
+			glib.timeout_add(Cardapio.FOCUS_BLOCK_INTERVAL, self.view.unblock_focus_out_event)
+
+
+	# This method is part of the View API
 	def set_message_window_visible(self, state = True):
 		"""
 		Show/Hide the "Rebuilding..." message window
@@ -216,6 +227,7 @@ class CardapioGtkView:
 			gtk.main_iteration()
 
 
+	# This method is part of the View API
 	def show_about_dialog(self):
 		"""
 		Shows the "About" dialog
@@ -224,6 +236,7 @@ class CardapioGtkView:
 		self.about_dialog.show()
 
 
+	# This method is part of the View API
 	def show_options_dialog(self, state):
 		"""
 		Shows the "Options" dialog
@@ -233,6 +246,7 @@ class CardapioGtkView:
 		else     : self.options_dialog.hide()
 
 
+	# This method is part of the View API
 	def show_executable_file_dialog(self, path):
 		"""
 		Opens a dialog similar to the one in Nautilus, that asks whether an
@@ -280,4 +294,41 @@ class CardapioGtkView:
 			self.window.handler_unblock_by_func(self.cardapio.on_mainwindow_cursor_leave)
 			self.focus_out_blocked = False
 
+
+	# This method is part of the View API
+	def fill_plugin_context_menu(self, clicked_app_context_menu):
+		"""
+		Add plugin-related actions to the context menu
+		"""
+
+		i = 0
+
+		for item_info in clicked_app_context_menu:
+
+			menu_item = gtk.ImageMenuItem(item_info['name'], True)
+			menu_item.set_tooltip_text(item_info['tooltip'])
+			menu_item.set_name('PluginAction' + str(i))
+			i += 1
+
+			if item_info['icon name'] is not None:
+				icon_pixbuf = self.cardapio.icon_helper.get_icon_pixbuf(item_info['icon name'], self.cardapio.icon_helper.icon_size_menu)
+				icon = gtk.image_new_from_pixbuf(icon_pixbuf)
+				menu_item.set_image(icon)
+
+			menu_item.app_info = item_info
+			menu_item.connect('activate', self.cardapio.on_app_button_clicked)
+
+			menu_item.show_all()
+			self.app_context_menu.append(menu_item)
+
+
+	# This method is part of the View API
+	def clear_plugin_context_menu(self):
+		"""
+		Remove all plugin-dependent actions from the context menu
+		"""
+
+		for menu_item in self.app_context_menu:
+			if menu_item.name is not None and menu_item.name.startswith('PluginAction'):
+				self.app_context_menu.remove(menu_item)
 
