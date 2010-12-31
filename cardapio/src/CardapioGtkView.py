@@ -59,11 +59,11 @@ class CardapioGtkView:
 		builder.connect_signals(self.cardapio)
 
 		self.get_widget = builder.get_object
-		self.cardapio.window                    = self.get_widget('CardapioWindow')
-		self.cardapio.message_window            = self.get_widget('MessageWindow')
-		self.cardapio.about_dialog              = self.get_widget('AboutDialog')
-		self.cardapio.options_dialog            = self.get_widget('OptionsDialog')
-		self.cardapio.executable_file_dialog    = self.get_widget('ExecutableFileDialog')
+		self.window                    = self.get_widget('CardapioWindow')
+		self.message_window            = self.get_widget('MessageWindow')
+		self.about_dialog              = self.get_widget('AboutDialog')
+		self.options_dialog            = self.get_widget('OptionsDialog')
+		self.executable_file_dialog    = self.get_widget('ExecutableFileDialog')
 		self.cardapio.application_pane          = self.get_widget('ApplicationPane')
 		self.cardapio.category_pane             = self.get_widget('CategoryPane')
 		self.cardapio.system_category_pane      = self.get_widget('SystemCategoryPane')
@@ -94,15 +94,12 @@ class CardapioGtkView:
 		for widget in builder.get_objects():
 
 			# skip the about dialog or the app name will be overwritten!
-			if widget == self.cardapio.about_dialog: continue
+			if widget == self.about_dialog: continue
 
 			if 'set_name' in dir(widget):
 				widget.set_name(gtk.Buildable.get_name(widget))
 
-		self.cardapio.icon_helper = IconHelper()
-		self.cardapio.icon_helper.register_icon_theme_listener(self.cardapio.schedule_rebuild)
-
-		self.cardapio.drag_allowed_cursor = gtk.gdk.Cursor(gtk.gdk.FLEUR)
+		self.drag_allowed_cursor = gtk.gdk.Cursor(gtk.gdk.FLEUR)
 
 		# dynamic translation of MenuItem defined in .ui file
 		about_distro_label = _('_About %(distro_name)s') % {'distro_name' : self.cardapio.distro_name}
@@ -117,7 +114,7 @@ class CardapioGtkView:
 		self.cardapio.gtk_settings.set_property('gtk-button-images', True)
 		self.cardapio.gtk_settings.connect('notify', self.cardapio.on_gtk_settings_changed)
 
-		self.cardapio.window.set_keep_above(True)
+		self.window.set_keep_above(True)
 
 		# make edges draggable
 		self.get_widget('MarginLeft').realize()
@@ -138,5 +135,115 @@ class CardapioGtkView:
 		self.get_widget('MarginBottomRight').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_RIGHT_CORNER))
 
 
+	def on_mainwindow_destroy(self, *dummy):
+		"""
+		Handler for when the Cardapio window is destroyed
+		"""
+
+		self.cardapio.save_and_quit()
+
+
+	def on_all_sections_sidebar_button_clicked(self, widget):
+		"""
+		Handler for when the user clicks "All" in the sidebar
+		"""
+
+		if self.cardapio.auto_toggled_sidebar_button:
+			self.cardapio.auto_toggled_sidebar_button = False
+			return True
+
+		if self.cardapio.selected_section is None:
+			self.cardapio.search_entry.set_text('')
+			widget.set_sensitive(False)
+
+		else:
+			self.cardapio.untoggle_and_show_all_sections()
+
+
+	def on_sidebar_button_clicked(self, widget, section_slab):
+		"""
+		Handler for when the user chooses a category in the sidebar
+		"""
+
+		if self.cardapio.auto_toggled_sidebar_button:
+			self.cardapio.auto_toggled_sidebar_button = False
+			return True
+
+		if self.cardapio.selected_section == section_slab:
+			self.cardapio.selected_section = None # necessary!
+			self.cardapio.untoggle_and_show_all_sections()
+			return True
+
+		self.cardapio.toggle_and_show_section(section_slab)
+
+
+	def set_message_window_visible(self, state = True):
+		"""
+		Show/Hide the "Rebuilding..." message window
+		"""
+
+		if state == False:
+			self.message_window.hide()
+			return
+
+		main_window_width, main_window_height = self.window.get_size()
+		message_width, message_height = self.message_window.get_size()
+
+		offset_x = (main_window_width  - message_width) / 2
+		offset_y = (main_window_height - message_height) / 2
+
+		x, y = self.window.get_position()
+		self.message_window.move(x + offset_x, y + offset_y)
+
+		self.message_window.set_keep_above(True)
+		self.cardapio.show_window_on_top(self.message_window)
+
+		# ensure window is rendered immediately
+		gtk.gdk.flush()
+		while gtk.events_pending():
+			gtk.main_iteration()
+
+
+	def show_about_dialog(self):
+		"""
+		Shows the "About" dialog
+		"""
+
+		self.about_dialog.show()
+
+
+	def show_options_dialog(self, state):
+		"""
+		Shows the "Options" dialog
+		"""
+
+		if state : self.options_dialog.show()
+		else     : self.options_dialog.hide()
+
+
+	def show_executable_file_dialog(self, path):
+		"""
+		Opens a dialog similar to the one in Nautilus, that asks whether an
+		executable script should be launched or edited.
+		"""
+
+		basename = os.path.basename(path)
+		arg_dict = {'file_name': basename}
+
+		primary_text = '<big><b>' + _('Do you want to run "%(file_name)s" or display its contents?' % arg_dict) + '</b></big>'
+		secondary_text = _('"%(file_name)s" is an executable text file.' % arg_dict)
+
+		self.get_widget('ExecutableDialogPrimaryText').set_markup(primary_text)
+		self.get_widget('ExecutableDialogSecondaryText').set_text(secondary_text)
+
+		if not self.cardapio.can_launch_in_terminal():
+			self.get_widget('ExecutableDialogRunInTerminal').hide()
+
+		self.executable_file_dialog.set_focus(self.get_widget('ExecutableDialogCancel'))
+
+		response = self.executable_file_dialog.run()
+		self.executable_file_dialog.hide()
+
+		return response
 
 

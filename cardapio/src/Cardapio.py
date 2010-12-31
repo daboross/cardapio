@@ -246,7 +246,7 @@ class Cardapio(dbus.service.Object):
 		logging.info('...done setting up DBus!')
 
 		logging.info('Setting up UI...')
-		self.view.setup_base_ui() # must be the first ui-related method to be called
+		self.setup_base_ui() # must be the first ui-related method to be called
 		logging.info('...done setting up UI!')
 
 		logging.info('Setting up panel applet (if any)...')
@@ -279,7 +279,8 @@ class Cardapio(dbus.service.Object):
 		Handler for when the Cardapio window is destroyed
 		"""
 
-		self.save_and_quit()
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW:
+		self.view.on_mainwindow_destroy(*dummy)
 
 
 	def save_and_quit(self, *dummy):
@@ -337,6 +338,17 @@ class Cardapio(dbus.service.Object):
 		dbus.service.Object.__init__(self, self.bus, Cardapio.bus_obj_str)
 
 
+	def setup_base_ui(self):
+		"""
+		Calls the UI backend's "setup_base_ui" function
+		"""
+
+		self.icon_helper = IconHelper()
+		self.icon_helper.register_icon_theme_listener(self.schedule_rebuild)
+
+		self.view.setup_base_ui()
+
+
 	def setup_panel_applet(self):
 		"""
 		Prepares Cardapio's applet in any of the compatible panels.
@@ -350,8 +362,8 @@ class Cardapio(dbus.service.Object):
 			self.view.get_widget('AboutDistroMenuItem').set_visible(False)
 
 		else:
-			self.window.set_decorated(True)
-			self.window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
+			self.view.window.set_decorated(True)
+			self.view.window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
 			self.view.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
 
 		self.panel_applet.setup(self)
@@ -557,16 +569,8 @@ class Cardapio(dbus.service.Object):
 		Handler for when the user clicks "All" in the sidebar
 		"""
 
-		if self.auto_toggled_sidebar_button:
-			self.auto_toggled_sidebar_button = False
-			return True
-
-		if self.selected_section is None:
-			self.search_entry.set_text('')
-			widget.set_sensitive(False)
-
-		else:
-			self.untoggle_and_show_all_sections()
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW:
+		self.view.on_all_sections_sidebar_button_clicked(widget)
 
 
 	def on_sidebar_button_clicked(self, widget, section_slab):
@@ -574,16 +578,7 @@ class Cardapio(dbus.service.Object):
 		Handler for when the user chooses a category in the sidebar
 		"""
 
-		if self.auto_toggled_sidebar_button:
-			self.auto_toggled_sidebar_button = False
-			return True
-
-		if self.selected_section == section_slab:
-			self.selected_section = None # necessary!
-			self.untoggle_and_show_all_sections()
-			return True
-
-		self.toggle_and_show_section(section_slab)
+		self.view.on_sidebar_button_clicked(widget, section_slab)
 
 
 	def on_sidebar_button_hovered(self, widget):
@@ -756,7 +751,7 @@ class Cardapio(dbus.service.Object):
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 
 		self.setup_ui_from_all_settings()
-		self.set_message_window_visible(False)
+		self.view.set_message_window_visible(False)
 
 
 	def rebuild_ui(self, show_message = False):
@@ -772,7 +767,7 @@ class Cardapio(dbus.service.Object):
 			self.view.rebuild_timer = None
 
 		if show_message:
-			self.set_message_window_visible(True)
+			self.view.set_message_window_visible(True)
 
 		self.build_ui()
 
@@ -788,32 +783,6 @@ class Cardapio(dbus.service.Object):
 			# (leak solved!)
 
 		self.schedule_search_with_all_plugins('')
-
-
-	def show_executable_file_dialog(self, path):
-		"""
-		Opens a dialog similar to the one in Nautilus, that asks whether an
-		executable script should be launched or edited.
-		"""
-
-		basename = os.path.basename(path)
-		arg_dict = {'file_name': basename}
-
-		primary_text = '<big><b>' + _('Do you want to run "%(file_name)s" or display its contents?' % arg_dict) + '</b></big>'
-		secondary_text = _('"%(file_name)s" is an executable text file.' % arg_dict)
-
-		self.view.get_widget('ExecutableDialogPrimaryText').set_markup(primary_text)
-		self.view.get_widget('ExecutableDialogSecondaryText').set_text(secondary_text)
-
-		if gnome_execute_terminal_shell is None:
-			self.view.get_widget('ExecutableDialogRunInTerminal').hide()
-
-		self.executable_file_dialog.set_focus(self.view.get_widget('ExecutableDialogCancel'))
-
-		response = self.executable_file_dialog.run()
-		self.executable_file_dialog.hide()
-
-		return response
 
 
 	def open_about_gnome_dialog(self, widget):
@@ -845,7 +814,7 @@ class Cardapio(dbus.service.Object):
 			self.launch_raw('yelp ghelp:about-%s' % Cardapio.distro_name.lower())
 			# i'm assuming this is the pattern for all distros...
 
-		else: self.about_dialog.show()
+		else: self.view.show_about_dialog()
 
 
 	def on_dialog_close(self, dialog, response = None):
@@ -922,7 +891,7 @@ class Cardapio(dbus.service.Object):
 			self.plugin_tree_model.append([basename, name, name, is_active, is_core, not is_required, icon_pixbuf])
 
 		self.update_plugin_description()
-		self.options_dialog.show()
+		self.view.show_options_dialog(True)
 
 
 	def on_options_dialog_closed(self, *dummy):
@@ -930,7 +899,7 @@ class Cardapio(dbus.service.Object):
 		Hides the Options Dialog
 		"""
 
-		self.options_dialog.hide()
+		self.view.show_options_dialog(False)
 		try:
 			self.settings.save()
 		except Exception, ex:
@@ -967,12 +936,12 @@ class Cardapio(dbus.service.Object):
 				try: keybinder.unbind(self.keybinding)
 				except: pass
 
-			self.key_grab_handler = self.options_dialog.connect('key-press-event', self.on_new_keybinding_press)
+			self.key_grab_handler = self.view.options_dialog.connect('key-press-event', self.on_new_keybinding_press)
 			self.view.get_widget('OptionGrabKeybinding').set_label(_('Recording...'))
 
 		else:
 
-			self.options_dialog.disconnect(self.key_grab_handler)
+			self.view.options_dialog.disconnect(self.key_grab_handler)
 			self.view.get_widget('OptionGrabKeybinding').set_label(_('Grab new shortcut'))
 			self.on_options_changed()
 
@@ -1094,7 +1063,7 @@ class Cardapio(dbus.service.Object):
 
 			iter_ = self.plugin_tree_model.iter_next(iter_)
 
-		self.options_dialog.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+		self.view.options_dialog.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 
 		# ensure cursor is rendered immediately
 		gtk.gdk.flush()
@@ -1102,7 +1071,7 @@ class Cardapio(dbus.service.Object):
 			gtk.main_iteration()
 
 		self.activate_plugins_from_settings() # investigate memory usage here
-		self.options_dialog.window.set_cursor(None)
+		self.view.options_dialog.window.set_cursor(None)
 
 		self.schedule_rebuild()
 
@@ -1123,7 +1092,7 @@ class Cardapio(dbus.service.Object):
 		if col == self.plugin_checkbox_column:
 			treeview.window.set_cursor(None)
 		else:
-			treeview.window.set_cursor(self.drag_allowed_cursor)
+			treeview.window.set_cursor(self.view.drag_allowed_cursor)
 
 
 	def on_plugin_state_toggled(self, cell, path):
@@ -1169,10 +1138,10 @@ class Cardapio(dbus.service.Object):
 		from Cardapio's borderless window.
 		"""
 
-		window_x, window_y = self.window.get_position()
+		window_x, window_y = self.view.window.get_position()
 		x = event.x_root - window_x
 		y = event.y_root - window_y
-		window_width, window_height = self.window.get_size()
+		window_width, window_height = self.view.window.get_size()
 		resize_margin = 10
 
 		if x < resize_margin:
@@ -1208,7 +1177,7 @@ class Cardapio(dbus.service.Object):
 		y = int(event.y_root)
 
 		self.block_focus_out_event()
-		self.window.window.begin_resize_drag(edge, event.button, x, y, event.time)
+		self.view.window.window.begin_resize_drag(edge, event.button, x, y, event.time)
 
 
 	def end_resize(self, *dummy):
@@ -1227,8 +1196,8 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if not self.focus_out_blocked:
-			self.window.handler_block_by_func(self.on_mainwindow_focus_out)
-			self.window.handler_block_by_func(self.on_mainwindow_cursor_leave)
+			self.view.window.handler_block_by_func(self.on_mainwindow_focus_out)
+			self.view.window.handler_block_by_func(self.on_mainwindow_cursor_leave)
 			self.focus_out_blocked = True
 
 
@@ -1238,8 +1207,8 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if self.focus_out_blocked:
-			self.window.handler_unblock_by_func(self.on_mainwindow_focus_out)
-			self.window.handler_unblock_by_func(self.on_mainwindow_cursor_leave)
+			self.view.window.handler_unblock_by_func(self.on_mainwindow_focus_out)
+			self.view.window.handler_unblock_by_func(self.on_mainwindow_cursor_leave)
 			self.focus_out_blocked = False
 
 
@@ -1249,13 +1218,13 @@ class Cardapio(dbus.service.Object):
 		from anywhere without the need to focus the search entry first
 		"""
 
-		w = self.window.get_focus()
+		w = self.view.window.get_focus()
 
 		if w != self.search_entry and w == self.previously_focused_widget:
 			if event.is_modifier:
 				return
 
-			self.window.set_focus(self.search_entry)
+			self.view.window.set_focus(self.search_entry)
 			self.search_entry.set_position(len(self.search_entry.get_text()))
 			
 			self.search_entry.emit('key-press-event', event)
@@ -1271,8 +1240,8 @@ class Cardapio(dbus.service.Object):
 		Because that would enter two of each key.
 		"""
 
-		if self.window.get_focus() != self.search_entry:
-			self.previously_focused_widget = self.window.get_focus()
+		if self.view.window.get_focus() != self.search_entry:
+			self.previously_focused_widget = self.view.window.get_focus()
 
 
 	def on_mainwindow_focus_out(self, widget, event):
@@ -1297,7 +1266,7 @@ class Cardapio(dbus.service.Object):
 		if self.opened_last_app_in_background:
 
 			self.opened_last_app_in_background = False
-			self.show_window_on_top(self.window)
+			self.show_window_on_top(self.view.window)
 			return
 
 		self.hide()
@@ -2015,12 +1984,12 @@ class Cardapio(dbus.service.Object):
 				visible_children = [c for c in contents.get_children() if c.get_property('visible')]
 
 				if visible_children:
-					self.window.set_focus(visible_children[0])
+					self.view.window.set_focus(visible_children[0])
 
 			else:
 				first_app_widget = self.get_first_visible_app()
 				if first_app_widget is not None:
-					self.window.set_focus(first_app_widget)
+					self.view.window.set_focus(first_app_widget)
 
 
 		elif event.keyval == gtk.gdk.keyval_from_name('Escape'):
@@ -2194,25 +2163,25 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if self.settings['window size'] is not None:
-			self.window.resize(*self.settings['window size'])
+			self.view.window.resize(*self.settings['window size'])
 
 		if x is None or y is None:
-			x, y = self.choose_coordinates_for_window(self.window)
+			x, y = self.choose_coordinates_for_window(self.view.window)
 
-		x, y, anchor_right, anchor_bottom = self.get_coordinates_inside_screen(self.window, x, y, force_anchor_right, force_anchor_bottom)
+		x, y, anchor_right, anchor_bottom = self.get_coordinates_inside_screen(self.view.window, x, y, force_anchor_right, force_anchor_bottom)
 
 		if anchor_right:
-			if anchor_bottom: self.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_EAST)
-			else: self.window.set_gravity(gtk.gdk.GRAVITY_NORTH_EAST)
+			if anchor_bottom: self.view.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_EAST)
+			else: self.view.window.set_gravity(gtk.gdk.GRAVITY_NORTH_EAST)
 
 		else:
-			if anchor_bottom: self.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
-			else: self.window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
+			if anchor_bottom: self.view.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
+			else: self.view.window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
 
 		if gtk.ver[0] == 2 and gtk.ver[1] <= 21 and gtk.ver[2] < 5:
-			gtk_window_move_with_gravity(self.window, x, y)
+			gtk_window_move_with_gravity(self.view.window, x, y)
 		else:
-			self.window.move(x, y)
+			self.view.window.move(x, y)
 
 		if self.settings['mini mode']:
 			self.main_splitter.set_position(0)
@@ -2230,7 +2199,7 @@ class Cardapio(dbus.service.Object):
 		Save Cardapio's size into the user preferences
 		"""
 
-		self.settings['window size'] = list(self.window.get_size())
+		self.settings['window size'] = list(self.view.window.get_size())
 		if not self.settings['mini mode']:
 			self.settings['splitter position'] = self.main_splitter.get_position()
 
@@ -2324,33 +2293,6 @@ class Cardapio(dbus.service.Object):
 				self.settings['window size'][0] += self.main_splitter.get_position()
 
 
-	def set_message_window_visible(self, state = True):
-		"""
-		Show/Hide the "Rebuilding..." message window
-		"""
-
-		if state == False:
-			self.message_window.hide()
-			return
-
-		main_window_width, main_window_height = self.window.get_size()
-		message_width, message_height = self.message_window.get_size()
-
-		offset_x = (main_window_width  - message_width) / 2
-		offset_y = (main_window_height - message_height) / 2
-
-		x, y = self.window.get_position()
-		self.message_window.move(x + offset_x, y + offset_y)
-
-		self.message_window.set_keep_above(True)
-		self.show_window_on_top(self.message_window)
-
-		# ensure window is rendered immediately
-		gtk.gdk.flush()
-		while gtk.events_pending():
-			gtk.main_iteration()
-
-
 	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
 	def show_hide(self):
 		"""
@@ -2422,8 +2364,8 @@ class Cardapio(dbus.service.Object):
 
 		self.restore_dimensions(x, y, force_anchor_right = False, force_anchor_bottom = False)
 
-		self.window.set_focus(self.search_entry)
-		self.show_window_on_top(self.window)
+		self.view.window.set_focus(self.search_entry)
+		self.show_window_on_top(self.view.window)
 
  		self.scroll_to_top()
 
@@ -2453,7 +2395,7 @@ class Cardapio(dbus.service.Object):
 		self.visible = False
 		self.last_visibility_toggle = time()
 
-		self.window.hide()
+		self.view.window.hide()
 
 		if not self.settings['keep search results']:
 			self.clear_search_entry()
@@ -2479,8 +2421,8 @@ class Cardapio(dbus.service.Object):
 		root_window = gtk.gdk.get_default_root_window()
 		mouse_x, mouse_y, dummy = root_window.get_pointer()
 
-		dummy, dummy, window_width, window_height = self.window.get_allocation()
-		window_x, window_y = self.window.get_position()
+		dummy, dummy, window_width, window_height = self.view.window.get_allocation()
+		window_x, window_y = self.view.window.get_position()
 
 		cursor_in_window_x = (window_x <= mouse_x <= window_x + window_width)
 		cursor_in_window_y = (window_y <= mouse_y <= window_y + window_height)
@@ -3598,7 +3540,7 @@ class Cardapio(dbus.service.Object):
 			if content_type[:5] == 'text/' or content_type == 'application/x-shellscript':
 
 				# show "Run in Terminal", "Display", "Cancel", "Run"
-				response = self.show_executable_file_dialog(path)
+				response = self.view.show_executable_file_dialog(path)
 
 				# if "Run in Terminal"
 				if response == 1:
@@ -3645,13 +3587,22 @@ class Cardapio(dbus.service.Object):
 		return True
 
 
+	def can_launch_in_terminal(self):
+		"""
+		Returns true if the libraries for launching in a terminal are installed
+		"""
+
+		return (gnome_execute_terminal_shell is not None)
+
+
 	def launch_raw_in_terminal(self, path, hide = True):
 		"""
 		Run a command inside Gnome's default terminal
 		"""
 
 		try:
-			gnome_execute_terminal_shell(self.home_folder_path, path)
+			if self.can_launch_in_terminal():
+				gnome_execute_terminal_shell(self.home_folder_path, path)
 
 		except Exception, exception:
 			logging.error('Could not launch %s' % path)
