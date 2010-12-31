@@ -209,7 +209,6 @@ class Cardapio(dbus.service.Object):
 		self.opened_last_app_in_background = False
 		self.auto_toggled_sidebar_button   = False
 		self.auto_toggled_view_mode_button = False
-		self.focus_out_blocked             = False
 		self.clicked_app                   = None
 		self.keybinding                    = None
 		self.search_timer_local            = None
@@ -279,7 +278,8 @@ class Cardapio(dbus.service.Object):
 		Handler for when the Cardapio window is destroyed
 		"""
 
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW:
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
 		self.view.on_mainwindow_destroy(*dummy)
 
 
@@ -569,7 +569,8 @@ class Cardapio(dbus.service.Object):
 		Handler for when the user clicks "All" in the sidebar
 		"""
 
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW:
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
 		self.view.on_all_sections_sidebar_button_clicked(widget)
 
 
@@ -1117,9 +1118,9 @@ class Cardapio(dbus.service.Object):
 		window
 		"""
 
-		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
-			self.block_focus_out_event()
-			self.context_menu.popup(None, None, None, event.button, event.time)
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
+		self.view.on_mainwindow_button_pressed(widget, event)
 
 
 	def on_search_entry_button_pressed(self, widget, event):
@@ -1128,8 +1129,8 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
-			self.block_focus_out_event()
-			glib.timeout_add(Cardapio.FOCUS_BLOCK_INTERVAL, self.unblock_focus_out_event)
+			self.view.block_focus_out_event()
+			glib.timeout_add(Cardapio.FOCUS_BLOCK_INTERVAL, self.view.unblock_focus_out_event)
 
 
 	def start_resize(self, widget, event):
@@ -1176,7 +1177,7 @@ class Cardapio(dbus.service.Object):
 		x = int(event.x_root)
 		y = int(event.y_root)
 
-		self.block_focus_out_event()
+		self.view.block_focus_out_event()
 		self.view.window.window.begin_resize_drag(edge, event.button, x, y, event.time)
 
 
@@ -1187,18 +1188,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.save_dimensions()
-		self.unblock_focus_out_event()
-
-
-	def block_focus_out_event(self):
-		"""
-		Blocks the focus-out event
-		"""
-
-		if not self.focus_out_blocked:
-			self.view.window.handler_block_by_func(self.on_mainwindow_focus_out)
-			self.view.window.handler_block_by_func(self.on_mainwindow_cursor_leave)
-			self.focus_out_blocked = True
+		self.view.unblock_focus_out_event()
 
 
 	def unblock_focus_out_event(self, *dummy):
@@ -1206,10 +1196,9 @@ class Cardapio(dbus.service.Object):
 		If the focus-out event was previously blocked, this unblocks it
 		"""
 
-		if self.focus_out_blocked:
-			self.view.window.handler_unblock_by_func(self.on_mainwindow_focus_out)
-			self.view.window.handler_unblock_by_func(self.on_mainwindow_cursor_leave)
-			self.focus_out_blocked = False
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
+		self.view.unblock_focus_out_event(*dummy)
 
 
 	def on_mainwindow_after_key_pressed(self, widget, event):
@@ -1280,7 +1269,7 @@ class Cardapio(dbus.service.Object):
 
 		if self.panel_applet.panel_type is None: return
 
-		if self.settings['open on hover'] and not self.focus_out_blocked:
+		if self.settings['open on hover'] and not self.view.focus_out_blocked:
 			glib.timeout_add(self.settings['autohide delay'], self.hide_if_mouse_away)
 
 
@@ -2416,7 +2405,7 @@ class Cardapio(dbus.service.Object):
 		Hide the window if the cursor is *not* on top of it
 		"""
 
-		if self.focus_out_blocked: return
+		if self.view.focus_out_blocked: return
 
 		root_window = gtk.gdk.get_default_root_window()
 		mouse_x, mouse_y, dummy = root_window.get_pointer()
@@ -3273,14 +3262,14 @@ class Cardapio(dbus.service.Object):
 
 		if event.type != gtk.gdk.BUTTON_PRESS: return
 
-		if  event.button == 2:
+		if event.button == 2:
 
 			self.launch_button_command(widget.app_info, hide = False)
 
 		elif event.button == 3:
 
 			self.setup_context_menu(widget)
-			self.block_focus_out_event()
+			self.view.block_focus_out_event()
 			self.app_context_menu.popup(None, None, None, event.button, event.time)
 
 

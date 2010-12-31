@@ -40,6 +40,7 @@ class CardapioGtkView:
 	def __init__(self, cardapio):
 
 		self.cardapio = cardapio
+		self.focus_out_blocked = False
 
 
 	def setup_base_ui(self):
@@ -71,7 +72,7 @@ class CardapioGtkView:
 		self.cardapio.scroll_adjustment         = self.get_widget('ScrolledWindow').get_vadjustment()
 		self.cardapio.left_session_pane         = self.get_widget('LeftSessionPane')
 		self.cardapio.right_session_pane        = self.get_widget('RightSessionPane')
-		self.cardapio.context_menu              = self.get_widget('CardapioContextMenu')
+		self.context_menu              = self.get_widget('CardapioContextMenu')
 		self.cardapio.app_context_menu          = self.get_widget('AppContextMenu')
 		self.cardapio.app_menu_separator        = self.get_widget('AppMenuSeparator')
 		self.cardapio.pin_menuitem              = self.get_widget('PinMenuItem')
@@ -177,6 +178,17 @@ class CardapioGtkView:
 		self.cardapio.toggle_and_show_section(section_slab)
 
 
+	def on_mainwindow_button_pressed(self, widget, event):
+		"""
+		Show context menu when the right mouse button is clicked on the main
+		window
+		"""
+
+		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
+			self.block_focus_out_event()
+			self.context_menu.popup(None, None, None, event.button, event.time)
+
+
 	def set_message_window_visible(self, state = True):
 		"""
 		Show/Hide the "Rebuilding..." message window
@@ -245,5 +257,27 @@ class CardapioGtkView:
 		self.executable_file_dialog.hide()
 
 		return response
+
+
+	def block_focus_out_event(self):
+		"""
+		Blocks the focus-out event
+		"""
+
+		if not self.focus_out_blocked:
+			self.window.handler_block_by_func(self.cardapio.on_mainwindow_focus_out)
+			self.window.handler_block_by_func(self.cardapio.on_mainwindow_cursor_leave)
+			self.focus_out_blocked = True
+
+
+	def unblock_focus_out_event(self, *dummy):
+		"""
+		If the focus-out event was previously blocked, this unblocks it
+		"""
+
+		if self.focus_out_blocked:
+			self.window.handler_unblock_by_func(self.cardapio.on_mainwindow_focus_out)
+			self.window.handler_unblock_by_func(self.cardapio.on_mainwindow_cursor_leave)
+			self.focus_out_blocked = False
 
 
