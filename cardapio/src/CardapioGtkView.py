@@ -24,6 +24,7 @@ try:
 	from icons import *
 	import os
 	import gtk
+	import urllib2
 
 
 except Exception, exception:
@@ -40,7 +41,10 @@ class CardapioGtkView:
 	def __init__(self, cardapio):
 
 		self.cardapio = cardapio
-		self.focus_out_blocked = False
+		self.focus_out_blocked             = False
+		self.clicked_app                   = None
+		self.auto_toggled_sidebar_button   = False # used to stop the on_toggle handler at times
+		self.auto_toggled_view_mode_button = False # used to stop the on_toggle handler at times
 
 
 	def setup_base_ui(self):
@@ -74,18 +78,21 @@ class CardapioGtkView:
 		self.cardapio.right_session_pane        = self.get_widget('RightSessionPane')
 		self.context_menu              = self.get_widget('CardapioContextMenu')
 		self.app_context_menu          = self.get_widget('AppContextMenu')
-		self.cardapio.app_menu_separator        = self.get_widget('AppMenuSeparator')
-		self.cardapio.pin_menuitem              = self.get_widget('PinMenuItem')
-		self.cardapio.unpin_menuitem            = self.get_widget('UnpinMenuItem')
-		self.cardapio.add_side_pane_menuitem    = self.get_widget('AddSidePaneMenuItem')
-		self.cardapio.remove_side_pane_menuitem = self.get_widget('RemoveSidePaneMenuItem')
-		self.cardapio.open_folder_menuitem      = self.get_widget('OpenParentFolderMenuItem')
-		self.cardapio.peek_inside_menuitem      = self.get_widget('PeekInsideMenuItem')
-		self.cardapio.eject_menuitem            = self.get_widget('EjectMenuItem')
+		self.app_menu_separator        = self.get_widget('AppMenuSeparator')
+		self.pin_menuitem              = self.get_widget('PinMenuItem')
+		self.unpin_menuitem            = self.get_widget('UnpinMenuItem')
+		self.add_side_pane_menuitem    = self.get_widget('AddSidePaneMenuItem')
+		self.remove_side_pane_menuitem = self.get_widget('RemoveSidePaneMenuItem')
+		self.open_folder_menuitem      = self.get_widget('OpenParentFolderMenuItem')
+		self.peek_inside_menuitem      = self.get_widget('PeekInsideMenuItem')
+		self.eject_menuitem            = self.get_widget('EjectMenuItem')
+		self.view_mode_button          = self.get_widget('ViewModeButton')
+		self.main_splitter             = self.get_widget('MainSplitter')
+
+		# TODO: move the configuration window stuff to another file, since all
+		# view backends could share the GTK-based configuration window.
 		self.cardapio.plugin_tree_model         = self.get_widget('PluginListstore')
 		self.cardapio.plugin_checkbox_column    = self.get_widget('PluginCheckboxColumn')
-		self.cardapio.view_mode_button          = self.get_widget('ViewModeButton')
-		self.cardapio.main_splitter             = self.get_widget('MainSplitter')
 
 		# start with any search entry -- doesn't matter which
 		self.cardapio.search_entry = self.get_widget('TopLeftSearchEntry')
@@ -144,21 +151,36 @@ class CardapioGtkView:
 		self.cardapio.save_and_quit()
 
 
+	# This method is required by the View API
+	def set_sidebar_button_toggled(self, button, state):
+		"""
+		Toggle a sidebar button
+		"""
+
+		if button.get_active() != state:
+			self.auto_toggled_sidebar_button = True
+			button.set_active(state)
+
+
 	def on_all_sections_sidebar_button_clicked(self, widget):
 		"""
 		Handler for when the user clicks "All" in the sidebar
 		"""
 
-		if self.cardapio.auto_toggled_sidebar_button:
-			self.cardapio.auto_toggled_sidebar_button = False
+		if self.auto_toggled_sidebar_button:
+			self.auto_toggled_sidebar_button = False
 			return True
 
-		if self.cardapio.selected_section is None:
-			self.cardapio.search_entry.set_text('')
-			widget.set_sensitive(False)
+		make_all_unclickable = self.cardapio.handle_section_all_clicked()
+		if make_all_unclickable: widget.set_sensitive(False)
 
-		else:
-			self.cardapio.untoggle_and_show_all_sections()
+
+	# This method is required by the View API
+	def clear_search_entry(self):
+		"""
+		Removes all text from the search entry.
+		"""
+		self.cardapio.search_entry.set_text('')
 
 
 	def on_sidebar_button_clicked(self, widget, section_slab):
@@ -166,16 +188,19 @@ class CardapioGtkView:
 		Handler for when the user chooses a category in the sidebar
 		"""
 
-		if self.cardapio.auto_toggled_sidebar_button:
-			self.cardapio.auto_toggled_sidebar_button = False
+		if self.auto_toggled_sidebar_button:
+			self.auto_toggled_sidebar_button = False
 			return True
 
-		if self.cardapio.selected_section == section_slab:
-			self.cardapio.selected_section = None # necessary!
-			self.cardapio.untoggle_and_show_all_sections()
-			return True
+		return not self.cardapio.handle_section_clicked(section_slab)
 
-		self.cardapio.toggle_and_show_section(section_slab)
+
+	def on_sidebar_button_hovered(self, widget):
+		"""
+		Handler for when the user hovers over a category in the sidebar
+		"""
+
+		widget.set_active(True)
 
 
 	def on_mainwindow_button_pressed(self, widget, event):
@@ -191,15 +216,16 @@ class CardapioGtkView:
 
 	def on_search_entry_button_pressed(self, widget, event):
 		"""
-		Stop window from hiding when context menu is shown
+		Handler for when the users clicks on the search entry. We use this to
+		stop window from hiding when context menu is shown.
 		"""
 
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
-			self.view.block_focus_out_event()
-			glib.timeout_add(Cardapio.FOCUS_BLOCK_INTERVAL, self.view.unblock_focus_out_event)
+			self.block_focus_out_event()
+			glib.timeout_add(Cardapio.FOCUS_BLOCK_INTERVAL, self.unblock_focus_out_event)
 
 
-	# This method is part of the View API
+	# This method is required by the View API
 	def set_message_window_visible(self, state = True):
 		"""
 		Show/Hide the "Rebuilding..." message window
@@ -227,7 +253,7 @@ class CardapioGtkView:
 			gtk.main_iteration()
 
 
-	# This method is part of the View API
+	# This method is required by the View API
 	def show_about_dialog(self):
 		"""
 		Shows the "About" dialog
@@ -236,7 +262,7 @@ class CardapioGtkView:
 		self.about_dialog.show()
 
 
-	# This method is part of the View API
+	# This method is required by the View API
 	def show_options_dialog(self, state):
 		"""
 		Shows the "Options" dialog
@@ -246,7 +272,7 @@ class CardapioGtkView:
 		else     : self.options_dialog.hide()
 
 
-	# This method is part of the View API
+	# This method is required by the View API
 	def show_executable_file_dialog(self, path):
 		"""
 		Opens a dialog similar to the one in Nautilus, that asks whether an
@@ -295,7 +321,7 @@ class CardapioGtkView:
 			self.focus_out_blocked = False
 
 
-	# This method is part of the View API
+	# This method is required by the View API
 	def fill_plugin_context_menu(self, clicked_app_context_menu):
 		"""
 		Add plugin-related actions to the context menu
@@ -322,7 +348,7 @@ class CardapioGtkView:
 			self.app_context_menu.append(menu_item)
 
 
-	# This method is part of the View API
+	# This method is required by the View API
 	def clear_plugin_context_menu(self):
 		"""
 		Remove all plugin-dependent actions from the context menu
@@ -331,4 +357,170 @@ class CardapioGtkView:
 		for menu_item in self.app_context_menu:
 			if menu_item.name is not None and menu_item.name.startswith('PluginAction'):
 				self.app_context_menu.remove(menu_item)
+
+
+	def setup_context_menu(self, widget):
+		"""
+		Show or hide different context menu options depending on the widget
+		"""
+
+		self.open_folder_menuitem.hide()
+		self.peek_inside_menuitem.hide()
+		self.eject_menuitem.hide()
+
+		if widget.app_info['type'] == 'callback':
+			self.pin_menuitem.hide()
+			self.unpin_menuitem.hide()
+			self.add_side_pane_menuitem.hide()
+			self.remove_side_pane_menuitem.hide()
+			self.app_menu_separator.hide()
+			self.setup_plugin_context_menu()
+			return
+
+		already_pinned = False
+		already_on_side_pane = False
+		self.app_menu_separator.show()
+
+		for command in [app['command'] for app in self.cardapio.settings['pinned items']]:
+			if command == widget.app_info['command']:
+				already_pinned = True
+				break
+
+		for command in [app['command'] for app in self.cardapio.settings['side pane items']]:
+			if command == widget.app_info['command']:
+				already_on_side_pane = True
+				break
+
+		if already_pinned:
+			self.pin_menuitem.hide()
+			self.unpin_menuitem.show()
+		else:
+			self.pin_menuitem.show()
+			self.unpin_menuitem.hide()
+
+		if already_on_side_pane:
+			self.add_side_pane_menuitem.hide()
+			self.remove_side_pane_menuitem.show()
+		else:
+			self.add_side_pane_menuitem.show()
+			self.remove_side_pane_menuitem.hide()
+
+		# TODO: move this into Controller
+		# figure out whether to show the 'open parent folder' menuitem
+		split_command = urllib2.splittype(widget.app_info['command'])
+
+		if widget.app_info['type'] == 'xdg' or len(split_command) == 2:
+
+			path_type, canonical_path = split_command
+			dummy, extension = os.path.splitext(canonical_path)
+
+			# don't show it for network://, trash://, or .desktop files
+			if path_type not in ('computer', 'network', 'trash') and extension != '.desktop':
+
+				# only show if path that exists
+				if os.path.exists(self.cardapio.unescape_url(canonical_path)):
+					self.open_folder_menuitem.show()
+					self.peek_inside_menuitem.show()
+
+		# figure out whether to show the 'eject' menuitem
+		if widget.app_info['command'] in self.cardapio.volumes:
+			self.eject_menuitem.show()
+
+		self.setup_plugin_context_menu()
+
+
+	def popup_context_menu(self, widget, event):
+		"""
+		Show context menu for app buttons
+		"""
+
+		self.setup_context_menu(widget)
+		self.block_focus_out_event()
+		self.app_context_menu.popup(None, None, None, event.button, event.time)
+
+
+	def on_app_button_button_pressed(self, widget, event):
+		"""
+		Respond to mouse click events onto app buttons. Either launch an app or
+		show context menu depending on the button pressed.
+		"""
+
+		if event.type != gtk.gdk.BUTTON_PRESS: return
+
+		if event.button == 2:
+
+			self.launch_button_command(widget.app_info, hide = False)
+
+		elif event.button == 3:
+
+			self.clicked_app = widget.app_info
+			self.popup_context_menu(widget, event)
+
+
+	def setup_plugin_context_menu(self):
+		"""
+		Sets up context menu items as requested by individual plugins
+		"""
+
+		self.clear_plugin_context_menu()
+		if 'context menu' not in self.clicked_app: return
+		if self.clicked_app['context menu'] is None: return
+		self.fill_plugin_context_menu(self.clicked_app['context menu'])
+
+
+	def on_view_mode_toggled(self, widget):
+		"""
+		Handler for when the "system menu" button is toggled
+		"""
+
+		if self.auto_toggled_view_mode_button:
+			self.auto_toggled_view_mode_button = False
+			return True
+
+		self.cardapio.switch_modes(show_system_menus = widget.get_active())
+
+
+	# This method is required by the View API
+	def set_view_mode_button_toggled(self, state):
+		"""
+		Toggle the "view mode" button, which switches between "app view" and
+		"control center" view
+		"""
+
+		if self.view_mode_button.get_active() != state:
+			self.auto_toggled_view_mode_button = True
+			self.view_mode_button.set_active(state)
+
+
+	# This method is required by the View API
+	def set_view_mode_button_visible(self, state):
+		"""
+		Shows or hides the "view mode" button, which switches between "app view"
+		and "control center" view
+		"""
+
+		if state: self.view_mode_button.show()
+		else: self.view_mode_button.hide()
+
+
+	# This method is required by the View API
+	def set_main_splitter_position(self, position):
+		"""
+		Set the position of the "splitter" which separates the sidepane from the
+		app pane
+		"""
+
+		self.main_splitter.set_position(position)
+
+
+	# This method is required by the View API
+	def get_main_splitter_position(self):
+		"""
+		Get the position of the "splitter" which separates the sidepane from the
+		app pane
+		"""
+
+		return self.main_splitter.get_position()
+
+
 

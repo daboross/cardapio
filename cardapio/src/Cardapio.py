@@ -207,9 +207,6 @@ class Cardapio(dbus.service.Object):
 		self.no_results_to_show            = False
 		self.previously_focused_widget     = None
 		self.opened_last_app_in_background = False
-		self.auto_toggled_sidebar_button   = False
-		self.auto_toggled_view_mode_button = False
-		self.clicked_app                   = None
 		self.keybinding                    = None
 		self.search_timer_local            = None
 		self.search_timer_remote           = None
@@ -283,6 +280,7 @@ class Cardapio(dbus.service.Object):
 		self.view.on_mainwindow_destroy(*dummy)
 
 
+	# This method is called from the View
 	def save_and_quit(self, *dummy):
 		"""
 		Saves the current state and quits
@@ -564,6 +562,43 @@ class Cardapio(dbus.service.Object):
 		write('[%s] %s'  % (plugin.name, text))
 
 
+	# This method is called from the View
+	def handle_section_all_clicked(self):
+		"""
+		This method is activated when the user presses the "All" section button.
+		It unselects the currently-selected section if any, otherwise it clears
+		the search entry and returns True to indicate that the "All" button should 
+		be drawn as inactive.
+		"""
+
+		if self.selected_section is None:
+			self.view.clear_search_entry()
+			return True
+
+		self.untoggle_and_show_all_sections()
+		return False
+
+
+	# This method is called from the View
+	def handle_section_clicked(self, section):
+		"""
+		This method is activated when the user presses a section button (except
+		for the "All" button). It causes that section to be displayed in case
+		the it wasn't already visible, or hides it otherwise. Returns a boolean
+		indicating whether the section button should be drawn toggled or not.
+		"""
+
+		# if already toggled, untoggle
+		if self.selected_section == section:
+			self.selected_section = None # necessary!
+			self.untoggle_and_show_all_sections()
+			return False
+
+		# otherwise toggle
+		self.toggle_and_show_section(section)
+		return True
+
+
 	def on_all_sections_sidebar_button_clicked(self, widget):
 		"""
 		Handler for when the user clicks "All" in the sidebar
@@ -579,6 +614,8 @@ class Cardapio(dbus.service.Object):
 		Handler for when the user chooses a category in the sidebar
 		"""
 
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
 		self.view.on_sidebar_button_clicked(widget, section_slab)
 
 
@@ -587,7 +624,9 @@ class Cardapio(dbus.service.Object):
 		Handler for when the user hovers over a category in the sidebar
 		"""
 
-		widget.set_active(True)
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
+		self.view.on_sidebar_button_hovered(widget)
 
 
 	def create_xdg_folders(self):
@@ -622,9 +661,9 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.safe_cardapio_proxy = Cardapio.SafeCardapioProxy()
-		self.safe_cardapio_proxy.write_to_log = self.plugin_write_to_log
-		self.safe_cardapio_proxy.handle_search_result = self.plugin_handle_search_result
-		self.safe_cardapio_proxy.handle_search_error = self.plugin_handle_search_error
+		self.safe_cardapio_proxy.write_to_log              = self.plugin_write_to_log
+		self.safe_cardapio_proxy.handle_search_result      = self.plugin_handle_search_result
+		self.safe_cardapio_proxy.handle_search_error       = self.plugin_handle_search_error
 		self.safe_cardapio_proxy.ask_for_reload_permission = self.plugin_ask_for_reload_permission
 
 		self.build_plugin_database()
@@ -716,14 +755,14 @@ class Cardapio(dbus.service.Object):
 		button = self.add_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_sections_sidebar_button = button
-		self.set_sidebar_button_active(button, True)
+		self.view.set_sidebar_button_toggled(button, True)
 		self.all_sections_sidebar_button.set_sensitive(False)
 
 		# "All" button for the system menu
 		button = self.add_button(_('All'), None, self.system_category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_system_sections_sidebar_button = button
-		self.set_sidebar_button_active(button, True)
+		self.view.set_sidebar_button_toggled(button, True)
 		self.all_system_sections_sidebar_button.set_sensitive(False)
 
 		self.no_results_slab, dummy, self.no_results_label = self.add_application_section('Dummy text')
@@ -737,7 +776,7 @@ class Cardapio(dbus.service.Object):
 			self.view.get_widget('OptionAppletLabel').hide()
 
 		if not self.have_control_center:
-			self.view_mode_button.hide()
+			self.view.set_view_mode_button_visible(False)
 
 		self.add_subfolders_slab()
 		self.add_all_reorderable_slabs()
@@ -1320,24 +1359,19 @@ class Cardapio(dbus.service.Object):
 		Handler for when the "system menu" button is toggled
 		"""
 
-		if self.auto_toggled_view_mode_button:
-			self.auto_toggled_view_mode_button = False
-			return True
-
-		self.switch_modes(show_system_menus = widget.get_active())
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
+		self.view.on_view_mode_toggled(widget)
 
 
 	def switch_modes(self, show_system_menus, toggle_mode_button = False):
 		"""
-		Switched between "all menus" and "system menus" mode
+		Switches between "all menus" and "system menus" mode
 		"""
 
 		self.in_system_menu_mode = show_system_menus
 
-		if toggle_mode_button:
-			if self.view_mode_button.get_active() != show_system_menus:
-				self.auto_toggled_view_mode_button = True
-				self.view_mode_button.set_active(show_system_menus)
+		if toggle_mode_button: self.view.set_view_mode_button_toggled(show_system_menus)
 
 		self.untoggle_and_show_all_sections()
 		self.on_search_entry_changed()
@@ -2173,10 +2207,10 @@ class Cardapio(dbus.service.Object):
 			self.view.window.move(x, y)
 
 		if self.settings['mini mode']:
-			self.main_splitter.set_position(0)
+			self.view.set_main_splitter_position(0)
 
 		elif self.settings['splitter position'] > 0:
-			self.main_splitter.set_position(self.settings['splitter position'])
+			self.view.set_main_splitter_position(self.settings['splitter position'])
 
 		# decide which search bar to show (top or bottom) depending
 		# on the y = 0 axis window invert
@@ -2190,7 +2224,7 @@ class Cardapio(dbus.service.Object):
 
 		self.settings['window size'] = list(self.view.window.get_size())
 		if not self.settings['mini mode']:
-			self.settings['splitter position'] = self.main_splitter.get_position()
+			self.settings['splitter position'] = self.view.get_main_splitter_position()
 
 
 	def on_main_splitter_clicked(self, widget, event):
@@ -2246,7 +2280,7 @@ class Cardapio(dbus.service.Object):
 			self.view.get_widget('TopLeftSearchSlabMargin').hide()    # these are required, to make sure the splitter
 			self.view.get_widget('BottomLeftSearchSlabMargin').hide() # ...moves all the way to the left
 			sidepane_margin = self.view.get_widget('SidePaneMargin')
-			#self.main_splitter.set_position(0)
+			#self.view.set_main_splitter_position(0)
 
 			# hack to make sure the viewport resizes to the minisize correctly
 			self.view.get_widget('SideappViewport').hide()
@@ -2257,7 +2291,7 @@ class Cardapio(dbus.service.Object):
 			#self.right_session_pane.show()
 
 			if update_window_size:
-				self.settings['window size'][0] -= self.main_splitter.get_position()
+				self.settings['window size'][0] -= self.view.get_main_splitter_position()
 
 		else:
 
@@ -2276,10 +2310,10 @@ class Cardapio(dbus.service.Object):
 
 			self.view.get_widget('CategoryMargin').set_padding(*self.fullsize_mode_padding)
 			
-			self.main_splitter.set_position(self.settings['splitter position'])
+			self.view.set_main_splitter_position(self.settings['splitter position'])
 
 			if update_window_size:
-				self.settings['window size'][0] += self.main_splitter.get_position()
+				self.settings['window size'][0] += self.view.get_main_splitter_position()
 
 
 	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
@@ -2686,7 +2720,7 @@ class Cardapio(dbus.service.Object):
 				button = self.add_button(app['name'], app['icon name'], self.sidepane, tooltip = app['tooltip'], button_type = Cardapio.SIDEPANE_BUTTON)
 				button.app_info = app_info
 				button.connect('clicked', self.on_app_button_clicked)
-				button.connect('button-press-event', self.on_app_button_button_pressed)
+				button.connect('button-press-event', self.view.on_app_button_button_pressed)
 
 		if no_results or (slab is self.sidepane_section_slab):
 			self.hide_section(slab, fully_hide = True)
@@ -2985,7 +3019,7 @@ class Cardapio(dbus.service.Object):
 		button = self.add_button(button_str, icon_name, parent_widget, tooltip, button_type = Cardapio.APP_BUTTON)
 
 		button.connect('clicked', self.on_app_button_clicked)
-		button.connect('button-press-event', self.on_app_button_button_pressed)
+		button.connect('button-press-event', self.view.on_app_button_button_pressed)
 		button.connect('focus-in-event', self.on_app_button_focused)
 
 		if command_type != 'callback' and command_type != 'raw':
@@ -3172,7 +3206,7 @@ class Cardapio(dbus.service.Object):
 
 		self.remove_section_from_app_list(self.favorites_section_slab)
 		self.clear_pane(self.favorites_section_contents)
-		self.settings['pinned items'].append(self.clicked_app)
+		self.settings['pinned items'].append(self.view.clicked_app)
 		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
 
 
@@ -3184,7 +3218,7 @@ class Cardapio(dbus.service.Object):
 
 		self.remove_section_from_app_list(self.favorites_section_slab)
 		self.clear_pane(self.favorites_section_contents)
-		self.settings['pinned items'].remove(self.clicked_app)
+		self.settings['pinned items'].remove(self.view.clicked_app)
 		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
 
 
@@ -3197,7 +3231,7 @@ class Cardapio(dbus.service.Object):
 		self.remove_section_from_app_list(self.sidepane_section_slab)
 		self.clear_pane(self.sidepane_section_contents)
  		self.clear_pane(self.sidepane)
-		self.settings['side pane items'].append(self.clicked_app)
+		self.settings['side pane items'].append(self.view.clicked_app)
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 		self.sidepane.queue_resize() # required! or sidepane's allocation will be x,y,width,0 when first item is added
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or sidepane will obscure the mode switcher button
@@ -3212,7 +3246,7 @@ class Cardapio(dbus.service.Object):
 		self.remove_section_from_app_list(self.sidepane_section_slab)
 		self.clear_pane(self.sidepane_section_contents)
  		self.clear_pane(self.sidepane)
-		self.settings['side pane items'].remove(self.clicked_app)
+		self.settings['side pane items'].remove(self.view.clicked_app)
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or an extra space will show up where but button used to be
 
@@ -3222,7 +3256,7 @@ class Cardapio(dbus.service.Object):
 		Handle the "open parent folder" action
 		"""
 
-		parent_folder, dummy = os.path.split(self.clicked_app['command'])
+		parent_folder, dummy = os.path.split(self.view.clicked_app['command'])
 		self.launch_xdg(parent_folder)
 
 
@@ -3231,7 +3265,7 @@ class Cardapio(dbus.service.Object):
 		Handle the "launch in background" action
 		"""
 
-		self.launch_button_command(self.clicked_app, hide = False)
+		self.launch_button_command(self.view.clicked_app, hide = False)
 
 
 	def on_peek_inside_pressed(self, widget):
@@ -3239,7 +3273,7 @@ class Cardapio(dbus.service.Object):
 		Handle the "peek inside folder" action
 		"""
 
-		dummy, path = urllib2.splittype(self.clicked_app['command'])
+		dummy, path = urllib2.splittype(self.view.clicked_app['command'])
 		if os.path.isfile(path): path, dummy = os.path.split(path)
 		path = self.unescape_url(path)
  		self.create_subfolder_stack(path)
@@ -3251,109 +3285,8 @@ class Cardapio(dbus.service.Object):
 		Handle the "eject" action
 		"""
 
-		volume = self.volumes[self.clicked_app['command']]
+		volume = self.volumes[self.view.clicked_app['command']]
 		volume.eject(return_true)
-
-
-	def on_app_button_button_pressed(self, widget, event):
-		"""
-		Show context menu for app buttons
-		"""
-
-		if event.type != gtk.gdk.BUTTON_PRESS: return
-
-		if event.button == 2:
-
-			self.launch_button_command(widget.app_info, hide = False)
-
-		elif event.button == 3:
-
-			self.setup_context_menu(widget)
-			self.view.block_focus_out_event()
-			self.view.app_context_menu.popup(None, None, None, event.button, event.time)
-
-
-	def setup_context_menu(self, widget):
-		"""
-		Show or hide different context menu options depending on the widget
-		"""
-
-		self.clicked_app = widget.app_info
-
-		self.open_folder_menuitem.hide()
-		self.peek_inside_menuitem.hide()
-		self.eject_menuitem.hide()
-
-		if widget.app_info['type'] == 'callback':
-			self.pin_menuitem.hide()
-			self.unpin_menuitem.hide()
-			self.add_side_pane_menuitem.hide()
-			self.remove_side_pane_menuitem.hide()
-			self.app_menu_separator.hide()
-			self.plugin_setup_context_menu()
-			return
-
-		already_pinned = False
-		already_on_side_pane = False
-		self.app_menu_separator.show()
-
-		for command in [app['command'] for app in self.settings['pinned items']]:
-			if command == widget.app_info['command']:
-				already_pinned = True
-				break
-
-		for command in [app['command'] for app in self.settings['side pane items']]:
-			if command == widget.app_info['command']:
-				already_on_side_pane = True
-				break
-
-		if already_pinned:
-			self.pin_menuitem.hide()
-			self.unpin_menuitem.show()
-		else:
-			self.pin_menuitem.show()
-			self.unpin_menuitem.hide()
-
-		if already_on_side_pane:
-			self.add_side_pane_menuitem.hide()
-			self.remove_side_pane_menuitem.show()
-		else:
-			self.add_side_pane_menuitem.show()
-			self.remove_side_pane_menuitem.hide()
-
-
-		# figure out whether to show the 'open parent folder' menuitem
-		split_command = urllib2.splittype(widget.app_info['command'])
-
-		if widget.app_info['type'] == 'xdg' or len(split_command) == 2:
-
-			path_type, canonical_path = split_command
-			dummy, extension = os.path.splitext(canonical_path)
-
-			# don't show it for network://, trash://, or .desktop files
-			if path_type not in ('computer', 'network', 'trash') and extension != '.desktop':
-
-				# only show if path that exists
-				if os.path.exists(self.unescape_url(canonical_path)):
-					self.open_folder_menuitem.show()
-					self.peek_inside_menuitem.show()
-
-		# figure out whether to show the 'eject' menuitem
-		if widget.app_info['command'] in self.volumes:
-			self.eject_menuitem.show()
-
-		self.plugin_setup_context_menu()
-
-
-	def plugin_setup_context_menu(self):
-		"""
-		Sets up context menu items as requested by individual plugins
-		"""
-
-		self.view.clear_plugin_context_menu()
-		if 'context menu' not in self.clicked_app: return
-		if self.clicked_app['context menu'] is None: return
-		self.view.fill_plugin_context_menu(self.clicked_app['context menu'])
 
 
 	def on_app_button_focused(self, widget, event):
@@ -3613,7 +3546,7 @@ class Cardapio(dbus.service.Object):
 
 		if self.selected_section is not None:
 			widget = self.section_list[self.selected_section]['category']
-			self.set_sidebar_button_active(widget, False)
+			self.view.set_sidebar_button_toggled(widget, False)
 
 		self.selected_section = None
 
@@ -3622,7 +3555,7 @@ class Cardapio(dbus.service.Object):
 		else:
 			widget = self.all_sections_sidebar_button
 
-		self.set_sidebar_button_active(widget, True)
+		self.view.set_sidebar_button_toggled(widget, True)
 
 		if self.is_search_entry_empty():
 			widget.set_sensitive(False)
@@ -3639,15 +3572,15 @@ class Cardapio(dbus.service.Object):
 
 		if self.selected_section is not None:
 			widget = self.section_list[self.selected_section]['category']
-			self.set_sidebar_button_active(widget, False)
+			self.view.set_sidebar_button_toggled(widget, False)
 
 		elif self.in_system_menu_mode and self.all_system_sections_sidebar_button.get_active():
 			widget = self.all_system_sections_sidebar_button
-			self.set_sidebar_button_active(widget, False)
+			self.view.set_sidebar_button_toggled(widget, False)
 
 		elif self.all_sections_sidebar_button.get_active():
 			widget = self.all_sections_sidebar_button
-			self.set_sidebar_button_active(widget, False)
+			self.view.set_sidebar_button_toggled(widget, False)
 
 		self.all_sections_sidebar_button.set_sensitive(True)
 		self.all_system_sections_sidebar_button.set_sensitive(True)
@@ -3786,16 +3719,6 @@ class Cardapio(dbus.service.Object):
 
 		self.section_list[section_slab]['has entries'] = True
 		self.section_list[section_slab]['category'].show()
-
-
-	def set_sidebar_button_active(self, button, state):
-		"""
-		Toggle a sidebar button
-		"""
-
-		if button.get_active() != state:
-			self.auto_toggled_sidebar_button = True
-			button.set_active(state)
 
 
 	def scroll_to_top(self):
