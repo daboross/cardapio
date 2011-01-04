@@ -47,27 +47,24 @@ class CardapioGtkView:
 		self.auto_toggled_view_mode_button = False # used to stop the on_toggle handler at times
 
 
-	def setup_base_ui(self):
+	def setup_ui(self):
 		"""
 		Reads the GTK Builder interface file and sets up some UI details
 		"""
 
 		self.rebuild_timer = None
 
-		main_ui_filepath    = os.path.join(self.cardapio.cardapio_path, 'ui', 'cardapio.ui')
-		options_ui_filepath = os.path.join(self.cardapio.cardapio_path, 'ui', 'options.ui')
+		main_ui_filepath = os.path.join(self.cardapio.cardapio_path, 'ui', 'cardapio.ui')
 
 		builder = gtk.Builder()
 		builder.set_translation_domain(self.cardapio.APP)
 		builder.add_from_file(main_ui_filepath)
-		builder.add_from_file(options_ui_filepath)
 		builder.connect_signals(self.cardapio)
 
 		self.get_widget = builder.get_object
 		self.window                    = self.get_widget('CardapioWindow')
 		self.message_window            = self.get_widget('MessageWindow')
 		self.about_dialog              = self.get_widget('AboutDialog')
-		self.options_dialog            = self.get_widget('OptionsDialog')
 		self.executable_file_dialog    = self.get_widget('ExecutableFileDialog')
 		self.cardapio.application_pane          = self.get_widget('ApplicationPane')
 		self.cardapio.category_pane             = self.get_widget('CategoryPane')
@@ -89,11 +86,6 @@ class CardapioGtkView:
 		self.view_mode_button          = self.get_widget('ViewModeButton')
 		self.main_splitter             = self.get_widget('MainSplitter')
 
-		# TODO: move the configuration window stuff to another file, since all
-		# view backends could share the GTK-based configuration window.
-		self.cardapio.plugin_tree_model         = self.get_widget('PluginListstore')
-		self.cardapio.plugin_checkbox_column    = self.get_widget('PluginCheckboxColumn')
-
 		# start with any search entry -- doesn't matter which
 		self.cardapio.search_entry = self.get_widget('TopLeftSearchEntry')
 
@@ -106,8 +98,6 @@ class CardapioGtkView:
 
 			if 'set_name' in dir(widget):
 				widget.set_name(gtk.Buildable.get_name(widget))
-
-		self.drag_allowed_cursor = gtk.gdk.Cursor(gtk.gdk.FLEUR)
 
 		# dynamic translation of MenuItem defined in .ui file
 		about_distro_label = _('_About %(distro_name)s') % {'distro_name' : self.cardapio.distro_name}
@@ -260,16 +250,6 @@ class CardapioGtkView:
 		"""
 
 		self.about_dialog.show()
-
-
-	# This method is required by the View API
-	def show_options_dialog(self, state):
-		"""
-		Shows the "Options" dialog
-		"""
-
-		if state : self.options_dialog.show()
-		else     : self.options_dialog.hide()
 
 
 	# This method is required by the View API
@@ -522,5 +502,48 @@ class CardapioGtkView:
 
 		return self.main_splitter.get_position()
 
+
+	# This method is required by the View API
+	def apply_settings(self):
+		"""
+		Setup UI elements from the set of preferences that are accessible
+		from the options dialog.
+		"""
+
+		if not self.cardapio.settings['applet icon']: 
+			self.cardapio.settings['applet icon'] = 'start-here'
+
+		if self.cardapio.settings['show session buttons']:
+			self.get_widget('SessionPane').show()
+		else:
+			self.get_widget('SessionPane').hide()
+
+		# set up open-on-hover for categories
+
+		category_buttons = self.cardapio.category_pane.get_children() + self.cardapio.system_category_pane.get_children()
+
+		if self.cardapio.settings['open categories on hover']:
+			for category_button in category_buttons:
+
+				if 'has_hover_handler' in dir(category_button) and not category_button.has_hover_handler: # is there a better way to check this?
+					category_button.handler_unblock_by_func(self.on_sidebar_button_hovered)
+				else: 
+					category_button.connect('enter', self.on_sidebar_button_hovered)
+					category_button.has_hover_handler = True 
+
+		else:
+			for category_button in category_buttons:
+				if 'has_hover_handler' in dir(category_button) and category_button.has_hover_handler:
+					category_button.handler_block_by_func(self.on_sidebar_button_hovered)
+					category_button.has_hover_handler = False
+
+
+	def on_dialog_close(self, dialog, response = None):
+		"""
+		Handler for when a dialog's X button is clicked
+		"""
+
+		dialog.hide()
+		return True
 
 

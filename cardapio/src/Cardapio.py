@@ -33,6 +33,7 @@ try:
 	from settings import *
 	from hacks import *
 	from CardapioGtkView import *
+	from OptionsWindow import *
 	from CardapioPluginInterface import CardapioPluginInterface
 	from CardapioAppletInterface import *
 
@@ -195,6 +196,7 @@ class Cardapio(dbus.service.Object):
 		self.cardapio_path = cardapio_path
 		self.APP = APP
 		self.view = CardapioGtkView(self)
+		self.options_window = OptionsWindow(self)
 
 		self.home_folder_path = os.path.abspath(os.path.expanduser('~'))
 		self.visible                       = False
@@ -242,7 +244,7 @@ class Cardapio(dbus.service.Object):
 		logging.info('...done setting up DBus!')
 
 		logging.info('Setting up UI...')
-		self.setup_base_ui() # must be the first ui-related method to be called
+		self.setup_ui() # must be the first ui-related method to be called
 		logging.info('...done setting up UI!')
 
 		logging.info('Setting up panel applet (if any)...')
@@ -336,15 +338,16 @@ class Cardapio(dbus.service.Object):
 		dbus.service.Object.__init__(self, self.bus, Cardapio.bus_obj_str)
 
 
-	def setup_base_ui(self):
+	def setup_ui(self):
 		"""
-		Calls the UI backend's "setup_base_ui" function
+		Calls the UI backend's "setup_ui" function
 		"""
 
 		self.icon_helper = IconHelper()
 		self.icon_helper.register_icon_theme_listener(self.schedule_rebuild)
 
-		self.view.setup_base_ui()
+		self.options_window.setup_ui()
+		self.view.setup_ui()
 
 
 	def setup_panel_applet(self):
@@ -619,16 +622,6 @@ class Cardapio(dbus.service.Object):
 		self.view.on_sidebar_button_clicked(widget, section_slab)
 
 
-	def on_sidebar_button_hovered(self, widget):
-		"""
-		Handler for when the user hovers over a category in the sidebar
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.on_sidebar_button_hovered(widget)
-
-
 	def create_xdg_folders(self):
 		"""
 		Creates Cardapio's config and cache folders (usually at ~/.config/Cardapio and
@@ -670,21 +663,12 @@ class Cardapio(dbus.service.Object):
 		self.activate_plugins_from_settings() # investigate memory usage here
 
 
-	def setup_ui_from_all_settings(self):
+	def apply_settings(self):
 		"""
 		Setup UI elements according to user preferences
 		"""
 
-		self.setup_ui_from_gui_settings()
-		self.toggle_mini_mode_ui(update_window_size = False)
-
-
-	def setup_ui_from_gui_settings(self):
-		"""
-		Setup UI elements from the set of preferences that are accessible
-		from the options dialog.
-		"""
-
+		# set up keybinding
 		if self.keybinding is not None:
 			try: keybinder.unbind(self.keybinding)
 			except: pass
@@ -692,35 +676,13 @@ class Cardapio(dbus.service.Object):
 		self.keybinding = self.settings['keybinding']
 		keybinder.bind(self.keybinding, self.show_hide)
 
-		if not self.settings['applet icon']: 
-			self.settings['applet icon'] = 'start-here'
-
+		# set up applet
 		if self.panel_applet.panel_type is not None:
 			self.panel_applet.update_from_user_settings(self.settings)
 
-		if self.settings['show session buttons']:
-			self.view.get_widget('SessionPane').show()
-		else:
-			self.view.get_widget('SessionPane').hide()
-
-		# set up open-on-hover for categories
-
-		category_buttons = self.category_pane.get_children() + self.system_category_pane.get_children()
-
-		if self.settings['open categories on hover']:
-			for category_button in category_buttons:
-
-				if 'has_hover_handler' in dir(category_button) and not category_button.has_hover_handler: # is there a better way to check this?
-					category_button.handler_unblock_by_func(self.on_sidebar_button_hovered)
-				else: 
-					category_button.connect('enter', self.on_sidebar_button_hovered)
-					category_button.has_hover_handler = True 
-
-		else:
-			for category_button in category_buttons:
-				if 'has_hover_handler' in dir(category_button) and category_button.has_hover_handler:
-					category_button.handler_block_by_func(self.on_sidebar_button_hovered)
-					category_button.has_hover_handler = False
+		# set up everything else
+		self.view.apply_settings()
+		self.toggle_mini_mode_ui(update_window_size = False)
 
 
 	def build_ui(self):
@@ -769,11 +731,11 @@ class Cardapio(dbus.service.Object):
 		self.hide_no_results_text()
 
 		if self.panel_applet.panel_type in (None, PANEL_TYPE_DOCKY):
-			self.view.get_widget('AppletOptionPane').hide()
+			self.options_window.get_widget('AppletOptionPane').hide()
 
 		elif self.panel_applet.panel_type is PANEL_TYPE_AWN:
-			self.view.get_widget('LabelAppletLabel').hide()
-			self.view.get_widget('OptionAppletLabel').hide()
+			self.options_window.get_widget('LabelAppletLabel').hide()
+			self.options_window.get_widget('OptionAppletLabel').hide()
 
 		if not self.have_control_center:
 			self.view.set_view_mode_button_visible(False)
@@ -790,7 +752,7 @@ class Cardapio(dbus.service.Object):
 		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 
-		self.setup_ui_from_all_settings()
+		self.apply_settings()
 		self.view.set_message_window_visible(False)
 
 
@@ -862,8 +824,9 @@ class Cardapio(dbus.service.Object):
 		Handler for when a dialog's X button is clicked
 		"""
 
-		dialog.hide()
-		return True
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
+		return self.view.on_dialog_close(dialog, response)
 
 
 	def set_widget_from_option(self, widget_str, option_str):
@@ -871,7 +834,7 @@ class Cardapio(dbus.service.Object):
 		Set the value of the widget named 'widget_str' to 'option_str'
 		"""
 
-		widget = self.view.get_widget(widget_str)
+		widget = self.options_window.get_widget(widget_str)
 		try    : widget.handler_block_by_func(self.on_options_changed)
 		except : pass
 
@@ -905,7 +868,7 @@ class Cardapio(dbus.service.Object):
 
 		icon_size = gtk.icon_size_lookup(4)[0] # 4 because it's that same as in the UI file
 
-		self.plugin_tree_model.clear()
+		self.options_window.plugin_tree_model.clear()
 
 		# place active plugins at the top of the list, in order
 
@@ -928,10 +891,10 @@ class Cardapio(dbus.service.Object):
 
 			icon_pixbuf = self.icon_helper.get_icon_pixbuf(plugin_info['category icon'], icon_size, 'package-x-generic')
 
-			self.plugin_tree_model.append([basename, name, name, is_active, is_core, not is_required, icon_pixbuf])
+			self.options_window.plugin_tree_model.append([basename, name, name, is_active, is_core, not is_required, icon_pixbuf])
 
 		self.update_plugin_description()
-		self.view.show_options_dialog(True)
+		self.options_window.show(True)
 
 
 	def on_options_dialog_closed(self, *dummy):
@@ -939,7 +902,7 @@ class Cardapio(dbus.service.Object):
 		Hides the Options Dialog
 		"""
 
-		self.view.show_options_dialog(False)
+		self.options_window.show(False)
 		try:
 			self.settings.save()
 		except Exception, ex:
@@ -954,15 +917,15 @@ class Cardapio(dbus.service.Object):
 		Dialog
 		"""
 
-		self.settings['keybinding'] = self.view.get_widget('OptionKeybinding').get_text()
-		self.settings['applet label'] = self.view.get_widget('OptionAppletLabel').get_text()
-		self.settings['applet icon'] = self.view.get_widget('OptionAppletIcon').get_text()
-		self.settings['show session buttons'] = self.view.get_widget('OptionSessionButtons').get_active()
-		self.settings['keep search results'] = self.view.get_widget('OptionKeepResults').get_active()
-		self.settings['open on hover'] = self.view.get_widget('OptionOpenOnHover').get_active()
-		self.settings['open categories on hover'] = self.view.get_widget('OptionOpenCategoriesOnHover').get_active()
-		self.settings['mini mode'] = self.view.get_widget('OptionMiniMode').get_active()
-		self.setup_ui_from_gui_settings()
+		self.settings['keybinding']               = self.options_window.get_widget('OptionKeybinding').get_text()
+		self.settings['applet label']             = self.options_window.get_widget('OptionAppletLabel').get_text()
+		self.settings['applet icon']              = self.options_window.get_widget('OptionAppletIcon').get_text()
+		self.settings['show session buttons']     = self.options_window.get_widget('OptionSessionButtons').get_active()
+		self.settings['keep search results']      = self.options_window.get_widget('OptionKeepResults').get_active()
+		self.settings['open on hover']            = self.options_window.get_widget('OptionOpenOnHover').get_active()
+		self.settings['open categories on hover'] = self.options_window.get_widget('OptionOpenCategoriesOnHover').get_active()
+		self.settings['mini mode']                = self.options_window.get_widget('OptionMiniMode').get_active()
+		self.apply_settings()
 
 
 	def on_grab_new_shortcut_toggled(self, button):
@@ -976,13 +939,13 @@ class Cardapio(dbus.service.Object):
 				try: keybinder.unbind(self.keybinding)
 				except: pass
 
-			self.key_grab_handler = self.view.options_dialog.connect('key-press-event', self.on_new_keybinding_press)
-			self.view.get_widget('OptionGrabKeybinding').set_label(_('Recording...'))
+			self.key_grab_handler = self.options_window.dialog.connect('key-press-event', self.on_new_keybinding_press)
+			self.options_window.get_widget('OptionGrabKeybinding').set_label(_('Recording...'))
 
 		else:
 
-			self.view.options_dialog.disconnect(self.key_grab_handler)
-			self.view.get_widget('OptionGrabKeybinding').set_label(_('Grab new shortcut'))
+			self.options_window.dialog.disconnect(self.key_grab_handler)
+			self.options_window.get_widget('OptionGrabKeybinding').set_label(_('Grab new shortcut'))
 			self.on_options_changed()
 
 
@@ -1025,18 +988,18 @@ class Cardapio(dbus.service.Object):
 
 		# cancel on "Escape"
 		if main_key == gtk.keysyms.Escape and not modifier_string:
-			self.view.get_widget('OptionKeybinding').set_text(self.settings['keybinding'])
-			self.view.get_widget('OptionGrabKeybinding').set_active(False)
+			self.options_window.get_widget('OptionKeybinding').set_text(self.settings['keybinding'])
+			self.options_window.get_widget('OptionGrabKeybinding').set_active(False)
 			return True
 
 		# clear on "BackSpace" or "Delete"
 		if main_key in (gtk.keysyms.BackSpace, gtk.keysyms.Delete) and not modifier_string:
-			self.view.get_widget('OptionKeybinding').set_text('')
-			self.view.get_widget('OptionGrabKeybinding').set_active(False)
+			self.options_window.get_widget('OptionKeybinding').set_text('')
+			self.options_window.get_widget('OptionGrabKeybinding').set_active(False)
 			return True
 
 		if main_key_string:
-			self.view.get_widget('OptionKeybinding').set_text(shortcut_string)
+			self.options_window.get_widget('OptionKeybinding').set_text(shortcut_string)
 
 			if main_key not in (
 					gtk.keysyms.Shift_L, gtk.keysyms.Shift_R, gtk.keysyms.Shift_Lock,
@@ -1048,7 +1011,7 @@ class Cardapio(dbus.service.Object):
 					# TODO: what else?
 					#gtk.keysyms.ISO_Level3_Shift, gtk.keysyms.ISO_Group_Shift, 
 					):
-				self.view.get_widget('OptionGrabKeybinding').set_active(False)
+				self.options_window.get_widget('OptionGrabKeybinding').set_active(False)
 
 		return True
 
@@ -1058,21 +1021,21 @@ class Cardapio(dbus.service.Object):
 		Writes information about the currently-selected plugin on the GUI
 		"""
 
-		model, iter_ = self.view.get_widget('PluginTreeView').get_selection().get_selected()
+		model, iter_ = self.options_window.get_widget('PluginTreeView').get_selection().get_selected()
 
 		if iter_ is None:
 			is_core = True
 			plugin_info = {'name': '', 'version': '', 'author': '', 'description': ''}
 
 		else:
-			is_core  = self.plugin_tree_model.get_value(iter_, 4)
-			basename = self.plugin_tree_model.get_value(iter_, 0)
+			is_core  = self.options_window.plugin_tree_model.get_value(iter_, 4)
+			basename = self.options_window.plugin_tree_model.get_value(iter_, 0)
 			plugin_info = self.plugin_database[basename]
 
 		description = _('<b>Plugin:</b> %(name)s %(version)s\n<b>Author:</b> %(author)s\n<b>Description:</b> %(description)s') % plugin_info
 		if not is_core  : description += '\n<small>(' + _('This is a community-supported plugin') + ')</small>'
 
-		label = self.view.get_widget('OptionPluginInfo')
+		label = self.options_window.get_widget('OptionPluginInfo')
 		dummy, dummy, width, dummy = label.get_allocation()
 		label.set_markup(description)
 		label.set_line_wrap(True)
@@ -1094,16 +1057,16 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.settings['active plugins'] = []
-		iter_ = self.plugin_tree_model.get_iter_first()
+		iter_ = self.options_window.plugin_tree_model.get_iter_first()
 
 		while iter_ is not None:
 
-			if self.plugin_tree_model.get_value(iter_, 3):
-				self.settings['active plugins'].append(self.plugin_tree_model.get_value(iter_, 0))
+			if self.options_window.plugin_tree_model.get_value(iter_, 3):
+				self.settings['active plugins'].append(self.options_window.plugin_tree_model.get_value(iter_, 0))
 
-			iter_ = self.plugin_tree_model.iter_next(iter_)
+			iter_ = self.options_window.plugin_tree_model.iter_next(iter_)
 
-		self.view.options_dialog.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
+		self.options_window.dialog.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
 
 		# ensure cursor is rendered immediately
 		gtk.gdk.flush()
@@ -1111,7 +1074,7 @@ class Cardapio(dbus.service.Object):
 			gtk.main_iteration()
 
 		self.activate_plugins_from_settings() # investigate memory usage here
-		self.view.options_dialog.window.set_cursor(None)
+		self.options_window.dialog.window.set_cursor(None)
 
 		self.schedule_rebuild()
 
@@ -1121,18 +1084,9 @@ class Cardapio(dbus.service.Object):
 		Change the cursor to show that plugins are draggable.
 		"""
 
-		pthinfo = treeview.get_path_at_pos(int(event.x), int(event.y))
-
-		if pthinfo is None:
-			treeview.window.set_cursor(None)
-			return
-
-		path, col, cellx, celly = pthinfo
-
-		if col == self.plugin_checkbox_column:
-			treeview.window.set_cursor(None)
-		else:
-			treeview.window.set_cursor(self.view.drag_allowed_cursor)
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
+		self.options_window.on_plugintreeview_hover(treeview, event)
 
 
 	def on_plugin_state_toggled(self, cell, path):
@@ -1142,12 +1096,12 @@ class Cardapio(dbus.service.Object):
 		This function does that.
 		"""
 
-		iter_ = self.plugin_tree_model.get_iter(path)
-		basename = self.plugin_tree_model.get_value(iter_, 0)
+		iter_ = self.options_window.plugin_tree_model.get_iter(path)
+		basename = self.options_window.plugin_tree_model.get_value(iter_, 0)
 
 		if basename in self.required_plugins: return
 
-		self.plugin_tree_model.set_value(iter_, 3, not cell.get_active())
+		self.options_window.plugin_tree_model.set_value(iter_, 3, not cell.get_active())
 		self.apply_plugins_from_option_window()
 
 
@@ -2246,7 +2200,7 @@ class Cardapio(dbus.service.Object):
 		Handler for the minimode checkbox in the preferences window
 		"""
 
-		self.settings['mini mode'] = self.view.get_widget('OptionMiniMode').get_active()
+		self.settings['mini mode'] = self.options_window.get_widget('OptionMiniMode').get_active()
 		self.toggle_mini_mode_ui(update_window_size = True)
 		return True
 
