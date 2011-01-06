@@ -207,7 +207,6 @@ class Cardapio(dbus.service.Object):
 		self.subfolder_stack               = []
 		self.selected_section              = None
 		self.no_results_to_show            = False
-		self.previously_focused_widget     = None
 		self.opened_last_app_in_background = False
 		self.keybinding                    = None
 		self.search_timer_local            = None
@@ -983,19 +982,9 @@ class Cardapio(dbus.service.Object):
 		from anywhere without the need to focus the search entry first
 		"""
 
-		w = self.view.window.get_focus()
-
-		if w != self.search_entry and w == self.previously_focused_widget:
-			if event.is_modifier:
-				return
-
-			self.view.window.set_focus(self.search_entry)
-			self.search_entry.set_position(len(self.search_entry.get_text()))
-			
-			self.search_entry.emit('key-press-event', event)
-
-		else:
-			self.previously_focused_widget = None
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
+		self.view.on_mainwindow_after_key_pressed(widget, event)
 
 
 	def on_mainwindow_key_pressed(self, widget, event):
@@ -1005,8 +994,9 @@ class Cardapio(dbus.service.Object):
 		Because that would enter two of each key.
 		"""
 
-		if self.view.window.get_focus() != self.search_entry:
-			self.previously_focused_widget = self.view.window.get_focus()
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
+		self.view.on_mainwindow_key_pressed(widget, event)
 
 
 	def on_mainwindow_focus_out(self, widget, event):
@@ -1014,15 +1004,24 @@ class Cardapio(dbus.service.Object):
 		Make Cardapio disappear when it loses focus
 		"""
 
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
+		self.view.on_mainwindow_focus_out(widget, event)
+
+
+	def handle_mainwindow_focus_out(self):
+		"""
+		Make Cardapio disappear when it loses focus
+		"""
+
 		self.save_dimensions()
 
 		# Make sure clicking the applet button doesn't cause a focus-out event.
-		# Otherwise, the click signal actually happens *after* the focus-out,
-		# which causes the applet to be re-shown rather than disappearing.
-		# So by ignoring this focus-out we actually make sure that Cardapio
-		# will be hidden after all. Silly.
-		root_window = gtk.gdk.get_default_root_window()
-		mouse_x, mouse_y, dummy = root_window.get_pointer()
+		# Otherwise, the click signal can actually happen *after* the focus-out,
+		# which causes the window to be re-shown rather than disappearing.  So
+		# by ignoring this focus-out we actually make sure that Cardapio will be
+		# hidden after all. Silly.
+		mouse_x, mouse_y = self.view.get_cursor_coordinates()
 		if self.panel_applet.has_mouse_cursor(mouse_x, mouse_y): return
 
 		# If the last app was opened in the background, make sure Cardapio
@@ -1031,7 +1030,7 @@ class Cardapio(dbus.service.Object):
 		if self.opened_last_app_in_background:
 
 			self.opened_last_app_in_background = False
-			self.show_window_on_top(self.view.window)
+			self.view.show_main_window()
 			return
 
 		self.hide()
@@ -1182,7 +1181,7 @@ class Cardapio(dbus.service.Object):
 			first_app_widget = self.get_first_visible_app()
 			selected_app_widget = self.get_selected_app()
 			self.fully_hide_all_sections()
-			self.previously_focused_widget = None
+			self.view.previously_focused_widget = None
 			handled = self.search_subfolders(text, first_app_widget, selected_app_widget)
 
 		# if none of these (or if the subfolder search tells you this is not a
@@ -1807,7 +1806,7 @@ class Cardapio(dbus.service.Object):
 		keyboard focus) if any.
 		"""
 
-		widget = self.previously_focused_widget
+		widget = self.view.previously_focused_widget
 
 		if (type(widget) is gtk.Button and 'app_info' in dir(widget)):
 			return widget
@@ -1830,7 +1829,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		window_width, window_height = window.get_size()
-		screen_x, screen_y, screen_width, screen_height = self.get_screen_dimensions()
+		screen_x, screen_y, screen_width, screen_height = self.view.get_screen_dimensions()
 
 		if self.panel_applet.panel_type != None:
 			orientation = self.panel_applet.get_orientation()
@@ -1858,7 +1857,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		window_width, window_height = window.get_size()
-		screen_x, screen_y, screen_width, screen_height = self.get_screen_dimensions()
+		screen_x, screen_y, screen_width, screen_height = self.view.get_screen_dimensions()
 
 		# maximal coordinates of window and usable screen
 		max_window_x, max_window_y = x + window_width, y + window_height
@@ -1895,26 +1894,6 @@ class Cardapio(dbus.service.Object):
 			y = screen_y + screen_height
 
 		return x, y, anchor_right, anchor_bottom
-
-
-	def get_screen_dimensions(self):
-		"""
-		Returns usable dimensions of the current desktop in a form of
-		a tuple: (x, y, width, height). If the real numbers can't be
-		determined, returns the size of the whole screen instead.
-		"""
-
-		root_window = gtk.gdk.get_default_root_window()
-		screen_property = gtk.gdk.atom_intern('_NET_WORKAREA')
-		screen_dimensions = root_window.property_get(screen_property)[2]
-
-		if screen_dimensions:
-			return (screen_dimensions[0], screen_dimensions[1],
-				screen_dimensions[2], screen_dimensions[3])
-
-		else:
-			logging.warn('Could not get dimensions of usable screen area. Using max screen area instead.')
-			return (0, 0, gtk.gdk.screen_width(), gtk.gdk.screen_height())
 
 
 	def restore_dimensions(self, x = None, y = None, force_anchor_right = False, force_anchor_bottom = False):
@@ -2069,7 +2048,7 @@ class Cardapio(dbus.service.Object):
 		This function is dbus-accessible.
 		"""
 
-		mouse_x, mouse_y, dummy = gtk.gdk.get_default_root_window().get_pointer()
+		mouse_x, mouse_y = self.view.get_cursor_coordinates()
 		return self.show_hide_near_point(mouse_x, mouse_y)
 
 
@@ -2115,7 +2094,7 @@ class Cardapio(dbus.service.Object):
 		self.restore_dimensions(x, y, force_anchor_right = False, force_anchor_bottom = False)
 
 		self.view.window.set_focus(self.search_entry)
-		self.show_window_on_top(self.view.window)
+		self.view.show_main_window()
 
  		self.scroll_to_top()
 
@@ -2168,8 +2147,7 @@ class Cardapio(dbus.service.Object):
 
 		if self.view.focus_out_blocked: return
 
-		root_window = gtk.gdk.get_default_root_window()
-		mouse_x, mouse_y, dummy = root_window.get_pointer()
+		mouse_x, mouse_y = self.view.get_cursor_coordinates()
 
 		dummy, dummy, window_width, window_height = self.view.window.get_allocation()
 		window_x, window_y = self.view.window.get_position()
@@ -2181,22 +2159,6 @@ class Cardapio(dbus.service.Object):
 		if self.panel_applet.has_mouse_cursor(mouse_x, mouse_y): return
 
 		self.hide()
-
-
-	def show_window_on_top(self, window):
-		"""
-		Place the Cardapio window on top of all others
-		"""
-
-		window.stick()
-		window.show_now()
-
-		# for compiz, this must take place twice!!
-		window.present_with_time(int(time()))
-		window.present_with_time(int(time()))
-
-		# for metacity, this is required!!
-		window.window.focus()
 
 
 	def remove_section_from_app_list(self, section_slab):
@@ -3066,8 +3028,24 @@ class Cardapio(dbus.service.Object):
 		Handle the on-click event for buttons on the app list
 		"""
 
-		hide = (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK != gtk.gdk.CONTROL_MASK)
-		self.launch_button_command(widget.app_info, hide = hide)
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
+		self.view.on_app_button_clicked(widget)
+
+	
+	def handle_app_clicked(self, app_info, button, ctrl_is_pressed):
+		"""
+		Handles the on-click event for buttons on the app list
+		"""
+
+		if button == 1:
+			self.launch_button_command(app_info, hide = not ctrl_is_pressed)
+
+		elif button == 2:
+			self.launch_button_command(app_info, hide = False)
+
+		elif button == 3:
+			self.view.popup_app_context_menu(app_info)
 
 
 	def launch_button_command(self, app_info, hide):

@@ -26,6 +26,8 @@ try:
 	import gtk
 	import urllib2
 
+	from time import time
+
 
 except Exception, exception:
 	fatal_error("Fatal error loading Cardapio's GTK interface", exception)
@@ -42,9 +44,9 @@ class CardapioGtkView:
 
 		self.cardapio = cardapio
 		self.focus_out_blocked             = False
-		self.clicked_app                   = None
 		self.auto_toggled_sidebar_button   = False # used to stop the on_toggle handler at times
 		self.auto_toggled_view_mode_button = False # used to stop the on_toggle handler at times
+		self.previously_focused_widget     = None
 
 
 	def setup_ui(self):
@@ -235,12 +237,21 @@ class CardapioGtkView:
 		self.message_window.move(x + offset_x, y + offset_y)
 
 		self.message_window.set_keep_above(True)
-		self.cardapio.show_window_on_top(self.message_window)
+		self.show_window_on_top(self.message_window)
 
 		# ensure window is rendered immediately
 		gtk.gdk.flush()
 		while gtk.events_pending():
 			gtk.main_iteration()
+
+
+	# This method is required by the View API
+	def show_main_window(self):
+		"""
+		Show's Cardapio's main window
+		"""
+
+		self.show_window_on_top(self.window)
 
 
 	# This method is required by the View API
@@ -277,6 +288,22 @@ class CardapioGtkView:
 		self.executable_file_dialog.hide()
 
 		return response
+
+
+	def show_window_on_top(self, window):
+		"""
+		Place the Cardapio window on top of all others
+		"""
+
+		window.stick()
+		window.show_now()
+
+		# for compiz, this must take place twice!!
+		window.present_with_time(int(time()))
+		window.present_with_time(int(time()))
+
+		# for metacity, this is required!!
+		window.window.focus()
 
 
 	def block_focus_out_event(self):
@@ -339,7 +366,8 @@ class CardapioGtkView:
 				self.app_context_menu.remove(menu_item)
 
 
-	def setup_context_menu(self, widget):
+	# TODO: move much of this method into the controller
+	def setup_context_menu(self, app_info):
 		"""
 		Show or hide different context menu options depending on the widget
 		"""
@@ -348,13 +376,13 @@ class CardapioGtkView:
 		self.peek_inside_menuitem.hide()
 		self.eject_menuitem.hide()
 
-		if widget.app_info['type'] == 'callback':
+		if app_info['type'] == 'callback':
 			self.pin_menuitem.hide()
 			self.unpin_menuitem.hide()
 			self.add_side_pane_menuitem.hide()
 			self.remove_side_pane_menuitem.hide()
 			self.app_menu_separator.hide()
-			self.setup_plugin_context_menu()
+			self.setup_plugin_context_menu(app_info)
 			return
 
 		already_pinned = False
@@ -362,12 +390,12 @@ class CardapioGtkView:
 		self.app_menu_separator.show()
 
 		for command in [app['command'] for app in self.cardapio.settings['pinned items']]:
-			if command == widget.app_info['command']:
+			if command == app_info['command']:
 				already_pinned = True
 				break
 
 		for command in [app['command'] for app in self.cardapio.settings['side pane items']]:
-			if command == widget.app_info['command']:
+			if command == app_info['command']:
 				already_on_side_pane = True
 				break
 
@@ -387,9 +415,9 @@ class CardapioGtkView:
 
 		# TODO: move this into Controller
 		# figure out whether to show the 'open parent folder' menuitem
-		split_command = urllib2.splittype(widget.app_info['command'])
+		split_command = urllib2.splittype(app_info['command'])
 
-		if widget.app_info['type'] == 'xdg' or len(split_command) == 2:
+		if app_info['type'] == 'xdg' or len(split_command) == 2:
 
 			path_type, canonical_path = split_command
 			dummy, extension = os.path.splitext(canonical_path)
@@ -403,20 +431,30 @@ class CardapioGtkView:
 					self.peek_inside_menuitem.show()
 
 		# figure out whether to show the 'eject' menuitem
-		if widget.app_info['command'] in self.cardapio.volumes:
+		if app_info['command'] in self.cardapio.volumes:
 			self.eject_menuitem.show()
 
-		self.setup_plugin_context_menu()
+		self.setup_plugin_context_menu(app_info)
 
 
-	def popup_context_menu(self, widget, event):
+	def popup_app_context_menu(self, app_info):
 		"""
 		Show context menu for app buttons
 		"""
 
-		self.setup_context_menu(widget)
+		time = gtk.get_current_event().time
+
+		self.setup_context_menu(app_info)
 		self.block_focus_out_event()
-		self.app_context_menu.popup(None, None, None, event.button, event.time)
+		self.app_context_menu.popup(None, None, None, 3, time)
+
+
+	def on_app_button_clicked(self, widget):
+		"""
+		Handle the on-click event for buttons on the app list
+		"""
+		ctrl_is_pressed = (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
+		self.cardapio.handle_app_clicked(widget.app_info, 1, ctrl_is_pressed)
 
 
 	def on_app_button_button_pressed(self, widget, event):
@@ -426,26 +464,18 @@ class CardapioGtkView:
 		"""
 
 		if event.type != gtk.gdk.BUTTON_PRESS: return
-
-		if event.button == 2:
-
-			self.launch_button_command(widget.app_info, hide = False)
-
-		elif event.button == 3:
-
-			self.clicked_app = widget.app_info
-			self.popup_context_menu(widget, event)
+		self.cardapio.handle_app_clicked(widget.app_info, event.button, False)
 
 
-	def setup_plugin_context_menu(self):
+	def setup_plugin_context_menu(self, app_info):
 		"""
 		Sets up context menu items as requested by individual plugins
 		"""
 
 		self.clear_plugin_context_menu()
-		if 'context menu' not in self.clicked_app: return
-		if self.clicked_app['context menu'] is None: return
-		self.fill_plugin_context_menu(self.clicked_app['context menu'])
+		if 'context menu' not in app_info: return
+		if app_info['context menu'] is None: return
+		self.fill_plugin_context_menu(app_info['context menu'])
 
 
 	def on_view_mode_toggled(self, widget):
@@ -540,10 +570,82 @@ class CardapioGtkView:
 
 	def on_dialog_close(self, dialog, response = None):
 		"""
-		Handler for when a dialog's X button is clicked
+		Handler for when a dialog's X button is clicked. This is used for the
+		"About" and "Open in terminal?" dialogs for example.
 		"""
 
 		dialog.hide()
 		return True
+
+
+	def on_mainwindow_after_key_pressed(self, widget, event):
+		"""
+		Send all keypresses to the search entry, so the user can search
+		from anywhere without the need to focus the search entry first
+		"""
+
+		w = self.window.get_focus()
+
+		if w != self.cardapio.search_entry and w == self.previously_focused_widget:
+			if event.is_modifier:
+				return
+
+			self.window.set_focus(self.cardapio.search_entry)
+			self.cardapio.search_entry.set_position(len(self.cardapio.search_entry.get_text()))
+			
+			self.cardapio.search_entry.emit('key-press-event', event)
+
+		else:
+			self.previously_focused_widget = None
+
+
+	def on_mainwindow_key_pressed(self, widget, event):
+		"""
+		This is a trick to make sure the user isn't already typing at the
+		search entry when we redirect all keypresses to the search entry.
+		Because that would enter two of each key.
+		"""
+
+		if self.window.get_focus() != self.cardapio.search_entry:
+			self.previously_focused_widget = self.window.get_focus()
+
+
+	# This method is required by the View API
+	def get_cursor_coordinates(self):
+		"""
+		Returns the x,y coordinates of the mouse cursor with respect
+		to the current screen.
+		"""
+		mouse_x, mouse_y, dummy = gtk.gdk.get_default_root_window().get_pointer()
+		return mouse_x, mouse_y
+
+
+	# This method is required by the View API
+	def get_screen_dimensions(self):
+		"""
+		Returns usable dimensions of the current desktop in a form of
+		a tuple: (x, y, width, height). If the real numbers can't be
+		determined, returns the size of the whole screen instead.
+		"""
+
+		root_window = gtk.gdk.get_default_root_window()
+		screen_property = gtk.gdk.atom_intern('_NET_WORKAREA')
+		screen_dimensions = root_window.property_get(screen_property)[2]
+
+		if screen_dimensions:
+			return (screen_dimensions[0], screen_dimensions[1],
+				screen_dimensions[2], screen_dimensions[3])
+
+		else:
+			logging.warn('Could not get dimensions of usable screen area. Using max screen area instead.')
+			return (0, 0, gtk.gdk.screen_width(), gtk.gdk.screen_height())
+
+
+	def on_mainwindow_focus_out(self, widget, event):
+		"""
+		Make Cardapio disappear when it loses focus
+		"""
+
+		self.cardapio.handle_mainwindow_focus_out()
 
 
