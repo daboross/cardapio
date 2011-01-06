@@ -723,6 +723,7 @@ http://www.gnu.org/licenses/gpl-3.0-standalone.html	</property>
 ∙ Clifton Mulkey
 ∙ Pawel Bara</property>
     <property name="translator_credits" translatable="yes">See https://translations.launchpad.net/cardapio</property>
+    <property name="logo_icon_name">cardapio-256</property>
     <signal name="close" handler="on_dialog_close"/>
     <signal name="response" handler="on_dialog_close"/>
     <signal name="delete_event" handler="on_dialog_close"/>

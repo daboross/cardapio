@@ -135,6 +135,30 @@ class CardapioGtkView:
 		self.get_widget('MarginBottomRight').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_RIGHT_CORNER))
 
 
+	def on_gtk_settings_changed(self, gobj, property_changed):
+		"""
+		Rebuild the Cardapio UI whenever the color scheme or gtk theme change
+		"""
+
+		if property_changed.name == 'gtk-color-scheme' or property_changed.name == 'gtk-theme-name':
+			self.read_gtk_theme_info()
+			self.cardapio.schedule_rebuild()
+
+
+	def read_gtk_theme_info(self):
+		"""
+		Reads some info from the GTK theme to better adapt to it 
+		"""
+
+		dummy_window = gtk.Window()
+		dummy_window.set_name('ApplicationPane')
+		dummy_window.realize()
+		app_style = dummy_window.get_style()
+		self.style_app_button_bg = app_style.base[gtk.STATE_NORMAL]
+		self.style_app_button_fg = app_style.text[gtk.STATE_NORMAL]
+		self.get_widget('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
+
+
 	def on_mainwindow_destroy(self, *dummy):
 		"""
 		Handler for when the Cardapio window is destroyed
@@ -176,6 +200,22 @@ class CardapioGtkView:
 			self.cardapio.all_system_sections_sidebar_button.set_sensitive(state)
 		else:
 			self.cardapio.all_sections_sidebar_button.set_sensitive(state)
+
+
+	# This method is required by the View API
+	def show_section(self, section):
+		"""
+		Shows a given application section
+		"""
+		section.show()
+
+
+	# This method is required by the View API
+	def hide_section(self, section):
+		"""
+		Shows a given application section
+		"""
+		section.hide()
 
 
 	# This method is required by the View API
@@ -656,27 +696,17 @@ class CardapioGtkView:
 		self.cardapio.handle_user_closing_mainwindow()
 
 
-	def on_gtk_settings_changed(self, gobj, property_changed):
-		"""
-		Rebuild the Cardapio UI whenever the color scheme or gtk theme change
-		"""
+	def on_search_entry_icon_pressed(self, widget, iconpos, event):
 
-		if property_changed.name == 'gtk-color-scheme' or property_changed.name == 'gtk-theme-name':
-			self.read_gtk_theme_info()
-			self.cardapio.schedule_rebuild()
+		self.cardapio.handle_search_entry_icon_pressed()
 
 
-	def read_gtk_theme_info(self):
+	def is_search_entry_empty(self):
 		"""
-		Reads some info from the GTK theme to better adapt to it 
+		Returns True if the search entry is empty.
 		"""
 
-		dummy_window = gtk.Window()
-		dummy_window.set_name('ApplicationPane')
-		dummy_window.realize()
-		app_style = dummy_window.get_style()
-		self.style_app_button_bg = app_style.base[gtk.STATE_NORMAL]
-		self.style_app_button_fg = app_style.text[gtk.STATE_NORMAL]
-		self.get_widget('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
+		return (len(self.cardapio.search_entry.get_text().strip()) == 0)
+
 
 
