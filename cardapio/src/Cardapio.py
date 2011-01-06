@@ -573,20 +573,19 @@ class Cardapio(dbus.service.Object):
 
 
 	# This method is called from the View
-	def handle_section_all_clicked(self):
+	def handle_section_all_clicked(self, is_system_button):
 		"""
 		This method is activated when the user presses the "All" section button.
 		It unselects the currently-selected section if any, otherwise it clears
-		the search entry and returns True to indicate that the "All" button should 
-		be drawn as inactive.
+		the search entry.
 		"""
 
 		if self.selected_section is None:
 			self.view.clear_search_entry()
-			return True
+			self.view.set_all_sections_sidebar_button_state(False, is_system_button)
+			return 
 
 		self.untoggle_and_show_all_sections()
-		return False
 
 
 	# This method is called from the View
@@ -1009,6 +1008,7 @@ class Cardapio(dbus.service.Object):
 		self.view.on_mainwindow_focus_out(widget, event)
 
 
+	# This method is called from the View
 	def handle_mainwindow_focus_out(self):
 		"""
 		Make Cardapio disappear when it loses focus
@@ -1042,6 +1042,17 @@ class Cardapio(dbus.service.Object):
 		If using 'open on hover', this hides the Cardapio window after a delay.
 		"""
 
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
+		self.view.on_mainwindow_cursor_leave(widget, event)
+
+
+	# This method is called from the View
+	def handle_mainwindow_cursor_leave(self):
+		"""
+		Handler for when the cursor leaves the Cardapio window.
+		If using 'open on hover', this hides the Cardapio window after a delay.
+		"""
 		if self.panel_applet.panel_type is None: return
 
 		if self.settings['open on hover'] and not self.view.focus_out_blocked:
@@ -1100,6 +1111,7 @@ class Cardapio(dbus.service.Object):
 		self.view.on_view_mode_toggled(widget)
 
 
+	# This method is called from the View
 	def switch_modes(self, show_system_menus, toggle_mode_button = False):
 		"""
 		Switches between "all menus" and "system menus" mode
@@ -2974,6 +2986,18 @@ class Cardapio(dbus.service.Object):
 		volume.eject(return_true)
 
 
+	# This method is called from the View
+	def setup_plugin_context_menu(self, app_info):
+		"""
+		Sets up context menu items as requested by individual plugins
+		"""
+
+		self.view.clear_plugin_context_menu()
+		if 'context menu' not in app_info: return
+		if app_info['context menu'] is None: return
+		self.view.fill_plugin_context_menu(app_info['context menu'])
+
+
 	def on_app_button_focused(self, widget, event):
 		"""
 		Scroll to app buttons when they gain focus
@@ -3033,6 +3057,7 @@ class Cardapio(dbus.service.Object):
 		self.view.on_app_button_clicked(widget)
 
 	
+	# This method is called from the View
 	def handle_app_clicked(self, app_info, button, ctrl_is_pressed):
 		"""
 		Handles the on-click event for buttons on the app list
@@ -3045,6 +3070,8 @@ class Cardapio(dbus.service.Object):
 			self.launch_button_command(app_info, hide = False)
 
 		elif button == 3:
+			self.view.setup_context_menu(app_info)
+			self.view.block_focus_out_event()
 			self.view.popup_app_context_menu(app_info)
 
 
@@ -3174,6 +3201,7 @@ class Cardapio(dbus.service.Object):
 		return True
 
 
+	# This method is called from the View
 	def can_launch_in_terminal(self):
 		"""
 		Returns true if the libraries for launching in a terminal are installed

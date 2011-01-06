@@ -163,8 +163,19 @@ class CardapioGtkView:
 			self.auto_toggled_sidebar_button = False
 			return True
 
-		make_all_unclickable = self.cardapio.handle_section_all_clicked()
-		if make_all_unclickable: widget.set_sensitive(False)
+		is_system_button = (widget == self.cardapio.all_system_sections_sidebar_button)
+		self.cardapio.handle_section_all_clicked(is_system_button)
+
+	
+	def set_all_sections_sidebar_button_state(self, state, is_system_button):
+		"""
+		Makes the "All" button unclickable
+		"""
+
+		if is_system_button:
+			self.cardapio.all_system_sections_sidebar_button.set_sensitive(state)
+		else:
+			self.cardapio.all_sections_sidebar_button.set_sensitive(state)
 
 
 	# This method is required by the View API
@@ -306,6 +317,7 @@ class CardapioGtkView:
 		window.window.focus()
 
 
+	# This method is required by the View API
 	def block_focus_out_event(self):
 		"""
 		Blocks the focus-out event
@@ -366,11 +378,12 @@ class CardapioGtkView:
 				self.app_context_menu.remove(menu_item)
 
 
-	# TODO: move much of this method into the controller
+	# This method is required by the View API
 	def setup_context_menu(self, app_info):
 		"""
 		Show or hide different context menu options depending on the widget
 		"""
+		# TODO: move much of this method into the controller
 
 		self.open_folder_menuitem.hide()
 		self.peek_inside_menuitem.hide()
@@ -382,7 +395,7 @@ class CardapioGtkView:
 			self.add_side_pane_menuitem.hide()
 			self.remove_side_pane_menuitem.hide()
 			self.app_menu_separator.hide()
-			self.setup_plugin_context_menu(app_info)
+			self.cardapio.setup_plugin_context_menu(app_info)
 			return
 
 		already_pinned = False
@@ -434,18 +447,16 @@ class CardapioGtkView:
 		if app_info['command'] in self.cardapio.volumes:
 			self.eject_menuitem.show()
 
-		self.setup_plugin_context_menu(app_info)
+		self.cardapio.setup_plugin_context_menu(app_info)
 
 
+	# This method is required by the View API
 	def popup_app_context_menu(self, app_info):
 		"""
 		Show context menu for app buttons
 		"""
 
 		time = gtk.get_current_event().time
-
-		self.setup_context_menu(app_info)
-		self.block_focus_out_event()
 		self.app_context_menu.popup(None, None, None, 3, time)
 
 
@@ -465,17 +476,6 @@ class CardapioGtkView:
 
 		if event.type != gtk.gdk.BUTTON_PRESS: return
 		self.cardapio.handle_app_clicked(widget.app_info, event.button, False)
-
-
-	def setup_plugin_context_menu(self, app_info):
-		"""
-		Sets up context menu items as requested by individual plugins
-		"""
-
-		self.clear_plugin_context_menu()
-		if 'context menu' not in app_info: return
-		if app_info['context menu'] is None: return
-		self.fill_plugin_context_menu(app_info['context menu'])
 
 
 	def on_view_mode_toggled(self, widget):
@@ -647,5 +647,14 @@ class CardapioGtkView:
 		"""
 
 		self.cardapio.handle_mainwindow_focus_out()
+
+
+	def on_mainwindow_cursor_leave(self, widget, event):
+		"""
+		Handler for when the cursor leaves the Cardapio window.
+		If using 'open on hover', this hides the Cardapio window after a delay.
+		"""
+
+		self.cardapio.handle_mainwindow_cursor_leave()
 
 
