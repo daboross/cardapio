@@ -502,8 +502,11 @@ class CardapioGtkView:
 
 	def on_app_button_clicked(self, widget):
 		"""
-		Handle the on-click event for buttons on the app list
+		Handle the on-click event for buttons on the app list. This includes
+		the "mouse click" event and the "clicked using keyboard" event, but
+		not middle-clicks and right-clicks.
 		"""
+
 		ctrl_is_pressed = (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
 		self.cardapio.handle_app_clicked(widget.app_info, 1, ctrl_is_pressed)
 
@@ -515,6 +518,7 @@ class CardapioGtkView:
 		"""
 
 		if event.type != gtk.gdk.BUTTON_PRESS: return
+		if event.button == 1: return # avoid left-click activating the button twice
 		self.cardapio.handle_app_clicked(widget.app_info, event.button, False)
 
 
