@@ -25,8 +25,8 @@
     <property name="title" translatable="yes">Cardapio Properties</property>
     <property name="default_height">400</property>
     <property name="type_hint">normal</property>
-    <signal name="close" handler="on_options_dialog_closed"/>
-    <signal name="delete_event" handler="on_options_dialog_closed"/>
+    <signal name="close" handler="hide"/>
+    <signal name="delete_event" handler="hide"/>
     <child internal-child="vbox">
       <object class="GtkVBox" id="dialog-vbox1">
         <property name="visible">True</property>
@@ -504,7 +504,7 @@
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
                 <property name="use_stock">True</property>
-                <signal name="clicked" handler="on_options_dialog_closed"/>
+                <signal name="clicked" handler="hide"/>
               </object>
               <packing>
                 <property name="expand">False</property>
