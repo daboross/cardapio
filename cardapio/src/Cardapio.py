@@ -726,7 +726,7 @@ class Cardapio(dbus.service.Object):
 		self.plugin_loading_text         = _('Searching...')
 		self.plugin_timeout_text         = _('Search timed out')
 
-		self.read_gtk_theme_info()
+		self.view.read_gtk_theme_info()
 
 		self.clear_pane(self.application_pane)
 		self.clear_pane(self.category_pane)
@@ -1065,21 +1065,23 @@ class Cardapio(dbus.service.Object):
 		nothing. If in launcher mode, this terminates Cardapio.
 		"""
 
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
+		self.view.on_mainwindow_delete_event(widget, event)
+
+
+	# This method is called from the View
+	def handle_user_closing_mainwindow(self):
+		"""
+		What happens when the user presses Alt-F4? If in panel mode,
+		nothing. If in launcher mode, this terminates Cardapio.
+		"""
+
 		if self.panel_applet.panel_type is not None:
 			# keep window alive if in panel mode
 			return True
 
 		self.save_and_quit()
-
-
-	def on_gtk_settings_changed(self, gobj, property_changed):
-		"""
-		Rebuild the Cardapio UI whenever the color scheme or gtk theme change
-		"""
-
-		if property_changed.name == 'gtk-color-scheme' or property_changed.name == 'gtk-theme-name':
-			self.read_gtk_theme_info()
-			self.schedule_rebuild()
 
 
 	def on_menu_data_changed(self, tree):
@@ -2782,7 +2784,7 @@ class Cardapio(dbus.service.Object):
 
 		if button_type == Cardapio.APP_BUTTON:
 			icon_size_pixels = self.icon_helper.icon_size_app
-			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
+			label.modify_fg(gtk.STATE_NORMAL, self.view.style_app_button_fg)
 
 			# TODO: figure out how to set max width so that it is the best for
 			# the window and font sizes
@@ -2834,7 +2836,7 @@ class Cardapio(dbus.service.Object):
 
 		label = gtk.Label()
 		label.set_use_markup(True)
-		label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
+		label.modify_fg(gtk.STATE_NORMAL, self.view.style_app_button_fg)
 		label.set_padding(0, 4)
 		label.set_attributes(self.section_label_attributes)
 
@@ -2869,21 +2871,6 @@ class Cardapio(dbus.service.Object):
 			elif isinstance(node, gmenu.Directory) and recursive:
 
 				self.add_tree_to_app_list(node, parent_widget, app_list)
-
-
-	# MODEL/VIEW SEPARATION EFFORT: view
-	def read_gtk_theme_info(self):
-		"""
-		Reads some info from the GTK theme to better adapt to it 
-		"""
-
-		dummy_window = gtk.Window()
-		dummy_window.set_name('ApplicationPane')
-		dummy_window.realize()
-		app_style = dummy_window.get_style()
-		self.style_app_button_bg = app_style.base[gtk.STATE_NORMAL]
-		self.style_app_button_fg = app_style.text[gtk.STATE_NORMAL]
-		self.view.get_widget('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
 
 
 	# MODEL/VIEW SEPARATION EFFORT: controller

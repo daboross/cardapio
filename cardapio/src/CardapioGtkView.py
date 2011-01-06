@@ -112,7 +112,7 @@ class CardapioGtkView:
 		# make sure buttons have icons!
 		self.cardapio.gtk_settings = gtk.settings_get_default()
 		self.cardapio.gtk_settings.set_property('gtk-button-images', True)
-		self.cardapio.gtk_settings.connect('notify', self.cardapio.on_gtk_settings_changed)
+		self.cardapio.gtk_settings.connect('notify', self.on_gtk_settings_changed)
 
 		self.window.set_keep_above(True)
 
@@ -642,19 +642,41 @@ class CardapioGtkView:
 
 
 	def on_mainwindow_focus_out(self, widget, event):
-		"""
-		Make Cardapio disappear when it loses focus
-		"""
 
 		self.cardapio.handle_mainwindow_focus_out()
 
 
 	def on_mainwindow_cursor_leave(self, widget, event):
-		"""
-		Handler for when the cursor leaves the Cardapio window.
-		If using 'open on hover', this hides the Cardapio window after a delay.
-		"""
 
 		self.cardapio.handle_mainwindow_cursor_leave()
+
+
+	def on_mainwindow_delete_event(self, widget, event):
+
+		self.cardapio.handle_user_closing_mainwindow()
+
+
+	def on_gtk_settings_changed(self, gobj, property_changed):
+		"""
+		Rebuild the Cardapio UI whenever the color scheme or gtk theme change
+		"""
+
+		if property_changed.name == 'gtk-color-scheme' or property_changed.name == 'gtk-theme-name':
+			self.read_gtk_theme_info()
+			self.cardapio.schedule_rebuild()
+
+
+	def read_gtk_theme_info(self):
+		"""
+		Reads some info from the GTK theme to better adapt to it 
+		"""
+
+		dummy_window = gtk.Window()
+		dummy_window.set_name('ApplicationPane')
+		dummy_window.realize()
+		app_style = dummy_window.get_style()
+		self.style_app_button_bg = app_style.base[gtk.STATE_NORMAL]
+		self.style_app_button_fg = app_style.text[gtk.STATE_NORMAL]
+		self.get_widget('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
 
 
