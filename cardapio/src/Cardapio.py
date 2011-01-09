@@ -271,18 +271,8 @@ class Cardapio(dbus.service.Object):
 		logging.info('==> Done initializing Cardapio!')
 
 
-	def on_mainwindow_destroy(self, *dummy):
-		"""
-		Handler for when the Cardapio window is destroyed
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.on_mainwindow_destroy(*dummy)
-
-
-	# This method is called from the View
-	def save_and_quit(self, *dummy):
+	# This method is called from the View API
+	def save_and_quit(self):
 		"""
 		Saves the current state and quits
 		"""
@@ -302,7 +292,7 @@ class Cardapio(dbus.service.Object):
 			logging.error('Error while saving settings: %s' % ex)
 
 
-	def quit(self, *dummy):
+	def quit(self):
 		"""
 		Quits without saving the current state.
 		"""
@@ -357,6 +347,7 @@ class Cardapio(dbus.service.Object):
 		self.options_window.setup_ui()
 
 
+	# TODO MVC
 	def setup_panel_applet(self):
 		"""
 		Prepares Cardapio's applet in any of the compatible panels.
@@ -572,7 +563,7 @@ class Cardapio(dbus.service.Object):
 		write('[%s] %s'  % (plugin.name, text))
 
 
-	# This method is called from the View
+	# This method is called from the View API
 	def handle_section_all_clicked(self):
 		"""
 		This method is activated when the user presses the "All" section button.
@@ -588,7 +579,7 @@ class Cardapio(dbus.service.Object):
 		self.untoggle_and_show_all_sections()
 
 
-	# This method is called from the View
+	# This method is called from the View API
 	def handle_section_clicked(self, section):
 		"""
 		This method is activated when the user presses a section button (except
@@ -606,26 +597,6 @@ class Cardapio(dbus.service.Object):
 		# otherwise toggle
 		self.toggle_and_show_section(section)
 		return True
-
-
-	def on_all_sections_sidebar_button_clicked(self, widget):
-		"""
-		Handler for when the user clicks "All" in the sidebar
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.on_all_sections_sidebar_button_clicked(widget)
-
-
-	def on_sidebar_button_clicked(self, widget, section_slab):
-		"""
-		Handler for when the user chooses a category in the sidebar
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.on_sidebar_button_clicked(widget, section_slab)
 
 
 	def create_xdg_folders(self):
@@ -707,6 +678,7 @@ class Cardapio(dbus.service.Object):
 		self.toggle_mini_mode_ui(update_window_size = False)
 
 
+	# TODO MVC
 	def build_ui(self):
 		"""
 		Read the contents of all menus and plugins and build the UI
@@ -737,14 +709,14 @@ class Cardapio(dbus.service.Object):
 
 		# "All" button for the regular menu
 		button = self.add_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
-		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
+		button.connect('clicked', self.view.on_all_sections_sidebar_button_clicked)
 		self.all_sections_sidebar_button = button
 		self.view.set_sidebar_button_toggled(button, True)
 		self.all_sections_sidebar_button.set_sensitive(False)
 
 		# "All" button for the system menu
 		button = self.add_button(_('All'), None, self.system_category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
-		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
+		button.connect('clicked', self.view.on_all_sections_sidebar_button_clicked)
 		self.all_system_sections_sidebar_button = button
 		self.view.set_sidebar_button_toggled(button, True)
 		self.all_system_sections_sidebar_button.set_sensitive(False)
@@ -802,23 +774,8 @@ class Cardapio(dbus.service.Object):
 		self.schedule_search_with_all_plugins('')
 
 
-	def open_about_gnome_dialog(self, widget):
-		"""
-		Opens the "About Gnome" dialog.
-		"""
-
-		self.open_about_dialog(widget, 'AboutGnome')
-
-
-	def open_about_distro_dialog(self, widget):
-		"""
-		Opens the "About %distro%" dialog
-		"""
-
-		self.open_about_dialog(widget, 'AboutDistro')
-
-
-	def open_about_dialog(self, widget, verb = None):
+	# This method is used by both the View API and the Applet API
+	def open_about_dialog(self, verb):
 		"""
 		Opens either the "About Gnome" dialog, or the "About Ubuntu" dialog,
 		or the "About Cardapio" dialog
@@ -829,22 +786,13 @@ class Cardapio(dbus.service.Object):
 
 		elif verb == 'AboutDistro':
 			self.launch_raw('yelp ghelp:about-%s' % Cardapio.distro_name.lower())
-			# i'm assuming this is the pattern for all distros...
+			# NOTE: i'm assuming this is the pattern for all distros...
 
-		else: self.view.show_about_dialog()
-
-
-	def on_dialog_close(self, dialog, response = None):
-		"""
-		Handler for when a dialog's X button is clicked
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		return self.view.on_dialog_close(dialog, response)
+		else: self.view.open_about_dialog()
 
 
-	def open_options_dialog(self, *dummy):
+	# This method is called from the View API
+	def open_options_dialog(self):
 		"""
 		Show the Options Dialog and populate its widgets with values from the
 		user's settings.
@@ -886,129 +834,17 @@ class Cardapio(dbus.service.Object):
 		return self.plugin_database[plugin_basename]
 
 
-	def on_mainwindow_button_pressed(self, widget, event):
-		"""
-		Show context menu when the right mouse button is clicked on the main
-		window
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.on_mainwindow_button_pressed(widget, event)
-
-
-	def on_search_entry_button_pressed(self, widget, event):
-		"""
-		Stop window from hiding when context menu is shown
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.on_search_entry_button_pressed(widget, event)
-
-
-	def start_resize(self, widget, event):
-		"""
-		This function is used to emulate the window manager's resize function
-		from Cardapio's borderless window.
-		"""
-
-		window_x, window_y = self.view.window.get_position()
-		x = event.x_root - window_x
-		y = event.y_root - window_y
-		window_width, window_height = self.view.window.get_size()
-		resize_margin = 10
-
-		if x < resize_margin:
-
-			if y < resize_margin:
-				edge = gtk.gdk.WINDOW_EDGE_NORTH_WEST
-
-			elif y > window_height - resize_margin:
-				edge = gtk.gdk.WINDOW_EDGE_SOUTH_WEST
-
-			else:
-				edge = gtk.gdk.WINDOW_EDGE_WEST
-
-		elif x > window_width - resize_margin:
-
-			if y < resize_margin:
-				edge = gtk.gdk.WINDOW_EDGE_NORTH_EAST
-
-			elif y > window_height - resize_margin:
-				edge = gtk.gdk.WINDOW_EDGE_SOUTH_EAST
-
-			else:
-				edge = gtk.gdk.WINDOW_EDGE_EAST
-
-		else:
-			if y < resize_margin:
-				edge = gtk.gdk.WINDOW_EDGE_NORTH
-
-			else:
-				edge = gtk.gdk.WINDOW_EDGE_SOUTH
-
-		x = int(event.x_root)
-		y = int(event.y_root)
-
-		self.view.block_focus_out_event()
-		self.view.window.window.begin_resize_drag(edge, event.button, x, y, event.time)
-
-
-	def end_resize(self, *dummy):
+	# This method is called from the View API
+	def end_resize(self):
 		"""
 		This function is called when the user releases the mouse after resizing the
 		Cardapio window.
 		"""
 
 		self.save_dimensions()
-		self.view.unblock_focus_out_event()
 
 
-	def unblock_focus_out_event(self, *dummy):
-		"""
-		If the focus-out event was previously blocked, this unblocks it
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.unblock_focus_out_event(*dummy)
-
-
-	def on_mainwindow_after_key_pressed(self, widget, event):
-		"""
-		Send all keypresses to the search entry, so the user can search
-		from anywhere without the need to focus the search entry first
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.on_mainwindow_after_key_pressed(widget, event)
-
-
-	def on_mainwindow_key_pressed(self, widget, event):
-		"""
-		This is a trick to make sure the user isn't already typing at the
-		search entry when we redirect all keypresses to the search entry.
-		Because that would enter two of each key.
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.on_mainwindow_key_pressed(widget, event)
-
-
-	def on_mainwindow_focus_out(self, widget, event):
-		"""
-		Make Cardapio disappear when it loses focus
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.on_mainwindow_focus_out(widget, event)
-
-
-	# This method is called from the View
+	# This method is called from the View API
 	def handle_mainwindow_focus_out(self):
 		"""
 		Make Cardapio disappear when it loses focus
@@ -1036,18 +872,7 @@ class Cardapio(dbus.service.Object):
 		self.hide()
 
 
-	def on_mainwindow_cursor_leave(self, widget, event):
-		"""
-		Handler for when the cursor leaves the Cardapio window.
-		If using 'open on hover', this hides the Cardapio window after a delay.
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.on_mainwindow_cursor_leave(widget, event)
-
-
-	# This method is called from the View
+	# This method is called from the View API
 	def handle_mainwindow_cursor_leave(self):
 		"""
 		Handler for when the cursor leaves the Cardapio window.
@@ -1059,18 +884,7 @@ class Cardapio(dbus.service.Object):
 			glib.timeout_add(self.settings['autohide delay'], self.hide_if_mouse_away)
 
 
-	def on_mainwindow_delete_event(self, widget, event):
-		"""
-		What happens when the user presses Alt-F4? If in panel mode,
-		nothing. If in launcher mode, this terminates Cardapio.
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.on_mainwindow_delete_event(widget, event)
-
-
-	# This method is called from the View
+	# This method is called from the View API
 	def handle_user_closing_mainwindow(self):
 		"""
 		What happens when the user presses Alt-F4? If in panel mode,
@@ -1103,17 +917,7 @@ class Cardapio(dbus.service.Object):
 		self.view.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.rebuild_ui)
 
 
-	def on_view_mode_toggled(self, widget):
-		"""
-		Handler for when the "system menu" button is toggled
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.on_view_mode_toggled(widget)
-
-
-	# This method is called from the View
+	# This method is called from the View API
 	def switch_modes(self, show_system_menus, toggle_mode_button = False):
 		"""
 		Switches between "all menus" and "system menus" mode
@@ -1135,17 +939,7 @@ class Cardapio(dbus.service.Object):
 			self.category_pane.show()
 
 
-	def on_search_entry_icon_pressed(self, widget, iconpos, event):
-		"""
-		Handler for when the "clear" icon of the search entry is pressed
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.on_search_entry_icon_pressed(widget, iconpos, event)
-
-
-	# This method is called from the View
+	# This method is called from the View API
 	def handle_search_entry_icon_pressed(self):
 		"""
 		Handler for when the "clear" icon of the search entry is pressed
@@ -1158,6 +952,7 @@ class Cardapio(dbus.service.Object):
 			self.reset_search_query_and_selected_section()
 
 
+	# TODO MVC
 	def on_search_entry_changed(self, *dummy):
 		"""
 		Handler for when the user types something in the search entry
@@ -1287,6 +1082,7 @@ class Cardapio(dbus.service.Object):
 		self.subfolder_stack.append((path, path))
 
 
+	# TODO MVC
 	def search_subfolders(self, text, first_app_widget, selected_app_widget):
 		"""
 		Lets you browse your filesystem through Cardapio by typing slash "/" after
@@ -1727,16 +1523,7 @@ class Cardapio(dbus.service.Object):
 				logging.error(exception)
 
 
-	def on_search_entry_activate(self, widget):
-		"""
-		Handler for when the user presses Enter on the search entry
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.on_search_entry_activate(widget)
-
-
+	# TODO MVC
 	def handle_search_entry_activate(self):
 		"""
 		Handler for when the user presses Enter on the search entry
@@ -1755,6 +1542,7 @@ class Cardapio(dbus.service.Object):
 			self.reset_search_query_and_selected_section()
 
 
+	# TODO MVC
 	def on_search_entry_key_pressed(self, widget, event):
 		"""
 		Handler for when the user presses Tab or Escape on the search entry
@@ -1925,16 +1713,17 @@ class Cardapio(dbus.service.Object):
 		self.setup_search_entry(place_at_top = not anchor_bottom)
 
 
-	def save_dimensions(self, *dummy):
+	def save_dimensions(self):
 		"""
 		Save Cardapio's size into the user preferences
 		"""
 
-		self.settings['window size'] = list(self.view.window.get_size())
+		self.settings['window size'] = self.view.get_window_size()
 		if not self.settings['mini mode']:
 			self.settings['splitter position'] = self.view.get_main_splitter_position()
 
 
+	# TODO MVC
 	def on_main_splitter_clicked(self, widget, event):
 		"""
 		Make sure user can't move the splitter when in mini mode
@@ -1949,6 +1738,7 @@ class Cardapio(dbus.service.Object):
 				return True
 
 	
+	# TODO MVC
 	def toggle_mini_mode_ui(self, update_window_size):
 		"""
 		Collapses the sidebar into a row of small buttons (i.e. minimode)
@@ -2088,7 +1878,7 @@ class Cardapio(dbus.service.Object):
 		self.view.window.set_focus(self.search_entry)
 		self.view.show_main_window()
 
- 		self.scroll_to_top()
+ 		self.view.scroll_to_top()
 
 		self.visible = True
 		self.last_visibility_toggle = time()
@@ -2104,7 +1894,7 @@ class Cardapio(dbus.service.Object):
 			self.switch_modes(show_system_menus = False, toggle_mode_button = True)
 
 
-	def hide(self, *dummy):
+	def hide(self):
 		"""
 		Hides the Cardapio window.
 		"""
@@ -2399,7 +2189,7 @@ class Cardapio(dbus.service.Object):
 				app_info = button.app_info
 				button = self.add_button(app['name'], app['icon name'], self.sidepane, tooltip = app['tooltip'], button_type = Cardapio.SIDEPANE_BUTTON)
 				button.app_info = app_info
-				button.connect('clicked', self.on_app_button_clicked)
+				button.connect('clicked', self.view.on_app_button_clicked)
 				button.connect('button-press-event', self.view.on_app_button_button_pressed)
 
 		if no_results or (slab is self.sidepane_section_slab):
@@ -2448,7 +2238,7 @@ class Cardapio(dbus.service.Object):
 			app_info = button.app_info
 			button = self.add_button(item[0], item[2], item[4], tooltip = item[1], button_type = Cardapio.SESSION_BUTTON)
 			button.app_info = app_info
-			button.connect('clicked', self.on_app_button_clicked)
+			button.connect('clicked', self.view.on_app_button_clicked)
 			item.append(button)
 
 		self.session_button_locksys  = items[0][5]
@@ -2490,7 +2280,7 @@ class Cardapio(dbus.service.Object):
 			# add all apps in this category to application pane
 			self.add_tree_to_app_list(node, section_contents, app_list)
 
-		sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section_slab)
+		sidebar_button.connect('clicked', self.view.on_sidebar_button_clicked, section_slab)
 
 		if hide:
 			sidebar_button.hide()
@@ -2644,6 +2434,7 @@ class Cardapio(dbus.service.Object):
 				container.remove(child)
 
 
+	# TODO MVC
 	def setup_search_entry(self, place_at_top = False):
 		"""
 		Hides 3 of the 4 search entries and returns the visible entry.
@@ -2673,9 +2464,9 @@ class Cardapio(dbus.service.Object):
 				self.search_entry = self.view.get_widget('BottomRightSearchEntry')
 				self.view.get_widget('BottomRightSearchSlabMargin').show()
 
-		self.search_entry.handler_block_by_func(self.on_search_entry_changed)
+		self.search_entry.handler_block_by_func(self.view.on_search_entry_changed)
 		self.search_entry.set_text(text)
-		self.search_entry.handler_unblock_by_func(self.on_search_entry_changed)
+		self.search_entry.handler_unblock_by_func(self.view.on_search_entry_changed)
 
 
 	def reset_search_query(self):
@@ -2696,7 +2487,7 @@ class Cardapio(dbus.service.Object):
 		self.untoggle_and_show_all_sections()
 
 
-	# MODEL/VIEW SEPARATION EFFORT: mix of view and model
+	# TODO MVC
 	def add_app_button(self, button_str, icon_name, parent_widget, command_type, command, tooltip = '', app_list = None):
 		"""
 		Adds a new button to the app pane
@@ -2708,7 +2499,7 @@ class Cardapio(dbus.service.Object):
 		# MODEL/VIEW SEPARATION EFFORT: view
 		button = self.add_button(button_str, icon_name, parent_widget, tooltip, button_type = Cardapio.APP_BUTTON)
 
-		button.connect('clicked', self.on_app_button_clicked)
+		button.connect('clicked', self.view.on_app_button_clicked)
 		button.connect('button-press-event', self.view.on_app_button_button_pressed)
 		button.connect('focus-in-event', self.on_app_button_focused)
 
@@ -2754,7 +2545,7 @@ class Cardapio(dbus.service.Object):
 		return button
 
 
-	# MODEL/VIEW SEPARATION EFFORT: view
+	# TODO MVC
 	def add_button(self, button_str, icon_name, parent_widget, tooltip = '', button_type = APP_BUTTON):
 		"""
 		Adds a button to a parent container
@@ -2809,7 +2600,7 @@ class Cardapio(dbus.service.Object):
 		return button
 
 
-	# MODEL/VIEW SEPARATION EFFORT: view
+	# TODO MVC
 	def add_application_section(self, section_title = None):
 		"""
 		Adds a new slab to the applications pane
@@ -2842,7 +2633,6 @@ class Cardapio(dbus.service.Object):
 		return section_slab, section_contents, label
 
 
-	# MODEL/VIEW SEPARATION EFFORT: controller
 	def add_tree_to_app_list(self, tree, parent_widget, app_list, recursive = True):
 		"""
 		Adds all the apps in a subtree of Gnome's menu as buttons in a given
@@ -2860,8 +2650,8 @@ class Cardapio(dbus.service.Object):
 				self.add_tree_to_app_list(node, parent_widget, app_list)
 
 
-	# MODEL/VIEW SEPARATION EFFORT: controller
-	def launch_edit_app(self, *dummy):
+	# This method is called from the View API
+	def launch_edit_app(self):
 		"""
 		Opens Gnome's menu editor.
 		"""
@@ -2869,7 +2659,7 @@ class Cardapio(dbus.service.Object):
 		self.launch_raw('alacarte')
 
 
-	# MODEL/VIEW SEPARATION EFFORT: controller
+	# TODO MVC
 	def on_pin_this_app_clicked(self, widget):
 		"""
 		Handle the pinning action
@@ -2882,6 +2672,7 @@ class Cardapio(dbus.service.Object):
 
 
 	# MODEL/VIEW SEPARATION EFFORT: controller
+	# TODO MVC
 	def on_unpin_this_app_clicked(self, widget):
 		"""
 		Handle the unpinning action
@@ -2894,6 +2685,7 @@ class Cardapio(dbus.service.Object):
 
 
 	# MODEL/VIEW SEPARATION EFFORT: controller
+	# TODO MVC
 	def on_add_to_side_pane_clicked(self, widget):
 		"""
 		Handle the "add to sidepane" action
@@ -2909,6 +2701,7 @@ class Cardapio(dbus.service.Object):
 
 
 	# MODEL/VIEW SEPARATION EFFORT: controller
+	# TODO MVC
 	def on_remove_from_side_pane_clicked(self, widget):
 		"""
 		Handle the "remove from sidepane" action
@@ -2922,6 +2715,7 @@ class Cardapio(dbus.service.Object):
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or an extra space will show up where but button used to be
 
 
+	# TODO MVC
 	def on_open_parent_folder_pressed(self, widget):
 		"""
 		Handle the "open parent folder" action
@@ -2931,6 +2725,7 @@ class Cardapio(dbus.service.Object):
 		self.launch_xdg(parent_folder)
 
 
+	# TODO MVC
 	def on_launch_in_background_pressed(self, widget):
 		"""
 		Handle the "launch in background" action
@@ -2939,6 +2734,7 @@ class Cardapio(dbus.service.Object):
 		self.launch_button_command(self.view.clicked_app, hide = False)
 
 
+	# TODO MVC
 	def on_peek_inside_pressed(self, widget):
 		"""
 		Handle the "peek inside folder" action
@@ -2951,6 +2747,7 @@ class Cardapio(dbus.service.Object):
 		self.search_entry.set_text(self.subfolder_stack[-1][1] + '/')
 
 
+	# TODO MVC
 	def on_eject_pressed(self, widget):
 		"""
 		Handle the "eject" action
@@ -2960,7 +2757,7 @@ class Cardapio(dbus.service.Object):
 		volume.eject(return_true)
 
 
-	# This method is called from the View
+	# This method is called from the View API
 	def setup_plugin_context_menu(self, app_info):
 		"""
 		Sets up context menu items as requested by individual plugins
@@ -2972,22 +2769,24 @@ class Cardapio(dbus.service.Object):
 		self.view.fill_plugin_context_menu(app_info['context menu'])
 
 
+	# TODO MVC
 	def on_app_button_focused(self, widget, event):
 		"""
 		Scroll to app buttons when they gain focus
 		"""
 
 		alloc = widget.get_allocation()
-		scroller_position = self.scroll_adjustment.value
-		page_size = self.scroll_adjustment.page_size
+		scroller_position = self.view.scroll_adjustment.value
+		page_size = self.view.scroll_adjustment.page_size
 
 		if alloc.y < scroller_position:
-			self.scroll_adjustment.set_value(alloc.y)
+			self.view.scroll_adjustment.set_value(alloc.y)
 
 		elif alloc.y + alloc.height > scroller_position + page_size:
-			self.scroll_adjustment.set_value(alloc.y + alloc.height - page_size)
+			self.view.scroll_adjustment.set_value(alloc.y + alloc.height - page_size)
 
 
+	# TODO MVC
 	def on_app_button_drag_begin(self, button, drag_context):
 		"""
 		Set up drag action (not much goes on here...)
@@ -2997,6 +2796,7 @@ class Cardapio(dbus.service.Object):
 		button.drag_source_set_icon_pixbuf(icon_pixbuf)
 
 
+	# TODO MVC
 	def on_app_button_data_get(self, button, drag_context, selection_data, info, time):
 		"""
 		Prepare the data that will be sent to the other app when the drag-and-drop
@@ -3021,17 +2821,7 @@ class Cardapio(dbus.service.Object):
 		selection_data.set_uris([command])
 
 
-	def on_app_button_clicked(self, widget):
-		"""
-		Handle the on-click event for buttons on the app list
-		"""
-
-		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
-		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
-		self.view.on_app_button_clicked(widget)
-
-	
-	# This method is called from the View
+	# This method is called from the View API
 	def handle_app_clicked(self, app_info, button, ctrl_is_pressed):
 		"""
 		Handles the on-click event for buttons on the app list
@@ -3175,7 +2965,7 @@ class Cardapio(dbus.service.Object):
 		return True
 
 
-	# This method is called from the View
+	# This method is called from the View API
 	def can_launch_in_terminal(self):
 		"""
 		Returns true if the libraries for launching in a terminal are installed
@@ -3229,6 +3019,7 @@ class Cardapio(dbus.service.Object):
 		return text.decode('string-escape')
 
 
+	# TODO MVC
 	def untoggle_and_show_all_sections(self):
 		"""
 		Show all sections that currently have search results, and untoggle all
@@ -3258,6 +3049,7 @@ class Cardapio(dbus.service.Object):
 			self.view.set_all_sections_sidebar_button_sensitive(False, self.in_system_menu_mode)
 
 
+	# TODO MVC
 	def toggle_and_show_section(self, section_slab):
 		"""
 		Show a given section, make sure its button is toggled, and that
@@ -3284,23 +3076,12 @@ class Cardapio(dbus.service.Object):
 		self.selected_section = section_slab
 
 		self.consider_showing_no_results_text()
- 		self.scroll_to_top()
-
-
-	def show_no_results_text(self, text = None):
-		"""
-		Show the "No results to show" text
-		"""
-
-		if text is None: text = self.no_results_text
-
-		self.no_results_label.set_text(text)
-		self.no_results_slab.show()
+ 		self.view.scroll_to_top()
 
 
 	def consider_showing_no_results_text(self):
 		"""
-		Decide whether the "No results" text should be shown
+		Decide whether the "No results" text should be shown (and, if so, show it)
 		"""
 
 		if self.selected_section is None:
@@ -3309,7 +3090,7 @@ class Cardapio(dbus.service.Object):
 				return
 
 			if self.no_results_to_show:
-				self.show_no_results_text()
+				self.view.show_no_results_text()
 
 			return
 
@@ -3319,7 +3100,7 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			self.selected_section.hide()
-			self.show_no_results_text(self.no_results_in_category_text % {'category_name': self.section_list[self.selected_section]['name']})
+			self.view.show_no_results_text(self.no_results_in_category_text % {'category_name': self.section_list[self.selected_section]['name']})
 
 
 	def disappear_with_all_transitory_sections(self):
@@ -3398,14 +3179,6 @@ class Cardapio(dbus.service.Object):
 
 		self.section_list[section_slab]['has entries'] = True
 		self.section_list[section_slab]['category'].show()
-
-
-	def scroll_to_top(self):
-		"""
-		Scroll to the top of the app pane
-		"""
-
-		self.scroll_adjustment.set_value(0)
 
 
 

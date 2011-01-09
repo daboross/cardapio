@@ -61,7 +61,7 @@ class CardapioGtkView:
 		builder = gtk.Builder()
 		builder.set_translation_domain(self.cardapio.APP)
 		builder.add_from_file(main_ui_filepath)
-		builder.connect_signals(self.cardapio)
+		builder.connect_signals(self)
 
 		self.get_widget = builder.get_object
 		self.window                    = self.get_widget('CardapioWindow')
@@ -72,7 +72,7 @@ class CardapioGtkView:
 		self.cardapio.category_pane             = self.get_widget('CategoryPane')
 		self.cardapio.system_category_pane      = self.get_widget('SystemCategoryPane')
 		self.cardapio.sidepane                  = self.get_widget('SideappPane')
-		self.cardapio.scroll_adjustment         = self.get_widget('ScrolledWindow').get_vadjustment()
+		self.scroll_adjustment         = self.get_widget('ScrolledWindow').get_vadjustment()
 		self.cardapio.left_session_pane         = self.get_widget('LeftSessionPane')
 		self.cardapio.right_session_pane        = self.get_widget('RightSessionPane')
 		self.context_menu              = self.get_widget('CardapioContextMenu')
@@ -320,7 +320,7 @@ class CardapioGtkView:
 
 
 	# This method is required by the View API
-	def show_about_dialog(self):
+	def open_about_dialog(self):
 		"""
 		Shows the "About" dialog
 		"""
@@ -378,8 +378,8 @@ class CardapioGtkView:
 		"""
 
 		if not self.focus_out_blocked:
-			self.window.handler_block_by_func(self.cardapio.on_mainwindow_focus_out)
-			self.window.handler_block_by_func(self.cardapio.on_mainwindow_cursor_leave)
+			self.window.handler_block_by_func(self.on_mainwindow_focus_out)
+			self.window.handler_block_by_func(self.on_mainwindow_cursor_leave)
 			self.focus_out_blocked = True
 
 
@@ -389,8 +389,8 @@ class CardapioGtkView:
 		"""
 
 		if self.focus_out_blocked:
-			self.window.handler_unblock_by_func(self.cardapio.on_mainwindow_focus_out)
-			self.window.handler_unblock_by_func(self.cardapio.on_mainwindow_cursor_leave)
+			self.window.handler_unblock_by_func(self.on_mainwindow_focus_out)
+			self.window.handler_unblock_by_func(self.on_mainwindow_cursor_leave)
 			self.focus_out_blocked = False
 
 
@@ -589,6 +589,15 @@ class CardapioGtkView:
 		"""
 
 		return self.main_splitter.get_position()
+
+
+	# This method is required by the View API
+	def get_window_size(self):
+		"""
+		Get the width and height of the Cardapio window
+		"""
+
+		return list(self.window.get_size())
 
 
 	# This method is required by the View API
@@ -793,5 +802,214 @@ class CardapioGtkView:
 		"""
 
 		self.cardapio.no_results_slab.hide()
+
+
+	# This method is required by the View API
+	def scroll_to_top(self):
+		"""
+		Scroll to the top of the app pane
+		"""
+
+		self.scroll_adjustment.set_value(0)
+
+
+	# This method is required by the View API
+	def show_no_results_text(self, text = None):
+		"""
+		Show the "No results to show" text
+		"""
+
+		if text is None: text = self.cardapio.no_results_text
+
+		self.cardapio.no_results_label.set_text(text)
+		self.cardapio.no_results_slab.show()
+
+
+	def open_about_gnome_dialog(self, widget):
+		"""
+		Opens the "About Gnome" dialog.
+		"""
+
+		self.cardapio.open_about_dialog('AboutGnome')
+
+
+	def open_about_distro_dialog(self, widget):
+		"""
+		Opens the "About %distro%" dialog
+		"""
+
+		self.cardapio.open_about_dialog('AboutDistro')
+
+
+	def open_options_dialog(self, *dummy):
+		"""
+		Opens Cardapio's options dialog	
+		"""
+
+		self.cardapio.open_options_dialog()
+
+
+	def launch_edit_app(self, *dummy):
+		"""
+		Open the menu editor app
+		"""
+
+		self.cardapio.launch_edit_app()
+
+		
+	def on_search_entry_changed(self, *dummy):
+
+		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
+		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
+		self.cardapio.on_search_entry_changed(*dummy)
+
+
+	def on_search_entry_key_pressed(self, widget, event):
+
+		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
+		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
+		self.cardapio.on_search_entry_key_pressed(widget, event)
+
+
+	def on_main_splitter_clicked(self, widget, event):
+
+		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
+		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
+		self.cardapio.on_main_splitter_clicked(widget, event)
+
+
+	def on_pin_this_app_clicked(self, widget):
+
+		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
+		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
+		self.cardapio.on_pin_this_app_clicked(widget)
+
+
+	def on_unpin_this_app_clicked(self, widget):
+
+		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
+		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
+		self.cardapio.on_unpin_this_app_clicked(widget)
+
+
+	def on_add_to_side_pane_clicked(self, widget):
+
+		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
+		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
+		self.cardapio.on_add_to_side_pane_clicked(widget)
+
+
+	def on_remove_from_side_pane_clicked(self, widget):
+
+		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
+		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
+		self.cardapio.on_remove_from_side_pane_clicked(widget)
+
+
+	def on_open_parent_folder_pressed(self, widget):
+
+		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
+		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
+		self.cardapio.on_open_parent_folder_pressed(widget)
+
+
+	def on_launch_in_background_pressed(self, widget):
+
+		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
+		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
+		self.cardapio.on_launch_in_background_pressed(widget)
+
+
+	def on_peek_inside_pressed(self, widget):
+
+		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
+		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
+		self.cardapio.on_peek_inside_pressed(widget)
+
+
+	def on_eject_pressed(self, widget):
+
+		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
+		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
+		self.cardapio.on_eject_pressed(widget)
+
+
+	def on_app_button_focused(self, widget, event):
+		
+		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
+		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
+		self.cardapio.on_app_button_focused(widget, event)
+
+
+	def on_app_button_drag_begin(self, button, drag_context):
+		
+		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
+		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
+		self.cardapio.on_app_button_drag_begin(button, drag_context)
+
+
+	def on_app_button_data_get(self, button, drag_context, selection_data, info, time):
+
+		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
+		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
+		self.on_app_button_data_get(button, drag_context, selection_data, info, time)
+
+
+	def start_resize(self, widget, event):
+		"""
+		This function is used to emulate the window manager's resize function
+		from Cardapio's borderless window.
+		"""
+
+		window_x, window_y = self.window.get_position()
+		x = event.x_root - window_x
+		y = event.y_root - window_y
+		window_width, window_height = self.window.get_size()
+		resize_margin = 10
+
+		if x < resize_margin:
+
+			if y < resize_margin:
+				edge = gtk.gdk.WINDOW_EDGE_NORTH_WEST
+
+			elif y > window_height - resize_margin:
+				edge = gtk.gdk.WINDOW_EDGE_SOUTH_WEST
+
+			else:
+				edge = gtk.gdk.WINDOW_EDGE_WEST
+
+		elif x > window_width - resize_margin:
+
+			if y < resize_margin:
+				edge = gtk.gdk.WINDOW_EDGE_NORTH_EAST
+
+			elif y > window_height - resize_margin:
+				edge = gtk.gdk.WINDOW_EDGE_SOUTH_EAST
+
+			else:
+				edge = gtk.gdk.WINDOW_EDGE_EAST
+
+		else:
+			if y < resize_margin:
+				edge = gtk.gdk.WINDOW_EDGE_NORTH
+
+			else:
+				edge = gtk.gdk.WINDOW_EDGE_SOUTH
+
+		x = int(event.x_root)
+		y = int(event.y_root)
+
+		self.block_focus_out_event()
+		self.window.window.begin_resize_drag(edge, event.button, x, y, event.time)
+
+
+	def end_resize(self, *dummy):
+		"""
+		This function is called when the user releases the mouse after resizing the
+		Cardapio window.
+		"""
+
+		self.cardapio.end_resize()
+		self.unblock_focus_out_event()
 
 

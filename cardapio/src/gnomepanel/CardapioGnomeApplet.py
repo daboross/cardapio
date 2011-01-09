@@ -71,9 +71,9 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 		self.context_menu_verbs = [
 			('Properties', cardapio.open_options_dialog),
 			('Edit', cardapio.launch_edit_app),
-			('AboutCardapio', cardapio.open_about_dialog),
-			('AboutGnome', cardapio.open_about_dialog),
-			('AboutDistro', cardapio.open_about_dialog)
+			('AboutCardapio', self.open_about_dialog),
+			('AboutGnome', self.open_about_dialog),
+			('AboutDistro', self.open_about_dialog)
 		]
 
 		self.button.set_tooltip_text(_('Access applications, folders, system settings, etc.'))
@@ -272,6 +272,14 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 		return True
 
 
+	def _on_applet_cursor_leave(self, *dummy):
+		"""
+		Handler for whent the cursor leaves the panel applet.
+		"""
+
+		self.cardapio.handle_mainwindow_cursor_leave()
+
+
 	def _load_settings(self):
 
 		self.button.set_label(self.applet_label)
@@ -321,7 +329,7 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 		if self.open_on_hover:
 			self.applet_press_handler = self.button.connect('button-press-event', self._on_panel_button_toggled, True)
 			self.applet_enter_handler = self.button.connect('enter-notify-event', self._on_applet_cursor_enter)
-			self.applet_leave_handler = self.button.connect('leave-notify-event', self.cardapio.on_mainwindow_cursor_leave)
+			self.applet_leave_handler = self.button.connect('leave-notify-event', self._on_applet_cursor_leave)
 
 		else:
 			self.applet_press_handler = self.button.connect('button-press-event', self._on_panel_button_toggled, False)
@@ -357,5 +365,14 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 
 		# if no stock icon size if close enough, then use the panel size
 		return panel_size
+
+
+	def open_about_dialog(self, widget, verb):
+		"""
+		This method simply forwards its "verb" argument to the appropriate
+		method in Cardapio, acting as a layer to remove the dependence on the
+		"widget" argument.
+		"""
+		self.cardapio.open_about_dialog(verb)
 
 
