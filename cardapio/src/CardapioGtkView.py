@@ -43,10 +43,12 @@ class CardapioGtkView:
 	def __init__(self, cardapio):
 
 		self.cardapio = cardapio
+
 		self.focus_out_blocked             = False
 		self.auto_toggled_sidebar_button   = False # used to stop the on_toggle handler at times
 		self.auto_toggled_view_mode_button = False # used to stop the on_toggle handler at times
 		self.previously_focused_widget     = None
+		self.clicked_app                   = None
 
 
 	def setup_ui(self):
@@ -533,6 +535,7 @@ class CardapioGtkView:
 
 		if event.type != gtk.gdk.BUTTON_PRESS: return
 		if event.button == 1: return # avoid left-click activating the button twice
+		self.clicked_app = widget.app_info
 		self.cardapio.handle_app_clicked(widget.app_info, event.button, False)
 
 
