@@ -178,6 +178,32 @@ class CardapioGtkView:
 			button.set_active(state)
 
 
+	# This method is required by the View API
+	def set_all_sections_sidebar_button_toggled(self, state, is_system_mode):
+		"""
+		Toggle the "All" sidebar button for either the main mode or
+		the system mode sidebar.
+		"""
+
+		if is_system_mode:
+			self.set_sidebar_button_toggled(self.cardapio.all_system_sections_sidebar_button, state)
+			return
+
+		self.set_sidebar_button_toggled(self.cardapio.all_sections_sidebar_button, state)
+
+
+	# This method is required by the View API
+	def set_all_sections_sidebar_button_sensitive(self, state, is_system_mode):
+		"""
+		Makes the "All" button unclickable
+		"""
+
+		if is_system_mode:
+			self.cardapio.all_system_sections_sidebar_button.set_sensitive(state)
+		else:
+			self.cardapio.all_sections_sidebar_button.set_sensitive(state)
+
+
 	def on_all_sections_sidebar_button_clicked(self, widget):
 		"""
 		Handler for when the user clicks "All" in the sidebar
@@ -187,21 +213,9 @@ class CardapioGtkView:
 			self.auto_toggled_sidebar_button = False
 			return True
 
-		is_system_button = (widget == self.cardapio.all_system_sections_sidebar_button)
-		self.cardapio.handle_section_all_clicked(is_system_button)
+		self.cardapio.handle_section_all_clicked()
 
 	
-	def set_all_sections_sidebar_button_state(self, state, is_system_button):
-		"""
-		Makes the "All" button unclickable
-		"""
-
-		if is_system_button:
-			self.cardapio.all_system_sections_sidebar_button.set_sensitive(state)
-		else:
-			self.cardapio.all_sections_sidebar_button.set_sensitive(state)
-
-
 	# This method is required by the View API
 	def show_section(self, section):
 		"""
@@ -631,8 +645,7 @@ class CardapioGtkView:
 		w = self.window.get_focus()
 
 		if w != self.cardapio.search_entry and w == self.previously_focused_widget:
-			if event.is_modifier:
-				return
+			if event.is_modifier: return
 
 			self.window.set_focus(self.cardapio.search_entry)
 			self.cardapio.search_entry.set_position(len(self.cardapio.search_entry.get_text()))
@@ -705,6 +718,12 @@ class CardapioGtkView:
 		self.cardapio.handle_search_entry_icon_pressed()
 
 
+	def on_search_entry_activate(self, widget):
+
+		self.cardapio.handle_search_entry_activate()
+
+
+	# This method is required by the View API
 	def is_search_entry_empty(self):
 		"""
 		Returns True if the search entry is empty.
@@ -712,5 +731,67 @@ class CardapioGtkView:
 
 		return (len(self.cardapio.search_entry.get_text().strip()) == 0)
 
+
+	# This method is required by the View API
+	def get_first_visible_app(self):
+		"""
+		Returns the first app in the right pane, if any.
+		"""
+
+		for slab in self.cardapio.application_pane.get_children():
+			if not slab.get_visible(): continue
+
+			# NOTE: the following line depends on the UI file. If the file is
+			# changed, this may raise an exception:
+
+			for child in slab.get_children()[0].get_children()[0].get_children():
+				if not child.get_visible(): continue
+				if type(child) != gtk.Button: continue
+
+				return child
+
+		return None
+
+
+	# This method is required by the View API
+	def get_selected_app(self):
+		"""
+		Returns the button for the selected app (that is, the one that has
+		keyboard focus) if any.
+		"""
+
+		widget = self.previously_focused_widget
+
+		if (type(widget) is gtk.Button and 'app_info' in dir(widget)):
+			return widget
+
+		return None
+
+
+	# This method is required by the View API
+	def set_search_entry_text(self, text):
+		"""
+		Sets the text in the search entry textbox
+		"""
+
+		self.cardapio.search_entry.set_text(text)
+
+
+	# This method is required by the View API
+	def place_text_cursor_at_end(self):
+		"""
+		Places the text cursor at the end of the search entry's text
+		"""
+
+		self.cardapio.search_entry.set_position(-1)
+
+
+	# This method is required by the View API
+	def hide_no_results_text(self):
+		"""
+		Hide the "No results to show" text
+		"""
+
+		self.cardapio.no_results_slab.hide()
 
 

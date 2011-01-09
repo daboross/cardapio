@@ -573,7 +573,7 @@ class Cardapio(dbus.service.Object):
 
 
 	# This method is called from the View
-	def handle_section_all_clicked(self, is_system_button):
+	def handle_section_all_clicked(self):
 		"""
 		This method is activated when the user presses the "All" section button.
 		It unselects the currently-selected section if any, otherwise it clears
@@ -582,7 +582,7 @@ class Cardapio(dbus.service.Object):
 
 		if self.selected_section is None:
 			self.view.clear_search_entry()
-			self.view.set_all_sections_sidebar_button_state(False, is_system_button)
+			self.view.set_all_sections_sidebar_button_sensitive(False, self.in_system_mode)
 			return 
 
 		self.untoggle_and_show_all_sections()
@@ -750,7 +750,7 @@ class Cardapio(dbus.service.Object):
 		self.all_system_sections_sidebar_button.set_sensitive(False)
 
 		self.no_results_slab, dummy, self.no_results_label = self.add_application_section('Dummy text')
-		self.hide_no_results_text()
+		self.view.hide_no_results_text()
 
 		if not self.have_control_center:
 			self.view.set_view_mode_button_visible(False)
@@ -1155,7 +1155,7 @@ class Cardapio(dbus.service.Object):
 			self.untoggle_and_show_all_sections()
 
 		else:
-			self.clear_search_entry()
+			self.reset_search_query_and_selected_section()
 
 
 	def on_search_entry_changed(self, *dummy):
@@ -1174,7 +1174,7 @@ class Cardapio(dbus.service.Object):
 		self.current_query = text
 
 		self.no_results_to_show = True
-		self.hide_no_results_text()
+		self.view.hide_no_results_text()
 
 		handled = False
 		in_subfolder_search_mode = (text and text.find('/') != -1)
@@ -1203,8 +1203,8 @@ class Cardapio(dbus.service.Object):
 
 		# if doing a subfolder search
 		elif in_subfolder_search_mode:
-			first_app_widget = self.get_first_visible_app()
-			selected_app_widget = self.get_selected_app()
+			first_app_widget    = self.view.get_first_visible_app()
+			selected_app_widget = self.view.get_selected_app()
 			self.disappear_with_all_sections_and_category_buttons()
 			self.view.previously_focused_widget = None
 			handled = self.search_subfolders(text, first_app_widget, selected_app_widget)
@@ -1234,14 +1234,13 @@ class Cardapio(dbus.service.Object):
 			#
 			#else:
 			#	# clean up plugin results
-			#	self.fully_hide_plugin_sections()
+			#	self.disappear_with_plugin_sections_and_category_buttons()
 
 		if len(text) == 0:
 			self.disappear_with_all_transitory_sections()
 
 		else:
-			self.all_sections_sidebar_button.set_sensitive(True)
-			self.all_system_sections_sidebar_button.set_sensitive(True)
+			self.view.set_all_sections_sidebar_button_sensitive(True, self.in_system_menu_mode)
 
 		self.consider_showing_no_results_text()
 
@@ -1555,7 +1554,7 @@ class Cardapio(dbus.service.Object):
 
 		if self.selected_section is None or plugin.section_slab == self.selected_section:
 			plugin.section_slab.show()
-			self.hide_no_results_text()
+			self.view.hide_no_results_text()
 
 		self.plugins_still_searching += 1
 
@@ -1668,7 +1667,7 @@ class Cardapio(dbus.service.Object):
 
 			if (self.selected_section is None) or (self.selected_section == plugin.section_slab):
 				plugin.section_slab.show()
-				self.hide_no_results_text()
+				self.view.hide_no_results_text()
 
 			else:
 				self.consider_showing_no_results_text()
@@ -1733,18 +1732,27 @@ class Cardapio(dbus.service.Object):
 		Handler for when the user presses Enter on the search entry
 		"""
 
+		# FOR NOW, THIS IS JUST A LAYER THAT MAPS ONTO THE VIEW
+		# LATER, THIS METHOD WILL BE COMPLETELY REMOVED FROM THE MODEL/CONTROLLER
+		self.view.on_search_entry_activate(widget)
+
+
+	def handle_search_entry_activate(self):
+		"""
+		Handler for when the user presses Enter on the search entry
+		"""
+
 		if self.view.is_search_entry_empty():
-			# TODO: why is this needed?
+			# TODO: why is this needed? I don't see its effects...
 			self.disappear_with_all_transitory_sections() 
 			return
 
-		first_app_widget = self.get_first_visible_app()
+		first_app_widget = self.view.get_first_visible_app()
 		if first_app_widget is not None:
 			first_app_widget.emit('clicked')
 
 		if not self.settings['keep search results']:
-			self.clear_search_entry()
-			self.untoggle_and_show_all_sections()
+			self.reset_search_query_and_selected_section()
 
 
 	def on_search_entry_key_pressed(self, widget, event):
@@ -1764,7 +1772,7 @@ class Cardapio(dbus.service.Object):
 					self.view.window.set_focus(visible_children[0])
 
 			else:
-				first_app_widget = self.get_first_visible_app()
+				first_app_widget = self.view.get_first_visible_app()
 				if first_app_widget is not None:
 					self.view.window.set_focus(first_app_widget)
 
@@ -1779,11 +1787,11 @@ class Cardapio(dbus.service.Object):
 			if self.subfolder_stack and slash_pos != -1:
 				if text[-1] == '/': slash_pos = text[:-1].rfind('/')
 				text = text[:slash_pos+1]
-				self.search_entry.set_text(text)
-				self.search_entry.set_position(-1)
+				self.view.set_search_entry_text(text)
+				self.view.place_text_cursor_at_end()
 
 			elif not self.view.is_search_entry_empty():
-				self.clear_search_entry()
+				self.reset_search_query()
 
 			elif self.selected_section is not None:
 				self.untoggle_and_show_all_sections()
@@ -1796,40 +1804,6 @@ class Cardapio(dbus.service.Object):
 
 		else: return False
 		return True
-
-
-	def get_first_visible_app(self):
-		"""
-		Returns the first app in the right pane, if any.
-		"""
-
-		for slab in self.application_pane.get_children():
-			if not slab.get_visible(): continue
-
-			# NOTE: the following line depends on the UI file. If the file is
-			# changed, this may raise an exception:
-
-			for child in slab.get_children()[0].get_children()[0].get_children():
-				if not child.get_visible(): continue
-				if type(child) != gtk.Button: continue
-
-				return child
-
-		return None
-
-
-	def get_selected_app(self):
-		"""
-		Returns the button for the selected app (that is, the one that has
-		keyboard focus) if any.
-		"""
-
-		widget = self.view.previously_focused_widget
-
-		if (type(widget) is gtk.Button and 'app_info' in dir(widget)):
-			return widget
-
-		return None
 
 
 	def choose_coordinates_for_window(self, window):
@@ -2145,8 +2119,7 @@ class Cardapio(dbus.service.Object):
 		self.view.window.hide()
 
 		if not self.settings['keep search results']:
-			self.clear_search_entry()
-			self.untoggle_and_show_all_sections()
+			self.reset_search_query_and_selected_section()
 		else:
 			# remembering current search text in all entries
 			self.search_entry.set_text(self.current_query)
@@ -2705,13 +2678,22 @@ class Cardapio(dbus.service.Object):
 		self.search_entry.handler_unblock_by_func(self.on_search_entry_changed)
 
 
-	def clear_search_entry(self):
+	def reset_search_query(self):
 		"""
 		Clears search entry.
 		"""
 
-		self.search_entry.set_text('')
+		self.view.clear_search_entry()
 		self.subfolder_stack = []
+
+
+	def reset_search_query_and_selected_section(self):
+		"""
+		Clears search entry and unselects the selected section button (if any)
+		"""
+
+		self.reset_search_query()
+		self.untoggle_and_show_all_sections()
 
 
 	# MODEL/VIEW SEPARATION EFFORT: mix of view and model
@@ -3263,23 +3245,17 @@ class Cardapio(dbus.service.Object):
 				self.view.hide_section(sec)
 
 		if not self.no_results_to_show:
-			self.hide_no_results_text()
+			self.view.hide_no_results_text()
 
 		if self.selected_section is not None:
 			widget = self.section_list[self.selected_section]['category']
 			self.view.set_sidebar_button_toggled(widget, False)
 
 		self.selected_section = None
-
-		if self.in_system_menu_mode:
-			widget = self.all_system_sections_sidebar_button
-		else:
-			widget = self.all_sections_sidebar_button
-
-		self.view.set_sidebar_button_toggled(widget, True)
+		self.view.set_all_sections_sidebar_button_toggled(True, self.in_system_menu_mode)
 
 		if self.view.is_search_entry_empty():
-			widget.set_sensitive(False)
+			self.view.set_all_sections_sidebar_button_sensitive(False, self.in_system_menu_mode)
 
 
 	def toggle_and_show_section(self, section_slab):
@@ -3322,14 +3298,6 @@ class Cardapio(dbus.service.Object):
 		self.no_results_slab.show()
 
 
-	def hide_no_results_text(self):
-		"""
-		Hide the "No results to show" text
-		"""
-
-		self.no_results_slab.hide()
-
-
 	def consider_showing_no_results_text(self):
 		"""
 		Decide whether the "No results" text should be shown
@@ -3347,7 +3315,7 @@ class Cardapio(dbus.service.Object):
 
 		if self.section_list[self.selected_section]['has entries']:
 			self.view.show_section(self.selected_section)
-			self.hide_no_results_text()
+			self.view.hide_no_results_text()
 
 		else:
 			self.selected_section.hide()
@@ -3388,15 +3356,15 @@ class Cardapio(dbus.service.Object):
 			section_slab.hide()
 
 
-	def fully_hide_plugin_sections(self):
-		"""
-		Hide all plugin sections
-		"""
-
-		for plugin in self.active_plugin_instances:
-			if plugin.hide_from_sidebar:
-				self.mark_section_empty_and_hide_category_button(plugin.section_slab)
-				plugin.section_slab.hide()
+	#def disappear_with_plugin_sections_and_category_buttons(self):
+	#	"""
+	#	Hide all plugin sections
+	#	"""
+	#
+	#	for plugin in self.active_plugin_instances:
+	#		if plugin.hide_from_sidebar:
+	#			self.mark_section_empty_and_hide_category_button(plugin.section_slab)
+	#			plugin.section_slab.hide()
 
 
 	def disappear_with_all_transitory_plugin_sections(self):
