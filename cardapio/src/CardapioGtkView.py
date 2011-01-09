@@ -21,6 +21,7 @@ from misc import *
 import sys
 
 try:
+	from CardapioViewInterface import *
 	from icons import *
 	import os
 	import gtk
@@ -38,7 +39,11 @@ if gtk.ver < (2, 14, 0):
 	sys.exit(1)
 
 
-class CardapioGtkView:
+# TODO: Figure out locale/gettext configuration, now that CardapioGTKView is in
+# its own file...
+
+
+class CardapioGtkView(CardapioViewInterface):
 
 	def __init__(self, cardapio):
 
@@ -48,7 +53,7 @@ class CardapioGtkView:
 		self.auto_toggled_sidebar_button   = False # used to stop the on_toggle handler at times
 		self.auto_toggled_view_mode_button = False # used to stop the on_toggle handler at times
 		self.previously_focused_widget     = None
-		self.clicked_app                   = None
+		self.clicked_app_info              = None
 
 
 	def setup_ui(self):
@@ -89,6 +94,24 @@ class CardapioGtkView:
 		self.eject_menuitem            = self.get_widget('EjectMenuItem')
 		self.view_mode_button          = self.get_widget('ViewModeButton')
 		self.main_splitter             = self.get_widget('MainSplitter')
+
+		self.no_results_text             = _('No results to show')
+		self.no_results_in_category_text = _('No results to show in "%(category_name)s"')
+		self.plugin_loading_text         = _('Searching...')
+		self.plugin_timeout_text         = _('Search timed out')
+
+
+		self.context_menu_options = {
+			CardapioViewInterface.PIN_MENUITEM              : self.pin_menuitem,
+			CardapioViewInterface.UNPIN_MENUITEM            : self.unpin_menuitem,
+			CardapioViewInterface.ADD_SIDE_PANE_MENUITEM    : self.add_side_pane_menuitem,
+			CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM : self.remove_side_pane_menuitem,
+			CardapioViewInterface.OPEN_FOLDER_MENUITEM      : self.open_folder_menuitem,
+			CardapioViewInterface.PEEK_INSIDE_MENUITEM      : self.peek_inside_menuitem,
+			CardapioViewInterface.EJECT_MENUITEM            : self.eject_menuitem,
+			}
+
+		# TODO MVC separation of the rest of the code in this method
 
 		# start with any search entry -- doesn't matter which
 		self.cardapio.search_entry = self.get_widget('TopLeftSearchEntry')
@@ -397,14 +420,14 @@ class CardapioGtkView:
 
 
 	# This method is required by the View API
-	def fill_plugin_context_menu(self, clicked_app_context_menu):
+	def fill_plugin_context_menu(self, clicked_app_info_context_menu):
 		"""
 		Add plugin-related actions to the context menu
 		"""
 
 		i = 0
 
-		for item_info in clicked_app_context_menu:
+		for item_info in clicked_app_info_context_menu:
 
 			menu_item = gtk.ImageMenuItem(item_info['name'], True)
 			menu_item.set_tooltip_text(item_info['tooltip'])
@@ -417,7 +440,7 @@ class CardapioGtkView:
 				menu_item.set_image(icon)
 
 			menu_item.app_info = item_info
-			menu_item.connect('activate', self.cardapio.on_app_button_clicked)
+			menu_item.connect('activate', self.on_app_button_clicked)
 
 			menu_item.show_all()
 			self.app_context_menu.append(menu_item)
@@ -435,75 +458,16 @@ class CardapioGtkView:
 
 
 	# This method is required by the View API
-	def setup_context_menu(self, app_info):
+	def set_context_menu_option_visible(self, menu_item, state):
 		"""
-		Show or hide different context menu options depending on the widget
+		Shows or hides (depending on the "state" parameter) the context menu
+		option specified by "menu_item". The "menu_item" parameter is one of 
+		the *_MENUITEM constants declared in CardapioViewInterface.
 		"""
-		# TODO: move much of this method into the controller
 
-		self.open_folder_menuitem.hide()
-		self.peek_inside_menuitem.hide()
-		self.eject_menuitem.hide()
-
-		if app_info['type'] == 'callback':
-			self.pin_menuitem.hide()
-			self.unpin_menuitem.hide()
-			self.add_side_pane_menuitem.hide()
-			self.remove_side_pane_menuitem.hide()
-			self.app_menu_separator.hide()
-			self.cardapio.setup_plugin_context_menu(app_info)
-			return
-
-		already_pinned = False
-		already_on_side_pane = False
-		self.app_menu_separator.show()
-
-		for command in [app['command'] for app in self.cardapio.settings['pinned items']]:
-			if command == app_info['command']:
-				already_pinned = True
-				break
-
-		for command in [app['command'] for app in self.cardapio.settings['side pane items']]:
-			if command == app_info['command']:
-				already_on_side_pane = True
-				break
-
-		if already_pinned:
-			self.pin_menuitem.hide()
-			self.unpin_menuitem.show()
-		else:
-			self.pin_menuitem.show()
-			self.unpin_menuitem.hide()
-
-		if already_on_side_pane:
-			self.add_side_pane_menuitem.hide()
-			self.remove_side_pane_menuitem.show()
-		else:
-			self.add_side_pane_menuitem.show()
-			self.remove_side_pane_menuitem.hide()
-
-		# TODO: move this into Controller
-		# figure out whether to show the 'open parent folder' menuitem
-		split_command = urllib2.splittype(app_info['command'])
-
-		if app_info['type'] == 'xdg' or len(split_command) == 2:
-
-			path_type, canonical_path = split_command
-			dummy, extension = os.path.splitext(canonical_path)
-
-			# don't show it for network://, trash://, or .desktop files
-			if path_type not in ('computer', 'network', 'trash') and extension != '.desktop':
-
-				# only show if path that exists
-				if os.path.exists(self.cardapio.unescape_url(canonical_path)):
-					self.open_folder_menuitem.show()
-					self.peek_inside_menuitem.show()
-
-		# figure out whether to show the 'eject' menuitem
-		if app_info['command'] in self.cardapio.volumes:
-			self.eject_menuitem.show()
-
-		self.cardapio.setup_plugin_context_menu(app_info)
+		widget = self.context_menu_options[menu_item]
+		if state: widget.show()
+		else: widget.hide()
 
 
 	# This method is required by the View API
@@ -535,7 +499,7 @@ class CardapioGtkView:
 
 		if event.type != gtk.gdk.BUTTON_PRESS: return
 		if event.button == 1: return # avoid left-click activating the button twice
-		self.clicked_app = widget.app_info
+		self.clicked_app_info = widget.app_info
 		self.cardapio.handle_app_clicked(widget.app_info, event.button, False)
 
 
@@ -822,7 +786,7 @@ class CardapioGtkView:
 		Show the "No results to show" text
 		"""
 
-		if text is None: text = self.cardapio.no_results_text
+		if text is None: text = self.no_results_text
 
 		self.cardapio.no_results_label.set_text(text)
 		self.cardapio.no_results_slab.show()
@@ -875,73 +839,73 @@ class CardapioGtkView:
 
 
 	def on_main_splitter_clicked(self, widget, event):
+		"""
+		Make sure user can't move the splitter when in mini mode
+		"""
 
-		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
-		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
-		self.cardapio.on_main_splitter_clicked(widget, event)
+		# TODO: collapse to mini mode when main_splitter is clicked (but not dragged)
+		#if event.type == gtk.gdk.BUTTON_PRESS:
+
+		if event.button == 1:
+			if self.cardapio.settings['mini mode']:
+				# block any other type of clicking when in mini mode
+				return True
 
 
 	def on_pin_this_app_clicked(self, widget):
 
-		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
-		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
-		self.cardapio.on_pin_this_app_clicked(widget)
+		self.cardapio.handle_pin_this_app_clicked(self.clicked_app_info)
 
 
 	def on_unpin_this_app_clicked(self, widget):
 
-		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
-		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
-		self.cardapio.on_unpin_this_app_clicked(widget)
+		self.cardapio.handle_unpin_this_app_clicked(self.clicked_app_info)
 
 
 	def on_add_to_side_pane_clicked(self, widget):
 
-		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
-		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
-		self.cardapio.on_add_to_side_pane_clicked(widget)
+		self.cardapio.handle_add_to_side_pane_clicked(self.clicked_app_info)
 
 
 	def on_remove_from_side_pane_clicked(self, widget):
 
-		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
-		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
-		self.cardapio.on_remove_from_side_pane_clicked(widget)
+		self.cardapio.handle_remove_from_side_pane_clicked(self.clicked_app_info)
 
 
 	def on_open_parent_folder_pressed(self, widget):
 
-		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
-		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
-		self.cardapio.on_open_parent_folder_pressed(widget)
+		self.cardapio.handle_open_parent_folder_pressed(self.clicked_app_info)
 
 
 	def on_launch_in_background_pressed(self, widget):
 
-		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
-		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
-		self.cardapio.on_launch_in_background_pressed(widget)
+		self.cardapio.handle_launch_in_background_pressed(self.clicked_app_info)
 
 
 	def on_peek_inside_pressed(self, widget):
 
-		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
-		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
-		self.cardapio.on_peek_inside_pressed(widget)
+		self.cardapio.handle_peek_inside_pressed(self.clicked_app_info)
 
 
 	def on_eject_pressed(self, widget):
 
-		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
-		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
-		self.cardapio.on_eject_pressed(widget)
+		self.cardapio.handle_eject_pressed(self.clicked_app_info)
 
 
 	def on_app_button_focused(self, widget, event):
-		
-		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
-		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
-		self.cardapio.on_app_button_focused(widget, event)
+		"""
+		Scroll to app buttons when they gain focus
+		"""
+
+		alloc = widget.get_allocation()
+		scroller_position = self.scroll_adjustment.value
+		page_size = self.scroll_adjustment.page_size
+
+		if alloc.y < scroller_position:
+			self.scroll_adjustment.set_value(alloc.y)
+
+		elif alloc.y + alloc.height > scroller_position + page_size:
+			self.scroll_adjustment.set_value(alloc.y + alloc.height - page_size)
 
 
 	def on_app_button_drag_begin(self, button, drag_context):
@@ -1014,5 +978,103 @@ class CardapioGtkView:
 
 		self.cardapio.end_resize()
 		self.unblock_focus_out_event()
+
+
+	def get_clicked_app_info(self):
+		"""
+		Returns
+		"""
+		return self.clicked_app_info
+
+
+	def add_button(self, button_str, icon_name, parent_widget, tooltip, button_type):
+		"""
+		Adds a button to a parent container
+		"""
+
+		if button_type != CardapioViewInterface.CATEGORY_BUTTON:
+			# TODO: make app buttons be togglebuttons too, so we can fake select
+			# them when the context menu is showing
+			button = gtk.Button() 
+		else:
+			button = gtk.ToggleButton()
+
+		label = gtk.Label(button_str)
+
+		if button_type == CardapioViewInterface.APP_BUTTON:
+			icon_size_pixels = self.cardapio.icon_helper.icon_size_app
+			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
+
+			button.connect('clicked', self.on_app_button_clicked)
+			button.connect('button-press-event', self.on_app_button_button_pressed)
+			button.connect('focus-in-event', self.on_app_button_focused)
+
+			# TODO: figure out how to set max width so that it is the best for
+			# the window and font sizes
+			#layout = label.get_layout()
+			#extents = layout.get_pixel_extents()
+			#label.set_ellipsize(ELLIPSIZE_END)
+			#label.set_max_width_chars(20)
+
+		else:
+			icon_size_pixels = self.cardapio.icon_helper.icon_size_category
+
+		icon_pixbuf = self.cardapio.icon_helper.get_icon_pixbuf(icon_name, icon_size_pixels)
+		icon = gtk.image_new_from_pixbuf(icon_pixbuf)
+
+		hbox = gtk.HBox()
+		hbox.add(icon)
+		hbox.add(label)
+		hbox.set_spacing(5)
+		hbox.set_homogeneous(False)
+
+		align = gtk.Alignment(0, 0.5)
+		align.add(hbox)
+
+		if tooltip: button.set_tooltip_text(tooltip)
+
+		button.add(align)
+		button.set_relief(gtk.RELIEF_NONE)
+		button.set_use_underline(False)
+
+		button.show_all()
+		parent_widget.pack_start(button, expand = False, fill = False)
+
+		return button
+
+
+	def setup_button_drag_and_drop(self, button):
+		"""
+		"""
+
+		command_type = button.app_info['type']
+
+		if command_type == 'app':
+			button.drag_source_set(
+					gtk.gdk.BUTTON1_MASK,
+					[('text/uri-list', 0, 0)],
+					gtk.gdk.ACTION_COPY)
+		else:
+			button.drag_source_set(
+					gtk.gdk.BUTTON1_MASK,
+					[('text/uri-list', 0, 0)],
+					gtk.gdk.ACTION_LINK)
+
+			button.connect('drag-begin', self.on_app_button_drag_begin)
+			button.connect('drag-data-get', self.on_app_button_data_get)
+			# TODO: drag and drop to reorganize pinned items
+
+
+	# This method is required by the View API
+	def get_section_slab_from_button(self, button):
+		"""
+		Returns the section slab widget that a given app button belongs to
+		"""
+
+		# NOTE: IF THERE ARE CHANGES IN THE UI FILE, THIS MAY PRODUCE
+		# HARD-TO-FIND BUGS!!
+
+		return button.parent.parent.parent
+
 
 

@@ -32,6 +32,8 @@ install: install_docky_helper
 	cp -f src/Cardapio.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/CardapioGtkView.py $(PREFIX)/lib/cardapio/
 	cp -f src/CardapioGtkView.pyc $(PREFIX)/lib/cardapio/
+	cp -f src/CardapioViewInterface.py $(PREFIX)/lib/cardapio/
+	cp -f src/CardapioViewInterface.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/CardapioAppletInterface.py $(PREFIX)/lib/cardapio/
 	cp -f src/CardapioAppletInterface.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/CardapioPluginInterface.py $(PREFIX)/lib/cardapio/

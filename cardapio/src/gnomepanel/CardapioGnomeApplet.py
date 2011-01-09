@@ -115,7 +115,7 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 		self.applet.connect('size-allocate', self._on_panel_size_changed)
 		self.applet.connect('change-orient', self._panel_change_orientation)
 		self.applet.connect('change-background', self._on_panel_change_background)
-		self.applet.connect('destroy', cardapio.save_and_quit)
+		self.applet.connect('destroy', self._on_panel_destroy)
 
 		self.applet.set_applet_flags(gnomeapplet.EXPAND_MINOR)
 		self.applet.show_all()
@@ -278,6 +278,14 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 		"""
 
 		self.cardapio.handle_mainwindow_cursor_leave()
+
+
+	def _on_panel_destroy(self, *dummy):
+		"""
+		Handler for when the applet is removed from the panel
+		"""
+
+		self.cardapio.save_and_quit()
 
 
 	def _load_settings(self):

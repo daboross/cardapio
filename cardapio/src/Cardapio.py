@@ -36,6 +36,7 @@ try:
 	from OptionsWindow import *
 	from CardapioPluginInterface import CardapioPluginInterface
 	from CardapioAppletInterface import *
+	from CardapioViewInterface import *
 
 	import gc
 	import os
@@ -152,11 +153,6 @@ class Cardapio(dbus.service.Object):
 
 	required_plugins = ['applications', 'places', 'pinned']
 
-	APP_BUTTON      = 0
-	CATEGORY_BUTTON = 1
-	SESSION_BUTTON  = 2
-	SIDEPANE_BUTTON = 3
-
 	DONT_SHOW       = 0
 	SHOW_CENTERED   = 1
 	SHOW_NEAR_MOUSE = 2
@@ -264,9 +260,11 @@ class Cardapio(dbus.service.Object):
 		elif show == Cardapio.SHOW_CENTERED  : self.show()
 
 		if gnome_program_init is not None:
-			gnome_program_init('', self.version) # Prints a warning to the screen. Ignore it.
+			# The function below prints a warning to the screen, saying that
+			# an assertion has failed. Apparently this is normal. Ignore it.
+			gnome_program_init('', self.version) 
 			client = gnome_ui_master_client()
-			client.connect('save-yourself', self.save_and_quit)
+			client.connect('save-yourself', lambda x: self.save_and_quit())
 
 		logging.info('==> Done initializing Cardapio!')
 
@@ -685,18 +683,11 @@ class Cardapio(dbus.service.Object):
 		elements that support them.
 		"""
 
-		# MODEL/VIEW SEPARATION EFFORT: model
 		self.app_list              = []  # holds a list of all apps for searching purposes
 		self.sys_list              = []  # holds a list of all apps in the system menus
 		self.section_list          = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
 		self.current_query         = ''
 		self.subfolder_stack       = []
-
-		# MODEL/VIEW SEPARATION EFFORT: view
-		self.no_results_text             = _('No results to show')
-		self.no_results_in_category_text = _('No results to show in "%(category_name)s"')
-		self.plugin_loading_text         = _('Searching...')
-		self.plugin_timeout_text         = _('Search timed out')
 
 		self.view.read_gtk_theme_info()
 
@@ -708,14 +699,14 @@ class Cardapio(dbus.service.Object):
 		self.clear_pane(self.view.right_session_pane)
 
 		# "All" button for the regular menu
-		button = self.add_button(_('All'), None, self.view.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
+		button = self.sanitize_and_add_button(_('All'), None, self.view.category_pane, _('Show all categories'), CardapioViewInterface.CATEGORY_BUTTON)
 		button.connect('clicked', self.view.on_all_sections_sidebar_button_clicked)
 		self.all_sections_sidebar_button = button
 		self.view.set_sidebar_button_toggled(button, True)
 		self.all_sections_sidebar_button.set_sensitive(False)
 
 		# "All" button for the system menu
-		button = self.add_button(_('All'), None, self.view.system_category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
+		button = self.sanitize_and_add_button(_('All'), None, self.view.system_category_pane, _('Show all categories'), CardapioViewInterface.CATEGORY_BUTTON)
 		button.connect('clicked', self.view.on_all_sections_sidebar_button_clicked)
 		self.all_system_sections_sidebar_button = button
 		self.view.set_sidebar_button_toggled(button, True)
@@ -906,6 +897,7 @@ class Cardapio(dbus.service.Object):
 		self.schedule_rebuild()
 
 
+	# This method is called from the View API
 	def schedule_rebuild(self):
 		"""
 		Rebuilds the Cardapio UI after a timer
@@ -1334,13 +1326,14 @@ class Cardapio(dbus.service.Object):
 		return True
 
 
+	# TODO MVC
 	def show_plugin_loading_text(self, plugin):
 		"""
 		Write "Searching..." under the plugin slab title
 		"""
 
 		self.reset_plugin_section_contents(plugin)
-		label = gtk.Label(self.plugin_loading_text)
+		label = gtk.Label(self.view.plugin_loading_text)
 		label.set_alignment(0, 0.5)
 		label.set_sensitive(False)
 		label.show()
@@ -1355,6 +1348,7 @@ class Cardapio(dbus.service.Object):
 		self.plugins_still_searching += 1
 
 
+	# TODO MVC
 	def show_all_plugin_timeout_text(self, delay_type):
 		"""
 		Write "Plugin timed out..." under the plugin slab title
@@ -1373,7 +1367,7 @@ class Cardapio(dbus.service.Object):
 				logging.error(exception)
 
 			self.reset_plugin_section_contents(plugin)
-			label = gtk.Label(self.plugin_timeout_text)
+			label = gtk.Label(self.view.plugin_timeout_text)
 			label.set_alignment(0, 0.5)
 			label.set_sensitive(False)
 			label.show()
@@ -1723,21 +1717,6 @@ class Cardapio(dbus.service.Object):
 			self.settings['splitter position'] = self.view.get_main_splitter_position()
 
 
-	# TODO MVC
-	def on_main_splitter_clicked(self, widget, event):
-		"""
-		Make sure user can't move the splitter when in mini mode
-		"""
-
-		# TODO: collapse to mini mode when main_splitter is clicked (but not dragged)
-		#if event.type == gtk.gdk.BUTTON_PRESS:
-
-		if event.button == 1:
-			if self.settings['mini mode']:
-				# block any other type of clicking when in mini mode
-				return True
-
-	
 	# TODO MVC
 	def toggle_mini_mode_ui(self, update_window_size):
 		"""
@@ -2187,7 +2166,7 @@ class Cardapio(dbus.service.Object):
 			if slab == self.sidepane_section_slab:
 
 				app_info = button.app_info
-				button = self.add_button(app['name'], app['icon name'], self.view.sidepane, tooltip = app['tooltip'], button_type = Cardapio.SIDEPANE_BUTTON)
+				button = self.sanitize_and_add_button(app['name'], app['icon name'], self.view.sidepane, app['tooltip'], CardapioViewInterface.SIDEPANE_BUTTON)
 				button.app_info = app_info
 				button.connect('clicked', self.view.on_app_button_clicked)
 				button.connect('button-press-event', self.view.on_app_button_button_pressed)
@@ -2236,7 +2215,7 @@ class Cardapio(dbus.service.Object):
 
 			button = self.add_app_button(item[0], item[2], self.session_section_contents, 'raw', item[3], tooltip = item[1], app_list = self.app_list)
 			app_info = button.app_info
-			button = self.add_button(item[0], item[2], item[4], tooltip = item[1], button_type = Cardapio.SESSION_BUTTON)
+			button = self.sanitize_and_add_button(item[0], item[2], item[4], item[1], CardapioViewInterface.SESSION_BUTTON)
 			button.app_info = app_info
 			button.connect('clicked', self.view.on_app_button_clicked)
 			item.append(button)
@@ -2256,6 +2235,7 @@ class Cardapio(dbus.service.Object):
 				self.add_slab(node.name, node.icon, node.get_comment(), node = node, hide = False)
 
 
+	# TODO MVC
 	def add_slab(self, title_str, icon_name = None, tooltip = '', hide = False, node = None, system_menu = False):
 		"""
 		Add to the app pane a new section slab (i.e. a container holding a title
@@ -2271,7 +2251,7 @@ class Cardapio(dbus.service.Object):
 			app_list = self.app_list
 
 		# add category to category pane
-		sidebar_button = self.add_button(title_str, icon_name, category_pane, tooltip = tooltip, button_type = Cardapio.CATEGORY_BUTTON)
+		sidebar_button = self.sanitize_and_add_button(title_str, icon_name, category_pane, tooltip, CardapioViewInterface.CATEGORY_BUTTON)
 
 		# add category to application pane
 		section_slab, section_contents, label = self.add_application_section(title_str)
@@ -2286,21 +2266,21 @@ class Cardapio(dbus.service.Object):
 			sidebar_button.hide()
 			section_slab.hide()
 			self.section_list[section_slab] = {
-					'has entries': False,
-					'category': sidebar_button,
-					'contents': section_contents,
-					'name': title_str,
-					'is system section': system_menu,
-					}
+				'has entries': False,
+				'category': sidebar_button,
+				'contents': section_contents,
+				'name': title_str,
+				'is system section': system_menu,
+				}
 
 		else:
 			self.section_list[section_slab] = {
-					'has entries': True,
-					'category': sidebar_button,
-					'contents': section_contents,
-					'name': title_str,
-					'is system section': system_menu,
-					}
+				'has entries': True,
+				'category': sidebar_button,
+				'contents': section_contents,
+				'name': title_str,
+				'is system section': system_menu,
+				}
 
 		return section_slab, section_contents, label
 
@@ -2418,6 +2398,7 @@ class Cardapio(dbus.service.Object):
 				self.add_plugin_slab(basename)
 
 
+	# TODO MVC
 	def clear_pane(self, container):
 		"""
 		Remove all children from a GTK container
@@ -2487,7 +2468,6 @@ class Cardapio(dbus.service.Object):
 		self.untoggle_and_show_all_sections()
 
 
-	# TODO MVC
 	def add_app_button(self, button_str, icon_name, parent_widget, command_type, command, tooltip = '', app_list = None):
 		"""
 		Adds a new button to the app pane
@@ -2496,41 +2476,7 @@ class Cardapio(dbus.service.Object):
 		if type(button_str) is str:
 			button_str = unicode(button_str, 'utf-8')
 
-		# MODEL/VIEW SEPARATION EFFORT: view
-		button = self.add_button(button_str, icon_name, parent_widget, tooltip, button_type = Cardapio.APP_BUTTON)
-
-		button.connect('clicked', self.view.on_app_button_clicked)
-		button.connect('button-press-event', self.view.on_app_button_button_pressed)
-		button.connect('focus-in-event', self.on_app_button_focused)
-
-		if command_type != 'callback' and command_type != 'raw':
-
-			if command_type == 'app':
-				button.drag_source_set(
-						gtk.gdk.BUTTON1_MASK,
-						[('text/uri-list', 0, 0)],
-						gtk.gdk.ACTION_COPY)
-			else:
-				button.drag_source_set(
-						gtk.gdk.BUTTON1_MASK,
-						[('text/uri-list', 0, 0)],
-						gtk.gdk.ACTION_LINK)
-
-			button.connect('drag-begin', self.on_app_button_drag_begin)
-			button.connect('drag-data-get', self.on_app_button_data_get)
-			# TODO: drag and drop to reorganize pinned items
-
-		# MODEL/VIEW SEPARATION EFFORT: model
-		if app_list is not None:
-
-			path, basename = os.path.split(command)
-			if basename : basename, dummy = os.path.splitext(basename)
-			else        : basename = path
-
-			app_list.append({'name': button_str.lower(), 'button': button, 'section': parent_widget.parent.parent, 'basename' : basename, 'command' : command})
-
-			# NOTE: IF THERE ARE CHANGES IN THE UI FILE, THIS MAY PRODUCE
-			# HARD-TO-FIND BUGS!!
+		button = self.sanitize_and_add_button(button_str, icon_name, parent_widget, tooltip, CardapioViewInterface.APP_BUTTON)
 
 		# save some metadata for easy access
 		button.app_info = {
@@ -2542,62 +2488,36 @@ class Cardapio(dbus.service.Object):
 			'context menu' : None,
 		}
 
+		if command_type != 'callback' and command_type != 'raw':
+			self.view.setup_button_drag_and_drop(button)
+
+		if app_list is not None:
+
+			path, basename = os.path.split(command)
+			if basename : basename, dummy = os.path.splitext(basename)
+			else        : basename = path
+
+			button_section_slab = self.view.get_section_slab_from_button(button)
+
+			app_list.append({
+				'name'     : button_str.lower(),
+				'button'   : button,
+				'section'  : button_section_slab,
+				'basename' : basename,
+				'command'  : command,
+				})
+
 		return button
 
 
-	# TODO MVC
-	def add_button(self, button_str, icon_name, parent_widget, tooltip = '', button_type = APP_BUTTON):
+	def sanitize_and_add_button(self, button_str, icon_name, parent_widget, tooltip = '', button_type = CardapioViewInterface.APP_BUTTON):
 		"""
 		Adds a button to a parent container
 		"""
 
-		if button_type != Cardapio.CATEGORY_BUTTON:
-			button = gtk.Button()
-		else:
-			button = gtk.ToggleButton()
-
 		button_str = self.unescape_url(button_str)
-
-		label = gtk.Label(button_str)
-
-		if button_type == Cardapio.APP_BUTTON:
-			icon_size_pixels = self.icon_helper.icon_size_app
-			label.modify_fg(gtk.STATE_NORMAL, self.view.style_app_button_fg)
-
-			# TODO: figure out how to set max width so that it is the best for
-			# the window and font sizes
-			#layout = label.get_layout()
-			#extents = layout.get_pixel_extents()
-			#label.set_ellipsize(ELLIPSIZE_END)
-			#label.set_max_width_chars(20)
-
-		else:
-			icon_size_pixels = self.icon_helper.icon_size_category
-
-		icon_pixbuf = self.icon_helper.get_icon_pixbuf(icon_name, icon_size_pixels)
-		icon = gtk.image_new_from_pixbuf(icon_pixbuf)
-
-		hbox = gtk.HBox()
-		hbox.add(icon)
-		hbox.add(label)
-		hbox.set_spacing(5)
-		hbox.set_homogeneous(False)
-
-		align = gtk.Alignment(0, 0.5)
-		align.add(hbox)
-
-		if tooltip:
-			tooltip = self.unescape_url(tooltip)
-			button.set_tooltip_text(tooltip)
-
-		button.add(align)
-		button.set_relief(gtk.RELIEF_NONE)
-		button.set_use_underline(False)
-
-		button.show_all()
-		parent_widget.pack_start(button, expand = False, fill = False)
-
-		return button
+		if tooltip: tooltip = self.unescape_url(tooltip)
+		return self.view.add_button(button_str, icon_name, parent_widget, tooltip, button_type)
 
 
 	# TODO MVC
@@ -2660,33 +2580,31 @@ class Cardapio(dbus.service.Object):
 
 
 	# TODO MVC
-	def on_pin_this_app_clicked(self, widget):
+	def handle_pin_this_app_clicked(self, clicked_app_info):
 		"""
 		Handle the pinning action
 		"""
 
 		self.remove_section_from_app_list(self.favorites_section_slab)
 		self.clear_pane(self.favorites_section_contents)
-		self.settings['pinned items'].append(self.view.clicked_app)
+		self.settings['pinned items'].append(clicked_app_info)
 		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
 
 
-	# MODEL/VIEW SEPARATION EFFORT: controller
 	# TODO MVC
-	def on_unpin_this_app_clicked(self, widget):
+	def handle_unpin_this_app_clicked(self, clicked_app_info):
 		"""
 		Handle the unpinning action
 		"""
 
 		self.remove_section_from_app_list(self.favorites_section_slab)
 		self.clear_pane(self.favorites_section_contents)
-		self.settings['pinned items'].remove(self.view.clicked_app)
+		self.settings['pinned items'].remove(clicked_app_info)
 		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
 
 
-	# MODEL/VIEW SEPARATION EFFORT: controller
 	# TODO MVC
-	def on_add_to_side_pane_clicked(self, widget):
+	def handle_add_to_side_pane_clicked(self, clicked_app_info):
 		"""
 		Handle the "add to sidepane" action
 		"""
@@ -2694,15 +2612,14 @@ class Cardapio(dbus.service.Object):
 		self.remove_section_from_app_list(self.sidepane_section_slab)
 		self.clear_pane(self.sidepane_section_contents)
  		self.clear_pane(self.view.sidepane)
-		self.settings['side pane items'].append(self.view.clicked_app)
+		self.settings['side pane items'].append(clicked_app_info)
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 		self.view.sidepane.queue_resize() # required! or sidepane's allocation will be x,y,width,0 when first item is added
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or sidepane will obscure the mode switcher button
 
 
-	# MODEL/VIEW SEPARATION EFFORT: controller
 	# TODO MVC
-	def on_remove_from_side_pane_clicked(self, widget):
+	def handle_remove_from_side_pane_clicked(self, clicked_app_info):
 		"""
 		Handle the "remove from sidepane" action
 		"""
@@ -2710,37 +2627,37 @@ class Cardapio(dbus.service.Object):
 		self.remove_section_from_app_list(self.sidepane_section_slab)
 		self.clear_pane(self.sidepane_section_contents)
  		self.clear_pane(self.view.sidepane)
-		self.settings['side pane items'].remove(self.view.clicked_app)
+		self.settings['side pane items'].remove(clicked_app_info)
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or an extra space will show up where but button used to be
 
 
 	# TODO MVC
-	def on_open_parent_folder_pressed(self, widget):
+	def handle_open_parent_folder_pressed(self, clicked_app_info):
 		"""
 		Handle the "open parent folder" action
 		"""
 
-		parent_folder, dummy = os.path.split(self.view.clicked_app['command'])
+		parent_folder, dummy = os.path.split(clicked_app_info['command'])
 		self.launch_xdg(parent_folder)
 
 
 	# TODO MVC
-	def on_launch_in_background_pressed(self, widget):
+	def handle_launch_in_background_pressed(self, clicked_app_info):
 		"""
 		Handle the "launch in background" action
 		"""
 
-		self.launch_button_command(self.view.clicked_app, hide = False)
+		self.launch_button_command(clicked_app_info, hide = False)
 
 
 	# TODO MVC
-	def on_peek_inside_pressed(self, widget):
+	def handle_peek_inside_pressed(self, clicked_app_info):
 		"""
 		Handle the "peek inside folder" action
 		"""
 
-		dummy, path = urllib2.splittype(self.view.clicked_app['command'])
+		dummy, path = urllib2.splittype(clicked_app_info['command'])
 		if os.path.isfile(path): path, dummy = os.path.split(path)
 		path = self.unescape_url(path)
  		self.create_subfolder_stack(path)
@@ -2748,13 +2665,84 @@ class Cardapio(dbus.service.Object):
 
 
 	# TODO MVC
-	def on_eject_pressed(self, widget):
+	def handle_eject_pressed(self, clicked_app_info):
 		"""
 		Handle the "eject" action
 		"""
 
-		volume = self.volumes[self.view.clicked_app['command']]
+		volume = self.volumes[clicked_app_info['command']]
 		volume.eject(return_true)
+
+
+	def setup_app_context_menu(self, app_info):
+		"""
+		Show or hide different context menu options depending on the widget
+		"""
+
+		self.view.set_context_menu_option_visible(CardapioViewInterface.OPEN_FOLDER_MENUITEM, False)
+		self.view.set_context_menu_option_visible(CardapioViewInterface.PEEK_INSIDE_MENUITEM, False)
+		self.view.set_context_menu_option_visible(CardapioViewInterface.EJECT_MENUITEM, False)
+
+		if app_info['type'] == 'callback':
+			self.view.set_context_menu_option_visible(CardapioViewInterface.PIN_MENUITEM, False)
+			self.view.set_context_menu_option_visible(CardapioViewInterface.UNPIN_MENUITEM, False)
+			self.view.set_context_menu_option_visible(CardapioViewInterface.ADD_SIDE_PANE_MENUITEM, False)
+			self.view.set_context_menu_option_visible(CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM, False)
+			self.view.app_menu_separator.hide() # this should happen automatically in setup_plugin_context_menu
+			self.setup_plugin_context_menu(app_info)
+			return
+
+		already_pinned = False
+		already_on_side_pane = False
+		self.view.app_menu_separator.show() # this should happen automatically somewhere...
+
+		for command in [app['command'] for app in self.settings['pinned items']]:
+			if command == app_info['command']:
+				already_pinned = True
+				break
+
+		for command in [app['command'] for app in self.settings['side pane items']]:
+			if command == app_info['command']:
+				already_on_side_pane = True
+				break
+
+		if already_pinned:
+			self.view.set_context_menu_option_visible(CardapioViewInterface.PIN_MENUITEM, False)
+			self.view.set_context_menu_option_visible(CardapioViewInterface.UNPIN_MENUITEM, True)
+		else:
+			self.view.set_context_menu_option_visible(CardapioViewInterface.PIN_MENUITEM, True)
+			self.view.set_context_menu_option_visible(CardapioViewInterface.UNPIN_MENUITEM, False)
+
+		if already_on_side_pane:
+			self.view.set_context_menu_option_visible(CardapioViewInterface.ADD_SIDE_PANE_MENUITEM, False)
+			self.view.set_context_menu_option_visible(CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM, True)
+		else:
+			self.view.set_context_menu_option_visible(CardapioViewInterface.ADD_SIDE_PANE_MENUITEM, True)
+			self.view.set_context_menu_option_visible(CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM, False)
+
+		# TODO: move this into Controller
+		# figure out whether to show the 'open parent folder' menuitem
+		split_command = urllib2.splittype(app_info['command'])
+
+		if app_info['type'] == 'xdg' or len(split_command) == 2:
+
+			path_type, canonical_path = split_command
+			dummy, extension = os.path.splitext(canonical_path)
+
+			# don't show it for network://, trash://, or .desktop files
+			if path_type not in ('computer', 'network', 'trash') and extension != '.desktop':
+
+				# only show if path that exists
+				if os.path.exists(self.unescape_url(canonical_path)):
+					self.view.set_context_menu_option_visible(CardapioViewInterface.OPEN_FOLDER_MENUITEM, True)
+					self.view.set_context_menu_option_visible(CardapioViewInterface.PEEK_INSIDE_MENUITEM, True)
+
+		# figure out whether to show the 'eject' menuitem
+		if app_info['command'] in self.volumes:
+			self.view.set_context_menu_option_visible(CardapioViewInterface.EJECT_MENUITEM, True)
+
+		self.setup_plugin_context_menu(app_info)
+
 
 
 	# This method is called from the View API
@@ -2767,23 +2755,6 @@ class Cardapio(dbus.service.Object):
 		if 'context menu' not in app_info: return
 		if app_info['context menu'] is None: return
 		self.view.fill_plugin_context_menu(app_info['context menu'])
-
-
-	# TODO MVC
-	def on_app_button_focused(self, widget, event):
-		"""
-		Scroll to app buttons when they gain focus
-		"""
-
-		alloc = widget.get_allocation()
-		scroller_position = self.view.scroll_adjustment.value
-		page_size = self.view.scroll_adjustment.page_size
-
-		if alloc.y < scroller_position:
-			self.view.scroll_adjustment.set_value(alloc.y)
-
-		elif alloc.y + alloc.height > scroller_position + page_size:
-			self.view.scroll_adjustment.set_value(alloc.y + alloc.height - page_size)
 
 
 	# TODO MVC
@@ -2834,7 +2805,7 @@ class Cardapio(dbus.service.Object):
 			self.launch_button_command(app_info, hide = False)
 
 		elif button == 3:
-			self.view.setup_context_menu(app_info)
+			self.setup_app_context_menu(app_info)
 			self.view.block_focus_out_event()
 			self.view.popup_app_context_menu(app_info)
 
@@ -3100,7 +3071,7 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			self.selected_section.hide()
-			self.view.show_no_results_text(self.no_results_in_category_text % {'category_name': self.section_list[self.selected_section]['name']})
+			self.view.show_no_results_text(self.view.no_results_in_category_text % {'category_name': self.section_list[self.selected_section]['name']})
 
 
 	def disappear_with_all_transitory_sections(self):
