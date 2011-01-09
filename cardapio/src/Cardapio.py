@@ -700,22 +700,22 @@ class Cardapio(dbus.service.Object):
 
 		self.view.read_gtk_theme_info()
 
-		self.clear_pane(self.application_pane)
-		self.clear_pane(self.category_pane)
-		self.clear_pane(self.system_category_pane)
-		self.clear_pane(self.sidepane)
-		self.clear_pane(self.left_session_pane)
-		self.clear_pane(self.right_session_pane)
+		self.clear_pane(self.view.application_pane)
+		self.clear_pane(self.view.category_pane)
+		self.clear_pane(self.view.system_category_pane)
+		self.clear_pane(self.view.sidepane)
+		self.clear_pane(self.view.left_session_pane)
+		self.clear_pane(self.view.right_session_pane)
 
 		# "All" button for the regular menu
-		button = self.add_button(_('All'), None, self.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
+		button = self.add_button(_('All'), None, self.view.category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
 		button.connect('clicked', self.view.on_all_sections_sidebar_button_clicked)
 		self.all_sections_sidebar_button = button
 		self.view.set_sidebar_button_toggled(button, True)
 		self.all_sections_sidebar_button.set_sensitive(False)
 
 		# "All" button for the system menu
-		button = self.add_button(_('All'), None, self.system_category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
+		button = self.add_button(_('All'), None, self.view.system_category_pane, tooltip = _('Show all categories'), button_type = Cardapio.CATEGORY_BUTTON)
 		button.connect('clicked', self.view.on_all_sections_sidebar_button_clicked)
 		self.all_system_sections_sidebar_button = button
 		self.view.set_sidebar_button_toggled(button, True)
@@ -931,12 +931,12 @@ class Cardapio(dbus.service.Object):
 		self.on_search_entry_changed()
 
 		if show_system_menus:
-			self.category_pane.hide()
-			self.system_category_pane.show()
+			self.view.category_pane.hide()
+			self.view.system_category_pane.show()
 
 		else:
-			self.system_category_pane.hide()
-			self.category_pane.show()
+			self.view.system_category_pane.hide()
+			self.view.category_pane.show()
 
 
 	# This method is called from the View API
@@ -1047,7 +1047,7 @@ class Cardapio(dbus.service.Object):
 
 		text = text.lower()
 
-		self.application_pane.hide() # for speed
+		self.view.application_pane.hide() # for speed
 
 		for app in app_list:
 
@@ -1061,7 +1061,7 @@ class Cardapio(dbus.service.Object):
 		if self.selected_section is None:
 			self.untoggle_and_show_all_sections()
 
-		self.application_pane.show() # restore application_pane
+		self.view.application_pane.show() # restore application_pane
 
 
 	def create_subfolder_stack(self, path):
@@ -1744,8 +1744,8 @@ class Cardapio(dbus.service.Object):
 		Collapses the sidebar into a row of small buttons (i.e. minimode)
 		"""
 
-		category_buttons = self.category_pane.get_children() +\
-				self.system_category_pane.get_children() + self.sidepane.get_children()
+		category_buttons = self.view.category_pane.get_children() +\
+				self.view.system_category_pane.get_children() + self.view.sidepane.get_children()
 
 		if self.settings['mini mode']:
 
@@ -1754,7 +1754,7 @@ class Cardapio(dbus.service.Object):
 
 			self.session_button_locksys.child.child.get_children()[1].hide()
 			self.session_button_logout.child.child.get_children()[1].hide()
-			self.right_session_pane.set_homogeneous(False)
+			self.view.right_session_pane.set_homogeneous(False)
 
 			self.view.get_widget('ViewLabel').set_size_request(0, 0) # required! otherwise a weird margin appears
 			self.view.get_widget('ViewLabel').hide()
@@ -1773,10 +1773,10 @@ class Cardapio(dbus.service.Object):
 			# hack to make sure the viewport resizes to the minisize correctly
 			self.view.get_widget('SideappViewport').hide()
 			self.view.get_widget('SideappViewport').show()
-			#self.left_session_pane.hide()
-			#self.left_session_pane.show()
-			#self.right_session_pane.hide()
-			#self.right_session_pane.show()
+			#self.view.left_session_pane.hide()
+			#self.view.left_session_pane.show()
+			#self.view.right_session_pane.hide()
+			#self.view.right_session_pane.show()
 
 			if update_window_size:
 				self.settings['window size'][0] -= self.view.get_main_splitter_position()
@@ -1788,7 +1788,7 @@ class Cardapio(dbus.service.Object):
 
 			self.session_button_locksys.child.child.get_children()[1].show()
 			self.session_button_logout.child.child.get_children()[1].show()
-			self.right_session_pane.set_homogeneous(True)
+			self.view.right_session_pane.set_homogeneous(True)
 
 			self.view.get_widget('ViewLabel').set_size_request(-1, -1)
 			self.view.get_widget('ViewLabel').show()
@@ -1967,7 +1967,7 @@ class Cardapio(dbus.service.Object):
 			if isinstance(node, gmenu.Directory):
 				self.add_slab(node.name, node.icon, node.get_comment(), node = node, system_menu = True)
 
-		self.system_category_pane.hide()
+		self.view.system_category_pane.hide()
 
 		section_slab, section_contents, dummy = self.add_slab(_('Uncategorized'), 'applications-other', tooltip = _('Other configuration tools'), hide = False, system_menu = True)
 		self.add_tree_to_app_list(self.sys_tree.root, section_contents, self.sys_list, recursive = False)
@@ -2105,7 +2105,7 @@ class Cardapio(dbus.service.Object):
 	 	# hoping this helps with bug 662249, in case there is some strange threading problem happening (although there are no explicit threads in this program)	
 		self.volume_monitor.handler_block_by_func(self.on_volume_monitor_changed)
 
-		self.clear_pane(self.places_section_contents)
+		self.view.clear_pane(self.places_section_contents)
 		self.build_places_list()
 
 		# same here
@@ -2187,7 +2187,7 @@ class Cardapio(dbus.service.Object):
 			if slab == self.sidepane_section_slab:
 
 				app_info = button.app_info
-				button = self.add_button(app['name'], app['icon name'], self.sidepane, tooltip = app['tooltip'], button_type = Cardapio.SIDEPANE_BUTTON)
+				button = self.add_button(app['name'], app['icon name'], self.view.sidepane, tooltip = app['tooltip'], button_type = Cardapio.SIDEPANE_BUTTON)
 				button.app_info = app_info
 				button.connect('clicked', self.view.on_app_button_clicked)
 				button.connect('button-press-event', self.view.on_app_button_button_pressed)
@@ -2214,21 +2214,21 @@ class Cardapio(dbus.service.Object):
 				_('Protect your computer from unauthorized use'),
 				'system-lock-screen',
 				'gnome-screensaver-command --lock',
-				self.left_session_pane,
+				self.view.left_session_pane,
 			],
 			[
 				_('Log Out...'),
 				_('Log out of this session to log in as a different user'),
 				'system-log-out',
 				'gnome-session-save --logout-dialog',
-				self.right_session_pane,
+				self.view.right_session_pane,
 			],
 			[
 				_('Shut Down...'),
 				_('Shut down the system'),
 				'system-shutdown',
 				'gnome-session-save --shutdown-dialog',
-				self.right_session_pane,
+				self.view.right_session_pane,
 			],
 		]
 
@@ -2264,10 +2264,10 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if system_menu:
-			category_pane = self.system_category_pane
+			category_pane = self.view.system_category_pane
 			app_list = self.sys_list
 		else:
-			category_pane = self.category_pane
+			category_pane = self.view.category_pane
 			app_list = self.app_list
 
 		# add category to category pane
@@ -2628,7 +2628,7 @@ class Cardapio(dbus.service.Object):
 
 		section_slab.show_all()
 
-		self.application_pane.pack_start(section_slab, expand = False, fill = False)
+		self.view.application_pane.pack_start(section_slab, expand = False, fill = False)
 
 		return section_slab, section_contents, label
 
@@ -2693,10 +2693,10 @@ class Cardapio(dbus.service.Object):
 
 		self.remove_section_from_app_list(self.sidepane_section_slab)
 		self.clear_pane(self.sidepane_section_contents)
- 		self.clear_pane(self.sidepane)
+ 		self.clear_pane(self.view.sidepane)
 		self.settings['side pane items'].append(self.view.clicked_app)
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
-		self.sidepane.queue_resize() # required! or sidepane's allocation will be x,y,width,0 when first item is added
+		self.view.sidepane.queue_resize() # required! or sidepane's allocation will be x,y,width,0 when first item is added
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or sidepane will obscure the mode switcher button
 
 
@@ -2709,7 +2709,7 @@ class Cardapio(dbus.service.Object):
 
 		self.remove_section_from_app_list(self.sidepane_section_slab)
 		self.clear_pane(self.sidepane_section_contents)
- 		self.clear_pane(self.sidepane)
+ 		self.clear_pane(self.view.sidepane)
 		self.settings['side pane items'].remove(self.view.clicked_app)
 		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or an extra space will show up where but button used to be

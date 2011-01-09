@@ -68,13 +68,13 @@ class CardapioGtkView:
 		self.message_window            = self.get_widget('MessageWindow')
 		self.about_dialog              = self.get_widget('AboutDialog')
 		self.executable_file_dialog    = self.get_widget('ExecutableFileDialog')
-		self.cardapio.application_pane          = self.get_widget('ApplicationPane')
-		self.cardapio.category_pane             = self.get_widget('CategoryPane')
-		self.cardapio.system_category_pane      = self.get_widget('SystemCategoryPane')
-		self.cardapio.sidepane                  = self.get_widget('SideappPane')
+		self.application_pane          = self.get_widget('ApplicationPane')
+		self.category_pane             = self.get_widget('CategoryPane')
+		self.system_category_pane      = self.get_widget('SystemCategoryPane')
+		self.sidepane                  = self.get_widget('SideappPane')
 		self.scroll_adjustment         = self.get_widget('ScrolledWindow').get_vadjustment()
-		self.cardapio.left_session_pane         = self.get_widget('LeftSessionPane')
-		self.cardapio.right_session_pane        = self.get_widget('RightSessionPane')
+		self.left_session_pane         = self.get_widget('LeftSessionPane')
+		self.right_session_pane        = self.get_widget('RightSessionPane')
 		self.context_menu              = self.get_widget('CardapioContextMenu')
 		self.app_context_menu          = self.get_widget('AppContextMenu')
 		self.app_menu_separator        = self.get_widget('AppMenuSeparator')
@@ -617,7 +617,7 @@ class CardapioGtkView:
 
 		# set up open-on-hover for categories
 
-		category_buttons = self.cardapio.category_pane.get_children() + self.cardapio.system_category_pane.get_children()
+		category_buttons = self.category_pane.get_children() + self.system_category_pane.get_children()
 
 		if self.cardapio.settings['open categories on hover']:
 			for category_button in category_buttons:
@@ -747,7 +747,7 @@ class CardapioGtkView:
 		Returns the first app in the right pane, if any.
 		"""
 
-		for slab in self.cardapio.application_pane.get_children():
+		for slab in self.application_pane.get_children():
 			if not slab.get_visible(): continue
 
 			# NOTE: the following line depends on the UI file. If the file is
