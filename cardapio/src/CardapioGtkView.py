@@ -1,4 +1,4 @@
-#  
+# 
 #  Copyright (C) 2010 Cardapio Team (tvst@hotmail.com)
 # 
 #  This program is free software: you can redistribute it and/or modify
@@ -41,7 +41,6 @@ if gtk.ver < (2, 14, 0):
 
 # TODO: Figure out locale/gettext configuration, now that CardapioGTKView is in
 # its own file...
-
 
 class CardapioGtkView(CardapioViewInterface):
 
@@ -95,12 +94,6 @@ class CardapioGtkView(CardapioViewInterface):
 		self.view_mode_button          = self.get_widget('ViewModeButton')
 		self.main_splitter             = self.get_widget('MainSplitter')
 
-		self.no_results_text             = _('No results to show')
-		self.no_results_in_category_text = _('No results to show in "%(category_name)s"')
-		self.plugin_loading_text         = _('Searching...')
-		self.plugin_timeout_text         = _('Search timed out')
-
-
 		self.context_menu_options = {
 			CardapioViewInterface.PIN_MENUITEM              : self.pin_menuitem,
 			CardapioViewInterface.UNPIN_MENUITEM            : self.unpin_menuitem,
@@ -110,8 +103,6 @@ class CardapioGtkView(CardapioViewInterface):
 			CardapioViewInterface.PEEK_INSIDE_MENUITEM      : self.peek_inside_menuitem,
 			CardapioViewInterface.EJECT_MENUITEM            : self.eject_menuitem,
 			}
-
-		# TODO MVC separation of the rest of the code in this method
 
 		# start with any search entry -- doesn't matter which
 		self.cardapio.search_entry = self.get_widget('TopLeftSearchEntry')
@@ -131,13 +122,13 @@ class CardapioGtkView(CardapioViewInterface):
 		self.get_widget('AboutDistroMenuItem').set_label(about_distro_label)
 
 		# grab some widget properties from the ui file
-		self.cardapio.section_label_attributes = self.get_widget('SectionName').get_attributes()
-		self.cardapio.fullsize_mode_padding = self.get_widget('CategoryMargin').get_padding()
+		self.section_label_attributes = self.get_widget('SectionName').get_attributes()
+		self.fullsize_mode_padding = self.get_widget('CategoryMargin').get_padding()
 
 		# make sure buttons have icons!
-		self.cardapio.gtk_settings = gtk.settings_get_default()
-		self.cardapio.gtk_settings.set_property('gtk-button-images', True)
-		self.cardapio.gtk_settings.connect('notify', self.on_gtk_settings_changed)
+		self.gtk_settings = gtk.settings_get_default()
+		self.gtk_settings.set_property('gtk-button-images', True)
+		self.gtk_settings.connect('notify', self.on_gtk_settings_changed)
 
 		self.window.set_keep_above(True)
 
@@ -354,22 +345,18 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
-	def show_executable_file_dialog(self, path):
+	def show_executable_file_dialog(self, primary_text, secondary_text, hide_terminal_option):
 		"""
 		Opens a dialog similar to the one in Nautilus, that asks whether an
 		executable script should be launched or edited.
 		"""
 
-		basename = os.path.basename(path)
-		arg_dict = {'file_name': basename}
-
-		primary_text = '<big><b>' + _('Do you want to run "%(file_name)s" or display its contents?' % arg_dict) + '</b></big>'
-		secondary_text = _('"%(file_name)s" is an executable text file.' % arg_dict)
+		primary_text = '<big><b>' + primary_text + '</b></big>'
 
 		self.get_widget('ExecutableDialogPrimaryText').set_markup(primary_text)
 		self.get_widget('ExecutableDialogSecondaryText').set_text(secondary_text)
 
-		if not self.cardapio.can_launch_in_terminal():
+		if hide_terminal_option:
 			self.get_widget('ExecutableDialogRunInTerminal').hide()
 
 		self.executable_file_dialog.set_focus(self.get_widget('ExecutableDialogCancel'))
@@ -786,7 +773,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Show the "No results to show" text
 		"""
 
-		if text is None: text = self.no_results_text
+		if text is None: text = self.cardapio.no_results_text
 
 		self.cardapio.no_results_label.set_text(text)
 		self.cardapio.no_results_slab.show()

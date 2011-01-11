@@ -78,7 +78,8 @@ class OptionsWindow:
 		are supported by the current panel (if any)
 		"""
 
-		if self.cardapio.panel_applet.panel_type in (None, PANEL_TYPE_DOCKY):
+		if self.cardapio.panel_applet is None \
+				or self.cardapio.panel_applet.panel_type == PANEL_TYPE_DOCKY:
 			self.get_widget('AppletOptionPane').hide()
 
 		elif self.cardapio.panel_applet.panel_type is PANEL_TYPE_AWN:

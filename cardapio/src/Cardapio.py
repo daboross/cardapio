@@ -338,6 +338,14 @@ class Cardapio(dbus.service.Object):
 		Calls the UI backend's "setup_ui" function
 		"""
 
+		self.no_results_text             = _('No results to show')
+		self.no_results_in_category_text = _('No results to show in "%(category_name)s"')
+		self.plugin_loading_text         = _('Searching...')
+		self.plugin_timeout_text         = _('Search timed out')
+
+		self.executable_file_dialog_text    = _('Do you want to run "%(file_name)s", or display its contents?')
+		self.executable_file_dialog_caption = _('"%(file_name)s" is an executable text file.')
+
 		self.icon_helper = IconHelper()
 		self.icon_helper.register_icon_theme_listener(self.schedule_rebuild)
 
@@ -1333,7 +1341,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.reset_plugin_section_contents(plugin)
-		label = gtk.Label(self.view.plugin_loading_text)
+		label = gtk.Label(self.plugin_loading_text)
 		label.set_alignment(0, 0.5)
 		label.set_sensitive(False)
 		label.show()
@@ -1367,7 +1375,7 @@ class Cardapio(dbus.service.Object):
 				logging.error(exception)
 
 			self.reset_plugin_section_contents(plugin)
-			label = gtk.Label(self.view.plugin_timeout_text)
+			label = gtk.Label(self.plugin_timeout_text)
 			label.set_alignment(0, 0.5)
 			label.set_sensitive(False)
 			label.show()
@@ -1741,7 +1749,7 @@ class Cardapio(dbus.service.Object):
 			self.view.get_widget('ControlCenterArrow').hide()
 			self.view.get_widget('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
 
-			padding = self.fullsize_mode_padding
+			padding = self.view.fullsize_mode_padding
 			self.view.get_widget('CategoryMargin').set_padding(0, padding[1], padding[2], padding[3])
 
 			self.view.get_widget('TopLeftSearchSlabMargin').hide()    # these are required, to make sure the splitter
@@ -1775,7 +1783,7 @@ class Cardapio(dbus.service.Object):
 			self.view.get_widget('ControlCenterArrow').show()
 			self.view.get_widget('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
 
-			self.view.get_widget('CategoryMargin').set_padding(*self.fullsize_mode_padding)
+			self.view.get_widget('CategoryMargin').set_padding(*self.view.fullsize_mode_padding)
 			
 			self.view.set_main_splitter_position(self.settings['splitter position'])
 
@@ -2539,7 +2547,7 @@ class Cardapio(dbus.service.Object):
 		label.set_use_markup(True)
 		label.modify_fg(gtk.STATE_NORMAL, self.view.style_app_button_fg)
 		label.set_padding(0, 4)
-		label.set_attributes(self.section_label_attributes)
+		label.set_attributes(self.view.section_label_attributes)
 
 		if section_title is not None:
 			label.set_text(section_title)
@@ -2889,8 +2897,14 @@ class Cardapio(dbus.service.Object):
 			# only show the executable dialog for executable text files and scripts
 			if content_type[:5] == 'text/' or content_type == 'application/x-shellscript':
 
+				arg_dict = {'file_name': os.path.basename(path)}
+
+				primary_text = self.executable_file_dialog_text % arg_dict
+				secondary_text = self.executable_file_dialog_caption % arg_dict
+				hide_terminal_option = not self.can_launch_in_terminal()
+
 				# show "Run in Terminal", "Display", "Cancel", "Run"
-				response = self.view.show_executable_file_dialog(path)
+				response = self.view.show_executable_file_dialog(primary_text, secondary_text, hide_terminal_option)
 
 				# if "Run in Terminal"
 				if response == 1:
@@ -3072,7 +3086,7 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			self.selected_section.hide()
-			self.view.show_no_results_text(self.view.no_results_in_category_text % {'category_name': self.section_list[self.selected_section]['name']})
+			self.view.show_no_results_text(self.no_results_in_category_text % {'category_name': self.section_list[self.selected_section]['name']})
 
 
 	def disappear_with_all_transitory_sections(self):
