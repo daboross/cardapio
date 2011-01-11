@@ -916,10 +916,13 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	def on_app_button_data_get(self, button, drag_context, selection_data, info, time):
+		"""
+		In a drag-and-drop operation, send the drop target some information 
+		about the dragged app.
+		"""
 
-		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
-		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
-		self.on_app_button_data_get(button, drag_context, selection_data, info, time)
+		app_uri = self.cardapio.get_app_uri_for_drag_and_drop(button.app_info)
+		selection_data.set_uris([app_uri])
 
 
 	def start_resize(self, widget, event):
@@ -1043,13 +1046,12 @@ class CardapioGtkView(CardapioViewInterface):
 		return button
 
 
-	def setup_button_drag_and_drop(self, button):
+	def setup_button_drag_and_drop(self, button, is_desktop_file):
 		"""
+		Sets up the event handlers for drag-and-drop
 		"""
 
-		command_type = button.app_info['type']
-
-		if command_type == 'app':
+		if is_desktop_file:
 			button.drag_source_set(
 					gtk.gdk.BUTTON1_MASK,
 					[('text/uri-list', 0, 0)],
@@ -1060,9 +1062,9 @@ class CardapioGtkView(CardapioViewInterface):
 					[('text/uri-list', 0, 0)],
 					gtk.gdk.ACTION_LINK)
 
-			button.connect('drag-begin', self.on_app_button_drag_begin)
-			button.connect('drag-data-get', self.on_app_button_data_get)
-			# TODO: drag and drop to reorganize pinned items
+		button.connect('drag-begin', self.on_app_button_drag_begin)
+		button.connect('drag-data-get', self.on_app_button_data_get)
+		# TODO: drag and drop to reorganize pinned items
 
 
 	# This method is required by the View API

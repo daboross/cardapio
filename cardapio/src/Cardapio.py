@@ -2489,7 +2489,8 @@ class Cardapio(dbus.service.Object):
 		}
 
 		if command_type != 'callback' and command_type != 'raw':
-			self.view.setup_button_drag_and_drop(button)
+			is_desktop_file = (command_type == 'app')
+			self.view.setup_button_drag_and_drop(button, is_desktop_file)
 
 		if app_list is not None:
 
@@ -2767,15 +2768,14 @@ class Cardapio(dbus.service.Object):
 		button.drag_source_set_icon_pixbuf(icon_pixbuf)
 
 
-	# TODO MVC
-	def on_app_button_data_get(self, button, drag_context, selection_data, info, time):
+	def get_app_uri_for_drag_and_drop(self, app_info):
 		"""
-		Prepare the data that will be sent to the other app when the drag-and-drop
-		operation is done
+		Prepare the data that will be sent to the other application when an app is
+		dragged from Cardapio.
 		"""
 
-		command = button.app_info['command']
-		command_type = button.app_info['type']
+		command = app_info['command']
+		command_type = app_info['type']
 
 		if command_type == 'app':
 			command = 'file://' + command
@@ -2789,7 +2789,8 @@ class Cardapio(dbus.service.Object):
 			# 'trash://' (it seems that nautilus has the same problems...)
 
 		# TODO: handle command_type == 'raw' by creating a new desktop file and link?
-		selection_data.set_uris([command])
+
+		return command
 
 
 	# This method is called from the View API
