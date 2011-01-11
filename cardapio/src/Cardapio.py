@@ -2488,9 +2488,11 @@ class Cardapio(dbus.service.Object):
 			'context menu' : None,
 		}
 
-		if command_type != 'callback' and command_type != 'raw':
-			is_desktop_file = (command_type == 'app')
-			self.view.setup_button_drag_and_drop(button, is_desktop_file)
+		if command_type == 'app':
+			self.view.setup_button_drag_and_drop(button, True)
+
+		elif command_type == 'xdg':
+			self.view.setup_button_drag_and_drop(button, False)
 
 		if app_list is not None:
 
@@ -2758,14 +2760,12 @@ class Cardapio(dbus.service.Object):
 		self.view.fill_plugin_context_menu(app_info['context menu'])
 
 
-	# TODO MVC
-	def on_app_button_drag_begin(self, button, drag_context):
+	def get_icon_pixbuf_from_app_info(self, app_info):
 		"""
-		Set up drag action (not much goes on here...)
+		Get the icon pixbuf for an app given its app_info dict
 		"""
 
-		icon_pixbuf = self.icon_helper.get_icon_pixbuf(button.app_info['icon name'], self.icon_helper.icon_size_app)
-		button.drag_source_set_icon_pixbuf(icon_pixbuf)
+		return self.icon_helper.get_icon_pixbuf(app_info['icon name'], self.icon_helper.icon_size_app)
 
 
 	def get_app_uri_for_drag_and_drop(self, app_info):

@@ -909,10 +909,13 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	def on_app_button_drag_begin(self, button, drag_context):
+		"""
+		In a drag-and-drop operation, setup the icon that will be displayed near the
+		mouse cursor.
+		"""
 		
-		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
-		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
-		self.cardapio.on_app_button_drag_begin(button, drag_context)
+		icon_pixbuf = self.cardapio.get_icon_pixbuf_from_app_info(button.app_info)
+		button.drag_source_set_icon_pixbuf(icon_pixbuf)
 
 
 	def on_app_button_data_get(self, button, drag_context, selection_data, info, time):
@@ -1046,6 +1049,7 @@ class CardapioGtkView(CardapioViewInterface):
 		return button
 
 
+	# This method is required by the View API
 	def setup_button_drag_and_drop(self, button, is_desktop_file):
 		"""
 		Sets up the event handlers for drag-and-drop
