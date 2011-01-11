@@ -203,9 +203,8 @@ class CardapioGtkView(CardapioViewInterface):
 
 		if is_system_mode:
 			self.set_sidebar_button_toggled(self.cardapio.all_system_sections_sidebar_button, state)
-			return
-
-		self.set_sidebar_button_toggled(self.cardapio.all_sections_sidebar_button, state)
+		else:
+			self.set_sidebar_button_toggled(self.cardapio.all_sections_sidebar_button, state)
 
 
 	# This method is required by the View API
@@ -243,9 +242,17 @@ class CardapioGtkView(CardapioViewInterface):
 	# This method is required by the View API
 	def hide_section(self, section):
 		"""
-		Shows a given application section
+		Hides a given application section
 		"""
 		section.hide()
+
+
+	# This method is required by the View API
+	def hide_sections(self, sections):
+		"""
+		Hides the application sections listed in the array "sections"
+		"""
+		for section in sections: section.hide()
 
 
 	# This method is required by the View API
@@ -254,6 +261,14 @@ class CardapioGtkView(CardapioViewInterface):
 		Removes all text from the search entry.
 		"""
 		self.cardapio.search_entry.set_text('')
+
+
+	# This method is required by the View API
+	def set_search_entry_text(self, text):
+		"""
+		Removes all text from the search entry.
+		"""
+		self.cardapio.search_entry.set_text(text)
 
 
 	def on_sidebar_button_clicked(self, widget, section_slab):

@@ -579,7 +579,7 @@ class Cardapio(dbus.service.Object):
 
 		if self.selected_section is None:
 			self.view.clear_search_entry()
-			self.view.set_all_sections_sidebar_button_sensitive(False, self.in_system_mode)
+			self.view.set_all_sections_sidebar_button_sensitive(False, self.in_system_menu_mode)
 			return 
 
 		self.untoggle_and_show_all_sections()
@@ -1525,7 +1525,6 @@ class Cardapio(dbus.service.Object):
 				logging.error(exception)
 
 
-	# TODO MVC
 	def handle_search_entry_activate(self):
 		"""
 		Handler for when the user presses Enter on the search entry
@@ -2590,7 +2589,6 @@ class Cardapio(dbus.service.Object):
 		self.launch_raw('alacarte')
 
 
-	# TODO MVC
 	def handle_pin_this_app_clicked(self, clicked_app_info):
 		"""
 		Handle the pinning action
@@ -2602,7 +2600,6 @@ class Cardapio(dbus.service.Object):
 		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
 
 
-	# TODO MVC
 	def handle_unpin_this_app_clicked(self, clicked_app_info):
 		"""
 		Handle the unpinning action
@@ -2643,7 +2640,6 @@ class Cardapio(dbus.service.Object):
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or an extra space will show up where but button used to be
 
 
-	# TODO MVC
 	def handle_open_parent_folder_pressed(self, clicked_app_info):
 		"""
 		Handle the "open parent folder" action
@@ -2653,7 +2649,6 @@ class Cardapio(dbus.service.Object):
 		self.launch_xdg(parent_folder)
 
 
-	# TODO MVC
 	def handle_launch_in_background_pressed(self, clicked_app_info):
 		"""
 		Handle the "launch in background" action
@@ -2662,7 +2657,6 @@ class Cardapio(dbus.service.Object):
 		self.launch_button_command(clicked_app_info, hide = False)
 
 
-	# TODO MVC
 	def handle_peek_inside_pressed(self, clicked_app_info):
 		"""
 		Handle the "peek inside folder" action
@@ -2672,10 +2666,9 @@ class Cardapio(dbus.service.Object):
 		if os.path.isfile(path): path, dummy = os.path.split(path)
 		path = self.unescape_url(path)
  		self.create_subfolder_stack(path)
-		self.search_entry.set_text(self.subfolder_stack[-1][1] + '/')
+		self.view.set_search_entry_text(self.subfolder_stack[-1][1] + '/')
 
 
-	# TODO MVC
 	def handle_eject_pressed(self, clicked_app_info):
 		"""
 		Handle the "eject" action
@@ -3005,7 +2998,6 @@ class Cardapio(dbus.service.Object):
 		return text.decode('string-escape')
 
 
-	# TODO MVC
 	def untoggle_and_show_all_sections(self):
 		"""
 		Show all sections that currently have search results, and untoggle all
@@ -3035,32 +3027,27 @@ class Cardapio(dbus.service.Object):
 			self.view.set_all_sections_sidebar_button_sensitive(False, self.in_system_menu_mode)
 
 
-	# TODO MVC
 	def toggle_and_show_section(self, section_slab):
 		"""
 		Show a given section, make sure its button is toggled, and that
 		no other buttons are toggled
 		"""
 
-		for sec in self.section_list:
-			sec.hide()
+		# hide all sections
+		self.view.hide_sections(self.section_list)
 
+		# untoggle the currently-toggled button, if any
 		if self.selected_section is not None:
 			widget = self.section_list[self.selected_section]['category']
 			self.view.set_sidebar_button_toggled(widget, False)
 
-		elif self.in_system_menu_mode and self.all_system_sections_sidebar_button.get_active():
-			widget = self.all_system_sections_sidebar_button
-			self.view.set_sidebar_button_toggled(widget, False)
+		# untoggled and make sensitive the "All" buttons
+		self.view.set_all_sections_sidebar_button_toggled(False, True)
+		self.view.set_all_sections_sidebar_button_toggled(False, False)
+		self.view.set_all_sections_sidebar_button_sensitive(True, True)
+		self.view.set_all_sections_sidebar_button_sensitive(True, False)
 
-		elif self.all_sections_sidebar_button.get_active():
-			widget = self.all_sections_sidebar_button
-			self.view.set_sidebar_button_toggled(widget, False)
-
-		self.all_sections_sidebar_button.set_sensitive(True)
-		self.all_system_sections_sidebar_button.set_sensitive(True)
 		self.selected_section = section_slab
-
 		self.consider_showing_no_results_text()
  		self.view.scroll_to_top()
 
