@@ -1074,9 +1074,10 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
-	def get_section_slab_from_button(self, button):
+	def get_section_from_button(self, button):
 		"""
-		Returns the section slab widget that a given app button belongs to
+		Returns a unique handler describing the section that a given app button
+		belongs to
 		"""
 
 		# NOTE: IF THERE ARE CHANGES IN THE UI FILE, THIS MAY PRODUCE

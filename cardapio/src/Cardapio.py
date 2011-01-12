@@ -691,7 +691,6 @@ class Cardapio(dbus.service.Object):
 		self.subfolder_stack       = []
 
 
-	# TODO MVC
 	def build_ui(self):
 		"""
 		Read the contents of all menus and plugins and build the UI
@@ -707,6 +706,7 @@ class Cardapio(dbus.service.Object):
 		if not self.have_control_center:
 			self.view.set_view_mode_button_visible(False)
 
+		# TODO MVC - Separated the MC from the V in all of the fill_* methods!
 		self.fill_places_list()
 		self.fill_session_list()
 		self.fill_system_list()
@@ -1327,8 +1327,8 @@ class Cardapio(dbus.service.Object):
 		plugin.section_contents.pack_start(label, expand = False, fill = False)
 		plugin.section_contents.show()
 
-		if self.selected_section is None or plugin.section_slab == self.selected_section:
-			plugin.section_slab.show()
+		if self.selected_section is None or plugin.section == self.selected_section:
+			plugin.section.show()
 			self.view.hide_no_results_text()
 
 		self.plugins_still_searching += 1
@@ -1360,7 +1360,7 @@ class Cardapio(dbus.service.Object):
 
 			plugin.section_contents.pack_start(label, expand = False, fill = False)
 			plugin.section_contents.show()
-			plugin.section_slab.show()
+			plugin.section.show()
 
 			self.plugins_still_searching -= 1
 
@@ -1382,12 +1382,13 @@ class Cardapio(dbus.service.Object):
 		self.plugin_handle_search_result(plugin, [], '')
 
 
+	# TODO MVC
 	def plugin_handle_search_result(self, plugin, results, original_query):
 		"""
 		Handler for when a plugin returns some search results
 		"""
 
-		plugin.section_slab.hide() # for added performance
+		plugin.section.hide() # for added performance
 
 		plugin.__is_running = False
 		self.plugins_still_searching -= 1
@@ -1439,10 +1440,10 @@ class Cardapio(dbus.service.Object):
 			self.no_results_to_show = False
 
 			plugin.section_contents.show()
-			self.mark_section_has_entries_and_show_category_button(plugin.section_slab)
+			self.mark_section_has_entries_and_show_category_button(plugin.section)
 
-			if (self.selected_section is None) or (self.selected_section == plugin.section_slab):
-				plugin.section_slab.show()
+			if (self.selected_section is None) or (self.selected_section == plugin.section):
+				plugin.section.show()
 				self.view.hide_no_results_text()
 
 			else:
@@ -1450,10 +1451,10 @@ class Cardapio(dbus.service.Object):
 
 		else:
 
-			self.mark_section_empty_and_hide_category_button(plugin.section_slab)
+			self.mark_section_empty_and_hide_category_button(plugin.section)
 
-			if (self.selected_section is None) or (self.selected_section == plugin.section_slab):
-				plugin.section_slab.hide()
+			if (self.selected_section is None) or (self.selected_section == plugin.section):
+				plugin.section.hide()
 
 			self.consider_showing_no_results_text()
 
@@ -1906,17 +1907,16 @@ class Cardapio(dbus.service.Object):
 		self.hide()
 
 
-	def remove_section_from_app_list(self, section_slab):
+	def remove_section_from_app_list(self, section):
 		"""
-		Remove from the app list (used when searching) all apps that belong in a
-		given section.
+		Remove from the app list all apps that belong in a given section.
 		"""
 
 		i = 0
 		while i < len(self.app_list):
 
 			app = self.app_list[i]
-			if section_slab == app['section']: self.app_list.pop(i)
+			if section == app['section']: self.app_list.pop(i)
 			else: i += 1
 
 
@@ -2306,6 +2306,7 @@ class Cardapio(dbus.service.Object):
 				self.add_plugin_slab(basename)
 
 
+	# TODO MVC
 	def add_plugin_slab(self, basename):
 		"""
 		Add the slab for a plugin (as identified by the basename)
@@ -2319,8 +2320,8 @@ class Cardapio(dbus.service.Object):
 		if plugin is None: return
 
 		section_slab, section_contents, dummy = self.add_slab(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hide = plugin.hide_from_sidebar)
-		plugin.section_slab = section_slab
-		plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
+		plugin.section = section_slab
+		plugin.section_contents = plugin.section.get_children()[0].get_children()[0]
 
 
 	# TODO MVC
@@ -2425,12 +2426,12 @@ class Cardapio(dbus.service.Object):
 			if basename : basename, dummy = os.path.splitext(basename)
 			else        : basename = path
 
-			button_section_slab = self.view.get_section_slab_from_button(button)
+			section = self.view.get_section_from_button(button)
 
 			app_list.append({
 				'name'     : button_str.lower(),
 				'button'   : button,
-				'section'  : button_section_slab,
+				'section'  : section,
 				'basename' : basename,
 				'command'  : command,
 				})
@@ -2945,7 +2946,7 @@ class Cardapio(dbus.service.Object):
 			self.view.set_all_sections_sidebar_button_sensitive(False, self.in_system_menu_mode)
 
 
-	def toggle_and_show_section(self, section_slab):
+	def toggle_and_show_section(self, section):
 		"""
 		Show a given section, make sure its button is toggled, and that
 		no other buttons are toggled
@@ -2965,7 +2966,7 @@ class Cardapio(dbus.service.Object):
 		self.view.set_all_sections_sidebar_button_sensitive(True, True)
 		self.view.set_all_sections_sidebar_button_sensitive(True, False)
 
-		self.selected_section = section_slab
+		self.selected_section = section
 		self.consider_showing_no_results_text()
  		self.view.scroll_to_top()
 
@@ -3009,13 +3010,13 @@ class Cardapio(dbus.service.Object):
 		self.disappear_with_all_transitory_plugin_sections()
 
 
-	def disappear_with_section_and_category_button(self, section_slab):
+	def disappear_with_section_and_category_button(self, section):
 		"""
 		Mark a section as empty, hide its slab, and hide its category button
 		"""
 
-		self.mark_section_empty_and_hide_category_button(section_slab)
-		self.view.hide_section(section_slab)
+		self.mark_section_empty_and_hide_category_button(section)
+		self.view.hide_section(section)
 
 
 	def disappear_with_all_sections_and_category_buttons(self):
@@ -3023,9 +3024,9 @@ class Cardapio(dbus.service.Object):
 		Hide all sections, including plugins and non-plugins
 		"""
 
-		for section_slab in self.section_list:
-			self.mark_section_empty_and_hide_category_button(section_slab)
-			section_slab.hide()
+		for section in self.section_list:
+			self.mark_section_empty_and_hide_category_button(section)
+			section.hide()
 
 
 	#def disappear_with_plugin_sections_and_category_buttons(self):
@@ -3035,8 +3036,8 @@ class Cardapio(dbus.service.Object):
 	#
 	#	for plugin in self.active_plugin_instances:
 	#		if plugin.hide_from_sidebar:
-	#			self.mark_section_empty_and_hide_category_button(plugin.section_slab)
-	#			plugin.section_slab.hide()
+	#			self.mark_section_empty_and_hide_category_button(plugin.section)
+	#			plugin.section.hide()
 
 
 	def disappear_with_all_transitory_plugin_sections(self):
@@ -3046,30 +3047,30 @@ class Cardapio(dbus.service.Object):
 
 		for plugin in self.active_plugin_instances:
 			if plugin.hide_from_sidebar:
-				self.disappear_with_section_and_category_button(plugin.section_slab)
+				self.disappear_with_section_and_category_button(plugin.section)
 
 
-	def mark_section_empty_and_hide_category_button(self, section_slab):
+	def mark_section_empty_and_hide_category_button(self, section):
 		"""
 		Mark a section as empty (no search results) and hide its sidebar button
 		"""
 
-		if not self.section_list[section_slab]['has entries']: return
-		self.section_list[section_slab]['has entries'] = False
-		self.section_list[section_slab]['category'].hide()
+		if not self.section_list[section]['has entries']: return
+		self.section_list[section]['has entries'] = False
+		self.section_list[section]['category'].hide()
 
 
-	def mark_section_has_entries_and_show_category_button(self, section_slab):
+	def mark_section_has_entries_and_show_category_button(self, section):
 		"""
 		Mark a section as having entries and show its sidebar button
 		"""
 
 		# check first for speed improvement (since this function usually gets
 		# called several times, once for each app in the section)
-		if self.section_list[section_slab]['has entries']: return
+		if self.section_list[section]['has entries']: return
 
-		self.section_list[section_slab]['has entries'] = True
-		self.section_list[section_slab]['category'].show()
+		self.section_list[section]['has entries'] = True
+		self.section_list[section]['category'].show()
 
 
 
