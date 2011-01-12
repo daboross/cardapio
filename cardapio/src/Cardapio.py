@@ -195,12 +195,9 @@ class Cardapio(dbus.service.Object):
 		self.options_window = OptionsWindow(self)
 
 		self.home_folder_path = os.path.abspath(os.path.expanduser('~'))
+
+		self.reset_model()
 		self.visible                       = False
-		self.app_list                      = []    # used for searching the regular menus
-		self.sys_list                      = []    # used for searching the system menus
-		self.section_list                  = {}
-		self.current_query                 = ''
-		self.subfolder_stack               = []
 		self.selected_section              = None
 		self.no_results_to_show            = False
 		self.opened_last_app_in_background = False
@@ -209,9 +206,6 @@ class Cardapio(dbus.service.Object):
 		self.search_timer_remote           = None
 		self.search_timeout_local          = None
 		self.search_timeout_remote         = None
-		self.plugin_database               = {}
-		self.keyword_to_plugin_mapping     = {}
-		self.active_plugin_instances       = []
 		self.in_system_menu_mode           = False
 		self.plugins_still_searching       = 0
 		self.bookmark_monitor              = None
@@ -684,11 +678,10 @@ class Cardapio(dbus.service.Object):
 		self.toggle_mini_mode_ui(update_window_size = False)
 
 
-	# TODO MVC
-	def build_ui(self):
+	def reset_model(self):
 		"""
-		Read the contents of all menus and plugins and build the UI
-		elements that support them.
+		Resets the data structures that contain all data related to Cardapio's
+		main operation mode
 		"""
 
 		self.app_list              = []  # holds a list of all apps for searching purposes
@@ -697,48 +690,32 @@ class Cardapio(dbus.service.Object):
 		self.current_query         = ''
 		self.subfolder_stack       = []
 
-		self.view.read_gtk_theme_info()
 
-		self.clear_pane(self.view.application_pane)
-		self.clear_pane(self.view.category_pane)
-		self.clear_pane(self.view.system_category_pane)
-		self.clear_pane(self.view.sidepane)
-		self.clear_pane(self.view.left_session_pane)
-		self.clear_pane(self.view.right_session_pane)
+	# TODO MVC
+	def build_ui(self):
+		"""
+		Read the contents of all menus and plugins and build the UI
+		elements that support them.
+		"""
 
-		# "All" button for the regular menu
-		button = self.sanitize_and_add_button(_('All'), None, self.view.category_pane, _('Show all categories'), CardapioViewInterface.CATEGORY_BUTTON)
-		button.connect('clicked', self.view.on_all_sections_sidebar_button_clicked)
-		self.all_sections_sidebar_button = button
-		self.view.set_sidebar_button_toggled(button, True)
-		self.all_sections_sidebar_button.set_sensitive(False)
+		self.view.build_skeleton_ui()
+		self.view.build_all_sections_sidebar_buttons(_('All'), _('Show all categories'))
 
-		# "All" button for the system menu
-		button = self.sanitize_and_add_button(_('All'), None, self.view.system_category_pane, _('Show all categories'), CardapioViewInterface.CATEGORY_BUTTON)
-		button.connect('clicked', self.view.on_all_sections_sidebar_button_clicked)
-		self.all_system_sections_sidebar_button = button
-		self.view.set_sidebar_button_toggled(button, True)
-		self.all_system_sections_sidebar_button.set_sensitive(False)
-
-		self.no_results_slab, dummy, self.no_results_label = self.add_application_section('Dummy text')
-		self.view.hide_no_results_text()
+		self.build_special_slabs()
+		self.build_reorderable_slabs()
 
 		if not self.have_control_center:
 			self.view.set_view_mode_button_visible(False)
 
-		self.add_subfolders_slab()
-		self.add_all_reorderable_slabs()
-
-		# MODEL/VIEW SEPARATION EFFORT:
-		# the methods below mix the model with the view
-		self.build_places_list()
-		self.build_session_list()
-		self.build_system_list()
-		self.build_uncategorized_list()
-		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
-		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
+		self.fill_places_list()
+		self.fill_session_list()
+		self.fill_system_list()
+		self.fill_uncategorized_list()
+		self.fill_favorites_list(self.view.favorites_section_slab, 'pinned items')
+		self.fill_favorites_list(self.view.sidepane_section_slab, 'side pane items')
 
 		self.apply_settings()
+
 		self.view.set_message_window_visible(False)
 
 
@@ -757,6 +734,7 @@ class Cardapio(dbus.service.Object):
 		if show_message:
 			self.view.set_message_window_visible(True)
 
+		self.reset_model()
 		self.build_ui()
 
 		gc.collect()
@@ -1094,8 +1072,8 @@ class Cardapio(dbus.service.Object):
 		base_text     = text[slash_pos+1:]
 		path          = None
 
-		self.subfolders_section_slab.hide() # for added performance
-		self.clear_pane(self.subfolders_section_contents)
+		self.view.subfolders_section_slab.hide() # for added performance
+		self.clear_pane(self.view.subfolders_section_contents)
 
 		if not search_inside:
 			if not self.subfolder_stack: return False
@@ -1142,7 +1120,7 @@ class Cardapio(dbus.service.Object):
 
 		if path == '/': parent_name = _('Filesystem Root')
 		else: parent_name = os.path.basename(path)
-		self.subfolders_label.set_text(parent_name)
+		self.view.subfolders_label.set_text(parent_name)
 
 		count = 0
 		limit = self.settings['long search results limit']
@@ -1159,7 +1137,7 @@ class Cardapio(dbus.service.Object):
 			if filename[0] == '.': continue
 
 			if count >= limit: 
-				self.add_app_button(_('Show additional results'), 'system-file-manager', self.subfolders_section_contents, 'xdg', path, tooltip = _('Show additional search results in a file browser'), app_list = None)
+				self.add_app_button(_('Show additional results'), 'system-file-manager', self.view.subfolders_section_contents, 'xdg', path, tooltip = _('Show additional search results in a file browser'), app_list = None)
 				break
 
 			count += 1
@@ -1169,11 +1147,11 @@ class Cardapio(dbus.service.Object):
 			if icon_name is None: icon_name = 'folder'
 
 			basename, dummy = os.path.splitext(filename)
-			self.add_app_button(filename, icon_name, self.subfolders_section_contents, 'xdg', command, tooltip = command, app_list = None)
+			self.add_app_button(filename, icon_name, self.view.subfolders_section_contents, 'xdg', command, tooltip = command, app_list = None)
 
 		if count:
-			self.subfolders_section_slab.show()
-			self.mark_section_has_entries_and_show_category_button(self.subfolders_section_slab)
+			self.view.subfolders_section_slab.show()
+			self.mark_section_has_entries_and_show_category_button(self.view.subfolders_section_slab)
 			self.no_results_to_show = False
 
 		else:
@@ -1942,7 +1920,7 @@ class Cardapio(dbus.service.Object):
 			else: i += 1
 
 
-	def build_system_list(self):
+	def fill_system_list(self):
 		"""
 		Populate the System section
 		"""
@@ -1958,27 +1936,27 @@ class Cardapio(dbus.service.Object):
 		section_slab, section_contents, dummy = self.add_slab(_('Uncategorized'), 'applications-other', tooltip = _('Other configuration tools'), hide = False, system_menu = True)
 		self.add_tree_to_app_list(self.sys_tree.root, section_contents, self.sys_list, recursive = False)
 
-		self.add_tree_to_app_list(self.sys_tree.root, self.system_section_contents, self.app_list)
+		self.add_tree_to_app_list(self.sys_tree.root, self.view.system_section_contents, self.app_list)
 
 
-	def build_uncategorized_list(self):
+	def fill_uncategorized_list(self):
 		"""
 		Populate the Uncategorized section
 		"""
 
-		self.add_tree_to_app_list(self.app_tree.root, self.uncategorized_section_contents, self.app_list, recursive = False)
+		self.add_tree_to_app_list(self.app_tree.root, self.view.uncategorized_section_contents, self.app_list, recursive = False)
 
 
-	def build_places_list(self):
+	def fill_places_list(self):
 		"""
 		Populate the places list
 		"""
 
-		self.build_bookmarked_places_list(self.places_section_contents)
-		self.build_system_places_list(self.places_section_contents)
+		self.fill_bookmarked_places_list(self.view.places_section_contents)
+		self.fill_system_places_list(self.view.places_section_contents)
 
 
-	def build_system_places_list(self, section_contents):
+	def fill_system_places_list(self, section_contents):
 		"""
 		Populate the "system places", which include Computer, the list of
 		connected drives, and so on.
@@ -2019,7 +1997,7 @@ class Cardapio(dbus.service.Object):
 			self.volume_monitor.connect('mount-removed', self.on_volume_monitor_changed)
 
 
-	def build_bookmarked_places_list(self, section_contents):
+	def fill_bookmarked_places_list(self, section_contents):
 		"""
 		Populate the "bookmarked places", which include Home and your personal bookmarks.
 		"""
@@ -2076,8 +2054,8 @@ class Cardapio(dbus.service.Object):
 		self.bookmark_monitor.handler_block_by_func(self.on_bookmark_monitor_changed)
 
 		if event == gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
-			self.clear_pane(self.places_section_contents)
-			self.build_places_list()
+			self.clear_pane(self.view.places_section_contents)
+			self.fill_places_list()
 
 		# same here
 		self.bookmark_monitor.handler_unblock_by_func(self.on_bookmark_monitor_changed) 
@@ -2091,8 +2069,8 @@ class Cardapio(dbus.service.Object):
 	 	# hoping this helps with bug 662249, in case there is some strange threading problem happening (although there are no explicit threads in this program)	
 		self.volume_monitor.handler_block_by_func(self.on_volume_monitor_changed)
 
-		self.view.clear_pane(self.places_section_contents)
-		self.build_places_list()
+		self.view.clear_pane(self.view.places_section_contents)
+		self.fill_places_list()
 
 		# same here
 		self.volume_monitor.handler_unblock_by_func(self.on_volume_monitor_changed) 
@@ -2142,10 +2120,10 @@ class Cardapio(dbus.service.Object):
 
 		icon_name = self.icon_helper.get_icon_name_from_path(folder_path)
 		if icon_name is None: icon_name = folder_icon
-		self.add_app_button(folder_name, icon_name, self.places_section_contents, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
+		self.add_app_button(folder_name, icon_name, self.view.places_section_contents, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
 
 
-	def build_favorites_list(self, slab, list_name):
+	def fill_favorites_list(self, slab, list_name):
 		"""
 		Populate either the Pinned Items or Side Pane list
 		"""
@@ -2170,7 +2148,7 @@ class Cardapio(dbus.service.Object):
 			self.no_results_to_show = False
 			no_results = False
 
-			if slab == self.sidepane_section_slab:
+			if slab == self.view.sidepane_section_slab:
 
 				app_info = button.app_info
 				button = self.sanitize_and_add_button(app['name'], app['icon name'], self.view.sidepane, app['tooltip'], CardapioViewInterface.SIDEPANE_BUTTON)
@@ -2178,7 +2156,7 @@ class Cardapio(dbus.service.Object):
 				button.connect('clicked', self.view.on_app_button_clicked)
 				button.connect('button-press-event', self.view.on_app_button_button_pressed)
 
-		if no_results or (slab is self.sidepane_section_slab):
+		if no_results or (slab is self.view.sidepane_section_slab):
 			self.disappear_with_section_and_category_button(slab)
 
 		elif (self.selected_section is not None) and (self.selected_section != slab):
@@ -2189,7 +2167,7 @@ class Cardapio(dbus.service.Object):
 			self.view.show_section(slab)
 
 
-	def build_session_list(self):
+	def fill_session_list(self):
 		"""
 		Populate the Session list
 		"""
@@ -2220,7 +2198,7 @@ class Cardapio(dbus.service.Object):
 
 		for item in items:
 
-			button = self.add_app_button(item[0], item[2], self.session_section_contents, 'raw', item[3], tooltip = item[1], app_list = self.app_list)
+			button = self.add_app_button(item[0], item[2], self.view.session_section_contents, 'raw', item[3], tooltip = item[1], app_list = self.app_list)
 			app_info = button.app_info
 			button = self.sanitize_and_add_button(item[0], item[2], item[4], item[1], CardapioViewInterface.SESSION_BUTTON)
 			button.app_info = app_info
@@ -2292,75 +2270,40 @@ class Cardapio(dbus.service.Object):
 		return section_slab, section_contents, label
 
 
-	def add_places_slab(self):
+	def build_special_slabs(self):
 		"""
-		Add the Places slab to the app pane
-		"""
-		
-		section_slab, section_contents, dummy = self.add_slab(_('Places'), 'folder', tooltip = _('Access documents and folders'), hide = False)
-		self.places_section_slab = section_slab
-		self.places_section_contents = section_contents
-
-
-	def add_subfolders_slab(self):
-		"""
-		Add the Folder Contents slab to the app pane
+		Builds slabs that have special functions in the system, such as the
+		one that contains the "no results to show" text and the one containing
+		subfolder results.
 		"""
 
-		section_slab, section_contents, label = self.add_slab(_('Folder Contents'), 'system-file-manager', tooltip = _('Look inside folders'), hide = True)
-		self.subfolders_section_slab = section_slab
-		self.subfolders_section_contents = section_contents
-		self.subfolders_label = label
+		self.view.build_no_results_slab()
+		self.view.build_subfolders_slab(_('Folder Contents'), _('Look inside folders'))
 
 
-	def add_pinneditems_slab(self):
+	def build_reorderable_slabs(self):
 		"""
-		Add the Pinned Items slab to the app pane
+		Add all the reorderable slabs to the app pane
 		"""
 
-		section_slab, section_contents, dummy = self.add_slab(_('Pinned items'), 'emblem-favorite', tooltip = _('Your favorite items'), hide = False)
-		self.favorites_section_slab = section_slab
-		self.favorites_section_contents = section_contents
+		self.view.build_sidepane_slab(_('Side Pane'), _('Items pinned to the side pane'))
 
+		for basename in self.settings['active plugins']:
 
-	def add_sidepane_slab(self):
-		"""
-		Add the Side Pane slab to the app pane
-		"""
+			if basename == 'applications':
+				self.build_applications_list()
+				self.view.build_uncategorized_slab(_('Uncategorized'), _('Items that are not under any menu category'))
+				self.view.build_session_slab(_('Session'), None)
+				self.view.build_system_slab(_('System'), None)
 
-		section_slab, section_contents, dummy = self.add_slab(_('Side Pane'), 'emblem-favorite', tooltip = _('Items pinned to the side pane'), hide = True)
-		self.sidepane_section_slab = section_slab
-		self.sidepane_section_contents = section_contents
+			elif basename == 'places':
+				self.view.build_places_slab(_('Places'), _('Access documents and folders'))
 
+			elif basename == 'pinned':
+				self.view.build_pinneditems_slab(_('Pinned items'), _('Your favorite items'))
 
-	def add_uncategorized_slab(self):
-		"""
-		Add the Uncategorized slab to the app pane
-		"""
-
-		section_slab, section_contents, dummy = self.add_slab(_('Uncategorized'), 'applications-other', tooltip = _('Items that are not under any menu category'), hide = True)
-		self.uncategorized_section_slab = section_slab
-		self.uncategorized_section_contents = section_contents
-
-
-	def add_session_slab(self):
-		"""
-		Add the Session slab to the app pane
-		"""
-
-		section_slab, section_contents, dummy = self.add_slab(_('Session'), 'session-properties', hide = True)
-		self.session_section_slab = section_slab
-		self.session_section_contents = section_contents
-
-
-	def add_system_slab(self):
-		"""
-		Add the System slab to the app pane
-		"""
-
-		section_slab, section_contents, dummy = self.add_slab(_('System'), 'applications-system', hide = True)
-		self.system_section_slab = section_slab
-		self.system_section_contents = section_contents
+			else:
+				self.add_plugin_slab(basename)
 
 
 	def add_plugin_slab(self, basename):
@@ -2378,31 +2321,6 @@ class Cardapio(dbus.service.Object):
 		section_slab, section_contents, dummy = self.add_slab(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hide = plugin.hide_from_sidebar)
 		plugin.section_slab = section_slab
 		plugin.section_contents = plugin.section_slab.get_children()[0].get_children()[0]
-
-
-	def add_all_reorderable_slabs(self):
-		"""
-		Add all the reorderable slabs to the app pane
-		"""
-
-		self.add_sidepane_slab()
-
-		for basename in self.settings['active plugins']:
-
-			if basename == 'applications':
-				self.build_applications_list()
-				self.add_uncategorized_slab()
-				self.add_session_slab()
-				self.add_system_slab()
-
-			elif basename == 'places':
-				self.add_places_slab()
-
-			elif basename == 'pinned':
-				self.add_pinneditems_slab()
-
-			else:
-				self.add_plugin_slab(basename)
 
 
 	# TODO MVC
@@ -2594,10 +2512,10 @@ class Cardapio(dbus.service.Object):
 		Handle the pinning action
 		"""
 
-		self.remove_section_from_app_list(self.favorites_section_slab)
-		self.clear_pane(self.favorites_section_contents)
+		self.remove_section_from_app_list(self.view.favorites_section_slab)
+		self.clear_pane(self.view.favorites_section_contents)
 		self.settings['pinned items'].append(clicked_app_info)
-		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
+		self.fill_favorites_list(self.view.favorites_section_slab, 'pinned items')
 
 
 	def handle_unpin_this_app_clicked(self, clicked_app_info):
@@ -2605,10 +2523,10 @@ class Cardapio(dbus.service.Object):
 		Handle the unpinning action
 		"""
 
-		self.remove_section_from_app_list(self.favorites_section_slab)
-		self.clear_pane(self.favorites_section_contents)
+		self.remove_section_from_app_list(self.view.favorites_section_slab)
+		self.clear_pane(self.view.favorites_section_contents)
 		self.settings['pinned items'].remove(clicked_app_info)
-		self.build_favorites_list(self.favorites_section_slab, 'pinned items')
+		self.fill_favorites_list(self.view.favorites_section_slab, 'pinned items')
 
 
 	# TODO MVC
@@ -2617,11 +2535,11 @@ class Cardapio(dbus.service.Object):
 		Handle the "add to sidepane" action
 		"""
 
-		self.remove_section_from_app_list(self.sidepane_section_slab)
-		self.clear_pane(self.sidepane_section_contents)
+		self.remove_section_from_app_list(self.view.sidepane_section_slab)
+		self.clear_pane(self.view.sidepane_section_contents)
  		self.clear_pane(self.view.sidepane)
 		self.settings['side pane items'].append(clicked_app_info)
-		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
+		self.fill_favorites_list(self.view.sidepane_section_slab, 'side pane items')
 		self.view.sidepane.queue_resize() # required! or sidepane's allocation will be x,y,width,0 when first item is added
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or sidepane will obscure the mode switcher button
 
@@ -2632,11 +2550,11 @@ class Cardapio(dbus.service.Object):
 		Handle the "remove from sidepane" action
 		"""
 
-		self.remove_section_from_app_list(self.sidepane_section_slab)
-		self.clear_pane(self.sidepane_section_contents)
+		self.remove_section_from_app_list(self.view.sidepane_section_slab)
+		self.clear_pane(self.view.sidepane_section_contents)
  		self.clear_pane(self.view.sidepane)
 		self.settings['side pane items'].remove(clicked_app_info)
-		self.build_favorites_list(self.sidepane_section_slab, 'side pane items')
+		self.fill_favorites_list(self.view.sidepane_section_slab, 'side pane items')
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or an extra space will show up where but button used to be
 
 
@@ -3082,11 +3000,11 @@ class Cardapio(dbus.service.Object):
 		there is no text in the search entry
 		"""
 
-		self.disappear_with_section_and_category_button(self.subfolders_section_slab)
-		self.disappear_with_section_and_category_button(self.session_section_slab)
-		self.disappear_with_section_and_category_button(self.system_section_slab)
-		self.disappear_with_section_and_category_button(self.sidepane_section_slab)
-		self.disappear_with_section_and_category_button(self.uncategorized_section_slab)
+		self.disappear_with_section_and_category_button(self.view.subfolders_section_slab)
+		self.disappear_with_section_and_category_button(self.view.session_section_slab)
+		self.disappear_with_section_and_category_button(self.view.system_section_slab)
+		self.disappear_with_section_and_category_button(self.view.sidepane_section_slab)
+		self.disappear_with_section_and_category_button(self.view.uncategorized_section_slab)
 
 		self.disappear_with_all_transitory_plugin_sections()
 

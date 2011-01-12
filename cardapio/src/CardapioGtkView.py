@@ -157,11 +157,11 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		if property_changed.name == 'gtk-color-scheme' or property_changed.name == 'gtk-theme-name':
-			self.read_gtk_theme_info()
+			self.read_gui_theme_info()
 			self.cardapio.schedule_rebuild()
 
 
-	def read_gtk_theme_info(self):
+	def read_gui_theme_info(self):
 		"""
 		Reads some info from the GTK theme to better adapt to it 
 		"""
@@ -202,9 +202,9 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		if is_system_mode:
-			self.set_sidebar_button_toggled(self.cardapio.all_system_sections_sidebar_button, state)
+			self.set_sidebar_button_toggled(self.all_system_sections_sidebar_button, state)
 		else:
-			self.set_sidebar_button_toggled(self.cardapio.all_sections_sidebar_button, state)
+			self.set_sidebar_button_toggled(self.all_sections_sidebar_button, state)
 
 
 	# This method is required by the View API
@@ -214,9 +214,9 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		if is_system_mode:
-			self.cardapio.all_system_sections_sidebar_button.set_sensitive(state)
+			self.all_system_sections_sidebar_button.set_sensitive(state)
 		else:
-			self.cardapio.all_sections_sidebar_button.set_sensitive(state)
+			self.all_sections_sidebar_button.set_sensitive(state)
 
 
 	def on_all_sections_sidebar_button_clicked(self, widget):
@@ -770,7 +770,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Hide the "No results to show" text
 		"""
 
-		self.cardapio.no_results_slab.hide()
+		self.no_results_slab.hide()
 
 
 	# This method is required by the View API
@@ -790,8 +790,8 @@ class CardapioGtkView(CardapioViewInterface):
 
 		if text is None: text = self.cardapio.no_results_text
 
-		self.cardapio.no_results_label.set_text(text)
-		self.cardapio.no_results_slab.show()
+		self.no_results_label.set_text(text)
+		self.no_results_slab.show()
 
 
 	def open_about_gnome_dialog(self, widget):
@@ -1084,5 +1084,140 @@ class CardapioGtkView(CardapioViewInterface):
 
 		return button.parent.parent.parent
 
+
+	# This method is required by the View API
+	def build_skeleton_ui(self):
+		"""
+		Prepares the UI before building any of the actual content-related widgets
+		"""
+
+		self.read_gui_theme_info()
+
+		# the ui is already built by ui file, so we just clear it here
+		self.clear_all_panes()
+
+
+	def clear_all_panes(self):
+		"""
+		Clears the different sections of the UI (panes)
+		"""
+
+		self.cardapio.clear_pane(self.application_pane)
+		self.cardapio.clear_pane(self.category_pane)
+		self.cardapio.clear_pane(self.system_category_pane)
+		self.cardapio.clear_pane(self.sidepane)
+		self.cardapio.clear_pane(self.left_session_pane)
+		self.cardapio.clear_pane(self.right_session_pane)
+
+
+	# This method is required by the View API
+	def build_all_sections_sidebar_buttons(self, title, tooltip):
+		"""
+		Creates the "All sections" buttons for both the regular and system modes
+		"""
+
+		# "All" button for the regular menu
+		button = self.add_button(title, None, self.category_pane, tooltip, CardapioViewInterface.CATEGORY_BUTTON)
+		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
+		self.all_sections_sidebar_button = button
+		self.set_sidebar_button_toggled(button, True)
+		self.all_sections_sidebar_button.set_sensitive(False)
+
+		# "All" button for the system menu
+		button = self.add_button(title, None, self.system_category_pane, tooltip, CardapioViewInterface.CATEGORY_BUTTON)
+		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
+		self.all_system_sections_sidebar_button = button
+		self.set_sidebar_button_toggled(button, True)
+		self.all_system_sections_sidebar_button.set_sensitive(False)
+
+
+	# This method is required by the View API
+	def build_no_results_slab(self):
+		"""
+		Creates the slab that will be used to display the "No results to show" text
+		"""
+
+		section_slab, section_contents, label = self.cardapio.add_application_section('Dummy text')
+		self.no_results_slab = section_slab
+		self.no_results_label = label
+		self.hide_no_results_text()
+
+
+	# This method is required by the View API
+	def build_subfolders_slab(self, title, tooltip):
+		"""
+		Creates the Folder Contents slab to the app pane
+		"""
+
+		section_slab, section_contents, label = self.cardapio.add_slab(title, 'system-file-manager', tooltip = tooltip, hide = True)
+		self.subfolders_section_slab = section_slab
+		self.subfolders_section_contents = section_contents
+		self.subfolders_label = label
+
+
+	# This method is required by the View API
+	def build_uncategorized_slab(self, title, tooltip):
+		"""
+		Creates the Uncategorized slab to the app pane
+		"""
+
+		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'applications-other', tooltip = tooltip, hide = True)
+		self.uncategorized_section_slab = section_slab
+		self.uncategorized_section_contents = section_contents
+
+
+	# This method is required by the View API
+	def build_session_slab(self, title, tooltip):
+		"""
+		Creates the Session slab to the app pane
+		"""
+
+		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'session-properties', hide = True)
+		self.session_section_slab = section_slab
+		self.session_section_contents = section_contents
+
+
+	# This method is required by the View API
+	def build_system_slab(self, title, tooltip):
+		"""
+		Creates the System slab to the app pane
+		"""
+
+		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'applications-system', hide = True)
+		self.system_section_slab = section_slab
+		self.system_section_contents = section_contents
+
+
+	# This method is required by the View API
+	def build_places_slab(self, title, tooltip):
+		"""
+		Creates the Places slab to the app pane
+		"""
+		
+		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'folder', tooltip = tooltip, hide = False)
+		self.places_section_slab = section_slab
+		self.places_section_contents = section_contents
+
+
+	# This method is required by the View API
+	def build_pinneditems_slab(self, title, tooltip):
+		"""
+		Creates the Pinned Items slab to the app pane
+		"""
+
+		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'emblem-favorite', tooltip = tooltip, hide = False)
+		self.favorites_section_slab = section_slab
+		self.favorites_section_contents = section_contents
+
+
+	# This method is required by the View API
+	def build_sidepane_slab(self, title, tooltip):
+		"""
+		Creates the Side Pane slab to the app pane
+		"""
+
+		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'emblem-favorite', tooltip = tooltip, hide = True)
+		self.sidepane_section_slab = section_slab
+		self.sidepane_section_contents = section_contents
 
 
