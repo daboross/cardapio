@@ -370,7 +370,7 @@ class OptionsWindow:
 		"""
 
 		self.cardapio.settings['mini mode'] = self.get_widget('OptionMiniMode').get_active()
-		self.cardapio.toggle_mini_mode_ui(update_window_size = True)
+		self.cardapio.toggle_mini_mode_ui()
 		return True
 
 

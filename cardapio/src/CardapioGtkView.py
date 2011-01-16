@@ -605,6 +605,8 @@ class CardapioGtkView(CardapioViewInterface):
 					category_button.handler_block_by_func(self.on_sidebar_button_hovered)
 					category_button.has_hover_handler = False
 
+		self.toggle_mini_mode_ui(update_window_size = False)
+
 
 	def on_dialog_close(self, dialog, response = None):
 		"""
@@ -1272,8 +1274,75 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	def remove_all_buttons_from_category_panes(self):
+		"""
+		Removes all buttons from both the regular and system category panes
+		(i.e. the category filter lists)
+		"""
 		
 		for	child in self.category_pane.get_children(): self.category_pane.remove(child)
 		for	child in self.system_category_pane.get_children(): self.system_category_pane.remove(child)
 
 
+	def toggle_mini_mode_ui(self, update_window_size = True):
+		"""
+		Collapses the sidebar into a row of small buttons (i.e. minimode)
+		"""
+
+		category_buttons = self.category_pane.get_children() +\
+				self.system_category_pane.get_children() + self.sidepane.get_children()
+
+		if self.cardapio.settings['mini mode']:
+
+			for category_button in category_buttons:
+				category_button.child.child.get_children()[1].hide()
+
+			self.session_button_locksys.child.child.get_children()[1].hide()
+			self.session_button_logout.child.child.get_children()[1].hide()
+			self.right_session_pane.set_homogeneous(False)
+
+			self.get_widget('ViewLabel').set_size_request(0, 0) # required! otherwise a weird margin appears
+			self.get_widget('ViewLabel').hide()
+			self.get_widget('ControlCenterLabel').hide()
+			self.get_widget('ControlCenterArrow').hide()
+			self.get_widget('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
+
+			padding = self.fullsize_mode_padding
+			self.get_widget('CategoryMargin').set_padding(0, padding[1], padding[2], padding[3])
+
+			self.get_widget('TopLeftSearchSlabMargin').hide()    # these are required, to make sure the splitter
+			self.get_widget('BottomLeftSearchSlabMargin').hide() # ...moves all the way to the left
+			sidepane_margin = self.get_widget('SidePaneMargin')
+			#self.set_main_splitter_position(0)
+
+			# hack to make sure the viewport resizes to the minisize correctly
+			self.get_widget('SideappViewport').hide()
+			self.get_widget('SideappViewport').show()
+			#self.left_session_pane.hide()
+			#self.left_session_pane.show()
+			#self.right_session_pane.hide()
+			#self.right_session_pane.show()
+
+			if update_window_size:
+				self.cardapio.settings['window size'][0] -= self.get_main_splitter_position()
+
+		else:
+
+			for category_button in category_buttons:
+				category_button.child.child.get_children()[1].show()
+
+			self.session_button_locksys.child.child.get_children()[1].show()
+			self.session_button_logout.child.child.get_children()[1].show()
+			self.right_session_pane.set_homogeneous(True)
+
+			self.get_widget('ViewLabel').set_size_request(-1, -1)
+			self.get_widget('ViewLabel').show()
+			self.get_widget('ControlCenterLabel').show()
+			self.get_widget('ControlCenterArrow').show()
+			self.get_widget('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+
+			self.get_widget('CategoryMargin').set_padding(*self.fullsize_mode_padding)
+			
+			self.set_main_splitter_position(self.cardapio.settings['splitter position'])
+
+			if update_window_size:
+				self.cardapio.settings['window size'][0] += self.get_main_splitter_position()

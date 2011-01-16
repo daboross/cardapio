@@ -672,7 +672,6 @@ class Cardapio(dbus.service.Object):
 
 		# set up everything else
 		self.view.apply_settings()
-		self.toggle_mini_mode_ui(update_window_size = False)
 
 
 	def reset_model(self):
@@ -1316,6 +1315,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.view.remove_all_buttons_from_section(plugin.section)
+
 		# container = plugin.section_contents.parent
 
 		# # if plugin was deactivated while waiting for search result
@@ -1719,70 +1719,11 @@ class Cardapio(dbus.service.Object):
 			self.settings['splitter position'] = self.view.get_main_splitter_position()
 
 
-	# TODO MVC
-	def toggle_mini_mode_ui(self, update_window_size):
+	def toggle_mini_mode_ui(self):
 		"""
 		Collapses the sidebar into a row of small buttons (i.e. minimode)
 		"""
-
-		category_buttons = self.view.category_pane.get_children() +\
-				self.view.system_category_pane.get_children() + self.view.sidepane.get_children()
-
-		if self.settings['mini mode']:
-
-			for category_button in category_buttons:
-				category_button.child.child.get_children()[1].hide()
-
-			self.session_button_locksys.child.child.get_children()[1].hide()
-			self.session_button_logout.child.child.get_children()[1].hide()
-			self.view.right_session_pane.set_homogeneous(False)
-
-			self.view.get_widget('ViewLabel').set_size_request(0, 0) # required! otherwise a weird margin appears
-			self.view.get_widget('ViewLabel').hide()
-			self.view.get_widget('ControlCenterLabel').hide()
-			self.view.get_widget('ControlCenterArrow').hide()
-			self.view.get_widget('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
-
-			padding = self.view.fullsize_mode_padding
-			self.view.get_widget('CategoryMargin').set_padding(0, padding[1], padding[2], padding[3])
-
-			self.view.get_widget('TopLeftSearchSlabMargin').hide()    # these are required, to make sure the splitter
-			self.view.get_widget('BottomLeftSearchSlabMargin').hide() # ...moves all the way to the left
-			sidepane_margin = self.view.get_widget('SidePaneMargin')
-			#self.view.set_main_splitter_position(0)
-
-			# hack to make sure the viewport resizes to the minisize correctly
-			self.view.get_widget('SideappViewport').hide()
-			self.view.get_widget('SideappViewport').show()
-			#self.view.left_session_pane.hide()
-			#self.view.left_session_pane.show()
-			#self.view.right_session_pane.hide()
-			#self.view.right_session_pane.show()
-
-			if update_window_size:
-				self.settings['window size'][0] -= self.view.get_main_splitter_position()
-
-		else:
-
-			for category_button in category_buttons:
-				category_button.child.child.get_children()[1].show()
-
-			self.session_button_locksys.child.child.get_children()[1].show()
-			self.session_button_logout.child.child.get_children()[1].show()
-			self.view.right_session_pane.set_homogeneous(True)
-
-			self.view.get_widget('ViewLabel').set_size_request(-1, -1)
-			self.view.get_widget('ViewLabel').show()
-			self.view.get_widget('ControlCenterLabel').show()
-			self.view.get_widget('ControlCenterArrow').show()
-			self.view.get_widget('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-
-			self.view.get_widget('CategoryMargin').set_padding(*self.view.fullsize_mode_padding)
-			
-			self.view.set_main_splitter_position(self.settings['splitter position'])
-
-			if update_window_size:
-				self.settings['window size'][0] += self.view.get_main_splitter_position()
+		self.view.toggle_mini_mode_ui()
 
 
 	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
@@ -2221,9 +2162,9 @@ class Cardapio(dbus.service.Object):
 			button.connect('clicked', self.view.on_app_button_clicked)
 			item.append(button)
 
-		self.session_button_locksys  = items[0][5]
-		self.session_button_logout   = items[1][5]
-		self.session_button_shutdown = items[2][5]
+		self.view.session_button_locksys  = items[0][5]
+		self.view.session_button_logout   = items[1][5]
+		self.view.session_button_shutdown = items[2][5]
 
 
 	def build_applications_list(self):
