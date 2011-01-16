@@ -74,13 +74,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.message_window            = self.get_widget('MessageWindow')
 		self.about_dialog              = self.get_widget('AboutDialog')
 		self.executable_file_dialog    = self.get_widget('ExecutableFileDialog')
-		self.application_pane          = self.get_widget('ApplicationPane')
-		self.category_pane             = self.get_widget('CategoryPane')
-		self.system_category_pane      = self.get_widget('SystemCategoryPane')
-		self.sidepane                  = self.get_widget('SideappPane')
 		self.scroll_adjustment         = self.get_widget('ScrolledWindow').get_vadjustment()
-		self.left_session_pane         = self.get_widget('LeftSessionPane')
-		self.right_session_pane        = self.get_widget('RightSessionPane')
 		self.context_menu              = self.get_widget('CardapioContextMenu')
 		self.app_context_menu          = self.get_widget('AppContextMenu')
 		self.app_menu_separator        = self.get_widget('AppMenuSeparator')
@@ -93,6 +87,14 @@ class CardapioGtkView(CardapioViewInterface):
 		self.eject_menuitem            = self.get_widget('EjectMenuItem')
 		self.view_mode_button          = self.get_widget('ViewModeButton')
 		self.main_splitter             = self.get_widget('MainSplitter')
+
+		# These variables are all required by the View API
+		self.application_pane          = self.get_widget('ApplicationPane')
+		self.category_pane             = self.get_widget('CategoryPane')
+		self.system_category_pane      = self.get_widget('SystemCategoryPane')
+		self.sidepane                  = self.get_widget('SideappPane')
+		self.left_session_pane         = self.get_widget('LeftSessionPane')
+		self.right_session_pane        = self.get_widget('RightSessionPane')
 
 		self.context_menu_options = {
 			CardapioViewInterface.PIN_MENUITEM              : self.pin_menuitem,
@@ -1087,7 +1089,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
-	def build_skeleton_ui(self):
+	def pre_build_ui(self):
 		"""
 		Prepares the UI before building any of the actual content-related widgets
 		"""
@@ -1095,20 +1097,17 @@ class CardapioGtkView(CardapioViewInterface):
 		self.read_gui_theme_info()
 
 		# the ui is already built by ui file, so we just clear it here
-		self.clear_all_panes()
+		for child in self.application_pane.get_children():
+			self.application_pane.remove(child)
 
 
-	def clear_all_panes(self):
+	# This method is required by the View API
+	def post_build_ui(self):
 		"""
-		Clears the different sections of the UI (panes)
+		Performs operations after building the actual content-related widgets
 		"""
 
-		self.cardapio.clear_pane(self.application_pane)
-		self.cardapio.clear_pane(self.category_pane)
-		self.cardapio.clear_pane(self.system_category_pane)
-		self.cardapio.clear_pane(self.sidepane)
-		self.cardapio.clear_pane(self.left_session_pane)
-		self.cardapio.clear_pane(self.right_session_pane)
+		pass
 
 
 	# This method is required by the View API
@@ -1220,5 +1219,61 @@ class CardapioGtkView(CardapioViewInterface):
 		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'emblem-favorite', tooltip = tooltip, hide = True)
 		self.sidepane_section_slab = section_slab
 		self.sidepane_section_contents = section_contents
+
+
+	# This method is required by the View API
+	def remove_about_context_menu_items(self):
+		"""
+		Removes "About Gnome" and "About %distro" from Cardapio's context menu
+		"""
+
+		self.get_widget('AboutGnomeMenuItem').set_visible(False)
+		self.get_widget('AboutDistroMenuItem').set_visible(False)
+
+
+	# This method is required by the View API
+	def set_window_frame_visible(self, state):
+		"""
+		Shows/hides the window frame around Cardapio
+		"""
+		if state:
+			self.window.set_decorated(True)
+			self.window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
+			self.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
+
+
+	# This method is required by the View API
+	def remove_all_buttons_from_section(self, section):
+		"""
+		Removes all buttons from a given section slab
+		"""
+
+		container = self.get_button_container_from_section(section)
+		if container is None: return
+		for	child in container.get_children():
+			container.remove(child)
+		# TODO: for speed, remove/readd container from its parent instead of
+		# removing each child!
+
+
+	def get_button_container_from_section(self, section):
+		"""
+		Returns a SectionContents widget given a SectionSlab. (SectionContents
+		is the child of SectionMargin which is the child of SectionSlab. All app
+		buttons are contained inside a SectionContents widget. The only exception
+		is the SideappPane widget, which is its own button container)
+		"""
+
+		if section == self.sidepane: return section
+		try:
+			return section.get_children()[0].get_children()[0]
+		except:
+			return None
+
+
+	def remove_all_buttons_from_category_panes(self):
+		
+		for	child in self.category_pane.get_children(): self.category_pane.remove(child)
+		for	child in self.system_category_pane.get_children(): self.system_category_pane.remove(child)
 
 

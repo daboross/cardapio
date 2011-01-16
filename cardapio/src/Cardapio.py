@@ -347,7 +347,6 @@ class Cardapio(dbus.service.Object):
 		self.options_window.setup_ui()
 
 
-	# TODO MVC
 	def setup_panel_applet(self):
 		"""
 		Prepares Cardapio's applet in any of the compatible panels.
@@ -357,13 +356,11 @@ class Cardapio(dbus.service.Object):
 			self.panel_applet = CardapioAppletInterface()
 
 		if self.panel_applet.panel_type == PANEL_TYPE_GNOME2:
-			self.view.get_widget('AboutGnomeMenuItem').set_visible(False)
-			self.view.get_widget('AboutDistroMenuItem').set_visible(False)
+			self.view.remove_about_context_menu_items()
+			self.view.set_window_frame_visible(False)
 
 		else:
-			self.view.window.set_decorated(True)
-			self.view.window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
-			self.view.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
+			self.view.set_window_frame_visible(True)
 
 		self.panel_applet.setup(self)
 
@@ -697,7 +694,9 @@ class Cardapio(dbus.service.Object):
 		elements that support them.
 		"""
 
-		self.view.build_skeleton_ui()
+		self.view.pre_build_ui()
+
+		self.clear_all_panes()
 		self.view.build_all_sections_sidebar_buttons(_('All'), _('Show all categories'))
 
 		self.build_special_slabs()
@@ -706,7 +705,7 @@ class Cardapio(dbus.service.Object):
 		if not self.have_control_center:
 			self.view.set_view_mode_button_visible(False)
 
-		# TODO MVC - Separated the MC from the V in all of the fill_* methods!
+		# TODO MVC - Separate the MC from the V in all of the fill_* methods!
 		self.fill_places_list()
 		self.fill_session_list()
 		self.fill_system_list()
@@ -715,6 +714,8 @@ class Cardapio(dbus.service.Object):
 		self.fill_favorites_list(self.view.sidepane_section_slab, 'side pane items')
 
 		self.apply_settings()
+
+		self.view.post_build_ui()
 
 		self.view.set_message_window_visible(False)
 
@@ -749,6 +750,19 @@ class Cardapio(dbus.service.Object):
 			# (leak solved!)
 
 		self.schedule_search_with_all_plugins('')
+
+
+	def clear_all_panes(self):
+		"""
+		Clears the different sections of the UI (panes)
+		"""
+
+		self.remove_all_buttons_from_section(self.view.application_pane)
+		self.remove_all_buttons_from_section(self.view.sidepane)
+		self.remove_all_buttons_from_section(self.view.left_session_pane)
+		self.remove_all_buttons_from_section(self.view.right_session_pane)
+
+		self.view.remove_all_buttons_from_category_panes()
 
 
 	# This method is used by both the View API and the Applet API
@@ -1073,7 +1087,7 @@ class Cardapio(dbus.service.Object):
 		path          = None
 
 		self.view.subfolders_section_slab.hide() # for added performance
-		self.clear_pane(self.view.subfolders_section_contents)
+		self.remove_all_buttons_from_section(self.view.subfolders_section_slab)
 
 		if not search_inside:
 			if not self.subfolder_stack: return False
@@ -1295,19 +1309,21 @@ class Cardapio(dbus.service.Object):
 		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
+	# TODO MVC
 	def reset_plugin_section_contents(self, plugin):
 		"""
 		Clear the contents of a plugin's slab, usually to fill it with results later
 		"""
 
-		container = plugin.section_contents.parent
+		self.view.remove_all_buttons_from_section(plugin.section)
+		# container = plugin.section_contents.parent
 
-		# if plugin was deactivated while waiting for search result
-		if container is None: return False
+		# # if plugin was deactivated while waiting for search result
+		# if container is None: return False
 
-		container.remove(plugin.section_contents)
-		plugin.section_contents = gtk.VBox()
-		container.add(plugin.section_contents)
+		# container.remove(plugin.section_contents)
+		# plugin.section_contents = gtk.VBox()
+		# container.add(plugin.section_contents)
 
 		return True
 
@@ -2054,7 +2070,7 @@ class Cardapio(dbus.service.Object):
 		self.bookmark_monitor.handler_block_by_func(self.on_bookmark_monitor_changed)
 
 		if event == gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
-			self.clear_pane(self.view.places_section_contents)
+			self.remove_all_buttons_from_section(self.view.places_section_slab)
 			self.fill_places_list()
 
 		# same here
@@ -2069,7 +2085,7 @@ class Cardapio(dbus.service.Object):
 	 	# hoping this helps with bug 662249, in case there is some strange threading problem happening (although there are no explicit threads in this program)	
 		self.volume_monitor.handler_block_by_func(self.on_volume_monitor_changed)
 
-		self.view.clear_pane(self.view.places_section_contents)
+		self.remove_all_buttons_from_section(self.view.places_section_slab)
 		self.fill_places_list()
 
 		# same here
@@ -2324,21 +2340,17 @@ class Cardapio(dbus.service.Object):
 		plugin.section_contents = plugin.section.get_children()[0].get_children()[0]
 
 
-	# TODO MVC
-	def clear_pane(self, container):
+	def remove_all_buttons_from_section(self, section):
 		"""
-		Remove all children from a GTK container
+		Removes all buttons from a given section
 		"""
 
-		# this is necessary when clearing section contents to avoid a memory
-		# leak, but does nothing when clearing other containers:
-		if container is not None: 
-			if container.parent is not None and container.parent.parent is not None:
-				self.app_list = [app for app in self.app_list if app['section'] != container.parent.parent]
-				self.sys_list = [app for app in self.sys_list if app['section'] != container.parent.parent]
+		# this is necessary to avoid a memory leak
+		if section is not None: 
+			self.app_list = [app for app in self.app_list if app['section'] != section]
+			self.sys_list = [app for app in self.sys_list if app['section'] != section]
 
-			for	child in container.get_children():
-				container.remove(child)
+			self.view.remove_all_buttons_from_section(section)
 
 
 	# TODO MVC
@@ -2514,7 +2526,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.remove_section_from_app_list(self.view.favorites_section_slab)
-		self.clear_pane(self.view.favorites_section_contents)
+		self.remove_all_buttons_from_section(self.view.favorites_section_slab)
 		self.settings['pinned items'].append(clicked_app_info)
 		self.fill_favorites_list(self.view.favorites_section_slab, 'pinned items')
 
@@ -2525,7 +2537,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.remove_section_from_app_list(self.view.favorites_section_slab)
-		self.clear_pane(self.view.favorites_section_contents)
+		self.remove_all_buttons_from_section(self.view.favorites_section_slab)
 		self.settings['pinned items'].remove(clicked_app_info)
 		self.fill_favorites_list(self.view.favorites_section_slab, 'pinned items')
 
@@ -2537,8 +2549,8 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.remove_section_from_app_list(self.view.sidepane_section_slab)
-		self.clear_pane(self.view.sidepane_section_contents)
- 		self.clear_pane(self.view.sidepane)
+		self.remove_all_buttons_from_section(self.view.sidepane_section_slab)
+ 		self.remove_all_buttons_from_section(self.view.sidepane)
 		self.settings['side pane items'].append(clicked_app_info)
 		self.fill_favorites_list(self.view.sidepane_section_slab, 'side pane items')
 		self.view.sidepane.queue_resize() # required! or sidepane's allocation will be x,y,width,0 when first item is added
@@ -2552,8 +2564,8 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.remove_section_from_app_list(self.view.sidepane_section_slab)
-		self.clear_pane(self.view.sidepane_section_contents)
- 		self.clear_pane(self.view.sidepane)
+		self.remove_all_buttons_from_section(self.view.sidepane_section_slab)
+ 		self.remove_all_buttons_from_section(self.view.sidepane)
 		self.settings['side pane items'].remove(clicked_app_info)
 		self.fill_favorites_list(self.view.sidepane_section_slab, 'side pane items')
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or an extra space will show up where but button used to be
