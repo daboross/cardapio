@@ -751,15 +751,6 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
-	def set_search_entry_text(self, text):
-		"""
-		Sets the text in the search entry textbox
-		"""
-
-		self.cardapio.search_entry.set_text(text)
-
-
-	# This method is required by the View API
 	def place_text_cursor_at_end(self):
 		"""
 		Places the text cursor at the end of the search entry's text
@@ -1346,3 +1337,37 @@ class CardapioGtkView(CardapioViewInterface):
 
 			if update_window_size:
 				self.cardapio.settings['window size'][0] += self.get_main_splitter_position()
+
+
+	def setup_search_entry(self, place_at_top, place_at_left):
+		"""
+		Hides 3 of the 4 search entries and returns the visible entry.
+		"""
+
+		text = self.cardapio.search_entry.get_text()
+
+		self.get_widget('TopLeftSearchSlabMargin').hide()
+		self.get_widget('BottomLeftSearchSlabMargin').hide()
+		self.get_widget('TopRightSearchSlabMargin').hide()
+		self.get_widget('BottomRightSearchSlabMargin').hide()
+
+		if place_at_top:
+			if place_at_left:
+				self.cardapio.search_entry = self.get_widget('TopLeftSearchEntry')
+				self.get_widget('TopLeftSearchSlabMargin').show()
+			else:
+				self.cardapio.search_entry = self.get_widget('TopRightSearchEntry')
+				self.get_widget('TopRightSearchSlabMargin').show()
+		else:
+			if place_at_left:
+				self.cardapio.search_entry = self.get_widget('BottomLeftSearchEntry')
+				self.get_widget('BottomLeftSearchSlabMargin').show()
+			else:
+				self.cardapio.search_entry = self.get_widget('BottomRightSearchEntry')
+				self.get_widget('BottomRightSearchSlabMargin').show()
+
+		self.cardapio.search_entry.handler_block_by_func(self.on_search_entry_changed)
+		self.cardapio.search_entry.set_text(text)
+		self.cardapio.search_entry.handler_unblock_by_func(self.on_search_entry_changed)
+
+

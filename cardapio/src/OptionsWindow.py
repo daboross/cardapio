@@ -87,16 +87,6 @@ class OptionsWindow:
 			self.get_widget('OptionAppletLabel').hide()
 
 
-	# This method is required by the View API
-	def show(self, state):
-		"""
-		Shows the "Options" dialog
-		"""
-
-		if state : self.dialog.show()
-		else     : self.dialog.hide()
-
-
 	def on_plugintreeview_hover(self, treeview, event):
 		"""
 		Change the cursor to show that plugins are draggable.
@@ -122,6 +112,12 @@ class OptionsWindow:
 		user's settings.
 		"""
 
+		try: 
+			widget.handler_block_by_func(self.on_options_changed)
+			widget.handler_block_by_func(self.on_mini_mode_button_toggled)
+		except: 
+			pass
+
 		self.set_widget_from_option('OptionKeybinding', 'keybinding')
 		self.set_widget_from_option('OptionAppletLabel', 'applet label')
 		self.set_widget_from_option('OptionAppletIcon', 'applet icon')
@@ -129,7 +125,13 @@ class OptionsWindow:
 		self.set_widget_from_option('OptionKeepResults', 'keep search results')
 		self.set_widget_from_option('OptionOpenOnHover', 'open on hover')
 		self.set_widget_from_option('OptionOpenCategoriesOnHover', 'open categories on hover')
-		self.set_widget_from_option('OptionMiniMode', 'mini mode') # using a different handler
+		self.set_widget_from_option('OptionMiniMode', 'mini mode')
+
+		try: 
+			widget.handler_unblock_by_func(self.on_options_changed)
+			widget.handler_unblock_by_func(self.on_mini_mode_button_toggled)
+		except: 
+			pass
 
 		icon_size = gtk.icon_size_lookup(4)[0] # 4 because it's that same as in the UI file
 
@@ -166,8 +168,6 @@ class OptionsWindow:
 		"""
 
 		widget = self.get_widget(widget_str)
-		try    : widget.handler_block_by_func(self.cardapio.on_options_changed)
-		except : pass
 
 		if type(widget) is gtk.Entry:
 			widget.set_text(self.cardapio.settings[option_str])
@@ -177,9 +177,6 @@ class OptionsWindow:
 
 		else:
 			logging.error('Widget %s (%s) was not written' % (widget_str, type(widget)))
-
-		try    : widget.handler_unblock_by_func(self.cardapio.on_options_changed)
-		except : pass
 
 
 	def on_grab_new_shortcut_toggled(self, button):
@@ -198,7 +195,7 @@ class OptionsWindow:
 
 			self.dialog.disconnect(self.key_grab_handler)
 			self.get_widget('OptionGrabKeybinding').set_label(_('Grab new shortcut'))
-			self.cardapio.on_options_changed()
+			self.on_options_changed()
 
 
 	def on_new_keybinding_press(self, widget, event):
@@ -281,7 +278,14 @@ class OptionsWindow:
 		self.cardapio.settings['keep search results']      = self.get_widget('OptionKeepResults').get_active()
 		self.cardapio.settings['open on hover']            = self.get_widget('OptionOpenOnHover').get_active()
 		self.cardapio.settings['open categories on hover'] = self.get_widget('OptionOpenCategoriesOnHover').get_active()
-		self.cardapio.settings['mini mode']                = self.get_widget('OptionMiniMode').get_active()
+
+		# Should not execute the line below, since minimode is already set elsewhere
+		#self.cardapio.settings['mini mode']               = self.get_widget('OptionMiniMode').get_active() 
+		#
+		# (I actually don't understand why, but the line above causes a bug
+		# where the options window doesn't check the minimode checkbox when it
+		# first opens, raising all hell)
+
 		self.cardapio.apply_settings()
 
 

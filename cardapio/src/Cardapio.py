@@ -1706,7 +1706,7 @@ class Cardapio(dbus.service.Object):
 
 		# decide which search bar to show (top or bottom) depending
 		# on the y = 0 axis window invert
-		self.setup_search_entry(place_at_top = not anchor_bottom)
+		self.view.setup_search_entry(not anchor_bottom, not self.settings['mini mode'])
 
 
 	def save_dimensions(self):
@@ -2292,41 +2292,6 @@ class Cardapio(dbus.service.Object):
 			self.sys_list = [app for app in self.sys_list if app['section'] != section]
 
 			self.view.remove_all_buttons_from_section(section)
-
-
-	# TODO MVC
-	def setup_search_entry(self, place_at_top = False):
-		"""
-		Hides 3 of the 4 search entries and returns the visible entry.
-		"""
-
-		text = self.search_entry.get_text()
-
-		place_at_left = not self.settings['mini mode']
-
-		self.view.get_widget('TopLeftSearchSlabMargin').hide()
-		self.view.get_widget('BottomLeftSearchSlabMargin').hide()
-		self.view.get_widget('TopRightSearchSlabMargin').hide()
-		self.view.get_widget('BottomRightSearchSlabMargin').hide()
-
-		if place_at_top:
-			if place_at_left:
-				self.search_entry = self.view.get_widget('TopLeftSearchEntry')
-				self.view.get_widget('TopLeftSearchSlabMargin').show()
-			else:
-				self.search_entry = self.view.get_widget('TopRightSearchEntry')
-				self.view.get_widget('TopRightSearchSlabMargin').show()
-		else:
-			if place_at_left:
-				self.search_entry = self.view.get_widget('BottomLeftSearchEntry')
-				self.view.get_widget('BottomLeftSearchSlabMargin').show()
-			else:
-				self.search_entry = self.view.get_widget('BottomRightSearchEntry')
-				self.view.get_widget('BottomRightSearchSlabMargin').show()
-
-		self.search_entry.handler_block_by_func(self.view.on_search_entry_changed)
-		self.search_entry.set_text(text)
-		self.search_entry.handler_unblock_by_func(self.view.on_search_entry_changed)
 
 
 	def reset_search_query(self):
