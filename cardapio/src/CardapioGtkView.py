@@ -1090,8 +1090,9 @@ class CardapioGtkView(CardapioViewInterface):
 		self.read_gui_theme_info()
 
 		# the ui is already built by ui file, so we just clear it here
-		for child in self.application_pane.get_children():
-			self.application_pane.remove(child)
+		self.remove_all_children(self.application_pane)
+		self.remove_all_children(self.right_session_pane)
+		self.remove_all_children(self.left_session_pane)
 
 
 	# This method is required by the View API
@@ -1369,5 +1370,13 @@ class CardapioGtkView(CardapioViewInterface):
 		self.cardapio.search_entry.handler_block_by_func(self.on_search_entry_changed)
 		self.cardapio.search_entry.set_text(text)
 		self.cardapio.search_entry.handler_unblock_by_func(self.on_search_entry_changed)
+
+
+	def remove_all_children(self, container):
+		"""
+		Removes all children from a GTK container
+		"""
+		
+		for child in container: container.remove(child)
 
 
