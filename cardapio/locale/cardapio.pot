@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-11 22:42+0100\n"
+"POT-Creation-Date: 2011-01-18 11:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,77 +17,77 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Cardapio.py:341
+#: src/Cardapio.py:328
 msgid "No results to show"
 msgstr ""
 
-#: src/Cardapio.py:342
+#: src/Cardapio.py:329
 #, python-format
 msgid "No results to show in \"%(category_name)s\""
 msgstr ""
 
-#: src/Cardapio.py:343
+#: src/Cardapio.py:330
 msgid "Searching..."
 msgstr ""
 
-#: src/Cardapio.py:344
+#: src/Cardapio.py:331
 msgid "Search timed out"
 msgstr ""
 
-#: src/Cardapio.py:346
+#: src/Cardapio.py:333
 #, python-format
 msgid "Do you want to run \"%(file_name)s\", or display its contents?"
 msgstr ""
 
-#: src/Cardapio.py:347
+#: src/Cardapio.py:334
 #, python-format
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr ""
 
-#: src/Cardapio.py:406
+#: src/Cardapio.py:390
 msgid "Application menu"
 msgstr ""
 
-#: src/Cardapio.py:407 src/Cardapio.py:417 src/Cardapio.py:427
+#: src/Cardapio.py:391 src/Cardapio.py:401 src/Cardapio.py:411
 #: src/plugins/_zg_recent_documents.py:3 src/plugins/google.py:20
 #: src/plugins/google_localized.py:20 src/plugins/tracker.py:20
 #: src/plugins/tracker_fts.py:20
 msgid "Cardapio Team"
 msgstr ""
 
-#: src/Cardapio.py:408
+#: src/Cardapio.py:392
 msgid "Displays installed applications"
 msgstr ""
 
-#: src/Cardapio.py:416
+#: src/Cardapio.py:400
 msgid "Places menu"
 msgstr ""
 
-#: src/Cardapio.py:418
+#: src/Cardapio.py:402
 msgid "Displays a list of folders"
 msgstr ""
 
-#: src/Cardapio.py:426 src/Cardapio.py:2322
+#: src/Cardapio.py:410 src/Cardapio.py:2290
 msgid "Pinned items"
 msgstr ""
 
-#: src/Cardapio.py:428
+#: src/Cardapio.py:412
 msgid "Displays the items that you marked as \"pinned\" using the context menu"
 msgstr ""
 
-#: src/Cardapio.py:710 src/Cardapio.py:717
+#: src/Cardapio.py:722
 msgid "All"
 msgstr ""
 
-#: src/Cardapio.py:710 src/Cardapio.py:717
+#: src/Cardapio.py:722
 msgid "Show all categories"
 msgstr ""
 
-#: src/Cardapio.py:1143
+#: src/Cardapio.py:1157
 msgid "Filesystem Root"
 msgstr ""
 
-#: src/Cardapio.py:1162 src/plugins/_zg_recent_documents.py:76
+#: src/Cardapio.py:1176 src/plugins/_zg_recent_documents.py:76
 #: src/plugins/amazon.py:277 src/plugins/bing.py:150 src/plugins/ebay.py:244
 #: src/plugins/ebay.py:260 src/plugins/google.py:84
 #: src/plugins/google_localized.py:88 src/plugins/tracker.py:71
@@ -96,132 +96,132 @@ msgstr ""
 msgid "Show additional results"
 msgstr ""
 
-#: src/Cardapio.py:1162
+#: src/Cardapio.py:1176
 msgid "Show additional search results in a file browser"
 msgstr ""
 
-#: src/Cardapio.py:1959 src/Cardapio.py:2342
+#: src/Cardapio.py:1923 src/Cardapio.py:2282
 msgid "Uncategorized"
 msgstr ""
 
-#: src/Cardapio.py:1959
+#: src/Cardapio.py:1923
 msgid "Other configuration tools"
 msgstr ""
 
-#: src/Cardapio.py:2010
+#: src/Cardapio.py:1974
 msgid "Network"
 msgstr ""
 
-#: src/Cardapio.py:2010
+#: src/Cardapio.py:1974
 msgid "Browse the contents of the network"
 msgstr ""
 
-#: src/Cardapio.py:2014
+#: src/Cardapio.py:1978
 msgid "Connect to Server"
 msgstr ""
 
-#: src/Cardapio.py:2014
+#: src/Cardapio.py:1978
 msgid "Connect to a remote computer or shared disk"
 msgstr ""
 
-#: src/Cardapio.py:2016
+#: src/Cardapio.py:1980
 msgid "Trash"
 msgstr ""
 
-#: src/Cardapio.py:2016
+#: src/Cardapio.py:1980
 msgid "Open the trash"
 msgstr ""
 
-#: src/Cardapio.py:2028
+#: src/Cardapio.py:1992
 msgid "Home"
 msgstr ""
 
-#: src/Cardapio.py:2028
+#: src/Cardapio.py:1992
 msgid "Open your personal folder"
 msgstr ""
 
-#: src/Cardapio.py:2044
+#: src/Cardapio.py:2008
 msgid "Desktop"
 msgstr ""
 
-#: src/Cardapio.py:2200
+#: src/Cardapio.py:2164
 msgid "Lock Screen"
 msgstr ""
 
-#: src/Cardapio.py:2201
+#: src/Cardapio.py:2165
 msgid "Protect your computer from unauthorized use"
 msgstr ""
 
-#: src/Cardapio.py:2207
+#: src/Cardapio.py:2171
 msgid "Log Out..."
 msgstr ""
 
-#: src/Cardapio.py:2208
+#: src/Cardapio.py:2172
 msgid "Log out of this session to log in as a different user"
 msgstr ""
 
-#: src/Cardapio.py:2214
+#: src/Cardapio.py:2178
 msgid "Shut Down..."
 msgstr ""
 
-#: src/Cardapio.py:2215
+#: src/Cardapio.py:2179
 msgid "Shut down the system"
 msgstr ""
 
-#: src/Cardapio.py:2301
-msgid "Places"
-msgstr ""
-
-#: src/Cardapio.py:2301
-msgid "Access documents and folders"
-msgstr ""
-
-#: src/Cardapio.py:2311
+#: src/Cardapio.py:2268
 msgid "Folder Contents"
 msgstr ""
 
-#: src/Cardapio.py:2311
+#: src/Cardapio.py:2268
 msgid "Look inside folders"
 msgstr ""
 
-#: src/Cardapio.py:2322
-msgid "Your favorite items"
-msgstr ""
-
-#: src/Cardapio.py:2332
+#: src/Cardapio.py:2276
 msgid "Side Pane"
 msgstr ""
 
-#: src/Cardapio.py:2332
+#: src/Cardapio.py:2276
 msgid "Items pinned to the side pane"
 msgstr ""
 
-#: src/Cardapio.py:2342
+#: src/Cardapio.py:2282
 msgid "Items that are not under any menu category"
 msgstr ""
 
-#: src/Cardapio.py:2352
+#: src/Cardapio.py:2283
 msgid "Session"
 msgstr ""
 
-#: src/Cardapio.py:2362
+#: src/Cardapio.py:2284
 msgid "System"
 msgstr ""
 
-#: src/CardapioGtkView.py:121 src/gnomepanel/CardapioGnomeApplet.py:68
+#: src/Cardapio.py:2287
+msgid "Places"
+msgstr ""
+
+#: src/Cardapio.py:2287
+msgid "Access documents and folders"
+msgstr ""
+
+#: src/Cardapio.py:2290
+msgid "Your favorite items"
+msgstr ""
+
+#: src/CardapioGtkView.py:123 src/gnomepanel/CardapioGnomeApplet.py:68
 #, python-format
 msgid "_About %(distro_name)s"
 msgstr ""
 
-#: src/OptionsWindow.py:195
+#: src/OptionsWindow.py:186
 msgid "Recording..."
 msgstr ""
 
-#: src/OptionsWindow.py:200 src/ui/options.ui:167
+#: src/OptionsWindow.py:191 src/ui/options.ui:167
 msgid "Grab new shortcut"
 msgstr ""
 
-#: src/OptionsWindow.py:304
+#: src/OptionsWindow.py:298
 #, python-format
 msgid ""
 "<b>Plugin:</b> %(name)s %(version)s\n"
@@ -229,29 +229,29 @@ msgid ""
 "<b>Description:</b> %(description)s"
 msgstr ""
 
-#: src/OptionsWindow.py:305
+#: src/OptionsWindow.py:299
 msgid "This is a community-supported plugin"
 msgstr ""
 
-#: src/settings.py:57
+#: src/SettingsHelper.py:57
 msgid "Ubuntu Software Center"
 msgstr ""
 
-#: src/settings.py:59
+#: src/SettingsHelper.py:59
 msgid ""
 "Lets you choose from thousands of free applications available for Ubuntu"
 msgstr ""
 
-#: src/settings.py:66
+#: src/SettingsHelper.py:66
 msgid "Help and Support"
 msgstr ""
 
-#: src/settings.py:68
+#: src/SettingsHelper.py:68
 #, python-format
 msgid "Get help with %(distro_name)s"
 msgstr ""
 
-#: src/settings.py:90
+#: src/SettingsHelper.py:90
 msgid "Menu"
 msgstr ""
 
