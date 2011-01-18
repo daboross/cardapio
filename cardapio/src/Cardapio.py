@@ -213,20 +213,11 @@ class Cardapio(dbus.service.Object):
 		self.last_visibility_toggle        = 0
 		self.panel_applet                  = panel_applet
 
-		self.sys_tree = gmenu.lookup_tree('gnomecc.menu')
-		self.have_control_center = (self.sys_tree.root is not None)
+		self.package_root = '' if (__package__ is None) else ( __package__ + '.' )
 
-		if not self.have_control_center:
-			self.sys_tree = gmenu.lookup_tree('settings.menu')
-			logging.warn('Could not find Control Center menu file. Deactivating Control Center button.')
-
-		self.app_tree = gmenu.lookup_tree('applications.menu')
-		self.app_tree.add_monitor(self.on_menu_data_changed)
-		self.sys_tree.add_monitor(self.on_menu_data_changed)
-
-		self.package_root = ''
-		if __package__ is not None:
-			self.package_root = __package__ + '.'
+		logging.info('Loading menus...')
+		self.load_menus()
+		logging.info('...done loading menus!')
 
 		logging.info('Setting up DBus...')
 		self.setup_dbus()
@@ -315,6 +306,23 @@ class Cardapio(dbus.service.Object):
 				fatal_error('Error clearing log file', exception)
 
 		logging.basicConfig(filename = logging_filename, level = logging_level, format = logging_format)
+
+
+	def load_menus(self):
+		"""
+		Loads the XDG application menus into memory
+		"""
+
+		self.sys_tree = gmenu.lookup_tree('gnomecc.menu')
+		self.have_control_center = (self.sys_tree.root is not None)
+
+		if not self.have_control_center:
+			self.sys_tree = gmenu.lookup_tree('settings.menu')
+			logging.warn('Could not find Control Center menu file. Deactivating Control Center button.')
+
+		self.app_tree = gmenu.lookup_tree('applications.menu')
+		self.app_tree.add_monitor(self.on_menu_data_changed)
+		self.sys_tree.add_monitor(self.on_menu_data_changed)
 
 
 	def setup_dbus(self):
