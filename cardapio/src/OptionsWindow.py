@@ -114,11 +114,7 @@ class OptionsWindow:
 		user's settings.
 		"""
 
-		try: 
-			widget.handler_block_by_func(self.on_options_changed)
-			widget.handler_block_by_func(self.on_mini_mode_button_toggled)
-		except: 
-			pass
+		self.is_change_handler_blocked = True
 
 		self.set_widget_from_option('OptionKeybinding', 'keybinding')
 		self.set_widget_from_option('OptionAppletLabel', 'applet label')
@@ -128,12 +124,6 @@ class OptionsWindow:
 		self.set_widget_from_option('OptionOpenOnHover', 'open on hover')
 		self.set_widget_from_option('OptionOpenCategoriesOnHover', 'open categories on hover')
 		self.set_widget_from_option('OptionMiniMode', 'mini mode')
-
-		try: 
-			widget.handler_unblock_by_func(self.on_options_changed)
-			widget.handler_unblock_by_func(self.on_mini_mode_button_toggled)
-		except: 
-			pass
 
 		icon_size = gtk.icon_size_lookup(4)[0] # 4 because it's that same as in the UI file
 
@@ -151,6 +141,8 @@ class OptionsWindow:
 
 		self.update_plugin_description()
 		self.dialog.show()
+
+		self.is_change_handler_blocked = False
 
 
 	def hide(self, *dummy):
@@ -273,6 +265,8 @@ class OptionsWindow:
 		Dialog
 		"""
 
+		if self.is_change_handler_blocked: return
+
 		self.cardapio.settings['keybinding']               = self.get_widget('OptionKeybinding').get_text()
 		self.cardapio.settings['applet label']             = self.get_widget('OptionAppletLabel').get_text()
 		self.cardapio.settings['applet icon']              = self.get_widget('OptionAppletIcon').get_text()
@@ -280,13 +274,7 @@ class OptionsWindow:
 		self.cardapio.settings['keep search results']      = self.get_widget('OptionKeepResults').get_active()
 		self.cardapio.settings['open on hover']            = self.get_widget('OptionOpenOnHover').get_active()
 		self.cardapio.settings['open categories on hover'] = self.get_widget('OptionOpenCategoriesOnHover').get_active()
-
-		# Should not execute the line below, since minimode is already set elsewhere
-		#self.cardapio.settings['mini mode']               = self.get_widget('OptionMiniMode').get_active() 
-		#
-		# (I actually don't understand why, but the line above causes a bug
-		# where the options window doesn't check the minimode checkbox when it
-		# first opens, raising all hell)
+		self.cardapio.settings['mini mode']                = self.get_widget('OptionMiniMode').get_active() 
 
 		self.cardapio.apply_settings()
 
@@ -374,6 +362,8 @@ class OptionsWindow:
 		"""
 		Handler for the minimode checkbox in the preferences window
 		"""
+
+		if self.is_change_handler_blocked: return
 
 		self.cardapio.settings['mini mode'] = self.get_widget('OptionMiniMode').get_active()
 		self.cardapio.toggle_mini_mode_ui()
