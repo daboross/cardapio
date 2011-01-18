@@ -21,7 +21,6 @@ from misc import *
 import sys
 
 try:
-	from icons import *
 	import os
 	import gtk
 	from CardapioAppletInterface import PANEL_TYPE_DOCKY, PANEL_TYPE_AWN 

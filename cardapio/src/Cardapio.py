@@ -30,7 +30,7 @@ from misc import *
 import sys
 
 try:
-	from settings import *
+	from SettingsHelper import *
 	from hacks import *
 	from CardapioGtkView import *
 	from OptionsWindow import *

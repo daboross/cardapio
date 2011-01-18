@@ -22,7 +22,7 @@ import sys
 
 try:
 	from CardapioViewInterface import *
-	from icons import *
+	from IconHelper import *
 	import os
 	import gtk
 	import urllib2
