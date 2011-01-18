@@ -43,6 +43,9 @@ class OptionsWindow:
 
 
 	def setup_ui(self):
+		"""
+		Builds the OptionsWindow GUI
+		"""
 
 		options_ui_filepath = os.path.join(self.cardapio.cardapio_path, 'ui', 'options.ui')
 

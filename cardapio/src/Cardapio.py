@@ -175,26 +175,16 @@ class Cardapio(dbus.service.Object):
 		logging.info('Distribution: %s' % platform.platform())
 
 		logging.info('Loading settings...')
-
-		try:
-			self.settings = SettingsHelper(self.config_folder_path)
-
-		except Exception, ex:
-			msg = 'Unable to read settings: ' + str(ex)
-			logging.error(msg)
-			fatal_error('Settings error', msg)
-			traceback.print_exc()
-			sys.exit(1)
-
+		self.load_settings()
 		logging.info('...done loading settings!')
 
-		# starting the view / model+controller separation
-		self.cardapio_path = cardapio_path
 		self.APP = APP
-		self.view = CardapioGtkView(self)
-		self.options_window = OptionsWindow(self)
 
+		self.cardapio_path    = cardapio_path
 		self.home_folder_path = os.path.abspath(os.path.expanduser('~'))
+
+		self.view             = CardapioGtkView(self)
+		self.options_window   = OptionsWindow(self)
 
 		self.reset_model()
 		self.visible                       = False
@@ -239,19 +229,14 @@ class Cardapio(dbus.service.Object):
 		self.build_ui()
 		logging.info('...done building UI!')
 
-		self.schedule_search_with_all_plugins('')
+		self.init_desktop_environment()
+
+		logging.info('==> Done initializing Cardapio!')
+
+		self.reset_search()
 
 		if   show == Cardapio.SHOW_NEAR_MOUSE: self.show_hide_near_mouse()
 		elif show == Cardapio.SHOW_CENTERED  : self.show()
-
-		if gnome_program_init is not None:
-			# The function below prints a warning to the screen, saying that
-			# an assertion has failed. Apparently this is normal. Ignore it.
-			gnome_program_init('', self.version) 
-			client = gnome_ui_master_client()
-			client.connect('save-yourself', lambda x: self.save_and_quit())
-
-		logging.info('==> Done initializing Cardapio!')
 
 
 	# This method is called from the View API
@@ -695,6 +680,36 @@ class Cardapio(dbus.service.Object):
 		self.subfolder_stack       = []
 
 
+	def load_settings(self):
+		"""
+		Loads the user's settings using a SettingsHelper
+		"""
+
+		try:
+			self.settings = SettingsHelper(self.config_folder_path)
+
+		except Exception, ex:
+			msg = 'Unable to read settings: ' + str(ex)
+			logging.error(msg)
+			fatal_error('Settings error', msg)
+			traceback.print_exc()
+			sys.exit(1)
+
+
+	def init_desktop_environment(self):
+		"""
+		Runs a few initializations related to the user's desktop environment
+		(only handles Gnome for now)
+		"""
+
+		if gnome_program_init is not None:
+			# The function below prints a warning to the screen, saying that
+			# an assertion has failed. Apparently this is normal. Ignore it.
+			gnome_program_init('', self.version) 
+			client = gnome_ui_master_client()
+			client.connect('save-yourself', lambda x: self.save_and_quit())
+			
+
 	def build_ui(self):
 		"""
 		Read the contents of all menus and plugins and build the UI
@@ -756,7 +771,7 @@ class Cardapio(dbus.service.Object):
 			plugin.on_reload_permission_granted
 			# (leak solved!)
 
-		self.schedule_search_with_all_plugins('')
+		self.reset_search()
 
 
 	def clear_all_panes(self):
@@ -1223,6 +1238,13 @@ class Cardapio(dbus.service.Object):
 		self.cancel_all_plugin_timers()
 
 		self.schedule_search_with_specific_plugin(text, plugin.search_delay_type, plugin)
+
+
+	def reset_search(self):
+		"""
+		Sets Cardapio's search to its default empty state
+		"""
+		self.schedule_search_with_all_plugins('')
 
 
 	def schedule_search_with_all_plugins(self, text):
