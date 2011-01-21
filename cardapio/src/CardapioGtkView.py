@@ -273,6 +273,17 @@ class CardapioGtkView(CardapioViewInterface):
 		self.cardapio.search_entry.set_text(text)
 
 
+	# This method is required by the View API
+	def get_search_entry_text(self):
+		"""
+		Gets the text that is currently displayed in the search entry, formatted
+		in UTF8.
+		"""
+
+		text = self.cardapio.search_entry.get_text()
+		return unicode(text, 'utf-8')
+
+
 	def on_sidebar_button_clicked(self, widget, section_slab):
 		"""
 		Handler for when the user chooses a category in the sidebar
@@ -714,8 +725,8 @@ class CardapioGtkView(CardapioViewInterface):
 		return (len(self.cardapio.search_entry.get_text().strip()) == 0)
 
 
-	# This method is required by the View API
-	def get_first_visible_app(self):
+	# TODO MVC: Make sure this function is never called from Cardapio
+	def get_first_visible_app_widget(self):
 		"""
 		Returns the first app in the right pane, if any.
 		"""
@@ -736,6 +747,16 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
+	def get_first_visible_app(self):
+		"""
+		Returns the app_info for the first app in the right pane, if any.
+		"""
+		widget = self.get_first_visible_app_widget()
+		if widget is None: return None
+		return widget.app_info
+
+
+	# This method is required by the View API
 	def get_selected_app(self):
 		"""
 		Returns the button for the selected app (that is, the one that has
@@ -745,7 +766,7 @@ class CardapioGtkView(CardapioViewInterface):
 		widget = self.previously_focused_widget
 
 		if (type(widget) is gtk.Button and 'app_info' in dir(widget)):
-			return widget
+			return widget.app_info
 
 		return None
 

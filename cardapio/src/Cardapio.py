@@ -976,23 +976,26 @@ class Cardapio(dbus.service.Object):
 		# model/controller stuff. View stuff should go on separate, well-defined
 		# calls that are made from here.
 
-		text = self.search_entry.get_text()
-		text = unicode(text, 'utf-8').strip()
+		text = self.view.get_search_entry_text().strip()
 
 		if text and text == self.current_query: return
+
 		self.current_query = text
+		handled = False
 
 		self.no_results_to_show = True
 		self.view.hide_no_results_text()
 
-		handled = False
 		in_subfolder_search_mode = (text and text.find('/') != -1)
 
-		if not in_subfolder_search_mode:
+		if in_subfolder_search_mode:
+			# MUST run these lines BEFORE disappering with all sections
+			first_app_info    = self.view.get_first_visible_app()
+			selected_app_info = self.view.get_selected_app()
+		else:
 			self.subfolder_stack = []
-			# clean up the UI for every mode except subfolder_search, since it
-			# needs to know the topmost result:
-			self.disappear_with_all_sections_and_category_buttons()
+
+		self.disappear_with_all_sections_and_category_buttons()
 
 		# if showing the control center menu
 		if self.in_system_menu_mode:
@@ -1012,11 +1015,8 @@ class Cardapio(dbus.service.Object):
 
 		# if doing a subfolder search
 		elif in_subfolder_search_mode:
-			first_app_widget    = self.view.get_first_visible_app()
-			selected_app_widget = self.view.get_selected_app()
-			self.disappear_with_all_sections_and_category_buttons()
 			self.view.previously_focused_widget = None
-			handled = self.search_subfolders(text, first_app_widget, selected_app_widget)
+			handled = self.search_subfolders(text, first_app_info, selected_app_info)
 
 		# if none of these (or if the subfolder search tells you this is not a
 		# proper subfolder), then just run a regular search. This includes the
@@ -1097,7 +1097,7 @@ class Cardapio(dbus.service.Object):
 
 
 	# TODO MVC
-	def search_subfolders(self, text, first_app_widget, selected_app_widget):
+	def search_subfolders(self, text, first_app_info, selected_app_info):
 		"""
 		Lets you browse your filesystem through Cardapio by typing slash "/" after
 		a search query to "push into" a folder. 
@@ -1135,12 +1135,12 @@ class Cardapio(dbus.service.Object):
 			# if pushing into a folder
 			elif prev_level < curr_level:
 
-				if first_app_widget is not None:
-					if selected_app_widget is not None: widget = selected_app_widget
-					else: widget = first_app_widget
+				if first_app_info is not None:
+					if selected_app_info is not None: widget = selected_app_info
+					else: app_info = first_app_info
 
-					if widget.app_info['type'] != 'xdg': return False
-					path = self.escape_quotes(self.unescape_url(widget.app_info['command']))
+					if app_info['type'] != 'xdg': return False
+					path = self.escape_quotes(self.unescape_url(app_info['command']))
 
 					path_type, path = urllib2.splittype(path)
 					if path_type and path_type != 'file': return False
@@ -1550,6 +1550,7 @@ class Cardapio(dbus.service.Object):
 				logging.error(exception)
 
 
+	# TODO MVC
 	def handle_search_entry_activate(self):
 		"""
 		Handler for when the user presses Enter on the search entry
@@ -1560,7 +1561,7 @@ class Cardapio(dbus.service.Object):
 			self.disappear_with_all_transitory_sections() 
 			return
 
-		first_app_widget = self.view.get_first_visible_app()
+		first_app_widget = self.view.get_first_visible_app_widget()
 		if first_app_widget is not None:
 			first_app_widget.emit('clicked')
 
@@ -1586,7 +1587,7 @@ class Cardapio(dbus.service.Object):
 					self.view.window.set_focus(visible_children[0])
 
 			else:
-				first_app_widget = self.view.get_first_visible_app()
+				first_app_widget = self.view.get_first_visible_app_widget()
 				if first_app_widget is not None:
 					self.view.window.set_focus(first_app_widget)
 
