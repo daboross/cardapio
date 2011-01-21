@@ -107,7 +107,7 @@ class CardapioGtkView(CardapioViewInterface):
 			}
 
 		# start with any search entry -- doesn't matter which
-		self.cardapio.search_entry = self.get_widget('TopLeftSearchEntry')
+		self.search_entry = self.get_widget('TopLeftSearchEntry')
 
 		# HACK: fix names of widgets to allow theming
 		# (glade doesn't seem to properly add names to widgets anymore...)
@@ -262,7 +262,7 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 		Removes all text from the search entry.
 		"""
-		self.cardapio.search_entry.set_text('')
+		self.search_entry.set_text('')
 
 
 	# This method is required by the View API
@@ -270,7 +270,7 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 		Removes all text from the search entry.
 		"""
-		self.cardapio.search_entry.set_text(text)
+		self.search_entry.set_text(text)
 
 
 	# This method is required by the View API
@@ -280,7 +280,7 @@ class CardapioGtkView(CardapioViewInterface):
 		in UTF8.
 		"""
 
-		text = self.cardapio.search_entry.get_text()
+		text = self.search_entry.get_text()
 		return unicode(text, 'utf-8')
 
 
@@ -637,13 +637,13 @@ class CardapioGtkView(CardapioViewInterface):
 
 		w = self.window.get_focus()
 
-		if w != self.cardapio.search_entry and w == self.previously_focused_widget:
+		if w != self.search_entry and w == self.previously_focused_widget:
 			if event.is_modifier: return
 
-			self.window.set_focus(self.cardapio.search_entry)
-			self.cardapio.search_entry.set_position(len(self.cardapio.search_entry.get_text()))
+			self.window.set_focus(self.search_entry)
+			self.search_entry.set_position(len(self.search_entry.get_text()))
 			
-			self.cardapio.search_entry.emit('key-press-event', event)
+			self.search_entry.emit('key-press-event', event)
 
 		else:
 			self.previously_focused_widget = None
@@ -656,7 +656,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Because that would enter two of each key.
 		"""
 
-		if self.window.get_focus() != self.cardapio.search_entry:
+		if self.window.get_focus() != self.search_entry:
 			self.previously_focused_widget = self.window.get_focus()
 
 
@@ -722,7 +722,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Returns True if the search entry is empty.
 		"""
 
-		return (len(self.cardapio.search_entry.get_text().strip()) == 0)
+		return (len(self.search_entry.get_text().strip()) == 0)
 
 
 	# TODO MVC: Make sure this function is never called from Cardapio
@@ -777,7 +777,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Places the text cursor at the end of the search entry's text
 		"""
 
-		self.cardapio.search_entry.set_position(-1)
+		self.search_entry.set_position(-1)
 
 
 	# This method is required by the View API
@@ -1366,7 +1366,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Hides 3 of the 4 search entries and returns the visible entry.
 		"""
 
-		text = self.cardapio.search_entry.get_text()
+		text = self.search_entry.get_text()
 
 		self.get_widget('TopLeftSearchSlabMargin').hide()
 		self.get_widget('BottomLeftSearchSlabMargin').hide()
@@ -1375,22 +1375,22 @@ class CardapioGtkView(CardapioViewInterface):
 
 		if place_at_top:
 			if place_at_left:
-				self.cardapio.search_entry = self.get_widget('TopLeftSearchEntry')
+				self.search_entry = self.get_widget('TopLeftSearchEntry')
 				self.get_widget('TopLeftSearchSlabMargin').show()
 			else:
-				self.cardapio.search_entry = self.get_widget('TopRightSearchEntry')
+				self.search_entry = self.get_widget('TopRightSearchEntry')
 				self.get_widget('TopRightSearchSlabMargin').show()
 		else:
 			if place_at_left:
-				self.cardapio.search_entry = self.get_widget('BottomLeftSearchEntry')
+				self.search_entry = self.get_widget('BottomLeftSearchEntry')
 				self.get_widget('BottomLeftSearchSlabMargin').show()
 			else:
-				self.cardapio.search_entry = self.get_widget('BottomRightSearchEntry')
+				self.search_entry = self.get_widget('BottomRightSearchEntry')
 				self.get_widget('BottomRightSearchSlabMargin').show()
 
-		self.cardapio.search_entry.handler_block_by_func(self.on_search_entry_changed)
-		self.cardapio.search_entry.set_text(text)
-		self.cardapio.search_entry.handler_unblock_by_func(self.on_search_entry_changed)
+		self.search_entry.handler_block_by_func(self.on_search_entry_changed)
+		self.search_entry.set_text(text)
+		self.search_entry.handler_unblock_by_func(self.on_search_entry_changed)
 
 
 	def remove_all_children(self, container):
@@ -1399,5 +1399,13 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 		
 		for child in container: container.remove(child)
+
+
+	def focus_search_entry(self):
+		"""
+		Focuses the search entry
+		"""
+
+		self.window.set_focus(self.search_entry)
 
 

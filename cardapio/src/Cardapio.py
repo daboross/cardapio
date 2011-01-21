@@ -1596,7 +1596,7 @@ class Cardapio(dbus.service.Object):
 
 			self.cancel_all_plugins()
 
-			text = self.search_entry.get_text()
+			text = self.view.get_search_entry_text()
 			slash_pos = text.rfind('/')
 
 			if self.subfolder_stack and slash_pos != -1:
@@ -1828,7 +1828,7 @@ class Cardapio(dbus.service.Object):
 
 		self.restore_dimensions(x, y, force_anchor_right = False, force_anchor_bottom = False)
 
-		self.view.window.set_focus(self.search_entry)
+		self.view.focus_search_entry()
 		self.view.show_main_window()
 
  		self.view.scroll_to_top()
@@ -1865,7 +1865,7 @@ class Cardapio(dbus.service.Object):
 			self.reset_search_query_and_selected_section()
 		else:
 			# remembering current search text in all entries
-			self.search_entry.set_text(self.current_query)
+			self.view.set_search_entry_text(self.current_query)
 
 		self.cancel_all_plugins()
 
