@@ -999,8 +999,6 @@ class Cardapio(dbus.service.Object):
 		text = self.read_new_query()
 		if text is None: return
 
-		handled = False
-
 		self.no_results_to_show = True
 		self.view.hide_no_results_text()
 
@@ -1014,6 +1012,7 @@ class Cardapio(dbus.service.Object):
 			self.subfolder_stack = []
 
 		self.disappear_with_all_sections_and_category_buttons()
+		handled = False
 
 		# if showing the control center menu
 		if self.in_system_menu_mode:
@@ -1045,9 +1044,9 @@ class Cardapio(dbus.service.Object):
 		Start a menu search
 		"""
 
-		text = text.lower()
-
 		self.view.application_pane.hide() # for speed
+
+		text = text.lower()
 
 		for app in app_list:
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-18 11:13+0100\n"
+"POT-Creation-Date: 2011-01-25 00:01+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,7 +67,7 @@ msgstr ""
 msgid "Displays a list of folders"
 msgstr ""
 
-#: src/Cardapio.py:410 src/Cardapio.py:2290
+#: src/Cardapio.py:410 src/Cardapio.py:2285
 msgid "Pinned items"
 msgstr ""
 
@@ -83,11 +83,11 @@ msgstr ""
 msgid "Show all categories"
 msgstr ""
 
-#: src/Cardapio.py:1157
+#: src/Cardapio.py:1144
 msgid "Filesystem Root"
 msgstr ""
 
-#: src/Cardapio.py:1176 src/plugins/_zg_recent_documents.py:76
+#: src/Cardapio.py:1163 src/plugins/_zg_recent_documents.py:76
 #: src/plugins/amazon.py:277 src/plugins/bing.py:150 src/plugins/ebay.py:244
 #: src/plugins/ebay.py:260 src/plugins/google.py:84
 #: src/plugins/google_localized.py:88 src/plugins/tracker.py:71
@@ -96,115 +96,115 @@ msgstr ""
 msgid "Show additional results"
 msgstr ""
 
-#: src/Cardapio.py:1176
+#: src/Cardapio.py:1163
 msgid "Show additional search results in a file browser"
 msgstr ""
 
-#: src/Cardapio.py:1923 src/Cardapio.py:2282
+#: src/Cardapio.py:1918 src/Cardapio.py:2277
 msgid "Uncategorized"
 msgstr ""
 
-#: src/Cardapio.py:1923
+#: src/Cardapio.py:1918
 msgid "Other configuration tools"
 msgstr ""
 
-#: src/Cardapio.py:1974
+#: src/Cardapio.py:1969
 msgid "Network"
 msgstr ""
 
-#: src/Cardapio.py:1974
+#: src/Cardapio.py:1969
 msgid "Browse the contents of the network"
 msgstr ""
 
-#: src/Cardapio.py:1978
+#: src/Cardapio.py:1973
 msgid "Connect to Server"
 msgstr ""
 
-#: src/Cardapio.py:1978
+#: src/Cardapio.py:1973
 msgid "Connect to a remote computer or shared disk"
 msgstr ""
 
-#: src/Cardapio.py:1980
+#: src/Cardapio.py:1975
 msgid "Trash"
 msgstr ""
 
-#: src/Cardapio.py:1980
+#: src/Cardapio.py:1975
 msgid "Open the trash"
 msgstr ""
 
-#: src/Cardapio.py:1992
+#: src/Cardapio.py:1987
 msgid "Home"
 msgstr ""
 
-#: src/Cardapio.py:1992
+#: src/Cardapio.py:1987
 msgid "Open your personal folder"
 msgstr ""
 
-#: src/Cardapio.py:2008
+#: src/Cardapio.py:2003
 msgid "Desktop"
 msgstr ""
 
-#: src/Cardapio.py:2164
+#: src/Cardapio.py:2159
 msgid "Lock Screen"
 msgstr ""
 
-#: src/Cardapio.py:2165
+#: src/Cardapio.py:2160
 msgid "Protect your computer from unauthorized use"
 msgstr ""
 
-#: src/Cardapio.py:2171
+#: src/Cardapio.py:2166
 msgid "Log Out..."
 msgstr ""
 
-#: src/Cardapio.py:2172
+#: src/Cardapio.py:2167
 msgid "Log out of this session to log in as a different user"
 msgstr ""
 
-#: src/Cardapio.py:2178
+#: src/Cardapio.py:2173
 msgid "Shut Down..."
 msgstr ""
 
-#: src/Cardapio.py:2179
+#: src/Cardapio.py:2174
 msgid "Shut down the system"
 msgstr ""
 
-#: src/Cardapio.py:2268
+#: src/Cardapio.py:2263
 msgid "Folder Contents"
 msgstr ""
 
-#: src/Cardapio.py:2268
+#: src/Cardapio.py:2263
 msgid "Look inside folders"
 msgstr ""
 
-#: src/Cardapio.py:2276
+#: src/Cardapio.py:2271
 msgid "Side Pane"
 msgstr ""
 
-#: src/Cardapio.py:2276
+#: src/Cardapio.py:2271
 msgid "Items pinned to the side pane"
 msgstr ""
 
-#: src/Cardapio.py:2282
+#: src/Cardapio.py:2277
 msgid "Items that are not under any menu category"
 msgstr ""
 
-#: src/Cardapio.py:2283
+#: src/Cardapio.py:2278
 msgid "Session"
 msgstr ""
 
-#: src/Cardapio.py:2284
+#: src/Cardapio.py:2279
 msgid "System"
 msgstr ""
 
-#: src/Cardapio.py:2287
+#: src/Cardapio.py:2282
 msgid "Places"
 msgstr ""
 
-#: src/Cardapio.py:2287
+#: src/Cardapio.py:2282
 msgid "Access documents and folders"
 msgstr ""
 
-#: src/Cardapio.py:2290
+#: src/Cardapio.py:2285
 msgid "Your favorite items"
 msgstr ""
 
@@ -701,7 +701,7 @@ msgstr ""
 msgid "Access applications, folders, system settings, etc."
 msgstr ""
 
-#: src/ui/cardapio.ui:7
+#: src/ui/cardapio.ui:7 src/gnomepanel/cardapio.server.h:2
 msgid "Cardapio"
 msgstr ""
 
@@ -881,4 +881,8 @@ msgstr ""
 
 #: src/ui/options.ui:482
 msgid "Plugins"
+msgstr ""
+
+#: src/gnomepanel/cardapio.server.h:1
+msgid "A menu with search capabilities."
 msgstr ""

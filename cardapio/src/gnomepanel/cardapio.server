@@ -6,7 +6,7 @@
                 <item value="IDL:Bonobo/GenericFactory:1.0"/>
                 <item value="IDL:Bonobo/Unknown:1.0"/>
         </oaf_attribute>
-        <oaf_attribute name="name" type="string" value="Cardapio"/>
+        <oaf_attribute name="name" type="string" _value="Cardapio"/>
         <oaf_attribute name="description" type="string" _value="A menu with search capabilities."/>
 </oaf_server>
 
@@ -18,8 +18,8 @@
                 <item value="IDL:Bonobo/Control:1.0"/>
                 <item value="IDL:Bonobo/Unknown:1.0"/>
         </oaf_attribute>
-        <oaf_attribute name="name" type="string" value="Cardapio"/>
-        <oaf_attribute name="description" type="string" value="A menu with search capabilities."/>
+        <oaf_attribute name="name" type="string" _value="Cardapio"/>
+        <oaf_attribute name="description" type="string" _value="A menu with search capabilities."/>
         <oaf_attribute name="panel:category" type="string" value="Miscellaneous"/>
         <oaf_attribute name="panel:icon" type="string" value="cardapio-256"/>
 </oaf_server>

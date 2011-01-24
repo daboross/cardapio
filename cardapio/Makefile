@@ -49,16 +49,16 @@ install: install_docky_helper
 	cp -f src/hacks.py $(PREFIX)/lib/cardapio/
 	cp -f src/hacks.pyc $(PREFIX)/lib/cardapio/
 	cp -f res/cardapio.desktop $(PREFIX)/lib/cardapio/
-
+	
 	mkdir -p $(PREFIX)/lib/cardapio/ui
 	cp -f src/ui/cardapio.ui $(PREFIX)/lib/cardapio/ui/
 	cp -f src/ui/options.ui $(PREFIX)/lib/cardapio/ui/
-
+	
 	mkdir -p $(PREFIX)/lib/cardapio/gnomepanel
 	cp -f src/gnomepanel/CardapioGnomeApplet* $(PREFIX)/lib/cardapio/gnomepanel/
 	cp -f src/gnomepanel/CardapioGnomeAppletFactory* $(PREFIX)/lib/cardapio/gnomepanel/
 	cp -f src/gnomepanel/__init__* $(PREFIX)/lib/cardapio/gnomepanel/
-
+	
 	mkdir -p $(PREFIX)/lib/cardapio/docky
 	cp -f src/docky/DockySettingsHelper* $(PREFIX)/lib/cardapio/docky/
 	cp -f src/docky/__init__* $(PREFIX)/lib/cardapio/docky/
@@ -78,7 +78,11 @@ install: install_docky_helper
 	ln -fs $(PREFIX)/lib/cardapio/cardapio $(PREFIX)/bin/cardapio
 	
 	mkdir -p $(DESTDIR)/usr/lib/bonobo/servers
-	cp -f src/gnomepanel/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/
+	#cp -f src/gnomepanel/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/
+	for f in locale/*; \
+		do test -f $$f/LC_MESSAGES/cardapio.mo && msgunfmt -o $$f.po $$f/LC_MESSAGES/cardapio.mo || true; \
+	done
+	intltool-merge -b locale src/gnomepanel/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
 
 buildsrc:
 	debuild -S
