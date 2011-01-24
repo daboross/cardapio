@@ -1136,7 +1136,7 @@ class Cardapio(dbus.service.Object):
 			elif prev_level < curr_level:
 
 				if first_app_info is not None:
-					if selected_app_info is not None: widget = selected_app_info
+					if selected_app_info is not None: app_info = selected_app_info
 					else: app_info = first_app_info
 
 					if app_info['type'] != 'xdg': return False
