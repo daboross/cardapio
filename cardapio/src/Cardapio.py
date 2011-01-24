@@ -966,21 +966,39 @@ class Cardapio(dbus.service.Object):
 			self.reset_search_query_and_selected_section()
 
 
-	# TODO MVC
+	def read_new_query(self):
+		"""
+		Returns the query currently in the search entry, after sanitizing it.
+		"""
+
+		text = self.view.get_search_entry_text().strip()
+		if text and text == self.current_query: return None
+
+		self.current_query = text
+		return text
+	
+
+	def parse_keyword_query(self, text):
+		"""
+		Returns the (keyword, text) pair of a keyword search of type 
+		"?keyword text1 text2 ...", where text = "text1 text2 ..."
+		"""
+
+		keyword, dummy, text = text.partition(' ')
+		if len(keyword) == 0: return None
+
+		self.current_query = text
+		return keyword[1:], text
+
+
 	def on_search_entry_changed(self, *dummy):
 		"""
 		Handler for when the user types something in the search entry
 		"""
 
-		# MODEL/VIEW SEPARATION EFFORT: everything in here should be
-		# model/controller stuff. View stuff should go on separate, well-defined
-		# calls that are made from here.
+		text = self.read_new_query()
+		if text is None: return
 
-		text = self.view.get_search_entry_text().strip()
-
-		if text and text == self.current_query: return
-
-		self.current_query = text
 		handled = False
 
 		self.no_results_to_show = True
@@ -999,57 +1017,25 @@ class Cardapio(dbus.service.Object):
 
 		# if showing the control center menu
 		if self.in_system_menu_mode:
-			self.search_menus(text, self.sys_list)
-			handled = True
-
-		# if doing a keyword search
-		elif text and text[0] == '?':
-			keyword, dummy, text = text.partition(' ')
-			self.current_query = text
-
-			if len(keyword) >= 1 and text:
-				self.search_with_plugin_keyword(keyword[1:], text)
-
-			self.consider_showing_no_results_text()
-			handled = True
+			handled = self.search_menus(text, self.sys_list)
 
 		# if doing a subfolder search
 		elif in_subfolder_search_mode:
-			self.view.previously_focused_widget = None
 			handled = self.search_subfolders(text, first_app_info, selected_app_info)
 
-		# if none of these (or if the subfolder search tells you this is not a
-		# proper subfolder), then just run a regular search. This includes the
-		# regular menus, the system menus, and all active plugins
-		if not handled:
-			# search all menus (apps, places and system)
-			self.search_menus(text, self.app_list)
+		# if doing a keyword search
+		elif text and text[0] == '?':
+			handled = self.search_with_plugin_keyword(text)
 
-			# search with all plugins
+		# if none of these have "handled" the query, then just run a regular
+		# search. This includes the regular menus, the system menus, and all
+		# active plugins
+		if not handled:
+			self.search_menus(text, self.app_list)
 			self.schedule_search_with_all_plugins(text)
 
-			# NOTE: To fix a bug where plugins with hide_from_sidebar=False were
-			# not being placed on the sidebar, I replaced the block below for
-			# the line above. I'm just wondering if there are any unforeseen
-			# side effects, though. So I'm leaving the block below in the code
-			# for a few versions as a reminder. If nothing pops up, we can just
-			# remove it.
-
-			## if query is large enough
-			#if len(text) >= self.settings['min search string length']:
-			#
-			#	# search with all plugins
-			#	self.schedule_search_with_all_plugins(text)
-			#
-			#else:
-			#	# clean up plugin results
-			#	self.disappear_with_plugin_sections_and_category_buttons()
-
-		if len(text) == 0:
-			self.disappear_with_all_transitory_sections()
-
-		else:
-			self.view.set_all_sections_sidebar_button_sensitive(True, self.in_system_menu_mode)
+		if len(text) == 0: self.disappear_with_all_transitory_sections()
+		else: self.view.set_all_sections_sidebar_button_sensitive(True, self.in_system_menu_mode)
 
 		self.consider_showing_no_results_text()
 
@@ -1076,6 +1062,8 @@ class Cardapio(dbus.service.Object):
 			self.untoggle_and_show_all_sections()
 
 		self.view.application_pane.show() # restore application_pane
+		
+		return True
 
 
 	def create_subfolder_stack(self, path):
@@ -1214,13 +1202,18 @@ class Cardapio(dbus.service.Object):
 			glib.source_remove(self.search_timeout_remote)
 
 
-	def search_with_plugin_keyword(self, keyword, text):
+	def search_with_plugin_keyword(self, text):
 		"""
-		Search using the plugin that matches the given keyword
+		Search using the plugin that matches the keyword (specified as the first
+		word in a query beginning with a question mark). This method always
+		returns True, to make sure keyword searches take precedence over other
+		types. 
 		"""
 
-		if not keyword: return
+		keywordtext = self.parse_keyword_query(text)
+		if not keywordtext: return True
 
+		keyword, text = keywordtext
 		keyword_exists = False
 
 		# search for a registered keyword that has this keyword as a substring
@@ -1230,7 +1223,7 @@ class Cardapio(dbus.service.Object):
 				keyword = plugin_keyword
 				break
 
-		if not keyword_exists: return
+		if not keyword_exists: return True
 
 		plugin = self.keyword_to_plugin_mapping[keyword]
 
@@ -1238,6 +1231,8 @@ class Cardapio(dbus.service.Object):
 		self.cancel_all_plugin_timers()
 
 		self.schedule_search_with_specific_plugin(text, plugin.search_delay_type, plugin)
+
+		return True
 
 
 	def reset_search(self):
@@ -2976,17 +2971,6 @@ class Cardapio(dbus.service.Object):
 		for section in self.section_list:
 			self.mark_section_empty_and_hide_category_button(section)
 			section.hide()
-
-
-	#def disappear_with_plugin_sections_and_category_buttons(self):
-	#	"""
-	#	Hide all plugin sections
-	#	"""
-	#
-	#	for plugin in self.active_plugin_instances:
-	#		if plugin.hide_from_sidebar:
-	#			self.mark_section_empty_and_hide_category_button(plugin.section)
-	#			plugin.section.hide()
 
 
 	def disappear_with_all_transitory_plugin_sections(self):
