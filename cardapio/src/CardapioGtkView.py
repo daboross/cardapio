@@ -55,6 +55,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.clicked_app_info              = None
 
 
+	# This method is required by the View API
 	def setup_ui(self):
 		"""
 		Reads the GTK Builder interface file and sets up some UI details
@@ -287,6 +288,7 @@ class CardapioGtkView(CardapioViewInterface):
 		return unicode(text, 'utf-8')
 
 
+	# TODO MVC this out of Cardapio
 	def on_sidebar_button_clicked(self, widget, section_slab):
 		"""
 		Handler for when the user chooses a category in the sidebar
@@ -514,6 +516,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.app_context_menu.popup(None, None, None, 3, time)
 
 
+	# TODO MVC this out of Cardapio
 	def on_app_button_clicked(self, widget):
 		"""
 		Handle the on-click event for buttons on the app list. This includes
@@ -525,6 +528,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.cardapio.handle_app_clicked(widget.app_info, 1, ctrl_is_pressed)
 
 
+	# TODO MVC this out of Cardapio
 	def on_app_button_button_pressed(self, widget, event):
 		"""
 		Respond to mouse click events onto app buttons. Either launch an app or
@@ -753,7 +757,7 @@ class CardapioGtkView(CardapioViewInterface):
 		return (len(self.search_entry.get_text().strip()) == 0)
 
 
-	# TODO MVC: Make sure this function is never called from Cardapio
+	# TODO MVC this out of Cardapio
 	def get_first_visible_app_widget(self):
 		"""
 		Returns the first app in the right pane, if any.
@@ -870,6 +874,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.cardapio.launch_edit_app()
 
 		
+	# TODO MVC this out of Cardapio
 	def on_search_entry_changed(self, *dummy):
 
 		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
@@ -877,6 +882,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.cardapio.on_search_entry_changed(*dummy)
 
 
+	# TODO MVC this out of Cardapio
 	def on_search_entry_key_pressed(self, widget, event):
 
 		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
@@ -1069,6 +1075,7 @@ class CardapioGtkView(CardapioViewInterface):
 		return self.clicked_app_info
 
 
+	# This method is required by the View API
 	def add_button(self, button_str, icon_name, parent_widget, tooltip, button_type):
 		"""
 		Adds a button to a parent container
@@ -1353,6 +1360,7 @@ class CardapioGtkView(CardapioViewInterface):
 			return None
 
 
+	# This method is required by the View API
 	def remove_all_buttons_from_category_panes(self):
 		"""
 		Removes all buttons from both the regular and system category panes
@@ -1363,6 +1371,7 @@ class CardapioGtkView(CardapioViewInterface):
 		for	child in self.system_category_pane.get_children(): self.system_category_pane.remove(child)
 
 
+	# This method is required by the View API
 	def toggle_mini_mode_ui(self, update_window_size = True):
 		"""
 		Collapses the sidebar into a row of small buttons (i.e. minimode)
@@ -1428,6 +1437,7 @@ class CardapioGtkView(CardapioViewInterface):
 				self.cardapio.settings['window size'][0] += self.get_main_splitter_position()
 
 
+	# This method is required by the View API
 	def setup_search_entry(self, place_at_top, place_at_left):
 		"""
 		Hides 3 of the 4 search entries and returns the visible entry.
@@ -1468,6 +1478,7 @@ class CardapioGtkView(CardapioViewInterface):
 		for child in container: container.remove(child)
 
 
+	# This method is required by the View API
 	def focus_search_entry(self):
 		"""
 		Focuses the search entry
