@@ -1099,7 +1099,7 @@ class Cardapio(dbus.service.Object):
 				prev_level = -1
 
 			# if typed root folder
-			if text == '': 
+			if text == '' and selected_app_info is None: 
 				path        = '/'
 				base_text   = ''
 				self.subfolder_stack = [(text, path)]

@@ -964,6 +964,11 @@ class CardapioGtkView(CardapioViewInterface):
 		self.navigation_buttons_pane.show()
 		self.mainpane_separator.show()
 
+		# This is a hackish way to solve a bug, where adding a '/' to a folder
+		# from a Tracker result would not jump into it. We need to run this line
+		# somewhere before processing a subfolder, so we're doing it here.
+		self.previously_focused_widget = None
+
 
 	# This method is required by the View API
 	def hide_navigation_buttons(self):
