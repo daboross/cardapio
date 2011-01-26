@@ -87,6 +87,8 @@ class CardapioGtkView(CardapioViewInterface):
 		self.eject_menuitem            = self.get_widget('EjectMenuItem')
 		self.view_mode_button          = self.get_widget('ViewModeButton')
 		self.main_splitter             = self.get_widget('MainSplitter')
+		self.navigation_buttons_pane   = self.get_widget('NavigationButtonsBackground')
+		self.mainpane_separator        = self.get_widget('MainPaneSeparator')
 
 		# These variables are all required by the View API
 		self.application_pane          = self.get_widget('ApplicationPane')
@@ -175,6 +177,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.style_app_button_bg = app_style.base[gtk.STATE_NORMAL]
 		self.style_app_button_fg = app_style.text[gtk.STATE_NORMAL]
 		self.get_widget('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
+		#self.get_widget('NavigationButtonsBackground').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
 
 
 	def on_mainwindow_destroy(self, *dummy):
@@ -944,6 +947,31 @@ class CardapioGtkView(CardapioViewInterface):
 
 		app_uri = self.cardapio.get_app_uri_for_drag_and_drop(button.app_info)
 		selection_data.set_uris([app_uri])
+
+
+	def on_back_button_clicked(self, widget):
+		"""
+		Handler for when the "back" button is clicked.
+		"""
+		self.cardapio.handle_back_button_clicked()
+
+
+	# This method is required by the View API
+	def show_navigation_buttons(self):
+		"""
+		Shows the row of navigation buttons on top of the main app pane.
+		"""
+		self.navigation_buttons_pane.show()
+		self.mainpane_separator.show()
+
+
+	# This method is required by the View API
+	def hide_navigation_buttons(self):
+		"""
+		Shows the row of navigation buttons on top of the main app pane.
+		"""
+		self.navigation_buttons_pane.hide()
+		self.mainpane_separator.hide()
 
 
 	def start_resize(self, widget, event):

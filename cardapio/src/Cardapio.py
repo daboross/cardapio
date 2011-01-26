@@ -1008,8 +1008,10 @@ class Cardapio(dbus.service.Object):
 			# MUST run these lines BEFORE disappering with all sections
 			first_app_info    = self.view.get_first_visible_app()
 			selected_app_info = self.view.get_selected_app()
+			self.view.show_navigation_buttons()
 		else:
 			self.subfolder_stack = []
+			self.view.hide_navigation_buttons()
 
 		self.disappear_with_all_sections_and_category_buttons()
 		handled = False
@@ -1030,6 +1032,7 @@ class Cardapio(dbus.service.Object):
 		# search. This includes the regular menus, the system menus, and all
 		# active plugins
 		if not handled:
+			self.view.hide_navigation_buttons()
 			self.search_menus(text, self.app_list)
 			self.schedule_search_with_all_plugins(text)
 
@@ -1594,10 +1597,7 @@ class Cardapio(dbus.service.Object):
 			slash_pos = text.rfind('/')
 
 			if self.subfolder_stack and slash_pos != -1:
-				if text[-1] == '/': slash_pos = text[:-1].rfind('/')
-				text = text[:slash_pos+1]
-				self.view.set_search_entry_text(text)
-				self.view.place_text_cursor_at_end()
+				self.go_to_parent_folder()
 
 			elif not self.view.is_search_entry_empty():
 				self.reset_search_query()
@@ -2449,6 +2449,28 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.launch_raw('alacarte')
+
+
+	def go_to_parent_folder(self):
+		"""
+		Goes to the parent of the folder specified by the string in the search
+		entry.
+		"""
+
+		current_path = self.view.get_search_entry_text()
+		slash_pos = current_path.rfind('/')
+
+		if current_path[-1] == '/': slash_pos = current_path[:-1].rfind('/')
+		current_path = current_path[:slash_pos+1]
+		self.view.set_search_entry_text(current_path)
+		self.view.place_text_cursor_at_end()
+
+
+	def handle_back_button_clicked(self):
+		"""
+		Handle the back-button's click action
+		"""
+		self.go_to_parent_folder()
 
 
 	def handle_pin_this_app_clicked(self, clicked_app_info):
