@@ -177,7 +177,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.style_app_button_bg = app_style.base[gtk.STATE_NORMAL]
 		self.style_app_button_fg = app_style.text[gtk.STATE_NORMAL]
 		self.get_widget('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
-		#self.get_widget('NavigationButtonsBackground').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
+		self.get_widget('NavigationButtonsBackground').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
 
 
 	def on_mainwindow_destroy(self, *dummy):
