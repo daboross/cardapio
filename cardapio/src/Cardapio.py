@@ -1548,6 +1548,7 @@ class Cardapio(dbus.service.Object):
 
 
 	# TODO MVC
+	# This method is called from the View API
 	def handle_search_entry_activate(self):
 		"""
 		Handler for when the user presses Enter on the search entry
@@ -2466,6 +2467,7 @@ class Cardapio(dbus.service.Object):
 		self.view.place_text_cursor_at_end()
 
 
+	# This method is called from the View API
 	def handle_back_button_clicked(self):
 		"""
 		Handle the back-button's click action
@@ -2473,6 +2475,7 @@ class Cardapio(dbus.service.Object):
 		self.go_to_parent_folder()
 
 
+	# This method is called from the View API
 	def handle_pin_this_app_clicked(self, clicked_app_info):
 		"""
 		Handle the pinning action
@@ -2484,6 +2487,7 @@ class Cardapio(dbus.service.Object):
 		self.fill_favorites_list(self.view.favorites_section_slab, 'pinned items')
 
 
+	# This method is called from the View API
 	def handle_unpin_this_app_clicked(self, clicked_app_info):
 		"""
 		Handle the unpinning action
@@ -2496,6 +2500,7 @@ class Cardapio(dbus.service.Object):
 
 
 	# TODO MVC
+	# This method is called from the View API
 	def handle_add_to_side_pane_clicked(self, clicked_app_info):
 		"""
 		Handle the "add to sidepane" action
@@ -2511,6 +2516,7 @@ class Cardapio(dbus.service.Object):
 
 
 	# TODO MVC
+	# This method is called from the View API
 	def handle_remove_from_side_pane_clicked(self, clicked_app_info):
 		"""
 		Handle the "remove from sidepane" action
@@ -2524,6 +2530,7 @@ class Cardapio(dbus.service.Object):
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or an extra space will show up where but button used to be
 
 
+	# This method is called from the View API
 	def handle_open_parent_folder_pressed(self, clicked_app_info):
 		"""
 		Handle the "open parent folder" action
@@ -2533,6 +2540,7 @@ class Cardapio(dbus.service.Object):
 		self.launch_xdg(parent_folder)
 
 
+	# This method is called from the View API
 	def handle_launch_in_background_pressed(self, clicked_app_info):
 		"""
 		Handle the "launch in background" action
@@ -2541,6 +2549,7 @@ class Cardapio(dbus.service.Object):
 		self.launch_button_command(clicked_app_info, hide = False)
 
 
+	# This method is called from the View API
 	def handle_peek_inside_pressed(self, clicked_app_info):
 		"""
 		Handle the "peek inside folder" action
@@ -2553,6 +2562,7 @@ class Cardapio(dbus.service.Object):
 		self.view.set_search_entry_text(self.subfolder_stack[-1][1] + '/')
 
 
+	# This method is called from the View API
 	def handle_eject_pressed(self, clicked_app_info):
 		"""
 		Handle the "eject" action
