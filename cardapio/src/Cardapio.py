@@ -1068,24 +1068,6 @@ class Cardapio(dbus.service.Object):
 		return True
 
 
-	def create_subfolder_stack(self, path):
-		"""
-		Fills in the subfolder_stack array with all ancestors of a given path
-		"""
-
-		path = '/' + path.strip('/')
-		self.subfolder_stack = [('', '/')]
-
-		i = 0
-		while True:
-			i = path.find('/', i+1)
-			if i == -1: break
-			partial_path = path[:i]
-			self.subfolder_stack.append((partial_path, partial_path))
-
-		self.subfolder_stack.append((path, path))
-
-
 	# TODO MVC
 	def search_subfolders(self, text, first_app_info, selected_app_info):
 		"""
@@ -2557,9 +2539,18 @@ class Cardapio(dbus.service.Object):
 
 		dummy, path = urllib2.splittype(clicked_app_info['command'])
 		if os.path.isfile(path): path, dummy = os.path.split(path)
+
 		path = self.unescape_url(path)
- 		self.create_subfolder_stack(path)
-		self.view.set_search_entry_text(self.subfolder_stack[-1][1] + '/')
+		name = clicked_app_info['name']
+
+		if self.subfolder_stack:
+			entry_text = self.view.get_search_entry_text() + name
+			self.subfolder_stack.append((entry_text, path))
+		else:
+			self.subfolder_stack = [(name, path)]
+			entry_text = name
+
+		self.view.set_search_entry_text(entry_text + '/')
 
 
 	# This method is called from the View API
