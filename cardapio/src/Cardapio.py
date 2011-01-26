@@ -350,10 +350,10 @@ class Cardapio(dbus.service.Object):
 
 		if self.panel_applet.panel_type == PANEL_TYPE_GNOME2:
 			self.view.remove_about_context_menu_items()
-			self.view.set_window_frame_visible(False)
+			self.view.hide_window_frame()
 
 		else:
-			self.view.set_window_frame_visible(True)
+			self.view.show_window_frame()
 
 		self.panel_applet.setup(self)
 
@@ -725,7 +725,7 @@ class Cardapio(dbus.service.Object):
 		self.build_reorderable_slabs()
 
 		if not self.have_control_center:
-			self.view.set_view_mode_button_visible(False)
+			self.view.hide_view_mode_button()
 
 		# TODO MVC - Separate the MC from the V in all of the fill_* methods!
 		self.fill_places_list()
@@ -739,7 +739,7 @@ class Cardapio(dbus.service.Object):
 
 		self.view.post_build_ui()
 
-		self.view.set_message_window_visible(False)
+		self.view.hide_message_window()
 
 
 	def rebuild_ui(self, show_message = False):
@@ -755,7 +755,7 @@ class Cardapio(dbus.service.Object):
 			self.view.rebuild_timer = None
 
 		if show_message:
-			self.view.set_message_window_visible(True)
+			self.view.show_message_window()
 
 		self.reset_model()
 		self.build_ui()
@@ -2568,15 +2568,15 @@ class Cardapio(dbus.service.Object):
 		Show or hide different context menu options depending on the widget
 		"""
 
-		self.view.set_context_menu_option_visible(CardapioViewInterface.OPEN_FOLDER_MENUITEM, False)
-		self.view.set_context_menu_option_visible(CardapioViewInterface.PEEK_INSIDE_MENUITEM, False)
-		self.view.set_context_menu_option_visible(CardapioViewInterface.EJECT_MENUITEM, False)
+		self.view.hide_context_menu_option(CardapioViewInterface.OPEN_FOLDER_MENUITEM)
+		self.view.hide_context_menu_option(CardapioViewInterface.PEEK_INSIDE_MENUITEM)
+		self.view.hide_context_menu_option(CardapioViewInterface.EJECT_MENUITEM)
 
 		if app_info['type'] == 'callback':
-			self.view.set_context_menu_option_visible(CardapioViewInterface.PIN_MENUITEM, False)
-			self.view.set_context_menu_option_visible(CardapioViewInterface.UNPIN_MENUITEM, False)
-			self.view.set_context_menu_option_visible(CardapioViewInterface.ADD_SIDE_PANE_MENUITEM, False)
-			self.view.set_context_menu_option_visible(CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM, False)
+			self.view.hide_context_menu_option(CardapioViewInterface.PIN_MENUITEM)
+			self.view.hide_context_menu_option(CardapioViewInterface.UNPIN_MENUITEM)
+			self.view.hide_context_menu_option(CardapioViewInterface.ADD_SIDE_PANE_MENUITEM)
+			self.view.hide_context_menu_option(CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM)
 			self.view.app_menu_separator.hide() # this should happen automatically in setup_plugin_context_menu
 			self.setup_plugin_context_menu(app_info)
 			return
@@ -2596,18 +2596,18 @@ class Cardapio(dbus.service.Object):
 				break
 
 		if already_pinned:
-			self.view.set_context_menu_option_visible(CardapioViewInterface.PIN_MENUITEM, False)
-			self.view.set_context_menu_option_visible(CardapioViewInterface.UNPIN_MENUITEM, True)
+			self.view.hide_context_menu_option(CardapioViewInterface.PIN_MENUITEM)
+			self.view.show_context_menu_option(CardapioViewInterface.UNPIN_MENUITEM)
 		else:
-			self.view.set_context_menu_option_visible(CardapioViewInterface.PIN_MENUITEM, True)
-			self.view.set_context_menu_option_visible(CardapioViewInterface.UNPIN_MENUITEM, False)
+			self.view.show_context_menu_option(CardapioViewInterface.PIN_MENUITEM)
+			self.view.hide_context_menu_option(CardapioViewInterface.UNPIN_MENUITEM)
 
 		if already_on_side_pane:
-			self.view.set_context_menu_option_visible(CardapioViewInterface.ADD_SIDE_PANE_MENUITEM, False)
-			self.view.set_context_menu_option_visible(CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM, True)
+			self.view.hide_context_menu_option(CardapioViewInterface.ADD_SIDE_PANE_MENUITEM)
+			self.view.show_context_menu_option(CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM)
 		else:
-			self.view.set_context_menu_option_visible(CardapioViewInterface.ADD_SIDE_PANE_MENUITEM, True)
-			self.view.set_context_menu_option_visible(CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM, False)
+			self.view.show_context_menu_option(CardapioViewInterface.ADD_SIDE_PANE_MENUITEM)
+			self.view.hide_context_menu_option(CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM)
 
 		# TODO: move this into Controller
 		# figure out whether to show the 'open parent folder' menuitem
@@ -2623,12 +2623,12 @@ class Cardapio(dbus.service.Object):
 
 				# only show if path that exists
 				if os.path.exists(self.unescape_url(canonical_path)):
-					self.view.set_context_menu_option_visible(CardapioViewInterface.OPEN_FOLDER_MENUITEM, True)
-					self.view.set_context_menu_option_visible(CardapioViewInterface.PEEK_INSIDE_MENUITEM, True)
+					self.view.show_context_menu_option(CardapioViewInterface.OPEN_FOLDER_MENUITEM)
+					self.view.show_context_menu_option(CardapioViewInterface.PEEK_INSIDE_MENUITEM)
 
 		# figure out whether to show the 'eject' menuitem
 		if app_info['command'] in self.volumes:
-			self.view.set_context_menu_option_visible(CardapioViewInterface.EJECT_MENUITEM, True)
+			self.view.show_context_menu_option(CardapioViewInterface.EJECT_MENUITEM)
 
 		self.setup_plugin_context_menu(app_info)
 

@@ -330,14 +330,10 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
-	def set_message_window_visible(self, state = True):
+	def show_message_window(self):
 		"""
-		Show/Hide the "Rebuilding..." message window
+		Show the "Rebuilding..." message window
 		"""
-
-		if state == False:
-			self.message_window.hide()
-			return
 
 		main_window_width, main_window_height = self.window.get_size()
 		message_width, message_height = self.message_window.get_size()
@@ -355,6 +351,15 @@ class CardapioGtkView(CardapioViewInterface):
 		gtk.gdk.flush()
 		while gtk.events_pending():
 			gtk.main_iteration()
+
+
+	# This method is required by the View API
+	def hide_message_window(self):
+		"""
+		Hide the "Rebuilding..." message window
+		"""
+
+		self.message_window.hide()
 
 
 	# This method is required by the View API
@@ -476,16 +481,27 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
-	def set_context_menu_option_visible(self, menu_item, state):
+	def show_context_menu_option(self, menu_item):
 		"""
-		Shows or hides (depending on the "state" parameter) the context menu
-		option specified by "menu_item". The "menu_item" parameter is one of 
-		the *_MENUITEM constants declared in CardapioViewInterface.
+		Shows the context menu option specified by "menu_item". The "menu_item"
+		parameter is one of the *_MENUITEM constants declared in
+		CardapioViewInterface.
 		"""
 
 		widget = self.context_menu_options[menu_item]
-		if state: widget.show()
-		else: widget.hide()
+		widget.show()
+
+
+	# This method is required by the View API
+	def hide_context_menu_option(self, menu_item):
+		"""
+		Hides the context menu option specified by "menu_item". The "menu_item"
+		parameter is one of the *_MENUITEM constants declared in
+		CardapioViewInterface.
+		"""
+
+		widget = self.context_menu_options[menu_item]
+		widget.hide()
 
 
 	# This method is required by the View API
@@ -546,14 +562,23 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
-	def set_view_mode_button_visible(self, state):
+	def show_view_mode_button(self):
 		"""
-		Shows or hides the "view mode" button, which switches between "app view"
-		and "control center" view
+		Shows the "view mode" button, which switches between "app view" and
+		"control center" view
 		"""
 
-		if state: self.view_mode_button.show()
-		else: self.view_mode_button.hide()
+		self.view_mode_button.show()
+
+
+	# This method is required by the View API
+	def hide_view_mode_button(self):
+		"""
+		Hides the "view mode" button, which switches between "app view" and
+		"control center" view
+		"""
+
+		self.view_mode_button.hide()
 
 
 	# This method is required by the View API
@@ -1280,14 +1305,23 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
-	def set_window_frame_visible(self, state):
+	def show_window_frame(self):
 		"""
-		Shows/hides the window frame around Cardapio
+		Shows the window frame around Cardapio
 		"""
-		if state:
-			self.window.set_decorated(True)
-			self.window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
-			self.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
+		self.window.set_decorated(True)
+		self.window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
+		self.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
+
+
+	# This method is required by the View API
+	def hide_window_frame(self):
+		"""
+		Hides the window frame around Cardapio
+		"""
+		self.window.set_decorated(False)
+		self.window.set_deletable(True) 
+		self.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_IN)
 
 
 	# This method is required by the View API
