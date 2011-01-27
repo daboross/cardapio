@@ -14,20 +14,39 @@ class CardapioViewInterface:
 	PEEK_INSIDE_MENUITEM       = 5
 	EJECT_MENUITEM             = 6
 
-	# TODO: Add virtual methods here, once they are well-defined
 
 	def setup_ui(self):
 		"""
-		Reads the GTK Builder interface file and sets up some UI details
+		Reads the GTK Builder interface file and sets up some UI details. Must 
+		define the member variables below, which are used to refer to different 
+		areas of the UI within the Controller code.
+
+			self.application_pane
+			self.category_pane
+			self.system_category_pane
+			self.sidepane
+			self.left_session_pane
+			self.right_session_pane
+
+		For instance, these are used as an argument to the method
+		remove_all_buttons_from_section()
 		"""
-		pass
+
+		self.application_pane     = NotImplemented
+		self.category_pane        = NotImplemented
+		self.system_category_pane = NotImplemented
+		self.sidepane             = NotImplemented
+		self.left_session_pane    = NotImplemented
+		self.right_session_pane   = NotImplemented
+
+		raise NotImplementedError("You must implement this method!")
 
 
 	def set_sidebar_button_toggled(self, button, state):
 		"""
 		Toggle a sidebar button
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def set_all_sections_sidebar_button_toggled(self, state, is_system_mode):
@@ -35,56 +54,56 @@ class CardapioViewInterface:
 		Toggle the "All" sidebar button for either the main mode or
 		the system mode sidebar.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def set_all_sections_sidebar_button_sensitive(self, state, is_system_mode):
 		"""
 		Makes the "All" button unclickable
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def on_all_sections_sidebar_button_clicked(self, widget):
 		"""
 		Handler for when the user clicks "All" in the sidebar
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def show_section(self, section):
 		"""
 		Shows a given application section
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def hide_section(self, section):
 		"""
 		Hides a given application section
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def hide_sections(self, sections):
 		"""
 		Hides the application sections listed in the array "sections"
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def clear_search_entry(self):
 		"""
 		Removes all text from the search entry.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def set_search_entry_text(self, text):
 		"""
 		Removes all text from the search entry.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def get_search_entry_text(self):
@@ -92,35 +111,35 @@ class CardapioViewInterface:
 		Gets the text that is currently displayed in the search entry, formatted
 		in UTF8.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def show_message_window(self):
 		"""
 		Show the "Rebuilding..." message window
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def hide_message_window(self):
 		"""
 		Hide the "Rebuilding..." message window
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def show_main_window(self):
 		"""
 		Show's Cardapio's main window
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def open_about_dialog(self):
 		"""
 		Shows the "About" dialog
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def show_executable_file_dialog(self, primary_text, secondary_text, hide_terminal_option):
@@ -128,28 +147,28 @@ class CardapioViewInterface:
 		Opens a dialog similar to the one in Nautilus, that asks whether an
 		executable script should be launched or edited.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def block_focus_out_event(self):
 		"""
 		Blocks the focus-out event
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def fill_plugin_context_menu(self, clicked_app_info_context_menu):
 		"""
 		Add plugin-related actions to the context menu
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def clear_plugin_context_menu(self):
 		"""
 		Remove all plugin-dependent actions from the context menu
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def show_context_menu_option(self, menu_item):
@@ -158,7 +177,7 @@ class CardapioViewInterface:
 		parameter is one of the *_MENUITEM constants declared in
 		CardapioViewInterface.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def hide_context_menu_option(self, menu_item):
@@ -167,14 +186,14 @@ class CardapioViewInterface:
 		parameter is one of the *_MENUITEM constants declared in
 		CardapioViewInterface.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def popup_app_context_menu(self, app_info):
 		"""
 		Show context menu for app buttons
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def set_view_mode_button_toggled(self, state):
@@ -182,7 +201,7 @@ class CardapioViewInterface:
 		Toggle the "view mode" button, which switches between "app view" and
 		"control center" view
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def show_view_mode_button(self):
@@ -190,7 +209,7 @@ class CardapioViewInterface:
 		Shows the "view mode" button, which switches between "app view" and
 		"control center" view
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def hide_view_mode_button(self):
@@ -198,7 +217,7 @@ class CardapioViewInterface:
 		Hides the "view mode" button, which switches between "app view" and
 		"control center" view
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def set_main_splitter_position(self, position):
@@ -206,7 +225,7 @@ class CardapioViewInterface:
 		Set the position of the "splitter" which separates the sidepane from the
 		app pane
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def get_main_splitter_position(self):
@@ -214,14 +233,14 @@ class CardapioViewInterface:
 		Get the position of the "splitter" which separates the sidepane from the
 		app pane
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def get_window_size(self):
 		"""
 		Get the width and height of the Cardapio window
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def apply_settings(self):
@@ -229,7 +248,7 @@ class CardapioViewInterface:
 		Setup UI elements from the set of preferences that are accessible
 		from the options dialog.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def get_cursor_coordinates(self):
@@ -237,7 +256,7 @@ class CardapioViewInterface:
 		Returns the x,y coordinates of the mouse cursor with respect
 		to the current screen.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def get_screen_dimensions(self):
@@ -246,21 +265,21 @@ class CardapioViewInterface:
 		a tuple: (x, y, width, height). If the real numbers can't be
 		determined, returns the size of the whole screen instead.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def is_search_entry_empty(self):
 		"""
 		Returns True if the search entry is empty.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def get_first_visible_app(self):
 		"""
 		Returns the app_info for the first app in the right pane, if any.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def get_selected_app(self):
@@ -268,63 +287,63 @@ class CardapioViewInterface:
 		Returns the button for the selected app (that is, the one that has
 		keyboard focus) if any.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def place_text_cursor_at_end(self):
 		"""
 		Places the text cursor at the end of the search entry's text
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def hide_no_results_text(self):
 		"""
 		Hide the "No results to show" text
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def scroll_to_top(self):
 		"""
 		Scroll to the top of the app pane
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def show_no_results_text(self, text = None):
 		"""
 		Show the "No results to show" text
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def show_navigation_buttons(self):
 		"""
 		Shows the row of navigation buttons on top of the main app pane.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def hide_navigation_buttons(self):
 		"""
 		Shows the row of navigation buttons on top of the main app pane.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def add_button(self, button_str, icon_name, parent_widget, tooltip, button_type):
 		"""
 		Adds a button to a parent container
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def setup_button_drag_and_drop(self, button, is_desktop_file):
 		"""
 		Sets up the event handlers for drag-and-drop
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def get_section_from_button(self, button):
@@ -332,112 +351,112 @@ class CardapioViewInterface:
 		Returns a unique handler describing the section that a given app button
 		belongs to
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def pre_build_ui(self):
 		"""
 		Prepares the UI before building any of the actual content-related widgets
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def post_build_ui(self):
 		"""
 		Performs operations after building the actual content-related widgets
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def build_all_sections_sidebar_buttons(self, title, tooltip):
 		"""
 		Creates the "All sections" buttons for both the regular and system modes
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def build_no_results_slab(self):
 		"""
 		Creates the slab that will be used to display the "No results to show" text
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def build_subfolders_slab(self, title, tooltip):
 		"""
 		Creates the Folder Contents slab to the app pane
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def build_uncategorized_slab(self, title, tooltip):
 		"""
 		Creates the Uncategorized slab to the app pane
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def build_session_slab(self, title, tooltip):
 		"""
 		Creates the Session slab to the app pane
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def build_system_slab(self, title, tooltip):
 		"""
 		Creates the System slab to the app pane
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def build_places_slab(self, title, tooltip):
 		"""
 		Creates the Places slab to the app pane
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def build_pinneditems_slab(self, title, tooltip):
 		"""
 		Creates the Pinned Items slab to the app pane
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def build_sidepane_slab(self, title, tooltip):
 		"""
 		Creates the Side Pane slab to the app pane
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def remove_about_context_menu_items(self):
 		"""
 		Removes "About Gnome" and "About %distro" from Cardapio's context menu
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def show_window_frame(self):
 		"""
 		Shows the window frame around Cardapio
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def hide_window_frame(self):
 		"""
 		Hides the window frame around Cardapio
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def remove_all_buttons_from_section(self, section):
 		"""
-		Removes all buttons from a given section slab
+		Removes all buttons from a given section slab or from a pane
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def remove_all_buttons_from_category_panes(self):
@@ -445,28 +464,28 @@ class CardapioViewInterface:
 		Removes all buttons from both the regular and system category panes
 		(i.e. the category filter lists)
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def toggle_mini_mode_ui(self, update_window_size = True):
 		"""
 		Collapses the sidebar into a row of small buttons (i.e. minimode)
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def setup_search_entry(self, place_at_top, place_at_left):
 		"""
 		Hides 3 of the 4 search entries and returns the visible entry.
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 	def focus_search_entry(self):
 		"""
 		Focuses the search entry
 		"""
-		pass
+		raise NotImplementedError("You must implement this method!")
 
 
 
