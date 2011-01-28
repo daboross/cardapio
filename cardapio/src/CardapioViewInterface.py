@@ -488,4 +488,11 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
+	def show_section_status_text(self, section, text):
+		"""
+		Shows some status text inside a section (for instance, this is called to
+		write the "loading..." text for slow plugins).
+		"""
+		raise NotImplementedError("You must implement this method!")
+
 

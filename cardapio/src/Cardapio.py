@@ -1323,43 +1323,15 @@ class Cardapio(dbus.service.Object):
 		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
-	# TODO MVC
-	def reset_plugin_section_contents(self, plugin):
-		"""
-		Clear the contents of a plugin's slab, usually to fill it with results later
-		"""
-
-		self.view.remove_all_buttons_from_section(plugin.section)
-
-		# container = plugin.section_contents.parent
-
-		# # if plugin was deactivated while waiting for search result
-		# if container is None: return False
-
-		# container.remove(plugin.section_contents)
-		# plugin.section_contents = gtk.VBox()
-		# container.add(plugin.section_contents)
-
-		return True
-
-
-	# TODO MVC
 	def show_plugin_loading_text(self, plugin):
 		"""
 		Write "Searching..." under the plugin slab title
 		"""
 
-		self.reset_plugin_section_contents(plugin)
-		label = gtk.Label(self.plugin_loading_text)
-		label.set_alignment(0, 0.5)
-		label.set_sensitive(False)
-		label.show()
-
-		plugin.section_contents.pack_start(label, expand = False, fill = False)
-		plugin.section_contents.show()
+		self.view.show_section_status_text(plugin.section, self.plugin_loading_text)
 
 		if self.selected_section is None or plugin.section == self.selected_section:
-			plugin.section.show()
+			self.view.show_section(plugin.section)
 			self.view.hide_no_results_text()
 
 		self.plugins_still_searching += 1
@@ -1383,15 +1355,8 @@ class Cardapio(dbus.service.Object):
 				self.plugin_write_to_log(plugin, 'Plugin failed to cancel query', is_error = True)
 				logging.error(exception)
 
-			self.reset_plugin_section_contents(plugin)
-			label = gtk.Label(self.plugin_timeout_text)
-			label.set_alignment(0, 0.5)
-			label.set_sensitive(False)
-			label.show()
-
-			plugin.section_contents.pack_start(label, expand = False, fill = False)
-			plugin.section_contents.show()
-			plugin.section.show()
+			self.view.show_section_status_text(plugin.section, self.plugin_timeout_text)
+			self.view.show_section(plugin.section)
 
 			self.plugins_still_searching -= 1
 
@@ -1443,7 +1408,7 @@ class Cardapio(dbus.service.Object):
 
 		gtk.gdk.threads_enter()
 
-		self.reset_plugin_section_contents(plugin)
+		self.view.remove_all_buttons_from_section(plugin.section)
 
 		for result in results:
 
@@ -2273,26 +2238,16 @@ class Cardapio(dbus.service.Object):
 			elif basename == 'pinned':
 				self.view.build_pinneditems_slab(_('Pinned items'), _('Your favorite items'))
 
+			elif basename in self.plugin_database:
+
+				plugin = self.plugin_database[basename]['instance']
+				if plugin is None: continue
+
+				plugin.section, plugin.section_contents, dummy =\
+						self.add_slab(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hide = plugin.hide_from_sidebar)
+
 			else:
-				self.add_plugin_slab(basename)
-
-
-	# TODO MVC
-	def add_plugin_slab(self, basename):
-		"""
-		Add the slab for a plugin (as identified by the basename)
-		"""
-
-		if basename not in self.plugin_database:
-			self.settings['active plugins'].remove(basename)
-			return
-
-		plugin = self.plugin_database[basename]['instance']
-		if plugin is None: return
-
-		section_slab, section_contents, dummy = self.add_slab(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hide = plugin.hide_from_sidebar)
-		plugin.section = section_slab
-		plugin.section_contents = plugin.section.get_children()[0].get_children()[0]
+				self.settings['active plugins'].remove(basename)
 
 
 	def remove_all_buttons_from_section(self, section):

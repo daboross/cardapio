@@ -1487,3 +1487,21 @@ class CardapioGtkView(CardapioViewInterface):
 		self.window.set_focus(self.search_entry)
 
 
+	# This method is required by the View API
+	def show_section_status_text(self, section, text):
+		"""
+		Shows some status text inside a section (for instance, this is called to
+		write the "loading..." text for slow plugins).
+		"""
+
+		self.remove_all_buttons_from_section(section)
+
+		label = gtk.Label(text)
+		label.set_alignment(0, 0.5)
+		label.set_sensitive(False)
+		label.show()
+
+		section_contents = section.get_children()[0].get_children()[0]
+		section_contents.pack_start(label, expand = False, fill = False)
+		section_contents.show()
+
