@@ -316,8 +316,14 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		DBusGMainLoop(set_as_default=True)
-		self.bus = dbus.SessionBus()
-		dbus.service.Object.__init__(self, self.bus, Cardapio.bus_obj_str)
+
+		try: 
+			self.bus = dbus.SessionBus()
+			dbus.service.Object.__init__(self, self.bus, Cardapio.bus_obj_str)
+
+		except Exception, exception:
+			logging.warn('Could not open dbus. Uncaught exception.')
+			logging.warn(exception)
 
 
 	def setup_ui(self):
