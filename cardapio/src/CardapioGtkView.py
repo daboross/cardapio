@@ -746,6 +746,8 @@ class CardapioGtkView(CardapioViewInterface):
 	def on_search_entry_activate(self, widget):
 
 		self.cardapio.handle_search_entry_activate()
+		# TODO: make this run also when the search entry is activated WHILE the
+		# ctrl key is pressed
 
 
 	# This method is required by the View API
@@ -1522,5 +1524,12 @@ class CardapioGtkView(CardapioViewInterface):
 		section_contents = section.get_children()[0].get_children()[0]
 		section_contents.pack_start(label, expand = False, fill = False)
 		section_contents.show()
+
+
+	def get_ctrl_key_state(self):
+		"""
+		Returns True if the CTRL key is pressed, and False otherwise.
+		"""
+		return (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
 
 

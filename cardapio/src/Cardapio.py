@@ -1499,7 +1499,6 @@ class Cardapio(dbus.service.Object):
 				logging.error(exception)
 
 
-	# TODO MVC
 	def handle_search_entry_activate(self):
 		"""
 		Handler for when the user presses Enter on the search entry
@@ -1512,7 +1511,8 @@ class Cardapio(dbus.service.Object):
 
 		app_info = self.view.get_first_visible_app()
 		if app_info is not None:
-			self.handle_app_clicked(app_info, 1, False)
+			ctrl_is_pressed = self.view.get_ctrl_key_state()
+			self.handle_app_clicked(app_info, 1, ctrl_is_pressed)
 
 		if not self.settings['keep search results']:
 			self.reset_search_query_and_selected_section()
