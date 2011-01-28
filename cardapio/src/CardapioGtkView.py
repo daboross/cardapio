@@ -757,7 +757,6 @@ class CardapioGtkView(CardapioViewInterface):
 		return (len(self.search_entry.get_text().strip()) == 0)
 
 
-	# TODO MVC this out of Cardapio
 	def get_first_visible_app_widget(self):
 		"""
 		Returns the first app in the right pane, if any.
@@ -776,6 +775,17 @@ class CardapioGtkView(CardapioViewInterface):
 				return child
 
 		return None
+
+
+	# This method is required by the View API
+	def focus_first_visible_app(self):
+		"""
+		Focuses the first visible button in the app pane.
+		"""
+
+		first_app_widget = self.get_first_visible_app_widget()
+		if first_app_widget is not None:
+			self.window.set_focus(first_app_widget)
 
 
 	# This method is required by the View API
@@ -882,12 +892,20 @@ class CardapioGtkView(CardapioViewInterface):
 		self.cardapio.on_search_entry_changed(*dummy)
 
 
-	# TODO MVC this out of Cardapio
 	def on_search_entry_key_pressed(self, widget, event):
+		"""
+		Handler for when the user presses a key when the search entry is
+		focused.
+		"""
 
-		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
-		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
-		self.cardapio.on_search_entry_key_pressed(widget, event)
+		if event.keyval == gtk.gdk.keyval_from_name('Tab'):
+			self.cardapio.handle_search_entry_tab_pressed()
+
+		elif event.keyval == gtk.gdk.keyval_from_name('Escape'):
+			self.cardapio.handle_search_entry_escape_pressed()
+
+		else: return False
+		return True
 
 
 	def on_main_splitter_clicked(self, widget, event):
@@ -1504,4 +1522,5 @@ class CardapioGtkView(CardapioViewInterface):
 		section_contents = section.get_children()[0].get_children()[0]
 		section_contents.pack_start(label, expand = False, fill = False)
 		section_contents.show()
+
 

@@ -1337,7 +1337,6 @@ class Cardapio(dbus.service.Object):
 		self.plugins_still_searching += 1
 
 
-	# TODO MVC
 	def show_all_plugin_timeout_text(self, delay_type):
 		"""
 		Write "Plugin timed out..." under the plugin slab title
@@ -1501,7 +1500,6 @@ class Cardapio(dbus.service.Object):
 
 
 	# TODO MVC
-	# This method is called from the View API
 	def handle_search_entry_activate(self):
 		"""
 		Handler for when the user presses Enter on the search entry
@@ -1512,61 +1510,49 @@ class Cardapio(dbus.service.Object):
 			self.disappear_with_all_transitory_sections() 
 			return
 
-		first_app_widget = self.view.get_first_visible_app_widget()
-		if first_app_widget is not None:
-			first_app_widget.emit('clicked')
+		app_info = self.view.get_first_visible_app()
+		if app_info is not None:
+			self.handle_app_clicked(app_info, 1, False)
 
 		if not self.settings['keep search results']:
 			self.reset_search_query_and_selected_section()
 
 
-	# TODO MVC
-	def on_search_entry_key_pressed(self, widget, event):
+	# This method is called from the View API
+	def handle_search_entry_tab_pressed(self):
 		"""
-		Handler for when the user presses Tab or Escape on the search entry
+		Handler for when the tab is pressed while the search entry is focused.
+		This moves the focus into the app pane.
+		"""
+		self.view.focus_first_visible_app()
+
+
+	# This method is called from the View API
+	def handle_search_entry_escape_pressed(self):
+		"""
+		Handle what should happen when Escape is pressed while the search entry
+		is focused.
 		"""
 
-		# make Tab go to first result element
-		if event.keyval == gtk.gdk.keyval_from_name('Tab'):
+		self.cancel_all_plugins()
 
-			if self.selected_section is not None:
+		text = self.view.get_search_entry_text()
+		slash_pos = text.rfind('/')
 
-				contents = self.section_list[self.selected_section]['contents']
-				visible_children = [c for c in contents.get_children() if c.get_property('visible')]
+		if self.subfolder_stack and slash_pos != -1:
+			self.go_to_parent_folder()
 
-				if visible_children:
-					self.view.window.set_focus(visible_children[0])
+		elif not self.view.is_search_entry_empty():
+			self.reset_search_query()
 
-			else:
-				first_app_widget = self.view.get_first_visible_app_widget()
-				if first_app_widget is not None:
-					self.view.window.set_focus(first_app_widget)
+		elif self.selected_section is not None:
+			self.untoggle_and_show_all_sections()
 
+		elif self.in_system_menu_mode:
+			self.switch_modes(show_system_menus = False, toggle_mode_button = True)
 
-		elif event.keyval == gtk.gdk.keyval_from_name('Escape'):
-
-			self.cancel_all_plugins()
-
-			text = self.view.get_search_entry_text()
-			slash_pos = text.rfind('/')
-
-			if self.subfolder_stack and slash_pos != -1:
-				self.go_to_parent_folder()
-
-			elif not self.view.is_search_entry_empty():
-				self.reset_search_query()
-
-			elif self.selected_section is not None:
-				self.untoggle_and_show_all_sections()
-
-			elif self.in_system_menu_mode:
-				self.switch_modes(show_system_menus = False, toggle_mode_button = True)
-
-			else:
-				self.hide()
-
-		else: return False
-		return True
+		else:
+			self.hide()
 
 
 	def choose_coordinates_for_window(self, window):

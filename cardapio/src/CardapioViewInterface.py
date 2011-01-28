@@ -275,6 +275,13 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
+	def focus_first_visible_app(self):
+		"""
+		Focuses the first visible button in the app pane.
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
 	def get_first_visible_app(self):
 		"""
 		Returns the app_info for the first app in the right pane, if any.
