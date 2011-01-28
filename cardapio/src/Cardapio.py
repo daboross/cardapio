@@ -702,6 +702,7 @@ class Cardapio(dbus.service.Object):
 			sys.exit(1)
 
 
+	# TODO MVC: Move to a new GnomeHelper.py file
 	def init_desktop_environment(self):
 		"""
 		Runs a few initializations related to the user's desktop environment
@@ -733,7 +734,6 @@ class Cardapio(dbus.service.Object):
 		if not self.have_control_center:
 			self.view.hide_view_mode_button()
 
-		# TODO MVC - Separate the MC from the V in all of the fill_* methods!
 		self.fill_places_list()
 		self.fill_session_list()
 		self.fill_system_list()
@@ -1881,15 +1881,18 @@ class Cardapio(dbus.service.Object):
 		Populate the places list
 		"""
 
-		self.fill_bookmarked_places_list(self.view.places_section_contents)
-		self.fill_system_places_list(self.view.places_section_contents)
+		self.fill_bookmarked_places_list()
+		self.fill_system_places_list()
 
 
-	def fill_system_places_list(self, section_contents):
+	def fill_system_places_list(self):
 		"""
 		Populate the "system places", which include Computer, the list of
 		connected drives, and so on.
 		"""
+
+		# TODO MVC: this is temporary, while add_app_button isn't cleaned up
+		section_contents = self.view.places_section_contents
 
 		if self.volume_monitor is None:
 			volume_monitor_already_existed = False
@@ -1926,10 +1929,13 @@ class Cardapio(dbus.service.Object):
 			self.volume_monitor.connect('mount-removed', self.on_volume_monitor_changed)
 
 
-	def fill_bookmarked_places_list(self, section_contents):
+	def fill_bookmarked_places_list(self):
 		"""
 		Populate the "bookmarked places", which include Home and your personal bookmarks.
 		"""
+
+		# TODO MVC: this is temporary, while add_app_button isn't cleaned up
+		section_contents = self.view.places_section_contents
 
 		self.add_app_button(_('Home'), 'user-home', section_contents, 'xdg', self.home_folder_path, tooltip = _('Open your personal folder'), app_list = self.app_list)
 
@@ -2052,6 +2058,7 @@ class Cardapio(dbus.service.Object):
 		self.add_app_button(folder_name, icon_name, self.view.places_section_contents, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
 
 
+	# TODO MVC
 	def fill_favorites_list(self, slab, list_name):
 		"""
 		Populate either the Pinned Items or Side Pane list
@@ -2096,6 +2103,7 @@ class Cardapio(dbus.service.Object):
 			self.view.show_section(slab)
 
 
+	# TODO MVC
 	def fill_session_list(self):
 		"""
 		Populate the Session list
@@ -2435,7 +2443,6 @@ class Cardapio(dbus.service.Object):
 		self.fill_favorites_list(self.view.favorites_section_slab, 'pinned items')
 
 
-	# TODO MVC
 	# This method is called from the View API
 	def handle_add_to_side_pane_clicked(self, clicked_app_info):
 		"""
@@ -2451,7 +2458,6 @@ class Cardapio(dbus.service.Object):
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or sidepane will obscure the mode switcher button
 
 
-	# TODO MVC
 	# This method is called from the View API
 	def handle_remove_from_side_pane_clicked(self, clicked_app_info):
 		"""
