@@ -1377,10 +1377,21 @@ class Cardapio(dbus.service.Object):
 		self.plugin_handle_search_result(plugin, [], '')
 
 
-	# TODO MVC
 	def plugin_handle_search_result(self, plugin, results, original_query):
 		"""
-		Handler for when a plugin returns some search results
+		Handler for when a plugin returns some search results. This handler may be
+		running on a different thread from the rest of the Cardapio application, since
+		plugins can launch their own threads. For this reason, this code is actually 
+		sent to be executed in the UI thread (if any).
+		"""
+
+		self.view.run_in_ui_thread(self.plugin_handle_search_result_synchronized, plugin, results, original_query)
+
+
+	def plugin_handle_search_result_synchronized(self, plugin, results, original_query):
+		"""
+		Handler for when a plugin returns some search results. This one is
+		actually synchronized with the UI thread.
 		"""
 
 		plugin.section.hide() # for added performance
@@ -1404,8 +1415,6 @@ class Cardapio(dbus.service.Object):
 
 		if original_query != self.current_query:
 			results = []
-
-		gtk.gdk.threads_enter()
 
 		self.view.remove_all_buttons_from_section(plugin.section)
 
@@ -1452,8 +1461,6 @@ class Cardapio(dbus.service.Object):
 				plugin.section.hide()
 
 			self.consider_showing_no_results_text()
-
-		gtk.gdk.threads_leave()
 
 
 	def plugin_ask_for_reload_permission(self, plugin):

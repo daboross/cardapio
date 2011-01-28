@@ -1533,3 +1533,11 @@ class CardapioGtkView(CardapioViewInterface):
 		return (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
 
 
+	def run_in_ui_thread(self, function, *args, **kwargs):
+		"""
+		Runs a function making sure that no other thread can write to the UI.
+		"""
+		gtk.gdk.threads_enter()
+		function(*args, **kwargs)
+		gtk.gdk.threads_leave()
+

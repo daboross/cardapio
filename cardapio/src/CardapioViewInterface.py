@@ -503,3 +503,10 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
+	def run_in_ui_thread(self, function, *args, **kwargs):
+		"""
+		Runs a function making sure that no other thread can write to the UI.
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
