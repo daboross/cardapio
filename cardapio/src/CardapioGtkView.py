@@ -1096,7 +1096,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
-	def add_button(self, button_str, icon_name, parent_widget, tooltip, button_type):
+	def add_button(self, button_str, icon_name, pane_or_section, tooltip, button_type):
 		"""
 		Adds a button to a parent container
 		"""
@@ -1113,10 +1113,10 @@ class CardapioGtkView(CardapioViewInterface):
 		if button_type == CardapioViewInterface.APP_BUTTON:
 			icon_size_pixels = self.cardapio.icon_helper.icon_size_app
 			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
-
 			button.connect('clicked', self.on_app_button_clicked)
 			button.connect('button-press-event', self.on_app_button_button_pressed)
 			button.connect('focus-in-event', self.on_app_button_focused)
+			parent_widget = self.get_button_container_from_section(pane_or_section)
 
 			# TODO: figure out how to set max width so that it is the best for
 			# the window and font sizes
@@ -1126,7 +1126,18 @@ class CardapioGtkView(CardapioViewInterface):
 			#label.set_max_width_chars(20)
 
 		else:
+			parent_widget = pane_or_section
 			icon_size_pixels = self.cardapio.icon_helper.icon_size_category
+
+			if button_type == CardapioViewInterface.SIDEPANE_BUTTON:
+				icon_size_pixels = self.cardapio.icon_helper.icon_size_category
+				button.connect('clicked', self.on_app_button_clicked)
+				button.connect('button-press-event', self.on_app_button_button_pressed)
+				button.connect('focus-in-event', self.on_app_button_focused)
+
+			elif button_type == CardapioViewInterface.SESSION_BUTTON:
+				icon_size_pixels = self.cardapio.icon_helper.icon_size_category
+				button.connect('clicked', self.on_app_button_clicked)
 
 		icon_pixbuf = self.cardapio.icon_helper.get_icon_pixbuf(icon_name, icon_size_pixels)
 		icon = gtk.image_new_from_pixbuf(icon_pixbuf)
@@ -1250,8 +1261,7 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		section_slab, section_contents, label = self.cardapio.add_slab(title, 'system-file-manager', tooltip = tooltip, hide = True)
-		self.subfolders_section_slab = section_slab
-		self.subfolders_section_contents = section_contents
+		self.subfolders_section = section_slab
 		self.subfolders_label = label
 
 
@@ -1262,8 +1272,7 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'applications-other', tooltip = tooltip, hide = True)
-		self.uncategorized_section_slab = section_slab
-		self.uncategorized_section_contents = section_contents
+		self.uncategorized_section = section_slab
 
 
 	# This method is required by the View API
@@ -1273,8 +1282,7 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'session-properties', hide = True)
-		self.session_section_slab = section_slab
-		self.session_section_contents = section_contents
+		self.session_section = section_slab
 
 
 	# This method is required by the View API
@@ -1284,8 +1292,7 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'applications-system', hide = True)
-		self.system_section_slab = section_slab
-		self.system_section_contents = section_contents
+		self.system_section = section_slab
 
 
 	# This method is required by the View API
@@ -1295,8 +1302,7 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 		
 		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'folder', tooltip = tooltip, hide = False)
-		self.places_section_slab = section_slab
-		self.places_section_contents = section_contents
+		self.places_section = section_slab
 
 
 	# This method is required by the View API
@@ -1306,8 +1312,7 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'emblem-favorite', tooltip = tooltip, hide = False)
-		self.favorites_section_slab = section_slab
-		self.favorites_section_contents = section_contents
+		self.favorites_section = section_slab
 
 
 	# This method is required by the View API
@@ -1317,8 +1322,7 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'emblem-favorite', tooltip = tooltip, hide = True)
-		self.sidepane_section_slab = section_slab
-		self.sidepane_section_contents = section_contents
+		self.sidepane_section = section_slab
 
 
 	# This method is required by the View API
@@ -1533,6 +1537,7 @@ class CardapioGtkView(CardapioViewInterface):
 		return (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
 
 
+	# This method is required by the View API
 	def run_in_ui_thread(self, function, *args, **kwargs):
 		"""
 		Runs a function making sure that no other thread can write to the UI.
