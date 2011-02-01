@@ -785,10 +785,10 @@ class Cardapio(dbus.service.Object):
 		Clears the different sections of the UI (panes)
 		"""
 
-		self.remove_all_buttons_from_section(self.view.application_pane)
-		self.remove_all_buttons_from_section(self.view.sidepane)
-		self.remove_all_buttons_from_section(self.view.left_session_pane)
-		self.remove_all_buttons_from_section(self.view.right_session_pane)
+		self.remove_all_buttons_from_section(self.view.APPLICATION_PANE)
+		self.remove_all_buttons_from_section(self.view.SIDE_PANE)
+		self.remove_all_buttons_from_section(self.view.LEFT_SESSION_PANE)
+		self.remove_all_buttons_from_section(self.view.RIGHT_SESSION_PANE)
 
 		self.view.remove_all_buttons_from_category_panes()
 
@@ -951,12 +951,12 @@ class Cardapio(dbus.service.Object):
 		self.on_search_entry_changed()
 
 		if show_system_menus:
-			self.view.category_pane.hide()
-			self.view.system_category_pane.show()
+			self.view.CATEGORY_PANE.hide()
+			self.view.SYSTEM_CATEGORY_PANE.show()
 
 		else:
-			self.view.system_category_pane.hide()
-			self.view.category_pane.show()
+			self.view.SYSTEM_CATEGORY_PANE.hide()
+			self.view.CATEGORY_PANE.show()
 
 
 	# This method is called from the View API
@@ -1053,7 +1053,7 @@ class Cardapio(dbus.service.Object):
 		Start a menu search
 		"""
 
-		self.view.application_pane.hide() # for speed
+		self.view.APPLICATION_PANE.hide() # for speed
 
 		text = text.lower()
 
@@ -1069,7 +1069,7 @@ class Cardapio(dbus.service.Object):
 		if self.selected_section is None:
 			self.untoggle_and_show_all_sections()
 
-		self.view.application_pane.show() # restore application_pane
+		self.view.APPLICATION_PANE.show() # restore APPLICATION_PANE
 		
 		return True
 
@@ -1860,7 +1860,7 @@ class Cardapio(dbus.service.Object):
 			if isinstance(node, gmenu.Directory):
 				self.add_slab(node.name, node.icon, node.get_comment(), node = node, system_menu = True)
 
-		self.view.system_category_pane.hide()
+		self.view.SYSTEM_CATEGORY_PANE.hide()
 
 		section_slab, section_contents, dummy = self.add_slab(_('Uncategorized'), 'applications-other', tooltip = _('Other configuration tools'), hide = False, system_menu = True)
 		self.add_tree_to_app_list(self.sys_tree.root, section_contents, self.sys_list, recursive = False)
@@ -2058,7 +2058,6 @@ class Cardapio(dbus.service.Object):
 		self.add_app_button(folder_name, icon_name, self.view.places_section_contents, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
 
 
-	# TODO MVC
 	def fill_favorites_list(self, slab, list_name):
 		"""
 		Populate either the Pinned Items or Side Pane list
@@ -2087,7 +2086,7 @@ class Cardapio(dbus.service.Object):
 			if slab == self.view.sidepane_section_slab:
 
 				app_info = button.app_info
-				button = self.sanitize_and_add_button(app['name'], app['icon name'], self.view.sidepane, app['tooltip'], CardapioViewInterface.SIDEPANE_BUTTON)
+				button = self.sanitize_and_add_button(app['name'], app['icon name'], self.view.SIDE_PANE, app['tooltip'], CardapioViewInterface.SIDEPANE_BUTTON)
 				button.app_info = app_info
 				button.connect('clicked', self.view.on_app_button_clicked)
 				button.connect('button-press-event', self.view.on_app_button_button_pressed)
@@ -2115,21 +2114,21 @@ class Cardapio(dbus.service.Object):
 				_('Protect your computer from unauthorized use'),
 				'system-lock-screen',
 				'gnome-screensaver-command --lock',
-				self.view.left_session_pane,
+				self.view.LEFT_SESSION_PANE,
 			],
 			[
 				_('Log Out...'),
 				_('Log out of this session to log in as a different user'),
 				'system-log-out',
 				'gnome-session-save --logout-dialog',
-				self.view.right_session_pane,
+				self.view.RIGHT_SESSION_PANE,
 			],
 			[
 				_('Shut Down...'),
 				_('Shut down the system'),
 				'system-shutdown',
 				'gnome-session-save --shutdown-dialog',
-				self.view.right_session_pane,
+				self.view.RIGHT_SESSION_PANE,
 			],
 		]
 
@@ -2166,10 +2165,10 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if system_menu:
-			category_pane = self.view.system_category_pane
+			category_pane = self.view.SYSTEM_CATEGORY_PANE
 			app_list = self.sys_list
 		else:
-			category_pane = self.view.category_pane
+			category_pane = self.view.CATEGORY_PANE
 			app_list = self.app_list
 
 		# add category to category pane
@@ -2365,7 +2364,7 @@ class Cardapio(dbus.service.Object):
 
 		section_slab.show_all()
 
-		self.view.application_pane.pack_start(section_slab, expand = False, fill = False)
+		self.view.APPLICATION_PANE.pack_start(section_slab, expand = False, fill = False)
 
 		return section_slab, section_contents, label
 
@@ -2451,10 +2450,10 @@ class Cardapio(dbus.service.Object):
 
 		self.remove_section_from_app_list(self.view.sidepane_section_slab)
 		self.remove_all_buttons_from_section(self.view.sidepane_section_slab)
- 		self.remove_all_buttons_from_section(self.view.sidepane)
+ 		self.remove_all_buttons_from_section(self.view.SIDE_PANE)
 		self.settings['side pane items'].append(clicked_app_info)
 		self.fill_favorites_list(self.view.sidepane_section_slab, 'side pane items')
-		self.view.sidepane.queue_resize() # required! or sidepane's allocation will be x,y,width,0 when first item is added
+		self.view.SIDE_PANE.queue_resize() # required! or sidepane's allocation will be x,y,width,0 when first item is added
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or sidepane will obscure the mode switcher button
 
 
@@ -2466,7 +2465,7 @@ class Cardapio(dbus.service.Object):
 
 		self.remove_section_from_app_list(self.view.sidepane_section_slab)
 		self.remove_all_buttons_from_section(self.view.sidepane_section_slab)
- 		self.remove_all_buttons_from_section(self.view.sidepane)
+ 		self.remove_all_buttons_from_section(self.view.SIDE_PANE)
 		self.settings['side pane items'].remove(clicked_app_info)
 		self.fill_favorites_list(self.view.sidepane_section_slab, 'side pane items')
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or an extra space will show up where but button used to be

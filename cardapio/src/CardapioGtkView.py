@@ -92,12 +92,12 @@ class CardapioGtkView(CardapioViewInterface):
 		self.mainpane_separator        = self.get_widget('MainPaneSeparator')
 
 		# These variables are all required by the View API
-		self.application_pane          = self.get_widget('ApplicationPane')
-		self.category_pane             = self.get_widget('CategoryPane')
-		self.system_category_pane      = self.get_widget('SystemCategoryPane')
-		self.sidepane                  = self.get_widget('SideappPane')
-		self.left_session_pane         = self.get_widget('LeftSessionPane')
-		self.right_session_pane        = self.get_widget('RightSessionPane')
+		self.APPLICATION_PANE          = self.get_widget('ApplicationPane')
+		self.CATEGORY_PANE             = self.get_widget('CategoryPane')
+		self.SYSTEM_CATEGORY_PANE      = self.get_widget('SystemCategoryPane')
+		self.SIDE_PANE                 = self.get_widget('SideappPane')
+		self.LEFT_SESSION_PANE         = self.get_widget('LeftSessionPane')
+		self.RIGHT_SESSION_PANE        = self.get_widget('RightSessionPane')
 
 		self.context_menu_options = {
 			CardapioViewInterface.PIN_MENUITEM              : self.pin_menuitem,
@@ -631,7 +631,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 		# set up open-on-hover for categories
 
-		category_buttons = self.category_pane.get_children() + self.system_category_pane.get_children()
+		category_buttons = self.CATEGORY_PANE.get_children() + self.SYSTEM_CATEGORY_PANE.get_children()
 
 		if self.cardapio.settings['open categories on hover']:
 			for category_button in category_buttons:
@@ -764,7 +764,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Returns the first app in the right pane, if any.
 		"""
 
-		for slab in self.application_pane.get_children():
+		for slab in self.APPLICATION_PANE.get_children():
 			if not slab.get_visible(): continue
 
 			# NOTE: the following line depends on the UI file. If the file is
@@ -1196,9 +1196,9 @@ class CardapioGtkView(CardapioViewInterface):
 		self.read_gui_theme_info()
 
 		# the ui is already built by ui file, so we just clear it here
-		self.remove_all_children(self.application_pane)
-		self.remove_all_children(self.right_session_pane)
-		self.remove_all_children(self.left_session_pane)
+		self.remove_all_children(self.APPLICATION_PANE)
+		self.remove_all_children(self.RIGHT_SESSION_PANE)
+		self.remove_all_children(self.LEFT_SESSION_PANE)
 
 
 	# This method is required by the View API
@@ -1217,14 +1217,14 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		# "All" button for the regular menu
-		button = self.add_button(title, None, self.category_pane, tooltip, CardapioViewInterface.CATEGORY_BUTTON)
+		button = self.add_button(title, None, self.CATEGORY_PANE, tooltip, CardapioViewInterface.CATEGORY_BUTTON)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_sections_sidebar_button = button
 		self.set_sidebar_button_toggled(button, True)
 		self.all_sections_sidebar_button.set_sensitive(False)
 
 		# "All" button for the system menu
-		button = self.add_button(title, None, self.system_category_pane, tooltip, CardapioViewInterface.CATEGORY_BUTTON)
+		button = self.add_button(title, None, self.SYSTEM_CATEGORY_PANE, tooltip, CardapioViewInterface.CATEGORY_BUTTON)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_system_sections_sidebar_button = button
 		self.set_sidebar_button_toggled(button, True)
@@ -1373,7 +1373,7 @@ class CardapioGtkView(CardapioViewInterface):
 		is the SideappPane widget, which is its own button container)
 		"""
 
-		if section == self.sidepane: return section
+		if section == self.SIDE_PANE: return section
 		try:
 			return section.get_children()[0].get_children()[0]
 		except:
@@ -1387,8 +1387,8 @@ class CardapioGtkView(CardapioViewInterface):
 		(i.e. the category filter lists)
 		"""
 		
-		for	child in self.category_pane.get_children(): self.category_pane.remove(child)
-		for	child in self.system_category_pane.get_children(): self.system_category_pane.remove(child)
+		for	child in self.CATEGORY_PANE.get_children(): self.CATEGORY_PANE.remove(child)
+		for	child in self.SYSTEM_CATEGORY_PANE.get_children(): self.SYSTEM_CATEGORY_PANE.remove(child)
 
 
 	# This method is required by the View API
@@ -1397,8 +1397,8 @@ class CardapioGtkView(CardapioViewInterface):
 		Collapses the sidebar into a row of small buttons (i.e. minimode)
 		"""
 
-		category_buttons = self.category_pane.get_children() +\
-				self.system_category_pane.get_children() + self.sidepane.get_children()
+		category_buttons = self.CATEGORY_PANE.get_children() +\
+				self.SYSTEM_CATEGORY_PANE.get_children() + self.SIDE_PANE.get_children()
 
 		if self.cardapio.settings['mini mode']:
 
@@ -1407,7 +1407,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 			self.session_button_locksys.child.child.get_children()[1].hide()
 			self.session_button_logout.child.child.get_children()[1].hide()
-			self.right_session_pane.set_homogeneous(False)
+			self.RIGHT_SESSION_PANE.set_homogeneous(False)
 
 			self.get_widget('ViewLabel').set_size_request(0, 0) # required! otherwise a weird margin appears
 			self.get_widget('ViewLabel').hide()
@@ -1426,10 +1426,10 @@ class CardapioGtkView(CardapioViewInterface):
 			# hack to make sure the viewport resizes to the minisize correctly
 			self.get_widget('SideappViewport').hide()
 			self.get_widget('SideappViewport').show()
-			#self.left_session_pane.hide()
-			#self.left_session_pane.show()
-			#self.right_session_pane.hide()
-			#self.right_session_pane.show()
+			#self.LEFT_SESSION_PANE.hide()
+			#self.LEFT_SESSION_PANE.show()
+			#self.RIGHT_SESSION_PANE.hide()
+			#self.RIGHT_SESSION_PANE.show()
 
 			if update_window_size:
 				self.cardapio.settings['window size'][0] -= self.get_main_splitter_position()
@@ -1441,7 +1441,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 			self.session_button_locksys.child.child.get_children()[1].show()
 			self.session_button_logout.child.child.get_children()[1].show()
-			self.right_session_pane.set_homogeneous(True)
+			self.RIGHT_SESSION_PANE.set_homogeneous(True)
 
 			self.get_widget('ViewLabel').set_size_request(-1, -1)
 			self.get_widget('ViewLabel').show()

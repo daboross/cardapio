@@ -21,23 +21,23 @@ class CardapioViewInterface:
 		define the member variables below, which are used to refer to different 
 		areas of the UI within the Controller code.
 
-			self.application_pane
-			self.category_pane
-			self.system_category_pane
-			self.sidepane
-			self.left_session_pane
-			self.right_session_pane
+			self.APPLICATION_PANE
+			self.CATEGORY_PANE
+			self.SYSTEM_CATEGORY_PANE
+			self.SIDEPANE
+			self.LEFT_SESSION_PANE
+			self.RIGHT_SESSION_PANE
 
 		For instance, these are used as an argument to the method
 		remove_all_buttons_from_section()
 		"""
 
-		self.application_pane     = NotImplemented
-		self.category_pane        = NotImplemented
-		self.system_category_pane = NotImplemented
-		self.sidepane             = NotImplemented
-		self.left_session_pane    = NotImplemented
-		self.right_session_pane   = NotImplemented
+		self.APPLICATION_PANE     = NotImplemented
+		self.CATEGORY_PANE        = NotImplemented
+		self.SYSTEM_CATEGORY_PANE = NotImplemented
+		self.SIDEPANE             = NotImplemented
+		self.LEFT_SESSION_PANE    = NotImplemented
+		self.RIGHT_SESSION_PANE   = NotImplemented
 
 		raise NotImplementedError("You must implement this method!")
 
