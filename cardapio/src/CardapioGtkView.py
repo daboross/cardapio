@@ -1218,6 +1218,9 @@ class CardapioGtkView(CardapioViewInterface):
 		Performs operations after building the actual content-related widgets
 		"""
 
+		# TODO: this is nitpicky, but we should do something here to preload the
+		# window, so that it doesn't flash a grey rectangle on the first time
+		# cardapio is shown
 		pass
 
 
