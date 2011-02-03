@@ -2450,7 +2450,7 @@ class Cardapio(dbus.service.Object):
 		Handle the "launch in background" action
 		"""
 
-		self.launch_button_command(clicked_app_info, hide = False)
+		self.launch_command_from_app_info(clicked_app_info, hide = False)
 
 
 	# This method is called from the View API
@@ -2608,10 +2608,10 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if button == 1:
-			self.launch_button_command(app_info, hide = not ctrl_is_pressed)
+			self.launch_command_from_app_info(app_info, hide = not ctrl_is_pressed)
 
 		elif button == 2:
-			self.launch_button_command(app_info, hide = False)
+			self.launch_command_from_app_info(app_info, hide = False)
 
 		elif button == 3:
 			self.setup_app_context_menu(app_info)
@@ -2619,7 +2619,7 @@ class Cardapio(dbus.service.Object):
 			self.view.popup_app_context_menu(app_info)
 
 
-	def launch_button_command(self, app_info, hide):
+	def launch_command_from_app_info(self, app_info, hide):
 		"""
 		Execute app_info['command'], for any app_info['type']
 		"""
