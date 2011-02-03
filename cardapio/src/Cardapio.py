@@ -2678,7 +2678,7 @@ class Cardapio(dbus.service.Object):
 		Open a url, file or folder
 		"""
 
-		path = self.escape_quotes(self.unescape_url(path))
+		path = self.escape_quotes_for_shell(self.unescape_url(path))
 		path_type, dummy = urllib2.splittype(path)
 
 		# if the file is executable, ask what to do
@@ -2785,6 +2785,18 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		text = text.replace("'", r"\'")
+		text = text.replace('"', r'\"')
+		return text
+
+
+	def escape_quotes_for_shell(self, text):
+		"""
+		Sanitize a string by escaping quotation marks, but treat single quotes
+		differently since they cannot be escaped by the shell when in already
+		single-quote mode (i.e. strong quoting).
+		"""
+
+		text = text.replace("'", r"'\''")
 		text = text.replace('"', r'\"')
 		return text
 
