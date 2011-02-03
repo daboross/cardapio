@@ -1,3 +1,19 @@
+cardapio (0.9.165-ubuntu1-maverick1) maverick; urgency=low
+
+   * Refactored much of the code.
+   * Fixed several bugs
+   * Made subfolder search function more useful with the mouse
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 3 Feb 2010 23:01:00 +0100
+
+cardapio (0.9.165-ubuntu1-lucid1) lucid; urgency=low
+
+   * Refactored much of the code.
+   * Fixed several bugs
+   * Made subfolder search function more useful with the mouse
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 3 Feb 2010 23:01:00 +0100
+
 cardapio (0.9.164-ubuntu1-maverick1) maverick; urgency=low
 
    * Bug fixes
