@@ -29,7 +29,12 @@ class CardapioViewInterface:
 			self.RIGHT_SESSION_PANE
 
 		For instance, these are used as an argument to the method
-		remove_all_buttons_from_section()
+		remove_all_buttons_from_section().
+
+		Note that these variables are treated as constants by the Controller.
+		That is, they are *never* edited (hence the upper case). So it doesn't
+		matter what they point to, so long as they are unique and are treated in
+		the View as handlers for the corresponding UI elements.
 		"""
 
 		self.APPLICATION_PANE     = NotImplemented
@@ -341,7 +346,9 @@ class CardapioViewInterface:
 
 	def add_button(self, button_str, icon_name, parent_widget, tooltip, button_type):
 		"""
-		Adds a button to a parent container
+		Adds a button to a parent container and returns a handler to it, which
+		will be treated by the Controller as a constant (i.e. will never be
+		modified).
 		"""
 		raise NotImplementedError("You must implement this method!")
 
@@ -506,6 +513,13 @@ class CardapioViewInterface:
 	def run_in_ui_thread(self, function, *args, **kwargs):
 		"""
 		Runs a function making sure that no other thread can write to the UI.
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
+	def add_application_section(self, section_title):
+		"""
+		Adds a new slab to the applications pane
 		"""
 		raise NotImplementedError("You must implement this method!")
 

@@ -1098,7 +1098,9 @@ class CardapioGtkView(CardapioViewInterface):
 	# This method is required by the View API
 	def add_button(self, button_str, icon_name, pane_or_section, tooltip, button_type):
 		"""
-		Adds a button to a parent container
+		Adds a button to a parent container and returns a handler to it, which
+		will be treated by the Controller as a constant (i.e. will never be
+		modified).
 		"""
 
 		if button_type != CardapioViewInterface.CATEGORY_BUTTON:
@@ -1251,7 +1253,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Creates the slab that will be used to display the "No results to show" text
 		"""
 
-		section_slab, section_contents, label = self.cardapio.add_application_section('Dummy text')
+		section_slab, label = self.add_application_section('Dummy text')
 		self.no_results_slab = section_slab
 		self.no_results_label = label
 		self.hide_no_results_text()
@@ -1263,7 +1265,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Creates the Folder Contents slab to the app pane
 		"""
 
-		section_slab, section_contents, label = self.cardapio.add_slab(title, 'system-file-manager', tooltip = tooltip, hide = True)
+		section_slab, label = self.cardapio.add_slab(title, 'system-file-manager', tooltip = tooltip, hide = True)
 		self.subfolders_section = section_slab
 		self.subfolders_label = label
 
@@ -1274,7 +1276,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Creates the Uncategorized slab to the app pane
 		"""
 
-		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'applications-other', tooltip = tooltip, hide = True)
+		section_slab, dummy = self.cardapio.add_slab(title, 'applications-other', tooltip = tooltip, hide = True)
 		self.uncategorized_section = section_slab
 
 
@@ -1284,7 +1286,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Creates the Session slab to the app pane
 		"""
 
-		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'session-properties', hide = True)
+		section_slab, dummy = self.cardapio.add_slab(title, 'session-properties', hide = True)
 		self.session_section = section_slab
 
 
@@ -1294,7 +1296,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Creates the System slab to the app pane
 		"""
 
-		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'applications-system', hide = True)
+		section_slab, dummy = self.cardapio.add_slab(title, 'applications-system', hide = True)
 		self.system_section = section_slab
 
 
@@ -1304,7 +1306,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Creates the Places slab to the app pane
 		"""
 		
-		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'folder', tooltip = tooltip, hide = False)
+		section_slab, dummy = self.cardapio.add_slab(title, 'folder', tooltip = tooltip, hide = False)
 		self.places_section = section_slab
 
 
@@ -1314,7 +1316,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Creates the Pinned Items slab to the app pane
 		"""
 
-		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'emblem-favorite', tooltip = tooltip, hide = False)
+		section_slab, dummy = self.cardapio.add_slab(title, 'emblem-favorite', tooltip = tooltip, hide = False)
 		self.favorites_section = section_slab
 
 
@@ -1324,7 +1326,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Creates the Side Pane slab to the app pane
 		"""
 
-		section_slab, section_contents, dummy = self.cardapio.add_slab(title, 'emblem-favorite', tooltip = tooltip, hide = True)
+		section_slab, dummy = self.cardapio.add_slab(title, 'emblem-favorite', tooltip = tooltip, hide = True)
 		self.sidepane_section = section_slab
 
 
@@ -1548,4 +1550,38 @@ class CardapioGtkView(CardapioViewInterface):
 		gtk.gdk.threads_enter()
 		function(*args, **kwargs)
 		gtk.gdk.threads_leave()
+
+
+	# This method is required by the View API
+	def add_application_section(self, section_title):
+		"""
+		Adds a new slab to the applications pane
+		"""
+
+		section_contents = gtk.VBox(homogeneous = True)
+
+		section_margin = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
+		section_margin.add(section_contents)
+		section_margin.set_padding(0, 0, 0, 0)
+
+		label = gtk.Label()
+		label.set_use_markup(True)
+		label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
+		label.set_padding(0, 4)
+		label.set_attributes(self.section_label_attributes)
+
+		if section_title is not None:
+			label.set_text(section_title)
+
+		section_slab = gtk.Frame()
+		section_slab.set_label_widget(label)
+		section_slab.set_shadow_type(gtk.SHADOW_NONE)
+		section_slab.add(section_margin)
+
+		section_slab.show_all()
+
+		self.APPLICATION_PANE.pack_start(section_slab, expand = False, fill = False)
+
+		return section_slab, label
+
 

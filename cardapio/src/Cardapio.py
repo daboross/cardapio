@@ -1074,7 +1074,6 @@ class Cardapio(dbus.service.Object):
 		return True
 
 
-	# TODO MVC
 	def search_subfolders(self, text, first_app_info, selected_app_info):
 		"""
 		Lets you browse your filesystem through Cardapio by typing slash "/" after
@@ -1135,6 +1134,8 @@ class Cardapio(dbus.service.Object):
 		if path == '/': parent_name = _('Filesystem Root')
 		else: parent_name = os.path.basename(path)
 		self.view.subfolders_label.set_text(parent_name)
+		# TODO MVC: when the above is changed, remove label from return values
+		# of view.add_application_section()
 
 		count = 0
 		limit = self.settings['long search results limit']
@@ -1444,7 +1445,10 @@ class Cardapio(dbus.service.Object):
 
 			self.no_results_to_show = False
 
-			plugin.section_contents.show()
+			# TODO MVC: get rid of this somehow!
+			section_contents = plugin.section.get_children()[0].get_children()[0]
+			section_contents.show()
+
 			self.mark_section_has_entries_and_show_category_button(plugin.section)
 
 			if (self.selected_section is None) or (self.selected_section == plugin.section):
@@ -1863,7 +1867,7 @@ class Cardapio(dbus.service.Object):
 
 		self.view.SYSTEM_CATEGORY_PANE.hide()
 
-		section_slab, section_contents, dummy = self.add_slab(_('Uncategorized'), 'applications-other', tooltip = _('Other configuration tools'), hide = False, system_menu = True)
+		section_slab, dummy = self.add_slab(_('Uncategorized'), 'applications-other', tooltip = _('Other configuration tools'), hide = False, system_menu = True)
 		self.add_tree_to_app_list(self.sys_tree.root, section_slab, self.sys_list, recursive = False)
 
 		self.add_tree_to_app_list(self.sys_tree.root, self.view.system_section, self.app_list)
@@ -2150,7 +2154,6 @@ class Cardapio(dbus.service.Object):
 
 
 	# TODO MVC
-	# TODO MVC: remove the need for any *_section_contents
 	def add_slab(self, title_str, icon_name = None, tooltip = '', hide = False, node = None, system_menu = False):
 		"""
 		Add to the app pane a new section slab (i.e. a container holding a title
@@ -2165,16 +2168,18 @@ class Cardapio(dbus.service.Object):
 			category_pane = self.view.CATEGORY_PANE
 			app_list = self.app_list
 
-		# add category to category pane
-		sidebar_button = self.sanitize_and_add_button(title_str, icon_name, category_pane, tooltip, CardapioViewInterface.CATEGORY_BUTTON)
-
 		# add category to application pane
-		section_slab, section_contents, label = self.add_application_section(title_str)
+		section_slab, label = self.view.add_application_section(title_str)
 
 		if node is not None:
 			# add all apps in this category to application pane
 			self.add_tree_to_app_list(node, section_slab, app_list)
 
+		# add category to category pane
+		# TODO: separate add_button into add_sidebar_button, etc
+		sidebar_button = self.sanitize_and_add_button(title_str, icon_name, category_pane, tooltip, CardapioViewInterface.CATEGORY_BUTTON)
+
+		# TODO MVC
 		sidebar_button.connect('clicked', self.view.on_sidebar_button_clicked, section_slab)
 
 		if hide:
@@ -2183,7 +2188,6 @@ class Cardapio(dbus.service.Object):
 			self.section_list[section_slab] = {
 				'has entries': False,
 				'category': sidebar_button,
-				'contents': section_contents,
 				'name': title_str,
 				'is system section': system_menu,
 				}
@@ -2192,12 +2196,11 @@ class Cardapio(dbus.service.Object):
 			self.section_list[section_slab] = {
 				'has entries': True,
 				'category': sidebar_button,
-				'contents': section_contents,
 				'name': title_str,
 				'is system section': system_menu,
 				}
 
-		return section_slab, section_contents, label
+		return section_slab, label
 
 
 	def build_special_slabs(self):
@@ -2237,8 +2240,7 @@ class Cardapio(dbus.service.Object):
 				plugin = self.plugin_database[basename]['instance']
 				if plugin is None: continue
 
-				plugin.section, plugin.section_contents, dummy =\
-						self.add_slab(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hide = plugin.hide_from_sidebar)
+				plugin.section, dummy = self.add_slab(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hide = plugin.hide_from_sidebar)
 
 			else:
 				self.settings['active plugins'].remove(basename)
@@ -2275,7 +2277,6 @@ class Cardapio(dbus.service.Object):
 		self.untoggle_and_show_all_sections()
 
 
-	# TODO MVC
 	def add_app_button(self, button_str, icon_name, section, command_type, command, tooltip = '', app_list = None):
 		"""
 		Adds a new button to the app pane
@@ -2296,6 +2297,8 @@ class Cardapio(dbus.service.Object):
 			'context menu' : None,
 		}
 
+		# NOTE: I'm not too happy about keeping this outside the View, but I can't think
+		# of a better solution...
 		if command_type == 'app':
 			self.view.setup_button_drag_and_drop(button, True)
 
@@ -2308,12 +2311,10 @@ class Cardapio(dbus.service.Object):
 			if basename : basename, dummy = os.path.splitext(basename)
 			else        : basename = path
 
-			section = self.view.get_section_from_button(button)
-
 			app_list.append({
 				'name'     : button_str.lower(),
 				'button'   : button,
-				'section'  : section,
+				'section'  : self.view.get_section_from_button(button),
 				'basename' : basename,
 				'command'  : command,
 				})
@@ -2329,39 +2330,6 @@ class Cardapio(dbus.service.Object):
 		button_str = self.unescape_url(button_str)
 		if tooltip: tooltip = self.unescape_url(tooltip)
 		return self.view.add_button(button_str, icon_name, pane_or_section, tooltip, button_type)
-
-
-	# TODO MVC
-	def add_application_section(self, section_title = None):
-		"""
-		Adds a new slab to the applications pane
-		"""
-
-		section_contents = gtk.VBox(homogeneous = True)
-
-		section_margin = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
-		section_margin.add(section_contents)
-		section_margin.set_padding(0, 0, 0, 0)
-
-		label = gtk.Label()
-		label.set_use_markup(True)
-		label.modify_fg(gtk.STATE_NORMAL, self.view.style_app_button_fg)
-		label.set_padding(0, 4)
-		label.set_attributes(self.view.section_label_attributes)
-
-		if section_title is not None:
-			label.set_text(section_title)
-
-		section_slab = gtk.Frame()
-		section_slab.set_label_widget(label)
-		section_slab.set_shadow_type(gtk.SHADOW_NONE)
-		section_slab.add(section_margin)
-
-		section_slab.show_all()
-
-		self.view.APPLICATION_PANE.pack_start(section_slab, expand = False, fill = False)
-
-		return section_slab, section_contents, label
 
 
 	def add_tree_to_app_list(self, tree, section, app_list, recursive = True):
