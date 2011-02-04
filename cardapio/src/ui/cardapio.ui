@@ -892,7 +892,7 @@ Rebuilding…</property>
         <property name="use_underline">True</property>
         <property name="image">image6</property>
         <property name="use_stock">False</property>
-        <signal name="activate" handler="open_about_dialog"/>
+        <signal name="activate" handler="on_about_cardapio_clicked"/>
       </object>
     </child>
     <child>

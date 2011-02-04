@@ -382,6 +382,10 @@ class CardapioGtkView(CardapioViewInterface):
 		self.about_dialog.show()
 
 
+	def on_about_cardapio_clicked(self, dummy):
+		self.open_about_dialog()
+
+
 	# This method is required by the View API
 	def show_executable_file_dialog(self, primary_text, secondary_text, hide_terminal_option):
 		"""
