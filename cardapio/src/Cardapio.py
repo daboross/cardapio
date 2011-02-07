@@ -1152,7 +1152,7 @@ class Cardapio(dbus.service.Object):
 			if filename[0] == '.': continue
 
 			if count >= limit: 
-				self.add_app_button(_('Show additional results'), 'system-file-manager', self.view.subfolders_section, 'xdg', path, tooltip = _('Show additional search results in a file browser'), app_list = None)
+				self.add_app_button(_('Show additional results'), 'system-file-manager', self.view.subfolders_section, 'xdg', path, _('Show additional search results in a file browser'), None)
 				break
 
 			count += 1
@@ -1162,7 +1162,7 @@ class Cardapio(dbus.service.Object):
 			if icon_name is None: icon_name = 'folder'
 
 			basename, dummy = os.path.splitext(filename)
-			self.add_app_button(filename, icon_name, self.view.subfolders_section, 'xdg', command, tooltip = command, app_list = None)
+			self.add_app_button(filename, icon_name, self.view.subfolders_section, 'xdg', command, command, None)
 
 		if count:
 			self.view.subfolders_section.show()
@@ -1437,7 +1437,7 @@ class Cardapio(dbus.service.Object):
 			if icon_name is None:
 				icon_name = fallback_icon
 
-			button = self.add_app_button(result['name'], icon_name, plugin.section, result['type'], result['command'], tooltip = result['tooltip'])
+			button = self.add_app_button(result['name'], icon_name, plugin.section, result['type'], result['command'], result['tooltip'], None)
 			button.app_info['context menu'] = result['context menu']
 
 
@@ -1917,16 +1917,16 @@ class Cardapio(dbus.service.Object):
 			try    : command = str(volume.get_mount().get_root().get_uri())
 			except : command = ''
 
-			self.add_app_button(name, icon_name, section, 'xdg', command, tooltip = command, app_list = self.app_list)
+			self.add_app_button(name, icon_name, section, 'xdg', command, command, self.app_list)
 			self.volumes[command] = volume
 
-		self.add_app_button(_('Network'), 'network', section, 'xdg', 'network://', tooltip = _('Browse the contents of the network'), app_list = self.app_list)
+		self.add_app_button(_('Network'), 'network', section, 'xdg', 'network://', _('Browse the contents of the network'), self.app_list)
 
 		connect_to_server_app_path = which('nautilus-connect-server')
 		if connect_to_server_app_path is not None:
-			self.add_app_button(_('Connect to Server'), 'network-server', section, 'raw', connect_to_server_app_path, tooltip = _('Connect to a remote computer or shared disk'), app_list = self.app_list)
+			self.add_app_button(_('Connect to Server'), 'network-server', section, 'raw', connect_to_server_app_path, _('Connect to a remote computer or shared disk'), self.app_list)
 
-		self.add_app_button(_('Trash'), 'user-trash', section, 'xdg', 'trash:///', tooltip = _('Open the trash'), app_list = self.app_list)
+		self.add_app_button(_('Trash'), 'user-trash', section, 'xdg', 'trash:///', _('Open the trash'), self.app_list)
 
 		if not volume_monitor_already_existed:
 			self.volume_monitor.connect('mount-added', self.on_volume_monitor_changed)
@@ -1940,7 +1940,7 @@ class Cardapio(dbus.service.Object):
 
 		section = self.view.places_section
 
-		self.add_app_button(_('Home'), 'user-home', section, 'xdg', self.home_folder_path, tooltip = _('Open your personal folder'), app_list = self.app_list)
+		self.add_app_button(_('Home'), 'user-home', section, 'xdg', self.home_folder_path, _('Open your personal folder'), self.app_list)
 
 		xdg_folders_file_path = os.path.join(DesktopEntry.xdg_config_home, 'user-dirs.dirs')
 		xdg_folders_file = file(xdg_folders_file_path, 'r')
@@ -2058,7 +2058,7 @@ class Cardapio(dbus.service.Object):
 
 		icon_name = self.icon_helper.get_icon_name_from_path(folder_path)
 		if icon_name is None: icon_name = folder_icon
-		self.add_app_button(folder_name, icon_name, self.view.places_section, 'xdg', folder_path, tooltip = folder_path, app_list = self.app_list)
+		self.add_app_button(folder_name, icon_name, self.view.places_section, 'xdg', folder_path, folder_path, self.app_list)
 
 
 	def fill_favorites_list(self, slab, list_name):
@@ -2079,7 +2079,7 @@ class Cardapio(dbus.service.Object):
 			if 'context menu' not in app:
 				app['context menu'] = None
 
-			app_button = self.add_app_button(app['name'], app['icon name'], slab, app['type'], app['command'], tooltip = app['tooltip'], app_list = self.app_list)
+			app_button = self.add_app_button(app['name'], app['icon name'], slab, app['type'], app['command'], app['tooltip'], self.app_list)
 
 			app_button.show()
 			self.mark_section_has_entries_and_show_category_button(slab)
@@ -2132,7 +2132,7 @@ class Cardapio(dbus.service.Object):
 
 		for item in items:
 
-			app_button = self.add_app_button(item[0], item[2], self.view.session_section, 'raw', item[3], tooltip = item[1], app_list = self.app_list)
+			app_button = self.add_app_button(item[0], item[2], self.view.session_section, 'raw', item[3], item[1], self.app_list)
 			session_button = self.sanitize_and_add_button(item[0], item[2], item[4], item[1], CardapioViewInterface.SESSION_BUTTON)
 			session_button.app_info = app_button.app_info
 			item.append(session_button)
@@ -2277,7 +2277,7 @@ class Cardapio(dbus.service.Object):
 		self.untoggle_and_show_all_sections()
 
 
-	def add_app_button(self, button_str, icon_name, section, command_type, command, tooltip = '', app_list = None):
+	def add_app_button(self, button_str, icon_name, section, command_type, command, tooltip, app_list):
 		"""
 		Adds a new button to the app pane
 		"""
@@ -2342,7 +2342,7 @@ class Cardapio(dbus.service.Object):
 
 			if isinstance(node, gmenu.Entry):
 
-				self.add_app_button(node.name, node.icon, section, 'app', node.desktop_file_path, tooltip = node.get_comment(), app_list = app_list)
+				self.add_app_button(node.name, node.icon, section, 'app', node.desktop_file_path, node.get_comment(), app_list)
 
 			elif isinstance(node, gmenu.Directory) and recursive:
 
