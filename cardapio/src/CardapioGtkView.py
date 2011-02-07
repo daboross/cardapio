@@ -895,7 +895,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
 		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
-		self.cardapio.on_search_entry_changed(*dummy)
+		self.cardapio.on_search_entry_changed()
 
 
 	def on_search_entry_key_pressed(self, widget, event):

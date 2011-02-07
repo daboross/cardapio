@@ -997,7 +997,7 @@ class Cardapio(dbus.service.Object):
 		return keyword[1:], text
 
 
-	def on_search_entry_changed(self, *dummy):
+	def on_search_entry_changed(self):
 		"""
 		Handler for when the user types something in the search entry
 		"""
@@ -1013,6 +1013,8 @@ class Cardapio(dbus.service.Object):
 		if in_subfolder_search_mode:
 			# MUST run these lines BEFORE disappering with all sections
 			first_app_info    = self.view.get_first_visible_app()
+			# TODO MVC: there should be no need for get_first_visible_app. Instead,
+			# the model should know the top app already!
 			selected_app_info = self.view.get_selected_app()
 			self.view.show_navigation_buttons()
 		else:
@@ -1522,6 +1524,9 @@ class Cardapio(dbus.service.Object):
 			return
 
 		app_info = self.view.get_first_visible_app()
+		# TODO MVC: there should be no need for get_first_visible_app. Instead,
+		# the model should know the top app already!
+
 		if app_info is not None:
 			ctrl_is_pressed = self.view.get_ctrl_key_state()
 			self.handle_app_clicked(app_info, 1, ctrl_is_pressed)
