@@ -69,8 +69,8 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 			)
 
 		self.context_menu_verbs = [
-			('Properties', cardapio.open_options_dialog),
-			('Edit', cardapio.launch_edit_app),
+			('Properties', self.open_options_dialog),
+			('Edit', self.launch_edit_app),
 			('AboutCardapio', self.open_about_dialog),
 			('AboutGnome', self.open_about_dialog),
 			('AboutDistro', self.open_about_dialog)
@@ -382,5 +382,13 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 		"widget" argument.
 		"""
 		self.cardapio.open_about_dialog(verb)
+
+
+	def open_options_dialog(self, widget, verb):
+		self.cardapio.open_options_dialog()
+
+
+	def launch_edit_app(self, widget, verb):
+		self.cardapio.launch_edit_app()
 
 
