@@ -18,7 +18,7 @@
 #PANEL_TYPE_NONE  = None (Just use None instead of PANEL_TYPE_NONE)
 PANEL_TYPE_GNOME2 = 1
 PANEL_TYPE_AWN    = 2
-PANEL_TYPE_DOCKY  = None
+PANEL_TYPE_DOCKY  = None # The Docky applet is actually a "fake" applet, that just opens Cardapio at a given location.
 
 POS_TOP    = 0
 POS_BOTTOM = 1

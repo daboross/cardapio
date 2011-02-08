@@ -1101,6 +1101,9 @@ class CardapioGtkView(CardapioViewInterface):
 
 	# This method is required by the View API
 	def add_button(self, button_str, icon_name, pane_or_section, tooltip, button_type):
+		# TODO MVC: break this into add_app_button, add_sidebar_button, etc., so
+		# it's easier to implement app buttons that are different from sidebar
+		# ones.
 		"""
 		Adds a button to a parent container and returns a handler to it, which
 		will be treated by the Controller as a constant (i.e. will never be

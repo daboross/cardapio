@@ -116,6 +116,9 @@ if len(sys.argv) == 2:
 			except MainDockError:
 				fatal_error('Cardapio error!', "Couldn't find the main dock of Docky!")
 
+			except Exception, exception:
+				fatal_error('Unknown error with Cardapio in Docky!', exception)
+
 else:
 
 	from gnomepanel.CardapioGnomeAppletFactory import CardapioGnomeAppletFactory

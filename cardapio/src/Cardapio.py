@@ -266,6 +266,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		logging.info('Exiting...')
+		# TODO MVC:
 		gtk.main_quit()
 
 
@@ -1654,6 +1655,7 @@ class Cardapio(dbus.service.Object):
 		return x, y, anchor_right, anchor_bottom
 
 
+	# TODO MVC
 	def restore_dimensions(self, x = None, y = None, force_anchor_right = False, force_anchor_bottom = False):
 		"""
 		Resize Cardapio according to the user preferences
@@ -1810,6 +1812,7 @@ class Cardapio(dbus.service.Object):
 		self.visible = False
 		self.last_visibility_toggle = time()
 
+		# TODO MVC
 		self.view.window.hide()
 
 		if not self.settings['keep search results']:
@@ -1834,6 +1837,7 @@ class Cardapio(dbus.service.Object):
 
 		mouse_x, mouse_y = self.view.get_cursor_coordinates()
 
+		# TODO MVC
 		dummy, dummy, window_width, window_height = self.view.window.get_allocation()
 		window_x, window_y = self.view.window.get_position()
 
