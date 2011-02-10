@@ -2553,11 +2553,15 @@ class Cardapio(dbus.service.Object):
 		Returns True if the given app_info points to a local folder that exists
 		"""
 
+		app_type = app_info['type']
+
+		if app_type == 'app' or app_type == 'raw': return False
+
 		# TODO: move this into Controller
 		# figure out whether to show the 'open parent folder' menuitem
 		split_command = urllib2.splittype(app_info['command'])
 
-		if app_info['type'] == 'xdg' or len(split_command) == 2:
+		if app_type == 'xdg' or len(split_command) == 2:
 
 			path_type, canonical_path = split_command
 			dummy, extension = os.path.splitext(canonical_path)
@@ -2565,7 +2569,9 @@ class Cardapio(dbus.service.Object):
 			# don't show it for network://, trash://, or .desktop files
 			if path_type not in ('computer', 'network', 'trash') and extension != '.desktop':
 
-				return os.path.exists(self.unescape_url(canonical_path))
+				#if os.path.exists(self.unescape_url(canonical_path)): 
+				if os.path.isdir(self.unescape_url(canonical_path)): 
+					return True
 
 		return False
 
