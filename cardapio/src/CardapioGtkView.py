@@ -61,8 +61,6 @@ class CardapioGtkView(CardapioViewInterface):
 		Reads the GTK Builder interface file and sets up some UI details
 		"""
 
-		self.rebuild_timer = None
-
 		main_ui_filepath = os.path.join(self.cardapio.cardapio_path, 'ui', 'cardapio.ui')
 
 		builder = gtk.Builder()

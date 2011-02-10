@@ -191,6 +191,8 @@ class Cardapio(dbus.service.Object):
 		self.no_results_to_show            = False
 		self.opened_last_app_in_background = False
 		self.keybinding                    = None
+		self.reset_search_timer            = None
+		self.rebuild_timer                 = None
 		self.search_timer_local            = None
 		self.search_timer_remote           = None
 		self.search_timeout_local          = None
@@ -756,9 +758,9 @@ class Cardapio(dbus.service.Object):
 
 		logging.info('Rebuilding UI')
 
-		if self.view.rebuild_timer is not None:
-			glib.source_remove(self.view.rebuild_timer)
-			self.view.rebuild_timer = None
+		if self.rebuild_timer is not None:
+			glib.source_remove(self.rebuild_timer)
+			self.rebuild_timer = None
 
 		if show_message:
 			self.view.show_message_window()
@@ -933,10 +935,10 @@ class Cardapio(dbus.service.Object):
 		Rebuilds the Cardapio UI after a timer
 		"""
 
-		if self.view.rebuild_timer is not None:
-			glib.source_remove(self.view.rebuild_timer)
+		if self.rebuild_timer is not None:
+			glib.source_remove(self.rebuild_timer)
 
-		self.view.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.rebuild_ui)
+		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.rebuild_ui)
 
 
 	# This method is called from the View API
@@ -1478,10 +1480,10 @@ class Cardapio(dbus.service.Object):
 		database
 		"""
 
-		if self.view.rebuild_timer is not None:
-			glib.source_remove(self.view.rebuild_timer)
+		if self.rebuild_timer is not None:
+			glib.source_remove(self.rebuild_timer)
 
-		self.view.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.plugin_on_reload_permission_granted, plugin)
+		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.plugin_on_reload_permission_granted, plugin)
 
 
 	def plugin_on_reload_permission_granted(self, plugin):
@@ -1489,7 +1491,7 @@ class Cardapio(dbus.service.Object):
 		Tell the plugin that it may rebuild its database now
 		"""
 
-		self.view.rebuild_timer = None
+		self.rebuild_timer = None
 		plugin.on_reload_permission_granted()
 
 		return False
@@ -1534,7 +1536,7 @@ class Cardapio(dbus.service.Object):
 			self.handle_app_clicked(app_info, 1, ctrl_is_pressed)
 
 		if not self.settings['keep search results']:
-			self.reset_search_query_and_selected_section()
+			self.reset_search_timer = glib.timeout_add(self.settings['keep results duration'], self.reset_search_query_and_selected_section)
 
 
 	# This method is called from the View API
@@ -1780,6 +1782,10 @@ class Cardapio(dbus.service.Object):
 		or in the center of the screen (if there's no applet).
 		"""
 
+		if self.reset_search_timer is not None: 
+			glib.source_remove(self.reset_search_timer)
+			self.reset_search_timer = None
+
 		self.panel_applet.draw_toggled_state(True)
 
 		self.restore_dimensions(x, y, force_anchor_right = False, force_anchor_bottom = False)
@@ -1794,7 +1800,7 @@ class Cardapio(dbus.service.Object):
 
 		self.opened_last_app_in_background = False
 
-		if self.view.rebuild_timer is not None:
+		if self.rebuild_timer is not None:
 			# build the UI *after* showing the window, so the user gets the
 			# satisfaction of seeing the window pop up, even if it's incomplete...
 			self.rebuild_ui(show_message = True)
@@ -1818,7 +1824,7 @@ class Cardapio(dbus.service.Object):
 		self.view.hide_main_window()
 
 		if not self.settings['keep search results']:
-			self.reset_search_query_and_selected_section()
+			self.reset_search_timer = glib.timeout_add(self.settings['keep results duration'], self.reset_search_query_and_selected_section)
 		else:
 			# remembering current search text in all entries
 			self.view.set_search_entry_text(self.current_query)
@@ -2276,6 +2282,7 @@ class Cardapio(dbus.service.Object):
 		Clears search entry.
 		"""
 
+		self.reset_search_timer = None
 		self.view.clear_search_entry()
 		self.subfolder_stack = []
 

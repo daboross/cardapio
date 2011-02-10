@@ -126,6 +126,13 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
+	def hide_main_window(self):
+		"""
+		Hides Cardapio's main window
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
 	def open_about_dialog(self):
 		"""
 		Shows the "About" dialog
