@@ -92,7 +92,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.navigation_buttons_pane   = self.get_widget('NavigationButtonsBackground')
 		self.mainpane_separator        = self.get_widget('MainPaneSeparator')
 
-		# These variables are all required by the View API
+		# override the pane constants from CardapioViewInterface
 		self.APPLICATION_PANE          = self.get_widget('ApplicationPane')
 		self.CATEGORY_PANE             = self.get_widget('CategoryPane')
 		self.SYSTEM_CATEGORY_PANE      = self.get_widget('SystemCategoryPane')
@@ -101,14 +101,14 @@ class CardapioGtkView(CardapioViewInterface):
 		self.RIGHT_SESSION_PANE        = self.get_widget('RightSessionPane')
 
 		self.context_menu_options = {
-			CardapioViewInterface.PIN_MENUITEM              : self.pin_menuitem,
-			CardapioViewInterface.UNPIN_MENUITEM            : self.unpin_menuitem,
-			CardapioViewInterface.ADD_SIDE_PANE_MENUITEM    : self.add_side_pane_menuitem,
-			CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM : self.remove_side_pane_menuitem,
-			CardapioViewInterface.OPEN_MENUITEM             : self.open_app_menuitem,
-			CardapioViewInterface.OPEN_PARENT_MENUITEM      : self.open_parent_menuitem,
-			CardapioViewInterface.PEEK_INSIDE_MENUITEM      : self.peek_inside_menuitem,
-			CardapioViewInterface.EJECT_MENUITEM            : self.eject_menuitem,
+			self.PIN_MENUITEM              : self.pin_menuitem,
+			self.UNPIN_MENUITEM            : self.unpin_menuitem,
+			self.ADD_SIDE_PANE_MENUITEM    : self.add_side_pane_menuitem,
+			self.REMOVE_SIDE_PANE_MENUITEM : self.remove_side_pane_menuitem,
+			self.OPEN_MENUITEM             : self.open_app_menuitem,
+			self.OPEN_PARENT_MENUITEM      : self.open_parent_menuitem,
+			self.PEEK_INSIDE_MENUITEM      : self.peek_inside_menuitem,
+			self.EJECT_MENUITEM            : self.eject_menuitem,
 			}
 
 		# start with any search entry -- doesn't matter which
@@ -1117,7 +1117,7 @@ class CardapioGtkView(CardapioViewInterface):
 		modified).
 		"""
 
-		if button_type != CardapioViewInterface.CATEGORY_BUTTON:
+		if button_type != self.CATEGORY_BUTTON:
 			# TODO: make app buttons be togglebuttons too, so we can fake select
 			# them when the context menu is showing
 			button = gtk.Button() 
@@ -1126,7 +1126,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 		label = gtk.Label(button_str)
 
-		if button_type == CardapioViewInterface.APP_BUTTON:
+		if button_type == self.APP_BUTTON:
 			icon_size_pixels = self.cardapio.icon_helper.icon_size_app
 			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
 			button.connect('clicked', self.on_app_button_clicked)
@@ -1145,13 +1145,13 @@ class CardapioGtkView(CardapioViewInterface):
 			parent_widget = pane_or_section
 			icon_size_pixels = self.cardapio.icon_helper.icon_size_category
 
-			if button_type == CardapioViewInterface.SIDEPANE_BUTTON:
+			if button_type == self.SIDEPANE_BUTTON:
 				icon_size_pixels = self.cardapio.icon_helper.icon_size_category
 				button.connect('clicked', self.on_app_button_clicked)
 				button.connect('button-press-event', self.on_app_button_button_pressed)
 				button.connect('focus-in-event', self.on_app_button_focused)
 
-			elif button_type == CardapioViewInterface.SESSION_BUTTON:
+			elif button_type == self.SESSION_BUTTON:
 				icon_size_pixels = self.cardapio.icon_helper.icon_size_category
 				button.connect('clicked', self.on_app_button_clicked)
 
@@ -1247,14 +1247,14 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		# "All" button for the regular menu
-		button = self.add_button(title, None, self.CATEGORY_PANE, tooltip, CardapioViewInterface.CATEGORY_BUTTON)
+		button = self.add_button(title, None, self.CATEGORY_PANE, tooltip, self.CATEGORY_BUTTON)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_sections_sidebar_button = button
 		self.set_sidebar_button_toggled(button, True)
 		self.all_sections_sidebar_button.set_sensitive(False)
 
 		# "All" button for the system menu
-		button = self.add_button(title, None, self.SYSTEM_CATEGORY_PANE, tooltip, CardapioViewInterface.CATEGORY_BUTTON)
+		button = self.add_button(title, None, self.SYSTEM_CATEGORY_PANE, tooltip, self.CATEGORY_BUTTON)
 		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
 		self.all_system_sections_sidebar_button = button
 		self.set_sidebar_button_toggled(button, True)

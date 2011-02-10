@@ -1,50 +1,35 @@
 
 class CardapioViewInterface:
 
-	APP_BUTTON      = 0
-	CATEGORY_BUTTON = 1
-	SESSION_BUTTON  = 2
-	SIDEPANE_BUTTON = 3
+	# all these constants can be overridden, so long as they
+	# maintain their uniqueness (within their own groups)
 
-	PIN_MENUITEM               = 0
-	UNPIN_MENUITEM             = 1
-	ADD_SIDE_PANE_MENUITEM     = 2
-	REMOVE_SIDE_PANE_MENUITEM  = 3
-	OPEN_PARENT_MENUITEM       = 4
-	PEEK_INSIDE_MENUITEM       = 5
-	EJECT_MENUITEM             = 6
-	OPEN_MENUITEM              = 7
+	APP_BUTTON                = 0
+	CATEGORY_BUTTON           = 1
+	SESSION_BUTTON            = 2
+	SIDEPANE_BUTTON           = 3
+
+	APPLICATION_PANE          = 0
+	CATEGORY_PANE             = 1
+	SYSTEM_CATEGORY_PANE      = 2
+	SIDE_PANE                 = 3
+	LEFT_SESSION_PANE         = 4
+	RIGHT_SESSION_PANE        = 5
+
+	PIN_MENUITEM              = 0
+	UNPIN_MENUITEM            = 1
+	ADD_SIDE_PANE_MENUITEM    = 2
+	REMOVE_SIDE_PANE_MENUITEM = 3
+	OPEN_PARENT_MENUITEM      = 4
+	PEEK_INSIDE_MENUITEM      = 5
+	EJECT_MENUITEM            = 6
+	OPEN_MENUITEM             = 7
 
 
 	def setup_ui(self):
 		"""
-		Reads the GTK Builder interface file and sets up some UI details. Must 
-		define the member variables below, which are used to refer to different 
-		areas of the UI within the Controller code.
-
-			self.APPLICATION_PANE
-			self.CATEGORY_PANE
-			self.SYSTEM_CATEGORY_PANE
-			self.SIDEPANE
-			self.LEFT_SESSION_PANE
-			self.RIGHT_SESSION_PANE
-
-		For instance, these are used as an argument to the method
-		remove_all_buttons_from_section().
-
-		Note that these variables are treated as constants by the Controller.
-		That is, they are *never* edited (hence the upper case). So it doesn't
-		matter what they point to, so long as they are unique and are treated in
-		the View as handlers for the corresponding UI elements.
+		Reads the GTK Builder interface file and sets up some UI details.
 		"""
-
-		self.APPLICATION_PANE     = NotImplemented
-		self.CATEGORY_PANE        = NotImplemented
-		self.SYSTEM_CATEGORY_PANE = NotImplemented
-		self.SIDEPANE             = NotImplemented
-		self.LEFT_SESSION_PANE    = NotImplemented
-		self.RIGHT_SESSION_PANE   = NotImplemented
-
 		raise NotImplementedError("You must implement this method!")
 
 

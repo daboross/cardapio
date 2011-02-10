@@ -2096,7 +2096,7 @@ class Cardapio(dbus.service.Object):
 			no_results = False
 
 			if slab == self.view.sidepane_section:
-				sidepane_button = self.sanitize_and_add_button(app['name'], app['icon name'], self.view.SIDE_PANE, app['tooltip'], CardapioViewInterface.SIDEPANE_BUTTON)
+				sidepane_button = self.sanitize_and_add_button(app['name'], app['icon name'], self.view.SIDE_PANE, app['tooltip'], self.view.SIDEPANE_BUTTON)
 				sidepane_button.app_info = app_button.app_info
 
 		if no_results or (slab is self.view.sidepane_section):
@@ -2142,7 +2142,7 @@ class Cardapio(dbus.service.Object):
 		for item in items:
 
 			app_button = self.add_app_button(item[0], item[2], self.view.session_section, 'raw', item[3], item[1], self.app_list)
-			session_button = self.sanitize_and_add_button(item[0], item[2], item[4], item[1], CardapioViewInterface.SESSION_BUTTON)
+			session_button = self.sanitize_and_add_button(item[0], item[2], item[4], item[1], self.view.SESSION_BUTTON)
 			session_button.app_info = app_button.app_info
 			item.append(session_button)
 
@@ -2186,7 +2186,7 @@ class Cardapio(dbus.service.Object):
 
 		# add category to category pane
 		# TODO: separate add_button into add_sidebar_button, etc
-		sidebar_button = self.sanitize_and_add_button(title_str, icon_name, category_pane, tooltip, CardapioViewInterface.CATEGORY_BUTTON)
+		sidebar_button = self.sanitize_and_add_button(title_str, icon_name, category_pane, tooltip, self.view.CATEGORY_BUTTON)
 
 		# TODO MVC
 		sidebar_button.connect('clicked', self.view.on_sidebar_button_clicked, section_slab)
@@ -2294,7 +2294,7 @@ class Cardapio(dbus.service.Object):
 		if type(button_str) is str:
 			button_str = unicode(button_str, 'utf-8')
 
-		button = self.sanitize_and_add_button(button_str, icon_name, section, tooltip, CardapioViewInterface.APP_BUTTON)
+		button = self.sanitize_and_add_button(button_str, icon_name, section, tooltip, self.view.APP_BUTTON)
 
 		# save some metadata for easy access
 		button.app_info = {
@@ -2331,7 +2331,7 @@ class Cardapio(dbus.service.Object):
 		return button
 
 
-	def sanitize_and_add_button(self, button_str, icon_name, pane_or_section, tooltip = '', button_type = CardapioViewInterface.APP_BUTTON):
+	def sanitize_and_add_button(self, button_str, icon_name, pane_or_section, tooltip, button_type):
 		"""
 		Adds a button to a parent container
 		"""
@@ -2495,15 +2495,15 @@ class Cardapio(dbus.service.Object):
 		Show or hide different context menu options depending on the widget
 		"""
 
-		self.view.hide_context_menu_option(CardapioViewInterface.OPEN_PARENT_MENUITEM)
-		self.view.hide_context_menu_option(CardapioViewInterface.PEEK_INSIDE_MENUITEM)
-		self.view.hide_context_menu_option(CardapioViewInterface.EJECT_MENUITEM)
+		self.view.hide_context_menu_option(self.view.OPEN_PARENT_MENUITEM)
+		self.view.hide_context_menu_option(self.view.PEEK_INSIDE_MENUITEM)
+		self.view.hide_context_menu_option(self.view.EJECT_MENUITEM)
 
 		if app_info['type'] == 'callback':
-			self.view.hide_context_menu_option(CardapioViewInterface.PIN_MENUITEM)
-			self.view.hide_context_menu_option(CardapioViewInterface.UNPIN_MENUITEM)
-			self.view.hide_context_menu_option(CardapioViewInterface.ADD_SIDE_PANE_MENUITEM)
-			self.view.hide_context_menu_option(CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM)
+			self.view.hide_context_menu_option(self.view.PIN_MENUITEM)
+			self.view.hide_context_menu_option(self.view.UNPIN_MENUITEM)
+			self.view.hide_context_menu_option(self.view.ADD_SIDE_PANE_MENUITEM)
+			self.view.hide_context_menu_option(self.view.REMOVE_SIDE_PANE_MENUITEM)
 			self.view.app_menu_separator.hide() # this should happen automatically in setup_plugin_context_menu
 			self.setup_plugin_context_menu(app_info)
 			return
@@ -2523,26 +2523,26 @@ class Cardapio(dbus.service.Object):
 				break
 
 		if already_pinned:
-			self.view.hide_context_menu_option(CardapioViewInterface.PIN_MENUITEM)
-			self.view.show_context_menu_option(CardapioViewInterface.UNPIN_MENUITEM)
+			self.view.hide_context_menu_option(self.view.PIN_MENUITEM)
+			self.view.show_context_menu_option(self.view.UNPIN_MENUITEM)
 		else:
-			self.view.show_context_menu_option(CardapioViewInterface.PIN_MENUITEM)
-			self.view.hide_context_menu_option(CardapioViewInterface.UNPIN_MENUITEM)
+			self.view.show_context_menu_option(self.view.PIN_MENUITEM)
+			self.view.hide_context_menu_option(self.view.UNPIN_MENUITEM)
 
 		if already_on_side_pane:
-			self.view.hide_context_menu_option(CardapioViewInterface.ADD_SIDE_PANE_MENUITEM)
-			self.view.show_context_menu_option(CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM)
+			self.view.hide_context_menu_option(self.view.ADD_SIDE_PANE_MENUITEM)
+			self.view.show_context_menu_option(self.view.REMOVE_SIDE_PANE_MENUITEM)
 		else:
-			self.view.show_context_menu_option(CardapioViewInterface.ADD_SIDE_PANE_MENUITEM)
-			self.view.hide_context_menu_option(CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM)
+			self.view.show_context_menu_option(self.view.ADD_SIDE_PANE_MENUITEM)
+			self.view.hide_context_menu_option(self.view.REMOVE_SIDE_PANE_MENUITEM)
 
 		if self.app_info_points_to_valid_folder:
-			self.view.show_context_menu_option(CardapioViewInterface.OPEN_PARENT_MENUITEM)
-			self.view.show_context_menu_option(CardapioViewInterface.PEEK_INSIDE_MENUITEM)
+			self.view.show_context_menu_option(self.view.OPEN_PARENT_MENUITEM)
+			self.view.show_context_menu_option(self.view.PEEK_INSIDE_MENUITEM)
 
 		# figure out whether to show the 'eject' menuitem
 		if app_info['command'] in self.volumes:
-			self.view.show_context_menu_option(CardapioViewInterface.EJECT_MENUITEM)
+			self.view.show_context_menu_option(self.view.EJECT_MENUITEM)
 
 		self.setup_plugin_context_menu(app_info)
 
