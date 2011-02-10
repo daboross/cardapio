@@ -10,9 +10,10 @@ class CardapioViewInterface:
 	UNPIN_MENUITEM             = 1
 	ADD_SIDE_PANE_MENUITEM     = 2
 	REMOVE_SIDE_PANE_MENUITEM  = 3
-	OPEN_FOLDER_MENUITEM       = 4
+	OPEN_PARENT_MENUITEM       = 4
 	PEEK_INSIDE_MENUITEM       = 5
 	EJECT_MENUITEM             = 6
+	OPEN_MENUITEM              = 7
 
 
 	def setup_ui(self):

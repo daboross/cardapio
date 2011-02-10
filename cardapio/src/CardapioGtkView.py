@@ -83,7 +83,8 @@ class CardapioGtkView(CardapioViewInterface):
 		self.unpin_menuitem            = self.get_widget('UnpinMenuItem')
 		self.add_side_pane_menuitem    = self.get_widget('AddSidePaneMenuItem')
 		self.remove_side_pane_menuitem = self.get_widget('RemoveSidePaneMenuItem')
-		self.open_folder_menuitem      = self.get_widget('OpenParentFolderMenuItem')
+		self.open_app_menuitem         = self.get_widget('OpenAppMenuItem')
+		self.open_parent_menuitem      = self.get_widget('OpenParentFolderMenuItem')
 		self.peek_inside_menuitem      = self.get_widget('PeekInsideMenuItem')
 		self.eject_menuitem            = self.get_widget('EjectMenuItem')
 		self.view_mode_button          = self.get_widget('ViewModeButton')
@@ -104,7 +105,8 @@ class CardapioGtkView(CardapioViewInterface):
 			CardapioViewInterface.UNPIN_MENUITEM            : self.unpin_menuitem,
 			CardapioViewInterface.ADD_SIDE_PANE_MENUITEM    : self.add_side_pane_menuitem,
 			CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM : self.remove_side_pane_menuitem,
-			CardapioViewInterface.OPEN_FOLDER_MENUITEM      : self.open_folder_menuitem,
+			CardapioViewInterface.OPEN_MENUITEM             : self.open_app_menuitem,
+			CardapioViewInterface.OPEN_PARENT_MENUITEM      : self.open_parent_menuitem,
 			CardapioViewInterface.PEEK_INSIDE_MENUITEM      : self.peek_inside_menuitem,
 			CardapioViewInterface.EJECT_MENUITEM            : self.eject_menuitem,
 			}
@@ -966,6 +968,11 @@ class CardapioGtkView(CardapioViewInterface):
 	def on_eject_pressed(self, widget):
 
 		self.cardapio.handle_eject_pressed(self.clicked_app_info)
+
+
+	def on_open_app_pressed(self, widget):
+
+		self.cardapio.handle_launch_app_pressed(self.clicked_app_info)
 
 
 	def on_app_button_focused(self, widget, event):

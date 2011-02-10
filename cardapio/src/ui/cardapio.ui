@@ -917,6 +917,66 @@ Rebuilding…</property>
     <property name="visible">True</property>
     <signal name="hide" handler="unblock_focus_out_event"/>
     <child>
+      <object class="GtkImageMenuItem" id="OpenAppMenuItem">
+        <property name="label" translatable="yes">_Launch</property>
+        <property name="visible">True</property>
+        <property name="tooltip_text" translatable="yes">Launch this item</property>
+        <property name="use_underline">True</property>
+        <property name="image">image10</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="on_open_app_pressed"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="OpenInBackgroundMenuItem">
+        <property name="label" translatable="yes">_Launch in Background</property>
+        <property name="visible">True</property>
+        <property name="tooltip_text" translatable="yes">Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-Click)</property>
+        <property name="use_underline">True</property>
+        <property name="image">image7</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="on_launch_in_background_pressed"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="PeekInsideMenuItem">
+        <property name="label" translatable="yes">Peek _Inside Folder</property>
+        <property name="visible">True</property>
+        <property name="tooltip_text" translatable="yes">Show contents of this folder within Cardapio</property>
+        <property name="use_underline">True</property>
+        <property name="image">image12</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="on_peek_inside_pressed"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="OpenParentFolderMenuItem">
+        <property name="label" translatable="yes">Open Parent _Folder</property>
+        <property name="visible">True</property>
+        <property name="tooltip_text" translatable="yes">Open this item's parent folder in the file browser</property>
+        <property name="use_underline">True</property>
+        <property name="image">image8</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="on_open_parent_folder_pressed"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="EjectMenuItem">
+        <property name="label" translatable="yes">_Unmount</property>
+        <property name="visible">True</property>
+        <property name="tooltip_text" translatable="yes">Safely eject this mount</property>
+        <property name="use_underline">True</property>
+        <property name="image">image11</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="on_eject_pressed"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem" id="AppMenuSeparator">
+        <property name="visible">True</property>
+      </object>
+    </child>
+    <child>
       <object class="GtkImageMenuItem" id="PinMenuItem">
         <property name="label" translatable="yes">_Pin This Item</property>
         <property name="visible">True</property>
@@ -958,55 +1018,6 @@ Rebuilding…</property>
         <property name="image">image5</property>
         <property name="use_stock">False</property>
         <signal name="activate" handler="on_remove_from_side_pane_clicked"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkSeparatorMenuItem" id="AppMenuSeparator">
-        <property name="visible">True</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkImageMenuItem" id="OpenParentFolderMenuItem">
-        <property name="label" translatable="yes">Open Parent _Folder</property>
-        <property name="visible">True</property>
-        <property name="tooltip_text" translatable="yes">Open this item's parent folder in the file browser</property>
-        <property name="use_underline">True</property>
-        <property name="image">image8</property>
-        <property name="use_stock">False</property>
-        <signal name="activate" handler="on_open_parent_folder_pressed"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkImageMenuItem" id="OpenInBackgroundMenuItem">
-        <property name="label" translatable="yes">_Launch in Background</property>
-        <property name="visible">True</property>
-        <property name="tooltip_text" translatable="yes">Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-Click)</property>
-        <property name="use_underline">True</property>
-        <property name="image">image7</property>
-        <property name="use_stock">False</property>
-        <signal name="activate" handler="on_launch_in_background_pressed"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkImageMenuItem" id="PeekInsideMenuItem">
-        <property name="label" translatable="yes">Peek _Inside Folder</property>
-        <property name="visible">True</property>
-        <property name="tooltip_text" translatable="yes">Show contents of this folder within Cardapio</property>
-        <property name="use_underline">True</property>
-        <property name="image">image12</property>
-        <property name="use_stock">False</property>
-        <signal name="activate" handler="on_peek_inside_pressed"/>
-      </object>
-    </child>
-    <child>
-      <object class="GtkImageMenuItem" id="EjectMenuItem">
-        <property name="label" translatable="yes">_Unmount</property>
-        <property name="visible">True</property>
-        <property name="tooltip_text" translatable="yes">Safely eject this mount</property>
-        <property name="use_underline">True</property>
-        <property name="image">image11</property>
-        <property name="use_stock">False</property>
-        <signal name="activate" handler="on_eject_pressed"/>
       </object>
     </child>
   </object>
@@ -1200,5 +1211,9 @@ Rebuilding…</property>
   <object class="GtkImage" id="image12">
     <property name="visible">True</property>
     <property name="stock">gtk-go-forward</property>
+  </object>
+  <object class="GtkImage" id="image10">
+    <property name="visible">True</property>
+    <property name="stock">gtk-execute</property>
   </object>
 </interface>

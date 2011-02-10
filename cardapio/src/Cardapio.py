@@ -2444,9 +2444,18 @@ class Cardapio(dbus.service.Object):
 
 
 	# This method is called from the View API
+	def handle_launch_app_pressed(self, clicked_app_info):
+		"""
+		Handle the "launch" context-menu action
+		"""
+
+		self.launch_app(clicked_app_info, True)
+
+
+	# This method is called from the View API
 	def handle_open_parent_folder_pressed(self, clicked_app_info):
 		"""
-		Handle the "open parent folder" action
+		Handle the "open parent folder" context-menu action
 		"""
 
 		parent_folder, dummy = os.path.split(clicked_app_info['command'])
@@ -2456,16 +2465,16 @@ class Cardapio(dbus.service.Object):
 	# This method is called from the View API
 	def handle_launch_in_background_pressed(self, clicked_app_info):
 		"""
-		Handle the "launch in background" action
+		Handle the "launch in background" context-menu action
 		"""
 
-		self.launch_command_from_app_info(clicked_app_info, hide = False)
+		self.launch_app(clicked_app_info, hide = False)
 
 
 	# This method is called from the View API
 	def handle_peek_inside_pressed(self, clicked_app_info):
 		"""
-		Handle the "peek inside folder" action
+		Handle the "peek inside folder" context-menu action
 		"""
 
 		self.peek_inside_folder(clicked_app_info)
@@ -2474,7 +2483,7 @@ class Cardapio(dbus.service.Object):
 	# This method is called from the View API
 	def handle_eject_pressed(self, clicked_app_info):
 		"""
-		Handle the "eject" action
+		Handle the "eject" context-menu action
 		"""
 
 		volume = self.volumes[clicked_app_info['command']]
@@ -2486,7 +2495,7 @@ class Cardapio(dbus.service.Object):
 		Show or hide different context menu options depending on the widget
 		"""
 
-		self.view.hide_context_menu_option(CardapioViewInterface.OPEN_FOLDER_MENUITEM)
+		self.view.hide_context_menu_option(CardapioViewInterface.OPEN_PARENT_MENUITEM)
 		self.view.hide_context_menu_option(CardapioViewInterface.PEEK_INSIDE_MENUITEM)
 		self.view.hide_context_menu_option(CardapioViewInterface.EJECT_MENUITEM)
 
@@ -2528,8 +2537,9 @@ class Cardapio(dbus.service.Object):
 			self.view.hide_context_menu_option(CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM)
 
 		if self.app_info_points_to_valid_folder:
-			self.view.show_context_menu_option(CardapioViewInterface.OPEN_FOLDER_MENUITEM)
-			self.view.show_context_menu_option(CardapioViewInterface.PEEK_INSIDE_MENUITEM)
+			self.view.show_context_menu_option(CardapioViewInterface.OPEN_PARENT_MENUITEM)
+			# never show PEEK_INSIDE_FOLDER for now
+			#self.view.show_context_menu_option(CardapioViewInterface.PEEK_INSIDE_MENUITEM)
 
 		# figure out whether to show the 'eject' menuitem
 		if app_info['command'] in self.volumes:
@@ -2612,10 +2622,10 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if button == 1:
-			self.launch_command_from_app_info(app_info, hide = not ctrl_is_pressed)
+			self.peek_or_launch_app(app_info, hide = not ctrl_is_pressed)
 
 		elif button == 2:
-			self.launch_command_from_app_info(app_info, hide = False)
+			self.launch_app(app_info, hide = False)
 
 		elif button == 3:
 			self.setup_app_context_menu(app_info)
@@ -2623,7 +2633,20 @@ class Cardapio(dbus.service.Object):
 			self.view.popup_app_context_menu(app_info)
 
 
-	def launch_command_from_app_info(self, app_info, hide):
+	def peek_or_launch_app(self, app_info, hide):
+		"""
+		Either peek inside a folder (if the app_info describes a local folder)
+		or launch the item in the app_info
+		"""
+
+		if self.app_info_points_to_valid_folder(app_info):
+			self.peek_inside_folder(app_info)
+
+		else:
+			self.launch_app(app_info, hide)
+
+
+	def launch_app(self, app_info, hide):
 		"""
 		Execute app_info['command'], for any app_info['type']
 		"""
@@ -2638,9 +2661,6 @@ class Cardapio(dbus.service.Object):
 
 		elif command_type == 'raw':
 			self.launch_raw(command, hide)
-
-		elif self.app_info_points_to_valid_folder(app_info):
-			self.peek_inside_folder(app_info)
 
 		elif command_type == 'xdg':
 			self.launch_xdg(command, hide)
