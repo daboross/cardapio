@@ -188,7 +188,6 @@ class Cardapio(dbus.service.Object):
 
 		self.reset_model()
 		self.visible                       = False
-		self.selected_section              = None
 		self.no_results_to_show            = False
 		self.opened_last_app_in_background = False
 		self.keybinding                    = None
@@ -685,6 +684,7 @@ class Cardapio(dbus.service.Object):
 		self.section_list          = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
 		self.current_query         = ''
 		self.subfolder_stack       = []
+		self.selected_section      = None
 
 
 	def load_settings(self):
