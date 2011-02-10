@@ -265,8 +265,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		logging.info('Exiting...')
-		# TODO MVC:
-		gtk.main_quit()
+		self.view.quit()
 
 
 	def setup_log_file(self, debug):
@@ -900,7 +899,9 @@ class Cardapio(dbus.service.Object):
 		"""
 		if self.panel_applet.panel_type is None: return
 
-		if self.settings['open on hover'] and not self.view.focus_out_blocked:
+		# TODO - Delete this line on Feb 28th
+		#if self.settings['open on hover'] and not self.view.focus_out_blocked:
+		if self.settings['open on hover']:
 			glib.timeout_add(self.settings['autohide delay'], self.hide_if_mouse_away)
 
 
@@ -1573,6 +1574,7 @@ class Cardapio(dbus.service.Object):
 			self.hide()
 
 
+	# TODO MVC
 	def choose_coordinates_for_window(self, window):
 		"""
 		Returns the appropriate coordinates for the given window. The
@@ -1604,6 +1606,7 @@ class Cardapio(dbus.service.Object):
 		return x, y
 
 
+	# TODO MVC
 	def get_coordinates_inside_screen(self, window, x, y, force_anchor_right = False, force_anchor_bottom = False):
 		"""
 		If the window won't fit on the usable screen, given its size and
@@ -1812,8 +1815,7 @@ class Cardapio(dbus.service.Object):
 		self.visible = False
 		self.last_visibility_toggle = time()
 
-		# TODO MVC
-		self.view.window.hide()
+		self.view.hide_main_window()
 
 		if not self.settings['keep search results']:
 			self.reset_search_query_and_selected_section()
@@ -1830,16 +1832,17 @@ class Cardapio(dbus.service.Object):
 
 	def hide_if_mouse_away(self):
 		"""
-		Hide the window if the cursor is *not* on top of it
+		Hide the window if the cursor is neither on top of it nor on top of the
+		panel applet
 		"""
 
-		if self.view.focus_out_blocked: return
+		# TODO - Delete this line on Feb 28th
+		#if self.view.focus_out_blocked: return
 
 		mouse_x, mouse_y = self.view.get_cursor_coordinates()
 
-		# TODO MVC
-		dummy, dummy, window_width, window_height = self.view.window.get_allocation()
-		window_x, window_y = self.view.window.get_position()
+		window_width, window_height = self.view.get_window_size()
+		window_x, window_y = self.view.get_window_position()
 
 		cursor_in_window_x = (window_x <= mouse_x <= window_x + window_width)
 		cursor_in_window_y = (window_y <= mouse_y <= window_y + window_height)

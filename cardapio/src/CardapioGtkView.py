@@ -190,6 +190,15 @@ class CardapioGtkView(CardapioViewInterface):
 
 		self.cardapio.save_and_quit()
 
+	
+	# This method is required by the View API
+	def quit(self):
+		"""
+		Do the last cleaning up you need to do --- this is the last thing that
+		happens before Cardapio closes.
+		"""
+		gtk.main_quit()
+
 
 	# This method is required by the View API
 	def set_sidebar_button_toggled(self, button, state):
@@ -369,10 +378,20 @@ class CardapioGtkView(CardapioViewInterface):
 	# This method is required by the View API
 	def show_main_window(self):
 		"""
-		Show's Cardapio's main window
+		Shows Cardapio's main window
 		"""
 
 		self.show_window_on_top(self.window)
+
+
+	# This method is required by the View API
+	def hide_main_window(self):
+		"""
+		Hides Cardapio's main window
+		"""
+
+		#if self.focus_out_blocked: return
+		self.window.hide()
 
 
 	# This method is required by the View API
@@ -618,6 +637,14 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		return list(self.window.get_size())
+
+
+	# This method is required by the View API
+	def get_window_position(self):
+		"""
+		Get the x,y coordinates of the top-left corner of the Cardapio window
+		"""
+		return self.window.get_position()
 
 
 	# This method is required by the View API

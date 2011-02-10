@@ -234,6 +234,13 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
+	def get_window_position(self):
+		"""
+		Get the x,y coordinates of the top-left corner of the Cardapio window
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
 	def apply_settings(self):
 		"""
 		Setup UI elements from the set of preferences that are accessible
@@ -506,6 +513,14 @@ class CardapioViewInterface:
 	def add_application_section(self, section_title):
 		"""
 		Adds a new slab to the applications pane
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
+	def quit(self):
+		"""
+		Do the last cleaning up you need to do --- this is the last thing that
+		happens before Cardapio closes.
 		"""
 		raise NotImplementedError("You must implement this method!")
 
