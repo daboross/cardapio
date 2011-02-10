@@ -2468,20 +2468,7 @@ class Cardapio(dbus.service.Object):
 		Handle the "peek inside folder" action
 		"""
 
-		dummy, path = urllib2.splittype(clicked_app_info['command'])
-		if os.path.isfile(path): path, dummy = os.path.split(path)
-
-		path = self.unescape_url(path)
-		name = clicked_app_info['name']
-
-		if self.subfolder_stack:
-			entry_text = self.view.get_search_entry_text() + name
-			self.subfolder_stack.append((entry_text, path))
-		else:
-			self.subfolder_stack = [(name, path)]
-			entry_text = name
-
-		self.view.set_search_entry_text(entry_text + '/')
+		self.peek_inside_folder(clicked_app_info)
 
 
 	# This method is called from the View API
@@ -2540,6 +2527,22 @@ class Cardapio(dbus.service.Object):
 			self.view.show_context_menu_option(CardapioViewInterface.ADD_SIDE_PANE_MENUITEM)
 			self.view.hide_context_menu_option(CardapioViewInterface.REMOVE_SIDE_PANE_MENUITEM)
 
+		if self.app_info_points_to_valid_folder:
+			self.view.show_context_menu_option(CardapioViewInterface.OPEN_FOLDER_MENUITEM)
+			self.view.show_context_menu_option(CardapioViewInterface.PEEK_INSIDE_MENUITEM)
+
+		# figure out whether to show the 'eject' menuitem
+		if app_info['command'] in self.volumes:
+			self.view.show_context_menu_option(CardapioViewInterface.EJECT_MENUITEM)
+
+		self.setup_plugin_context_menu(app_info)
+
+
+	def app_info_points_to_valid_folder(self, app_info):
+		"""
+		Returns True if the given app_info points to a local folder that exists
+		"""
+
 		# TODO: move this into Controller
 		# figure out whether to show the 'open parent folder' menuitem
 		split_command = urllib2.splittype(app_info['command'])
@@ -2552,17 +2555,9 @@ class Cardapio(dbus.service.Object):
 			# don't show it for network://, trash://, or .desktop files
 			if path_type not in ('computer', 'network', 'trash') and extension != '.desktop':
 
-				# only show if path that exists
-				if os.path.exists(self.unescape_url(canonical_path)):
-					self.view.show_context_menu_option(CardapioViewInterface.OPEN_FOLDER_MENUITEM)
-					self.view.show_context_menu_option(CardapioViewInterface.PEEK_INSIDE_MENUITEM)
+				return os.path.exists(self.unescape_url(canonical_path))
 
-		# figure out whether to show the 'eject' menuitem
-		if app_info['command'] in self.volumes:
-			self.view.show_context_menu_option(CardapioViewInterface.EJECT_MENUITEM)
-
-		self.setup_plugin_context_menu(app_info)
-
+		return False
 
 
 	# This method is called from the View API
@@ -2644,6 +2639,9 @@ class Cardapio(dbus.service.Object):
 		elif command_type == 'raw':
 			self.launch_raw(command, hide)
 
+		elif self.app_info_points_to_valid_folder(app_info):
+			self.peek_inside_folder(app_info)
+
 		elif command_type == 'xdg':
 			self.launch_xdg(command, hide)
 
@@ -2651,6 +2649,27 @@ class Cardapio(dbus.service.Object):
 			text = self.current_query
 			if hide: self.hide()
 			command(text)
+
+
+	def peek_inside_folder(self, app_info):
+		"""
+		Shows within Cardapio the folder that given app_info points to
+		"""
+
+		dummy, path = urllib2.splittype(app_info['command'])
+		if os.path.isfile(path): path, dummy = os.path.split(path)
+
+		path = self.unescape_url(path)
+		name = app_info['name']
+
+		if self.subfolder_stack:
+			entry_text = self.view.get_search_entry_text() + name
+			self.subfolder_stack.append((entry_text, path))
+		else:
+			self.subfolder_stack = [(name, path)]
+			entry_text = name
+
+		self.view.set_search_entry_text(entry_text + '/')
 
 
 	def launch_desktop(self, command, hide = True):
