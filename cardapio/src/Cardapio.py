@@ -2538,8 +2538,7 @@ class Cardapio(dbus.service.Object):
 
 		if self.app_info_points_to_valid_folder:
 			self.view.show_context_menu_option(CardapioViewInterface.OPEN_PARENT_MENUITEM)
-			# never show PEEK_INSIDE_FOLDER for now
-			#self.view.show_context_menu_option(CardapioViewInterface.PEEK_INSIDE_MENUITEM)
+			self.view.show_context_menu_option(CardapioViewInterface.PEEK_INSIDE_MENUITEM)
 
 		# figure out whether to show the 'eject' menuitem
 		if app_info['command'] in self.volumes:
@@ -2628,7 +2627,13 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if button == 1:
-			self.peek_or_launch_app(app_info, hide = not ctrl_is_pressed)
+			# I'm not sure this is a good idea:
+			#self.peek_or_launch_app(app_info, hide = not ctrl_is_pressed)
+
+			# So i'm going back to this, for now:
+			self.launch_app(app_info, hide = not ctrl_is_pressed)
+
+			# I have more thinking to do about this...
 
 		elif button == 2:
 			self.launch_app(app_info, hide = False)
