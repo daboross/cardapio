@@ -952,9 +952,10 @@ class Cardapio(dbus.service.Object):
 		if toggle_mode_button: self.view.set_view_mode_button_toggled(show_system_menus)
 
 		self.untoggle_and_show_all_sections()
-		self.on_search_entry_changed()
+		self.process_query(ignore_if_unchanged = False)
 
 		if show_system_menus:
+			# TODO MVC: make these *_PANE.hide() into hide_pane(*_PANE)
 			self.view.CATEGORY_PANE.hide()
 			self.view.SYSTEM_CATEGORY_PANE.show()
 
@@ -976,18 +977,6 @@ class Cardapio(dbus.service.Object):
 			self.reset_search_query_and_selected_section()
 
 
-	def read_new_query(self):
-		"""
-		Returns the query currently in the search entry, after sanitizing it.
-		"""
-
-		text = self.view.get_search_entry_text().strip()
-		if text and text == self.current_query: return None
-
-		self.current_query = text
-		return text
-	
-
 	def parse_keyword_query(self, text):
 		"""
 		Returns the (keyword, text) pair of a keyword search of type 
@@ -1001,13 +990,23 @@ class Cardapio(dbus.service.Object):
 		return keyword[1:], text
 
 
-	def on_search_entry_changed(self):
+	def handle_search_entry_changed(self):
 		"""
 		Handler for when the user types something in the search entry
 		"""
 
-		text = self.read_new_query()
-		if text is None: return
+		self.process_query(ignore_if_unchanged = True)
+
+	
+	def process_query(self, ignore_if_unchanged):
+		"""
+		Processes user query (i.e. the text in the search entry)
+		"""
+
+		text = self.view.get_search_entry_text().strip()
+		if ignore_if_unchanged and text and text == self.current_query: return
+
+		self.current_query = text
 
 		self.no_results_to_show = True
 		self.view.hide_no_results_text()
@@ -1786,6 +1785,10 @@ class Cardapio(dbus.service.Object):
 			glib.source_remove(self.reset_search_timer)
 			self.reset_search_timer = None
 
+		# reset to regular mode if 'keep search results' is off
+		elif not self.settings['keep search results']:
+			self.switch_modes(show_system_menus = False, toggle_mode_button = True)
+
 		self.panel_applet.draw_toggled_state(True)
 
 		self.restore_dimensions(x, y, force_anchor_right = False, force_anchor_bottom = False)
@@ -1805,9 +1808,6 @@ class Cardapio(dbus.service.Object):
 			# satisfaction of seeing the window pop up, even if it's incomplete...
 			self.rebuild_ui(show_message = True)
 
-		if not self.settings['keep search results']:
-			self.switch_modes(show_system_menus = False, toggle_mode_button = True)
-
 
 	def hide(self):
 		"""
@@ -1823,11 +1823,11 @@ class Cardapio(dbus.service.Object):
 
 		self.view.hide_main_window()
 
-		if not self.settings['keep search results']:
-			self.reset_search_timer = glib.timeout_add(self.settings['keep results duration'], self.reset_search_query_and_selected_section)
-		else:
+		if self.settings['keep search results']:
 			# remembering current search text in all entries
 			self.view.set_search_entry_text(self.current_query)
+		else:
+			self.reset_search_timer = glib.timeout_add(self.settings['keep results duration'], self.reset_search_query_and_selected_section)
 
 		self.cancel_all_plugins()
 

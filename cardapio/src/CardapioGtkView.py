@@ -97,17 +97,14 @@ class CardapioGtkView(CardapioViewInterface):
 		self.SIDE_PANE                 = self.get_widget('SideappPane')
 		self.LEFT_SESSION_PANE         = self.get_widget('LeftSessionPane')
 		self.RIGHT_SESSION_PANE        = self.get_widget('RightSessionPane')
-
-		self.context_menu_options = {
-			self.PIN_MENUITEM              : self.pin_menuitem,
-			self.UNPIN_MENUITEM            : self.unpin_menuitem,
-			self.ADD_SIDE_PANE_MENUITEM    : self.add_side_pane_menuitem,
-			self.REMOVE_SIDE_PANE_MENUITEM : self.remove_side_pane_menuitem,
-			self.OPEN_MENUITEM             : self.open_app_menuitem,
-			self.OPEN_PARENT_MENUITEM      : self.open_parent_menuitem,
-			self.PEEK_INSIDE_MENUITEM      : self.peek_inside_menuitem,
-			self.EJECT_MENUITEM            : self.eject_menuitem,
-			}
+		self.PIN_MENUITEM              = self.pin_menuitem
+		self.UNPIN_MENUITEM            = self.unpin_menuitem
+		self.ADD_SIDE_PANE_MENUITEM    = self.add_side_pane_menuitem
+		self.REMOVE_SIDE_PANE_MENUITEM = self.remove_side_pane_menuitem
+		self.OPEN_MENUITEM             = self.open_app_menuitem
+		self.OPEN_PARENT_MENUITEM      = self.open_parent_menuitem
+		self.PEEK_INSIDE_MENUITEM      = self.peek_inside_menuitem
+		self.EJECT_MENUITEM            = self.eject_menuitem
 
 		# start with any search entry -- doesn't matter which
 		self.search_entry = self.get_widget('TopLeftSearchEntry')
@@ -513,8 +510,7 @@ class CardapioGtkView(CardapioViewInterface):
 		CardapioViewInterface.
 		"""
 
-		widget = self.context_menu_options[menu_item]
-		widget.show()
+		menu_item.show()
 
 
 	# This method is required by the View API
@@ -525,8 +521,7 @@ class CardapioGtkView(CardapioViewInterface):
 		CardapioViewInterface.
 		"""
 
-		widget = self.context_menu_options[menu_item]
-		widget.hide()
+		menu_item.hide()
 
 
 	# This method is required by the View API
@@ -917,12 +912,9 @@ class CardapioGtkView(CardapioViewInterface):
 		self.cardapio.launch_edit_app()
 
 		
-	# TODO MVC this out of Cardapio
 	def on_search_entry_changed(self, *dummy):
 
-		# FOR NOW, THIS METHOD SIMPLY FORWARDS ITS PARAMETERS TO CARDAPIO, BUT
-		# LATER IT WILL BE SMARTER ABOUT MVC SEPARATION
-		self.cardapio.on_search_entry_changed()
+		self.cardapio.handle_search_entry_changed()
 
 
 	def on_search_entry_key_pressed(self, widget, event):
