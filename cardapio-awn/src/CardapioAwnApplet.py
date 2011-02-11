@@ -75,7 +75,7 @@ class CardapioAwnApplet(CardapioAppletInterface):
 		if settings['open on hover']:
 			self.applet_press_handler = self.applet.connect('clicked', self._on_applet_clicked, True)
 			self.applet_enter_handler = self.applet.connect('enter-notify-event', self._on_applet_cursor_enter)
-			self.applet_leave_handler = self.applet.connect('leave-notify-event', self.cardapio.on_mainwindow_cursor_leave)
+			self.applet_leave_handler = self.applet.connect('leave-notify-event', self._on_applet_cursor_leave)
 
 		else:
 			self.applet_press_handler = self.applet.connect('clicked', self._on_applet_clicked, False)
@@ -154,5 +154,9 @@ class CardapioAwnApplet(CardapioAppletInterface):
 	def _on_applet_cursor_enter(self, widget, event):
 		self.cardapio.show_hide()
 		return True
+
+
+	def _on_applet_cursor_leave(self, widget, event):
+		self.cardapio.handle_mainwindow_cursor_leave()
 
 
