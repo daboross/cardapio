@@ -1,3 +1,17 @@
+cardapio-awn (0.9.168-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fixed bug 716744
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 11 Jan 2011 23:01:00 +1000
+
+
+cardapio-awn (0.9.168-ubuntu1-lucid1) lucid; urgency=low
+
+   * Fixed bug 716744
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 11 Jan 2011 23:01:00 +1000
+
+
 cardapio-awn (0.9.163-ubuntu1-maverick1) maverick; urgency=low
 
    * Added support for avant-window-navigator-trunk
