@@ -1535,7 +1535,7 @@ class Cardapio(dbus.service.Object):
 			self.handle_app_clicked(app_info, 1, ctrl_is_pressed)
 
 		if not self.settings['keep search results']:
-			self.reset_search_timer = glib.timeout_add(self.settings['keep results duration'], self.reset_search_query_and_selected_section)
+			self.reset_search_timer = glib.timeout_add(self.settings['keep results duration'], self.reset_search_timer_fired)
 
 
 	# This method is called from the View API
@@ -1781,12 +1781,8 @@ class Cardapio(dbus.service.Object):
 		or in the center of the screen (if there's no applet).
 		"""
 
-		if self.reset_search_timer is not None: 
-			glib.source_remove(self.reset_search_timer)
-			self.reset_search_timer = None
-
 		# reset to regular mode if 'keep search results' is off
-		elif not self.settings['keep search results']:
+		if not self.settings['keep search results'] and self.reset_search_timer is None:
 			self.switch_modes(show_system_menus = False, toggle_mode_button = True)
 
 		self.panel_applet.draw_toggled_state(True)
@@ -1827,7 +1823,7 @@ class Cardapio(dbus.service.Object):
 			# remembering current search text in all entries
 			self.view.set_search_entry_text(self.current_query)
 		else:
-			self.reset_search_timer = glib.timeout_add(self.settings['keep results duration'], self.reset_search_query_and_selected_section)
+			self.reset_search_timer = glib.timeout_add(self.settings['keep results duration'], self.reset_search_timer_fired)
 
 		self.cancel_all_plugins()
 
@@ -2285,6 +2281,17 @@ class Cardapio(dbus.service.Object):
 		self.reset_search_timer = None
 		self.view.clear_search_entry()
 		self.subfolder_stack = []
+
+
+	def reset_search_timer_fired(self):
+		"""
+		Clears search entry and unselects the selected section button (if any)
+		"""
+
+		if self.view.is_window_visible(): return
+		self.reset_search_query_and_selected_section()
+		return False
+		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
 	def reset_search_query_and_selected_section(self):

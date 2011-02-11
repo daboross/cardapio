@@ -777,6 +777,14 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
+	def is_window_visible(self):
+		"""
+		Returns True if the main window is visible
+		"""
+		return self.window.get_visible()
+
+
+	# This method is required by the View API
 	def is_search_entry_empty(self):
 		"""
 		Returns True if the search entry is empty.

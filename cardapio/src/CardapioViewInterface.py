@@ -273,6 +273,13 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
+	def is_window_visible(self):
+		"""
+		Returns True if the main window is visible
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
 	def is_search_entry_empty(self):
 		"""
 		Returns True if the search entry is empty.
