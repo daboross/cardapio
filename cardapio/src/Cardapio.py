@@ -1575,8 +1575,7 @@ class Cardapio(dbus.service.Object):
 			self.hide()
 
 
-	# TODO MVC
-	def choose_coordinates_for_window(self, window):
+	def choose_coordinates_for_window(self):
 		"""
 		Returns the appropriate coordinates for the given window. The
 		coordinates are determined according to the following algorithm:
@@ -1587,10 +1586,9 @@ class Cardapio(dbus.service.Object):
 		- Otherwise, position the window near the applet (just below it if the
 		  panel is top opriented, just to the left of it if the panel is right
 		  oriented, and so on)
-
 		"""
 
-		window_width, window_height = window.get_size()
+		window_width, window_height = self.view.get_window_size()
 		screen_x, screen_y, screen_width, screen_height = self.view.get_screen_dimensions()
 
 		if self.panel_applet.panel_type != None:
@@ -1608,18 +1606,18 @@ class Cardapio(dbus.service.Object):
 
 
 	# TODO MVC
-	def get_coordinates_inside_screen(self, window, x, y, force_anchor_right = False, force_anchor_bottom = False):
+	def get_coordinates_inside_screen(self, x, y, force_anchor_right = False, force_anchor_bottom = False):
 		"""
 		If the window won't fit on the usable screen, given its size and
 		proposed coordinates, the method will rotate it over its x, y, or x=y
-		axis. Als , the window won't hide beyond the top and left borders of the
+		axis. Also, the window won't hide beyond the top and left borders of the
 		usable screen.
 
 		Returns the new x, y coordinates and two booleans indicating whether the
 		window was rotated around the x and/or y axis.
 		"""
 
-		window_width, window_height = window.get_size()
+		window_width, window_height = self.view.get_window_size()
 		screen_x, screen_y, screen_width, screen_height = self.view.get_screen_dimensions()
 
 		# maximal coordinates of window and usable screen
@@ -1669,9 +1667,9 @@ class Cardapio(dbus.service.Object):
 			self.view.window.resize(*self.settings['window size'])
 
 		if x is None or y is None:
-			x, y = self.choose_coordinates_for_window(self.view.window)
+			x, y = self.choose_coordinates_for_window()
 
-		x, y, anchor_right, anchor_bottom = self.get_coordinates_inside_screen(self.view.window, x, y, force_anchor_right, force_anchor_bottom)
+		x, y, anchor_right, anchor_bottom = self.get_coordinates_inside_screen(x, y, force_anchor_right, force_anchor_bottom)
 
 		if anchor_right:
 			if anchor_bottom: self.view.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_EAST)
