@@ -1,3 +1,17 @@
+cardapio (0.9.168-ubuntu1-maverick1) maverick; urgency=low
+
+   * New feature: keep results for a few seconds after Cardapio is closed
+   * Several bug fixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 11 Feb 2011 23:01:00 +0100
+
+cardapio (0.9.168-ubuntu1-lucid1) lucid; urgency=low
+
+   * New feature: keep results for a few seconds after Cardapio is closed
+   * Several bug fixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 11 Feb 2011 23:01:00 +0100
+
 cardapio (0.9.167-ubuntu1-maverick1) maverick; urgency=low
 
    * Eh. Fixing error with the version numbers.
