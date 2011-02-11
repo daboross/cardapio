@@ -1781,8 +1781,11 @@ class Cardapio(dbus.service.Object):
 		or in the center of the screen (if there's no applet).
 		"""
 
+		if self.reset_search_timer is not None:
+			glib.source_remove(self.reset_search_timer)
+
 		# reset to regular mode if 'keep search results' is off
-		if not self.settings['keep search results'] and self.reset_search_timer is None:
+		elif not self.settings['keep search results']:
 			self.switch_modes(show_system_menus = False, toggle_mode_button = True)
 
 		self.panel_applet.draw_toggled_state(True)
@@ -2288,8 +2291,9 @@ class Cardapio(dbus.service.Object):
 		Clears search entry and unselects the selected section button (if any)
 		"""
 
-		if self.view.is_window_visible(): return
-		self.reset_search_query_and_selected_section()
+		if not self.view.is_window_visible():
+			self.reset_search_query_and_selected_section()
+
 		return False
 		# Required! makes this a "one-shot" timer, rather than "periodic"
 
