@@ -74,7 +74,7 @@ class SettingsHelper:
 		self.read_config_option(s, 'mini mode'                  , False                    ) # bool
 		self.read_config_option(s, 'splitter position'          , 0                        ) # int, position in pixels
 		self.read_config_option(s, 'show session buttons'       , False                    ) # bool
-		self.read_config_option(s, 'keep results duration'      , 3000                     ) # msec
+		self.read_config_option(s, 'keep results duration'      , 1500                     ) # msec
 		self.read_config_option(s, 'keep search results'        , False                    ) # bool
 		self.read_config_option(s, 'open on hover'              , False                    ) # bool
 		self.read_config_option(s, 'open categories on hover'   , False                    ) # bool
