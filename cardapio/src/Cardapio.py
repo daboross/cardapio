@@ -1605,7 +1605,6 @@ class Cardapio(dbus.service.Object):
 		return x, y
 
 
-	# TODO MVC
 	def get_coordinates_inside_screen(self, x, y, force_anchor_right = False, force_anchor_bottom = False):
 		"""
 		If the window won't fit on the usable screen, given its size and
@@ -1657,13 +1656,13 @@ class Cardapio(dbus.service.Object):
 		return x, y, anchor_right, anchor_bottom
 
 
-	# TODO MVC
 	def restore_dimensions(self, x = None, y = None, force_anchor_right = False, force_anchor_bottom = False):
 		"""
 		Resize Cardapio according to the user preferences
 		"""
 
 		if self.settings['window size'] is not None:
+			# TODO MVC
 			self.view.window.resize(*self.settings['window size'])
 
 		if x is None or y is None:
@@ -1672,16 +1671,20 @@ class Cardapio(dbus.service.Object):
 		x, y, anchor_right, anchor_bottom = self.get_coordinates_inside_screen(x, y, force_anchor_right, force_anchor_bottom)
 
 		if anchor_right:
+			# TODO MVC
 			if anchor_bottom: self.view.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_EAST)
 			else: self.view.window.set_gravity(gtk.gdk.GRAVITY_NORTH_EAST)
 
 		else:
+			# TODO MVC
 			if anchor_bottom: self.view.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
 			else: self.view.window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
 
 		if gtk.ver[0] == 2 and gtk.ver[1] <= 21 and gtk.ver[2] < 5:
+			# TODO MVC
 			gtk_window_move_with_gravity(self.view.window, x, y)
 		else:
+			# TODO MVC
 			self.view.window.move(x, y)
 
 		if self.settings['mini mode']:
@@ -2168,7 +2171,6 @@ class Cardapio(dbus.service.Object):
 				self.add_slab(node.name, node.icon, node.get_comment(), node = node, hide = False)
 
 
-	# TODO MVC
 	def add_slab(self, title_str, icon_name = None, tooltip = '', hide = False, node = None, system_menu = False):
 		"""
 		Add to the app pane a new section slab (i.e. a container holding a title
@@ -2195,9 +2197,11 @@ class Cardapio(dbus.service.Object):
 		sidebar_button = self.sanitize_and_add_button(title_str, icon_name, category_pane, tooltip, self.view.CATEGORY_BUTTON)
 
 		# TODO MVC
+		# slab and button variables should be *_handler
 		sidebar_button.connect('clicked', self.view.on_sidebar_button_clicked, section_slab)
 
 		if hide:
+			# TODO MVC
 			sidebar_button.hide()
 			section_slab.hide()
 			self.section_list[section_slab] = {
