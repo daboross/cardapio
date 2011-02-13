@@ -44,6 +44,11 @@ if gtk.ver < (2, 14, 0):
 
 class CardapioGtkView(CardapioViewInterface):
 
+	APP_BUTTON                = 0
+	CATEGORY_BUTTON           = 1
+	SESSION_BUTTON            = 2
+	SIDEPANE_BUTTON           = 3
+
 	def __init__(self, cardapio):
 
 		self.cardapio = cardapio
@@ -1131,7 +1136,6 @@ class CardapioGtkView(CardapioViewInterface):
 		return self.clicked_app_info
 
 
-	# This method is required by the View API
 	def add_button(self, button_str, icon_name, pane_or_section, tooltip, button_type):
 		# TODO MVC: break this into add_app_button, add_sidebar_button, etc., so
 		# it's easier to implement app buttons that are different from sidebar
@@ -1202,6 +1206,41 @@ class CardapioGtkView(CardapioViewInterface):
 		parent_widget.pack_start(button, expand = False, fill = False)
 
 		return button
+
+
+	# This method is required by the View API
+	def add_app_button(self, button_str, icon_name, pane_or_section, tooltip):
+		"""
+		Adds a button to the app pane, and returns a handler to it
+		"""
+		return self.add_button(button_str, icon_name, pane_or_section, tooltip, self.APP_BUTTON)
+
+
+	# This method is required by the View API
+	def add_category_button(self, button_str, icon_name, pane_or_section, section_slab, tooltip):
+		"""
+		Adds a toggle-button to the category pane, and returns a handler to it
+		"""
+
+		sidebar_button = self.add_button(button_str, icon_name, pane_or_section, tooltip, self.CATEGORY_BUTTON)
+		sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section_slab)
+		return sidebar_button
+
+
+	# This method is required by the View API
+	def add_session_button(self, button_str, icon_name, pane_or_section, tooltip):
+		"""
+		Adds a button to the session pane, and returns a handler to it
+		"""
+		return self.add_button(button_str, icon_name, pane_or_section, tooltip, self.SESSION_BUTTON)
+
+
+	# This method is required by the View API
+	def add_sidepane_button(self, button_str, icon_name, pane_or_section, tooltip):
+		"""
+		Adds a button to the sidepane, and returns a handler to it
+		"""
+		return self.add_button(button_str, icon_name, pane_or_section, tooltip, self.SIDEPANE_BUTTON)
 
 
 	# This method is required by the View API
@@ -1638,5 +1677,21 @@ class CardapioGtkView(CardapioViewInterface):
 		Hide the pane given by one of the *_PANE constants
 		"""
 		pane.hide()
+
+
+	# This method is required by the View API
+	def show_button(self, button):
+		"""
+		Show the given button 
+		"""
+		button.show()
+
+
+	# This method is required by the View API
+	def hide_button(self, button):
+		"""
+		Hide the given button
+		"""
+		button.hide()
 
 

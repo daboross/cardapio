@@ -1064,9 +1064,9 @@ class Cardapio(dbus.service.Object):
 		for app in app_list:
 
 			if app['name'].find(text) == -1 and app['basename'].find(text) == -1:
-				app['button'].hide()
+				self.view.hide_button(app['button'])
 			else:
-				app['button'].show()
+				self.view.show_button(app['button'])
 				self.mark_section_has_entries_and_show_category_button(app['section'])
 				self.no_results_to_show = False
 
@@ -1089,7 +1089,7 @@ class Cardapio(dbus.service.Object):
 		base_text     = text[slash_pos+1:]
 		path          = None
 
-		self.view.subfolders_section.hide() # for added performance
+		self.view.hide_section(self.view.subfolders_section) # for added performance
 		self.remove_all_buttons_from_section(self.view.subfolders_section)
 
 		if not search_inside:
@@ -1169,7 +1169,7 @@ class Cardapio(dbus.service.Object):
 			self.add_app_button(filename, icon_name, self.view.subfolders_section, 'xdg', command, command, None)
 
 		if count:
-			self.view.subfolders_section.show()
+			self.view.show_section(self.view.subfolders_section)
 			self.mark_section_has_entries_and_show_category_button(self.view.subfolders_section)
 			self.no_results_to_show = False
 
@@ -1400,7 +1400,7 @@ class Cardapio(dbus.service.Object):
 		actually synchronized with the UI thread.
 		"""
 
-		plugin.section.hide() # for added performance
+		self.view.hide_section(plugin.section) # for added performance
 
 		plugin.__is_running = False
 		self.plugins_still_searching -= 1
@@ -1456,7 +1456,7 @@ class Cardapio(dbus.service.Object):
 			self.mark_section_has_entries_and_show_category_button(plugin.section)
 
 			if (self.selected_section is None) or (self.selected_section == plugin.section):
-				plugin.section.show()
+				self.view.show_section(plugin.section)
 				self.view.hide_no_results_text()
 
 			else:
@@ -1467,7 +1467,7 @@ class Cardapio(dbus.service.Object):
 			self.mark_section_empty_and_hide_category_button(plugin.section)
 
 			if (self.selected_section is None) or (self.selected_section == plugin.section):
-				plugin.section.hide()
+				self.view.hide_section(plugin.section)
 
 			self.consider_showing_no_results_text()
 
@@ -2098,14 +2098,14 @@ class Cardapio(dbus.service.Object):
 
 			app_button = self.add_app_button(app['name'], app['icon name'], slab, app['type'], app['command'], app['tooltip'], self.app_list)
 
-			app_button.show()
+			self.view.show_button(app_button)
 			self.mark_section_has_entries_and_show_category_button(slab)
 			self.no_results_to_show = False
 			no_results = False
 
 			if slab == self.view.sidepane_section:
 				button_str, tooltip = self.sanitize_button_info(app['name'], app['tooltip'])
-				sidepane_button = self.view.add_button(button_str, app['icon name'], self.view.SIDE_PANE, tooltip, self.view.SIDEPANE_BUTTON)
+				sidepane_button = self.view.add_sidepane_button(button_str, app['icon name'], self.view.SIDE_PANE, tooltip)
 				sidepane_button.app_info = app_button.app_info
 
 		if no_results or (slab is self.view.sidepane_section):
@@ -2153,7 +2153,7 @@ class Cardapio(dbus.service.Object):
 			app_button = self.add_app_button(item[0], item[2], self.view.session_section, 'raw', item[3], item[1], self.app_list)
 
 			button_str, tooltip = self.sanitize_button_info(item[0], item[1])
-			session_button = self.view.add_button(button_str, item[2], item[4], tooltip, self.view.SESSION_BUTTON)
+			session_button = self.view.add_session_button(button_str, item[2], item[4], tooltip)
 
 			session_button.app_info = app_button.app_info
 			item.append(session_button)
@@ -2196,18 +2196,12 @@ class Cardapio(dbus.service.Object):
 			self.add_tree_to_app_list(node, section_slab, app_list)
 
 		# add category to category pane
-		# TODO: separate add_button into add_sidebar_button, etc
 		title_str, tooltip = self.sanitize_button_info(title_str, tooltip)
-		sidebar_button = self.view.add_button(title_str, icon_name, category_pane, tooltip, self.view.CATEGORY_BUTTON)
-
-		# TODO MVC
-		# slab and button variables should be *_handler
-		sidebar_button.connect('clicked', self.view.on_sidebar_button_clicked, section_slab)
+		sidebar_button = self.view.add_category_button(title_str, icon_name, category_pane, section_slab, tooltip)
 
 		if hide:
-			# TODO MVC
-			sidebar_button.hide()
-			section_slab.hide()
+			self.view.hide_button(sidebar_button)
+			self.view.hide_section(section_slab)
 			self.section_list[section_slab] = {
 				'has entries': False,
 				'category': sidebar_button,
@@ -2322,7 +2316,7 @@ class Cardapio(dbus.service.Object):
 			button_str = unicode(button_str, 'utf-8')
 
 		button_str, tooltip = self.sanitize_button_info(button_str, tooltip)
-		button = self.view.add_button(button_str, icon_name, section, tooltip, self.view.APP_BUTTON)
+		button = self.view.add_app_button(button_str, icon_name, section, tooltip)
 
 		# save some metadata for easy access
 		button.app_info = {
@@ -2532,13 +2526,15 @@ class Cardapio(dbus.service.Object):
 			self.view.hide_context_menu_option(self.view.UNPIN_MENUITEM)
 			self.view.hide_context_menu_option(self.view.ADD_SIDE_PANE_MENUITEM)
 			self.view.hide_context_menu_option(self.view.REMOVE_SIDE_PANE_MENUITEM)
+			# TODO MVC
 			self.view.app_menu_separator.hide() # this should happen automatically in setup_plugin_context_menu
 			self.setup_plugin_context_menu(app_info)
 			return
 
 		already_pinned = False
 		already_on_side_pane = False
-		self.view.app_menu_separator.show() # this should happen automatically somewhere...
+		# TODO MVC
+		self.view.app_menu_separator.show()
 
 		for command in [app['command'] for app in self.settings['pinned items']]:
 			if command == app_info['command']:
@@ -2978,7 +2974,7 @@ class Cardapio(dbus.service.Object):
 			self.view.hide_no_results_text()
 
 		else:
-			self.selected_section.hide()
+			self.view.hide_section(self.selected_section)
 			self.view.show_no_results_text(self.no_results_in_category_text % {'category_name': self.section_list[self.selected_section]['name']})
 
 
@@ -3013,7 +3009,7 @@ class Cardapio(dbus.service.Object):
 
 		for section in self.section_list:
 			self.mark_section_empty_and_hide_category_button(section)
-			section.hide()
+			self.view.hide_section(section)
 
 
 	def disappear_with_all_transitory_plugin_sections(self):
@@ -3033,6 +3029,7 @@ class Cardapio(dbus.service.Object):
 
 		if not self.section_list[section]['has entries']: return
 		self.section_list[section]['has entries'] = False
+		# TODO MVC
 		self.section_list[section]['category'].hide()
 
 
@@ -3046,6 +3043,7 @@ class Cardapio(dbus.service.Object):
 		if self.section_list[section]['has entries']: return
 
 		self.section_list[section]['has entries'] = True
+		# TODO MVC
 		self.section_list[section]['category'].show()
 
 

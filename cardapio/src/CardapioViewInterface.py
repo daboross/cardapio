@@ -4,11 +4,6 @@ class CardapioViewInterface:
 	# all these constants can be overridden, so long as they
 	# maintain their uniqueness (within their own groups)
 
-	APP_BUTTON                = 0
-	CATEGORY_BUTTON           = 1
-	SESSION_BUTTON            = 2
-	SIDEPANE_BUTTON           = 3
-
 	APPLICATION_PANE          = 0
 	CATEGORY_PANE             = 1
 	SYSTEM_CATEGORY_PANE      = 2
@@ -351,11 +346,30 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
-	def add_button(self, button_str, icon_name, parent_widget, tooltip, button_type):
+	def add_app_button(self, button_str, icon_name, pane_or_section, tooltip):
 		"""
-		Adds a button to a parent container and returns a handler to it, which
-		will be treated by the Controller as a constant (i.e. will never be
-		modified).
+		Adds a button to the app pane, and returns a handler to it
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
+	def add_category_button(self, button_str, icon_name, pane_or_section, section_slab, tooltip):
+		"""
+		Adds a toggle-button to the category pane, and returns a handler to it
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
+	def add_session_button(self, button_str, icon_name, pane_or_section, tooltip):
+		"""
+		Adds a button to the session pane, and returns a handler to it
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
+	def add_sidepane_button(self, button_str, icon_name, pane_or_section, tooltip):
+		"""
+		Adds a button to the sidepane, and returns a handler to it
 		"""
 		raise NotImplementedError("You must implement this method!")
 
