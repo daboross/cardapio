@@ -539,3 +539,18 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
+	def show_pane(self, pane):
+		"""
+		Show the pane given by one of the *_PANE constants
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
+	# This method is required by the View API
+	def hide_pane(self, pane):
+		"""
+		Hide the pane given by one of the *_PANE constants
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+

@@ -1624,3 +1624,19 @@ class CardapioGtkView(CardapioViewInterface):
 		return section_slab, label
 
 
+	# This method is required by the View API
+	def show_pane(self, pane):
+		"""
+		Show the pane given by one of the *_PANE constants
+		"""
+		pane.show()
+
+
+	# This method is required by the View API
+	def hide_pane(self, pane):
+		"""
+		Hide the pane given by one of the *_PANE constants
+		"""
+		pane.hide()
+
+

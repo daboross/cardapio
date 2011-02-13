@@ -955,13 +955,12 @@ class Cardapio(dbus.service.Object):
 		self.process_query(ignore_if_unchanged = False)
 
 		if show_system_menus:
-			# TODO MVC: make these *_PANE.hide() into hide_pane(*_PANE)
-			self.view.CATEGORY_PANE.hide()
-			self.view.SYSTEM_CATEGORY_PANE.show()
+			self.view.hide_pane(self.view.CATEGORY_PANE)
+			self.view.show_pane(self.view.SYSTEM_CATEGORY_PANE)
 
 		else:
-			self.view.SYSTEM_CATEGORY_PANE.hide()
-			self.view.CATEGORY_PANE.show()
+			self.view.hide_pane(self.view.SYSTEM_CATEGORY_PANE)
+			self.view.show_pane(self.view.CATEGORY_PANE)
 
 
 	# This method is called from the View API
@@ -1058,7 +1057,7 @@ class Cardapio(dbus.service.Object):
 		Start a menu search
 		"""
 
-		self.view.APPLICATION_PANE.hide() # for speed
+		self.view.hide_pane(self.view.APPLICATION_PANE) # for speed
 
 		text = text.lower()
 
@@ -1074,7 +1073,7 @@ class Cardapio(dbus.service.Object):
 		if self.selected_section is None:
 			self.untoggle_and_show_all_sections()
 
-		self.view.APPLICATION_PANE.show() # restore APPLICATION_PANE
+		self.view.show_pane(self.view.APPLICATION_PANE) # restore APPLICATION_PANE
 		
 		return True
 
@@ -1883,7 +1882,7 @@ class Cardapio(dbus.service.Object):
 			if isinstance(node, gmenu.Directory):
 				self.add_slab(node.name, node.icon, node.get_comment(), node = node, system_menu = True)
 
-		self.view.SYSTEM_CATEGORY_PANE.hide()
+		self.view.hide_pane(self.view.SYSTEM_CATEGORY_PANE)
 
 		section_slab, dummy = self.add_slab(_('Uncategorized'), 'applications-other', tooltip = _('Other configuration tools'), hide = False, system_menu = True)
 		self.add_tree_to_app_list(self.sys_tree.root, section_slab, self.sys_list, recursive = False)
@@ -2105,7 +2104,8 @@ class Cardapio(dbus.service.Object):
 			no_results = False
 
 			if slab == self.view.sidepane_section:
-				sidepane_button = self.sanitize_and_add_button(app['name'], app['icon name'], self.view.SIDE_PANE, app['tooltip'], self.view.SIDEPANE_BUTTON)
+				button_str, tooltip = self.sanitize_button_info(app['name'], app['tooltip'])
+				sidepane_button = self.view.add_button(button_str, app['icon name'], self.view.SIDE_PANE, tooltip, self.view.SIDEPANE_BUTTON)
 				sidepane_button.app_info = app_button.app_info
 
 		if no_results or (slab is self.view.sidepane_section):
@@ -2151,7 +2151,10 @@ class Cardapio(dbus.service.Object):
 		for item in items:
 
 			app_button = self.add_app_button(item[0], item[2], self.view.session_section, 'raw', item[3], item[1], self.app_list)
-			session_button = self.sanitize_and_add_button(item[0], item[2], item[4], item[1], self.view.SESSION_BUTTON)
+
+			button_str, tooltip = self.sanitize_button_info(item[0], item[1])
+			session_button = self.view.add_button(button_str, item[2], item[4], tooltip, self.view.SESSION_BUTTON)
+
 			session_button.app_info = app_button.app_info
 			item.append(session_button)
 
@@ -2194,7 +2197,8 @@ class Cardapio(dbus.service.Object):
 
 		# add category to category pane
 		# TODO: separate add_button into add_sidebar_button, etc
-		sidebar_button = self.sanitize_and_add_button(title_str, icon_name, category_pane, tooltip, self.view.CATEGORY_BUTTON)
+		title_str, tooltip = self.sanitize_button_info(title_str, tooltip)
+		sidebar_button = self.view.add_button(title_str, icon_name, category_pane, tooltip, self.view.CATEGORY_BUTTON)
 
 		# TODO MVC
 		# slab and button variables should be *_handler
@@ -2317,7 +2321,8 @@ class Cardapio(dbus.service.Object):
 		if type(button_str) is str:
 			button_str = unicode(button_str, 'utf-8')
 
-		button = self.sanitize_and_add_button(button_str, icon_name, section, tooltip, self.view.APP_BUTTON)
+		button_str, tooltip = self.sanitize_button_info(button_str, tooltip)
+		button = self.view.add_button(button_str, icon_name, section, tooltip, self.view.APP_BUTTON)
 
 		# save some metadata for easy access
 		button.app_info = {
@@ -2354,14 +2359,14 @@ class Cardapio(dbus.service.Object):
 		return button
 
 
-	def sanitize_and_add_button(self, button_str, icon_name, pane_or_section, tooltip, button_type):
+	def sanitize_button_info(self, button_str, tooltip):
 		"""
-		Adds a button to a parent container
+		Clean up the strings that have to do with a button: its label and its tooltip
 		"""
 
 		button_str = self.unescape_url(button_str)
 		if tooltip: tooltip = self.unescape_url(tooltip)
-		return self.view.add_button(button_str, icon_name, pane_or_section, tooltip, button_type)
+		return button_str, tooltip
 
 
 	def add_tree_to_app_list(self, tree, section, app_list, recursive = True):
