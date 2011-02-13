@@ -74,7 +74,7 @@ class CardapioGtkView(CardapioViewInterface):
 		builder.connect_signals(self)
 
 		self.get_widget = builder.get_object
-		self.window                    = self.get_widget('CardapioWindow')
+		self.main_window               = self.get_widget('CardapioWindow')
 		self.message_window            = self.get_widget('MessageWindow')
 		self.about_dialog              = self.get_widget('AboutDialog')
 		self.executable_file_dialog    = self.get_widget('ExecutableFileDialog')
@@ -137,7 +137,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.gtk_settings.set_property('gtk-button-images', True)
 		self.gtk_settings.connect('notify', self.on_gtk_settings_changed)
 
-		self.window.set_keep_above(True)
+		self.main_window.set_keep_above(True)
 
 		# make edges draggable
 		self.get_widget('MarginLeft').realize()
@@ -300,7 +300,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# TODO MVC this out of Cardapio
-	def on_sidebar_button_clicked(self, widget, section_slab):
+	def on_sidebar_button_clicked(self, widget, section):
 		"""
 		Handler for when the user chooses a category in the sidebar
 		"""
@@ -309,7 +309,7 @@ class CardapioGtkView(CardapioViewInterface):
 			self.auto_toggled_sidebar_button = False
 			return True
 
-		return not self.cardapio.handle_section_clicked(section_slab)
+		return not self.cardapio.handle_section_clicked(section)
 
 
 	def on_sidebar_button_hovered(self, widget):
@@ -348,13 +348,13 @@ class CardapioGtkView(CardapioViewInterface):
 		Show the "Rebuilding..." message window
 		"""
 
-		main_window_width, main_window_height = self.window.get_size()
+		main_window_width, main_window_height = self.main_window.get_size()
 		message_width, message_height = self.message_window.get_size()
 
 		offset_x = (main_window_width  - message_width) / 2
 		offset_y = (main_window_height - message_height) / 2
 
-		x, y = self.window.get_position()
+		x, y = self.main_window.get_position()
 		self.message_window.move(x + offset_x, y + offset_y)
 
 		self.message_window.set_keep_above(True)
@@ -381,7 +381,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Shows Cardapio's main window
 		"""
 
-		self.show_window_on_top(self.window)
+		self.show_window_on_top(self.main_window)
 
 
 	# This method is required by the View API
@@ -391,7 +391,7 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		#if self.focus_out_blocked: return
-		self.window.hide()
+		self.main_window.hide()
 
 
 	# This method is required by the View API
@@ -453,8 +453,8 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		if not self.focus_out_blocked:
-			self.window.handler_block_by_func(self.on_mainwindow_focus_out)
-			self.window.handler_block_by_func(self.on_mainwindow_cursor_leave)
+			self.main_window.handler_block_by_func(self.on_mainwindow_focus_out)
+			self.main_window.handler_block_by_func(self.on_mainwindow_cursor_leave)
 			self.focus_out_blocked = True
 
 
@@ -464,8 +464,8 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		if self.focus_out_blocked:
-			self.window.handler_unblock_by_func(self.on_mainwindow_focus_out)
-			self.window.handler_unblock_by_func(self.on_mainwindow_cursor_leave)
+			self.main_window.handler_unblock_by_func(self.on_mainwindow_focus_out)
+			self.main_window.handler_unblock_by_func(self.on_mainwindow_cursor_leave)
 			self.focus_out_blocked = False
 
 
@@ -634,7 +634,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Get the width and height of the Cardapio window
 		"""
 
-		return list(self.window.get_size())
+		return list(self.main_window.get_size())
 
 
 	# This method is required by the View API
@@ -642,7 +642,7 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 		Get the x,y coordinates of the top-left corner of the Cardapio window
 		"""
-		return self.window.get_position()
+		return self.main_window.get_position()
 
 
 	# This method is required by the View API
@@ -698,12 +698,12 @@ class CardapioGtkView(CardapioViewInterface):
 		from anywhere without the need to focus the search entry first
 		"""
 
-		w = self.window.get_focus()
+		w = self.main_window.get_focus()
 
 		if w != self.search_entry and w == self.previously_focused_widget:
 			if event.is_modifier: return
 
-			self.window.set_focus(self.search_entry)
+			self.main_window.set_focus(self.search_entry)
 			self.search_entry.set_position(len(self.search_entry.get_text()))
 			
 			self.search_entry.emit('key-press-event', event)
@@ -719,8 +719,8 @@ class CardapioGtkView(CardapioViewInterface):
 		Because that would enter two of each key.
 		"""
 
-		if self.window.get_focus() != self.search_entry:
-			self.previously_focused_widget = self.window.get_focus()
+		if self.main_window.get_focus() != self.search_entry:
+			self.previously_focused_widget = self.main_window.get_focus()
 
 
 	# This method is required by the View API
@@ -786,7 +786,7 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 		Returns True if the main window is visible
 		"""
-		return self.window.get_visible()
+		return self.main_window.get_visible()
 
 
 	# This method is required by the View API
@@ -803,13 +803,13 @@ class CardapioGtkView(CardapioViewInterface):
 		Returns the first app in the right pane, if any.
 		"""
 
-		for slab in self.APPLICATION_PANE.get_children():
-			if not slab.get_visible(): continue
+		for section in self.APPLICATION_PANE.get_children():
+			if not section.get_visible(): continue
 
 			# NOTE: the following line depends on the UI file. If the file is
 			# changed, this may raise an exception:
 
-			for child in slab.get_children()[0].get_children()[0].get_children():
+			for child in section.get_children()[0].get_children()[0].get_children():
 				if not child.get_visible(): continue
 				if type(child) != gtk.Button: continue
 
@@ -826,7 +826,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 		first_app_widget = self.get_first_visible_app_widget()
 		if first_app_widget is not None:
-			self.window.set_focus(first_app_widget)
+			self.main_window.set_focus(first_app_widget)
 
 
 	# This method is required by the View API
@@ -869,7 +869,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Hide the "No results to show" text
 		"""
 
-		self.no_results_slab.hide()
+		self.no_results_section.hide()
 
 
 	# This method is required by the View API
@@ -890,7 +890,7 @@ class CardapioGtkView(CardapioViewInterface):
 		if text is None: text = self.cardapio.no_results_text
 
 		self.no_results_label.set_text(text)
-		self.no_results_slab.show()
+		self.no_results_section.show()
 
 
 	def open_about_gnome_dialog(self, widget):
@@ -1077,10 +1077,10 @@ class CardapioGtkView(CardapioViewInterface):
 		from Cardapio's borderless window.
 		"""
 
-		window_x, window_y = self.window.get_position()
+		window_x, window_y = self.main_window.get_position()
 		x = event.x_root - window_x
 		y = event.y_root - window_y
-		window_width, window_height = self.window.get_size()
+		window_width, window_height = self.main_window.get_size()
 		resize_margin = 10
 
 		if x < resize_margin:
@@ -1116,7 +1116,7 @@ class CardapioGtkView(CardapioViewInterface):
 		y = int(event.y_root)
 
 		self.block_focus_out_event()
-		self.window.window.begin_resize_drag(edge, event.button, x, y, event.time)
+		self.main_window.window.begin_resize_drag(edge, event.button, x, y, event.time)
 
 
 	def end_resize(self, *dummy):
@@ -1217,13 +1217,13 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
-	def add_category_button(self, button_str, icon_name, pane_or_section, section_slab, tooltip):
+	def add_category_button(self, button_str, icon_name, pane_or_section, section, tooltip):
 		"""
 		Adds a toggle-button to the category pane, and returns a handler to it
 		"""
 
 		sidebar_button = self.add_button(button_str, icon_name, pane_or_section, tooltip, self.CATEGORY_BUTTON)
-		sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section_slab)
+		sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section)
 		return sidebar_button
 
 
@@ -1326,86 +1326,86 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
-	def build_no_results_slab(self):
+	def build_no_results_section(self):
 		"""
-		Creates the slab that will be used to display the "No results to show" text
+		Creates the section that will be used to display the "No results to show" text
 		"""
 
-		section_slab, label = self.add_application_section('Dummy text')
-		self.no_results_slab = section_slab
+		section, label = self.add_application_section('Dummy text')
+		self.no_results_section = section
 		self.no_results_label = label
 		self.hide_no_results_text()
 
 
 	# This method is required by the View API
-	def build_subfolders_slab(self, title, tooltip):
+	def build_subfolders_section(self, title, tooltip):
 		"""
-		Creates the Folder Contents slab to the app pane
+		Creates the Folder Contents section to the app pane
 		"""
 
-		section_slab, label = self.cardapio.add_slab(title, 'system-file-manager', tooltip = tooltip, hide = True)
-		self.subfolders_section = section_slab
+		section, label = self.cardapio.add_section(title, 'system-file-manager', tooltip = tooltip, hidden_when_no_query = True)
+		self.SUBFOLDERS_SECTION = section
 		self.subfolders_label = label
 
 
 	# This method is required by the View API
-	def build_uncategorized_slab(self, title, tooltip):
+	def build_uncategorized_section(self, title, tooltip):
 		"""
-		Creates the Uncategorized slab to the app pane
+		Creates the Uncategorized section to the app pane
 		"""
 
-		section_slab, dummy = self.cardapio.add_slab(title, 'applications-other', tooltip = tooltip, hide = True)
-		self.uncategorized_section = section_slab
+		section, dummy = self.cardapio.add_section(title, 'applications-other', tooltip = tooltip, hidden_when_no_query = True)
+		self.UNCATEGORIZED_SECTION = section
 
 
 	# This method is required by the View API
-	def build_session_slab(self, title, tooltip):
+	def build_session_section(self, title, tooltip):
 		"""
-		Creates the Session slab to the app pane
+		Creates the Session section to the app pane
 		"""
 
-		section_slab, dummy = self.cardapio.add_slab(title, 'session-properties', hide = True)
-		self.session_section = section_slab
+		section, dummy = self.cardapio.add_section(title, 'session-properties', hidden_when_no_query = True)
+		self.SESSION_SECTION = section
 
 
 	# This method is required by the View API
-	def build_system_slab(self, title, tooltip):
+	def build_system_section(self, title, tooltip):
 		"""
-		Creates the System slab to the app pane
+		Creates the System section to the app pane
 		"""
 
-		section_slab, dummy = self.cardapio.add_slab(title, 'applications-system', hide = True)
-		self.system_section = section_slab
+		section, dummy = self.cardapio.add_section(title, 'applications-system', hidden_when_no_query = True)
+		self.SYSTEM_SECTION = section
 
 
 	# This method is required by the View API
-	def build_places_slab(self, title, tooltip):
+	def build_places_section(self, title, tooltip):
 		"""
-		Creates the Places slab to the app pane
+		Creates the Places section to the app pane
 		"""
 		
-		section_slab, dummy = self.cardapio.add_slab(title, 'folder', tooltip = tooltip, hide = False)
-		self.places_section = section_slab
+		section, dummy = self.cardapio.add_section(title, 'folder', tooltip = tooltip, hidden_when_no_query = False)
+		self.PLACES_SECTION = section
 
 
 	# This method is required by the View API
-	def build_pinneditems_slab(self, title, tooltip):
+	def build_pinneditems_section(self, title, tooltip):
 		"""
-		Creates the Pinned Items slab to the app pane
+		Creates the Pinned Items section to the app pane
 		"""
 
-		section_slab, dummy = self.cardapio.add_slab(title, 'emblem-favorite', tooltip = tooltip, hide = False)
-		self.favorites_section = section_slab
+		section, dummy = self.cardapio.add_section(title, 'emblem-favorite', tooltip = tooltip, hidden_when_no_query = False)
+		self.FAVORITES_SECTION = section
 
 
 	# This method is required by the View API
-	def build_sidepane_slab(self, title, tooltip):
+	def build_sidepane_section(self, title, tooltip):
 		"""
-		Creates the Side Pane slab to the app pane
+		Creates the Side Pane section to the app pane
 		"""
 
-		section_slab, dummy = self.cardapio.add_slab(title, 'emblem-favorite', tooltip = tooltip, hide = True)
-		self.sidepane_section = section_slab
+		section, dummy = self.cardapio.add_section(title, 'emblem-favorite', tooltip = tooltip, hidden_when_no_query = True)
+		self.SIDEPANE_SECTION = section
 
 
 	# This method is required by the View API
@@ -1423,8 +1423,8 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 		Shows the window frame around Cardapio
 		"""
-		self.window.set_decorated(True)
-		self.window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
+		self.main_window.set_decorated(True)
+		self.main_window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
 		self.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
 
 
@@ -1433,15 +1433,15 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 		Hides the window frame around Cardapio
 		"""
-		self.window.set_decorated(False)
-		self.window.set_deletable(True) 
+		self.main_window.set_decorated(False)
+		self.main_window.set_deletable(True) 
 		self.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_IN)
 
 
 	# This method is required by the View API
 	def remove_all_buttons_from_section(self, section):
 		"""
-		Removes all buttons from a given section slab
+		Removes all buttons from a given section 
 		"""
 
 		container = self.get_button_container_from_section(section)
@@ -1591,7 +1591,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Focuses the search entry
 		"""
 
-		self.window.set_focus(self.search_entry)
+		self.main_window.set_focus(self.search_entry)
 
 
 	# This method is required by the View API
@@ -1633,7 +1633,7 @@ class CardapioGtkView(CardapioViewInterface):
 	# This method is required by the View API
 	def add_application_section(self, section_title):
 		"""
-		Adds a new slab to the applications pane
+		Adds a new section to the applications pane
 		"""
 
 		section_contents = gtk.VBox(homogeneous = True)
@@ -1651,16 +1651,16 @@ class CardapioGtkView(CardapioViewInterface):
 		if section_title is not None:
 			label.set_text(section_title)
 
-		section_slab = gtk.Frame()
-		section_slab.set_label_widget(label)
-		section_slab.set_shadow_type(gtk.SHADOW_NONE)
-		section_slab.add(section_margin)
+		section = gtk.Frame()
+		section.set_label_widget(label)
+		section.set_shadow_type(gtk.SHADOW_NONE)
+		section.add(section_margin)
 
-		section_slab.show_all()
+		section.show_all()
 
-		self.APPLICATION_PANE.pack_start(section_slab, expand = False, fill = False)
+		self.APPLICATION_PANE.pack_start(section, expand = False, fill = False)
 
-		return section_slab, label
+		return section, label
 
 
 	# This method is required by the View API
@@ -1700,7 +1700,7 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 		Resizes the main Cardapio window
 		"""
-		self.window.resize(width, height)
+		self.main_window.resize(width, height)
 
 
 	# This method is required by the View API
@@ -1710,19 +1710,17 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		if anchor_right:
-			if anchor_bottom: self.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_EAST)
-			else: self.window.set_gravity(gtk.gdk.GRAVITY_NORTH_EAST)
+			if anchor_bottom: self.main_window.set_gravity(gtk.gdk.GRAVITY_SOUTH_EAST)
+			else: self.main_window.set_gravity(gtk.gdk.GRAVITY_NORTH_EAST)
 
 		else:
-			if anchor_bottom: self.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
-			else: self.window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
+			if anchor_bottom: self.main_window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
+			else: self.main_window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
 
 		if gtk.ver[0] == 2 and gtk.ver[1] <= 21 and gtk.ver[2] < 5:
-			# TODO MVC
-			_move_main_window_with_gravity_hack(self.window, x, y)
+			_move_main_window_with_gravity_hack(self.main_window, x, y)
 		else:
-			# TODO MVC
-			self.window.move(x, y)
+			self.main_window.move(x, y)
 
 
 	def _move_main_window_with_gravity_hack(self, x, y):
@@ -1731,8 +1729,8 @@ class CardapioGtkView(CardapioViewInterface):
 		respect the set_gravity command, so here we fix that.
 		"""
 
-		gravity = self.window.get_gravity()
-		width, height = self.window.get_size()
+		gravity = self.main_window.get_gravity()
+		width, height = self.main_window.get_size()
 
 		if gravity == gtk.gdk.GRAVITY_NORTH_WEST:
 			pass
@@ -1750,8 +1748,15 @@ class CardapioGtkView(CardapioViewInterface):
 		# NOTE: There are other gravity constants in GDK, but we do not implement
 		# them here because they're not used in Cardapio.
 
-		self.window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
-		self.window.move(x, y)
+		self.main_window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
+		self.main_window.move(x, y)
 
+
+	# This method is required by the View API
+	def set_subfolder_section_title(self, title):
+		"""
+		Sets the title of the subfolder section
+		"""
+		self.subfolders_label.set_text(title)
 
 

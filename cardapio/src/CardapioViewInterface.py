@@ -4,22 +4,29 @@ class CardapioViewInterface:
 	# all these constants can be overridden, so long as they
 	# maintain their uniqueness (within their own groups)
 
-	APPLICATION_PANE          = 0
-	CATEGORY_PANE             = 1
-	SYSTEM_CATEGORY_PANE      = 2
-	SIDE_PANE                 = 3
-	LEFT_SESSION_PANE         = 4
-	RIGHT_SESSION_PANE        = 5
+	APPLICATION_PANE          = 100
+	CATEGORY_PANE             = 101
+	SYSTEM_CATEGORY_PANE      = 102
+	SIDE_PANE                 = 103
+	LEFT_SESSION_PANE         = 104
+	RIGHT_SESSION_PANE        = 105
 
-	PIN_MENUITEM              = 0
-	UNPIN_MENUITEM            = 1
-	ADD_SIDE_PANE_MENUITEM    = 2
-	REMOVE_SIDE_PANE_MENUITEM = 3
-	OPEN_PARENT_MENUITEM      = 4
-	PEEK_INSIDE_MENUITEM      = 5
-	EJECT_MENUITEM            = 6
-	OPEN_MENUITEM             = 7
+	SUBFOLDERS_SECTION        = 200
+	SESSION_SECTION           = 201
+	SYSTEM_SECTION            = 202
+	SIDEPANE_SECTION          = 203
+	UNCATEGORIZED_SECTION     = 204
+	PLACES_SECTION            = 205
+	FAVORITES_SECTION         = 206
 
+	PIN_MENUITEM              = 300
+	UNPIN_MENUITEM            = 301
+	ADD_SIDE_PANE_MENUITEM    = 302
+	REMOVE_SIDE_PANE_MENUITEM = 303
+	OPEN_PARENT_MENUITEM      = 304
+	PEEK_INSIDE_MENUITEM      = 305
+	EJECT_MENUITEM            = 306
+	OPEN_MENUITEM             = 307
 
 	def setup_ui(self):
 		"""
@@ -353,7 +360,7 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
-	def add_category_button(self, button_str, icon_name, pane_or_section, section_slab, tooltip):
+	def add_category_button(self, button_str, icon_name, pane_or_section, section, tooltip):
 		"""
 		Adds a toggle-button to the category pane, and returns a handler to it
 		"""
@@ -410,58 +417,58 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
-	def build_no_results_slab(self):
+	def build_no_results_section(self):
 		"""
-		Creates the slab that will be used to display the "No results to show" text
-		"""
-		raise NotImplementedError("You must implement this method!")
-
-
-	def build_subfolders_slab(self, title, tooltip):
-		"""
-		Creates the Folder Contents slab to the app pane
+		Creates the section that will be used to display the "No results to show" text
 		"""
 		raise NotImplementedError("You must implement this method!")
 
 
-	def build_uncategorized_slab(self, title, tooltip):
+	def build_subfolders_section(self, title, tooltip):
 		"""
-		Creates the Uncategorized slab to the app pane
-		"""
-		raise NotImplementedError("You must implement this method!")
-
-
-	def build_session_slab(self, title, tooltip):
-		"""
-		Creates the Session slab to the app pane
+		Creates the Folder Contents section to the app pane
 		"""
 		raise NotImplementedError("You must implement this method!")
 
 
-	def build_system_slab(self, title, tooltip):
+	def build_uncategorized_section(self, title, tooltip):
 		"""
-		Creates the System slab to the app pane
-		"""
-		raise NotImplementedError("You must implement this method!")
-
-
-	def build_places_slab(self, title, tooltip):
-		"""
-		Creates the Places slab to the app pane
+		Creates the Uncategorized section to the app pane
 		"""
 		raise NotImplementedError("You must implement this method!")
 
 
-	def build_pinneditems_slab(self, title, tooltip):
+	def build_session_section(self, title, tooltip):
 		"""
-		Creates the Pinned Items slab to the app pane
+		Creates the Session section to the app pane
 		"""
 		raise NotImplementedError("You must implement this method!")
 
 
-	def build_sidepane_slab(self, title, tooltip):
+	def build_system_section(self, title, tooltip):
 		"""
-		Creates the Side Pane slab to the app pane
+		Creates the System section to the app pane
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
+	def build_places_section(self, title, tooltip):
+		"""
+		Creates the Places section to the app pane
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
+	def build_pinneditems_section(self, title, tooltip):
+		"""
+		Creates the Pinned Items section to the app pane
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
+	def build_sidepane_section(self, title, tooltip):
+		"""
+		Creates the Side Pane section to the app pane
 		"""
 		raise NotImplementedError("You must implement this method!")
 
@@ -489,7 +496,7 @@ class CardapioViewInterface:
 
 	def remove_all_buttons_from_section(self, section):
 		"""
-		Removes all buttons from a given section slab or from a pane
+		Removes all buttons from a given section or from a pane
 		"""
 		raise NotImplementedError("You must implement this method!")
 
@@ -540,7 +547,7 @@ class CardapioViewInterface:
 
 	def add_application_section(self, section_title):
 		"""
-		Adds a new slab to the applications pane
+		Adds a new section to the applications pane
 		"""
 		raise NotImplementedError("You must implement this method!")
 
@@ -577,6 +584,13 @@ class CardapioViewInterface:
 	def move_main_window(self, x, y, anchor_right, anchor_bottom):
 		"""
 		Moves the main Cardapio window, obeying the anchor_* booleans
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
+	def set_subfolder_section_title(self, title):
+		"""
+		Sets the title of the subfolder section
 		"""
 		raise NotImplementedError("You must implement this method!")
 

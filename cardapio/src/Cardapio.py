@@ -682,7 +682,7 @@ class Cardapio(dbus.service.Object):
 
 		self.app_list              = []  # holds a list of all apps for searching purposes
 		self.sys_list              = []  # holds a list of all apps in the system menus
-		self.section_list          = {}  # holds a list of all sections to allow us to reference them by their "slab" widgets
+		self.section_list          = {}  # holds a list of all sections to allow us to reference them by their section
 		self.current_query         = ''
 		self.subfolder_stack       = []
 		self.selected_section      = None
@@ -730,8 +730,8 @@ class Cardapio(dbus.service.Object):
 		self.clear_all_panes()
 		self.view.build_all_sections_sidebar_buttons(_('All'), _('Show all categories'))
 
-		self.build_special_slabs()
-		self.build_reorderable_slabs()
+		self.build_special_sections()
+		self.build_reorderable_sections()
 
 		if not self.have_control_center:
 			self.view.hide_view_mode_button()
@@ -740,8 +740,8 @@ class Cardapio(dbus.service.Object):
 		self.fill_session_list()
 		self.fill_system_list()
 		self.fill_uncategorized_list()
-		self.fill_favorites_list(self.view.favorites_section, 'pinned items')
-		self.fill_favorites_list(self.view.sidepane_section, 'side pane items')
+		self.fill_favorites_list(self.view.FAVORITES_SECTION, 'pinned items')
+		self.fill_favorites_list(self.view.SIDEPANE_SECTION, 'side pane items')
 
 		self.apply_settings()
 
@@ -784,7 +784,7 @@ class Cardapio(dbus.service.Object):
 
 	def clear_all_panes(self):
 		"""
-		Clears the different sections of the UI (panes)
+		Clears all the different sections of the UI (panes)
 		"""
 
 		self.remove_all_buttons_from_section(self.view.APPLICATION_PANE)
@@ -1089,8 +1089,8 @@ class Cardapio(dbus.service.Object):
 		base_text     = text[slash_pos+1:]
 		path          = None
 
-		self.view.hide_section(self.view.subfolders_section) # for added performance
-		self.remove_all_buttons_from_section(self.view.subfolders_section)
+		self.view.hide_section(self.view.SUBFOLDERS_SECTION) # for added performance
+		self.remove_all_buttons_from_section(self.view.SUBFOLDERS_SECTION)
 
 		if not search_inside:
 			if not self.subfolder_stack: return False
@@ -1137,9 +1137,7 @@ class Cardapio(dbus.service.Object):
 
 		if path == '/': parent_name = _('Filesystem Root')
 		else: parent_name = os.path.basename(path)
-		self.view.subfolders_label.set_text(parent_name)
-		# TODO MVC: when the above is changed, remove label from return values
-		# of view.add_application_section()
+		self.view.set_subfolder_section_title(parent_name)
 
 		count = 0
 		limit = self.settings['long search results limit']
@@ -1156,7 +1154,7 @@ class Cardapio(dbus.service.Object):
 			if filename[0] == '.': continue
 
 			if count >= limit: 
-				self.add_app_button(_('Show additional results'), 'system-file-manager', self.view.subfolders_section, 'xdg', path, _('Show additional search results in a file browser'), None)
+				self.add_app_button(_('Show additional results'), 'system-file-manager', self.view.SUBFOLDERS_SECTION, 'xdg', path, _('Show additional search results in a file browser'), None)
 				break
 
 			count += 1
@@ -1166,11 +1164,11 @@ class Cardapio(dbus.service.Object):
 			if icon_name is None: icon_name = 'folder'
 
 			basename, dummy = os.path.splitext(filename)
-			self.add_app_button(filename, icon_name, self.view.subfolders_section, 'xdg', command, command, None)
+			self.add_app_button(filename, icon_name, self.view.SUBFOLDERS_SECTION, 'xdg', command, command, None)
 
 		if count:
-			self.view.show_section(self.view.subfolders_section)
-			self.mark_section_has_entries_and_show_category_button(self.view.subfolders_section)
+			self.view.show_section(self.view.SUBFOLDERS_SECTION)
+			self.mark_section_has_entries_and_show_category_button(self.view.SUBFOLDERS_SECTION)
 			self.no_results_to_show = False
 
 		else:
@@ -1330,7 +1328,7 @@ class Cardapio(dbus.service.Object):
 
 	def show_plugin_loading_text(self, plugin):
 		"""
-		Write "Searching..." under the plugin slab title
+		Write "Searching..." under the plugin section title
 		"""
 
 		self.view.show_section_status_text(plugin.section, self.plugin_loading_text)
@@ -1344,7 +1342,7 @@ class Cardapio(dbus.service.Object):
 
 	def show_all_plugin_timeout_text(self, delay_type):
 		"""
-		Write "Plugin timed out..." under the plugin slab title
+		Write "Plugin timed out..." under the plugin section title
 		"""
 
 		for plugin in self.active_plugin_instances:
@@ -1863,14 +1861,14 @@ class Cardapio(dbus.service.Object):
 
 		for node in self.sys_tree.root.contents:
 			if isinstance(node, gmenu.Directory):
-				self.add_slab(node.name, node.icon, node.get_comment(), node = node, system_menu = True)
+				self.add_section(node.name, node.icon, node.get_comment(), node = node, system_menu = True)
 
 		self.view.hide_pane(self.view.SYSTEM_CATEGORY_PANE)
 
-		section_slab, dummy = self.add_slab(_('Uncategorized'), 'applications-other', tooltip = _('Other configuration tools'), hide = False, system_menu = True)
-		self.add_tree_to_app_list(self.sys_tree.root, section_slab, self.sys_list, recursive = False)
+		section, dummy = self.add_section(_('Uncategorized'), 'applications-other', tooltip = _('Other configuration tools'), hidden_when_no_query = False, system_menu = True)
+		self.add_tree_to_app_list(self.sys_tree.root, section, self.sys_list, recursive = False)
 
-		self.add_tree_to_app_list(self.sys_tree.root, self.view.system_section, self.app_list)
+		self.add_tree_to_app_list(self.sys_tree.root, self.view.SYSTEM_SECTION, self.app_list)
 
 
 	def fill_uncategorized_list(self):
@@ -1878,7 +1876,7 @@ class Cardapio(dbus.service.Object):
 		Populate the Uncategorized section
 		"""
 
-		self.add_tree_to_app_list(self.app_tree.root, self.view.uncategorized_section, self.app_list, recursive = False)
+		self.add_tree_to_app_list(self.app_tree.root, self.view.UNCATEGORIZED_SECTION, self.app_list, recursive = False)
 
 
 	def fill_places_list(self):
@@ -1896,7 +1894,7 @@ class Cardapio(dbus.service.Object):
 		connected drives, and so on.
 		"""
 
-		section = self.view.places_section
+		section = self.view.PLACES_SECTION
 
 		if self.volume_monitor is None:
 			volume_monitor_already_existed = False
@@ -1938,7 +1936,7 @@ class Cardapio(dbus.service.Object):
 		Populate the "bookmarked places", which include Home and your personal bookmarks.
 		"""
 
-		section = self.view.places_section
+		section = self.view.PLACES_SECTION
 
 		self.add_app_button(_('Home'), 'user-home', section, 'xdg', self.home_folder_path, _('Open your personal folder'), self.app_list)
 
@@ -1992,7 +1990,7 @@ class Cardapio(dbus.service.Object):
 		self.bookmark_monitor.handler_block_by_func(self.on_bookmark_monitor_changed)
 
 		if event == gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
-			self.remove_all_buttons_from_section(self.view.places_section)
+			self.remove_all_buttons_from_section(self.view.PLACES_SECTION)
 			self.fill_places_list()
 
 		# same here
@@ -2007,7 +2005,7 @@ class Cardapio(dbus.service.Object):
 	 	# hoping this helps with bug 662249, in case there is some strange threading problem happening (although there are no explicit threads in this program)	
 		self.volume_monitor.handler_block_by_func(self.on_volume_monitor_changed)
 
-		self.remove_all_buttons_from_section(self.view.places_section)
+		self.remove_all_buttons_from_section(self.view.PLACES_SECTION)
 		self.fill_places_list()
 
 		# same here
@@ -2058,10 +2056,10 @@ class Cardapio(dbus.service.Object):
 
 		icon_name = self.icon_helper.get_icon_name_from_path(folder_path)
 		if icon_name is None: icon_name = folder_icon
-		self.add_app_button(folder_name, icon_name, self.view.places_section, 'xdg', folder_path, folder_path, self.app_list)
+		self.add_app_button(folder_name, icon_name, self.view.PLACES_SECTION, 'xdg', folder_path, folder_path, self.app_list)
 
 
-	def fill_favorites_list(self, slab, list_name):
+	def fill_favorites_list(self, section, list_name):
 		"""
 		Populate either the Pinned Items or Side Pane list
 		"""
@@ -2079,27 +2077,27 @@ class Cardapio(dbus.service.Object):
 			if 'context menu' not in app:
 				app['context menu'] = None
 
-			app_button = self.add_app_button(app['name'], app['icon name'], slab, app['type'], app['command'], app['tooltip'], self.app_list)
+			app_button = self.add_app_button(app['name'], app['icon name'], section, app['type'], app['command'], app['tooltip'], self.app_list)
 
 			self.view.show_button(app_button)
-			self.mark_section_has_entries_and_show_category_button(slab)
+			self.mark_section_has_entries_and_show_category_button(section)
 			self.no_results_to_show = False
 			no_results = False
 
-			if slab == self.view.sidepane_section:
+			if section == self.view.SIDEPANE_SECTION:
 				button_str, tooltip = self.sanitize_button_info(app['name'], app['tooltip'])
 				sidepane_button = self.view.add_sidepane_button(button_str, app['icon name'], self.view.SIDE_PANE, tooltip)
 				sidepane_button.app_info = app_button.app_info
 
-		if no_results or (slab is self.view.sidepane_section):
-			self.disappear_with_section_and_category_button(slab)
+		if no_results or (section is self.view.SIDEPANE_SECTION):
+			self.disappear_with_section_and_category_button(section)
 
-		elif (self.selected_section is not None) and (self.selected_section != slab):
-			self.view.hide_section(slab)
+		elif (self.selected_section is not None) and (self.selected_section != section):
+			self.view.hide_section(section)
 
 		else:
-			self.mark_section_has_entries_and_show_category_button(slab)
-			self.view.show_section(slab)
+			self.mark_section_has_entries_and_show_category_button(section)
+			self.view.show_section(section)
 
 
 	def fill_session_list(self):
@@ -2133,7 +2131,7 @@ class Cardapio(dbus.service.Object):
 
 		for item in items:
 
-			app_button = self.add_app_button(item[0], item[2], self.view.session_section, 'raw', item[3], item[1], self.app_list)
+			app_button = self.add_app_button(item[0], item[2], self.view.SESSION_SECTION, 'raw', item[3], item[1], self.app_list)
 
 			button_str, tooltip = self.sanitize_button_info(item[0], item[1])
 			session_button = self.view.add_session_button(button_str, item[2], item[4], tooltip)
@@ -2154,12 +2152,12 @@ class Cardapio(dbus.service.Object):
 
 		for node in self.app_tree.root.contents:
 			if isinstance(node, gmenu.Directory):
-				self.add_slab(node.name, node.icon, node.get_comment(), node = node, hide = False)
+				self.add_section(node.name, node.icon, node.get_comment(), node = node, hidden_when_no_query = False)
 
 
-	def add_slab(self, title_str, icon_name = None, tooltip = '', hide = False, node = None, system_menu = False):
+	def add_section(self, title_str, icon_name = None, tooltip = '', hidden_when_no_query = False, node = None, system_menu = False):
 		"""
-		Add to the app pane a new section slab (i.e. a container holding a title
+		Add to the app pane a new section (i.e. a container holding a title
 		label and a hbox to be filled with apps). This also adds the section
 		name to the left pane, under the View label.
 		"""
@@ -2172,75 +2170,68 @@ class Cardapio(dbus.service.Object):
 			app_list = self.app_list
 
 		# add category to application pane
-		section_slab, label = self.view.add_application_section(title_str)
+		section, label = self.view.add_application_section(title_str)
 
 		if node is not None:
 			# add all apps in this category to application pane
-			self.add_tree_to_app_list(node, section_slab, app_list)
+			self.add_tree_to_app_list(node, section, app_list)
 
 		# add category to category pane
 		title_str, tooltip = self.sanitize_button_info(title_str, tooltip)
-		sidebar_button = self.view.add_category_button(title_str, icon_name, category_pane, section_slab, tooltip)
+		category_button = self.view.add_category_button(title_str, icon_name, category_pane, section, tooltip)
 
-		if hide:
-			self.view.hide_button(sidebar_button)
-			self.view.hide_section(section_slab)
-			self.section_list[section_slab] = {
-				'has entries': False,
-				'category': sidebar_button,
-				'name': title_str,
-				'is system section': system_menu,
-				}
+		if hidden_when_no_query:
+			self.view.hide_button(category_button)
+			self.view.hide_section(section)
 
-		else:
-			self.section_list[section_slab] = {
-				'has entries': True,
-				'category': sidebar_button,
-				'name': title_str,
-				'is system section': system_menu,
-				}
+		self.section_list[section] = {
+			'must show'         : not hidden_when_no_query,
+			'category button'   : category_button,
+			'name'              : title_str,
+			'is system section' : system_menu,
+			}
 
-		return section_slab, label
+		return section, label
 
 
-	def build_special_slabs(self):
+	def build_special_sections(self):
 		"""
-		Builds slabs that have special functions in the system, such as the
+		Builds sections that have special functions in the system, such as the
 		one that contains the "no results to show" text and the one containing
 		subfolder results.
 		"""
 
-		self.view.build_no_results_slab()
-		self.view.build_subfolders_slab(_('Folder Contents'), _('Look inside folders'))
+		self.view.build_no_results_section()
+		self.view.build_subfolders_section(_('Folder Contents'), _('Look inside folders'))
 
 
-	def build_reorderable_slabs(self):
+	def build_reorderable_sections(self):
 		"""
-		Add all the reorderable slabs to the app pane
+		Add all the reorderable sections to the app pane
 		"""
 
-		self.view.build_sidepane_slab(_('Side Pane'), _('Items pinned to the side pane'))
+		self.view.build_sidepane_section(_('Side Pane'), _('Items pinned to the side pane'))
 
 		for basename in self.settings['active plugins']:
 
 			if basename == 'applications':
 				self.build_applications_list()
-				self.view.build_uncategorized_slab(_('Uncategorized'), _('Items that are not under any menu category'))
-				self.view.build_session_slab(_('Session'), None)
-				self.view.build_system_slab(_('System'), None)
+				self.view.build_uncategorized_section(_('Uncategorized'), _('Items that are not under any menu category'))
+				self.view.build_session_section(_('Session'), None)
+				self.view.build_system_section(_('System'), None)
 
 			elif basename == 'places':
-				self.view.build_places_slab(_('Places'), _('Access documents and folders'))
+				self.view.build_places_section(_('Places'), _('Access documents and folders'))
 
 			elif basename == 'pinned':
-				self.view.build_pinneditems_slab(_('Pinned items'), _('Your favorite items'))
+				self.view.build_pinneditems_section(_('Pinned items'), _('Your favorite items'))
 
 			elif basename in self.plugin_database:
 
 				plugin = self.plugin_database[basename]['instance']
 				if plugin is None: continue
 
-				plugin.section, dummy = self.add_slab(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hide = plugin.hide_from_sidebar)
+				plugin.section, dummy = self.add_section(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hidden_when_no_query = plugin.hide_from_sidebar)
 
 			else:
 				self.settings['active plugins'].remove(basename)
@@ -2401,10 +2392,10 @@ class Cardapio(dbus.service.Object):
 		Handle the pinning action
 		"""
 
-		self.remove_section_from_app_list(self.view.favorites_section)
-		self.remove_all_buttons_from_section(self.view.favorites_section)
+		self.remove_section_from_app_list(self.view.FAVORITES_SECTION)
+		self.remove_all_buttons_from_section(self.view.FAVORITES_SECTION)
 		self.settings['pinned items'].append(clicked_app_info)
-		self.fill_favorites_list(self.view.favorites_section, 'pinned items')
+		self.fill_favorites_list(self.view.FAVORITES_SECTION, 'pinned items')
 
 
 	# This method is called from the View API
@@ -2413,10 +2404,10 @@ class Cardapio(dbus.service.Object):
 		Handle the unpinning action
 		"""
 
-		self.remove_section_from_app_list(self.view.favorites_section)
-		self.remove_all_buttons_from_section(self.view.favorites_section)
+		self.remove_section_from_app_list(self.view.FAVORITES_SECTION)
+		self.remove_all_buttons_from_section(self.view.FAVORITES_SECTION)
 		self.settings['pinned items'].remove(clicked_app_info)
-		self.fill_favorites_list(self.view.favorites_section, 'pinned items')
+		self.fill_favorites_list(self.view.FAVORITES_SECTION, 'pinned items')
 
 
 	# This method is called from the View API
@@ -2425,11 +2416,11 @@ class Cardapio(dbus.service.Object):
 		Handle the "add to sidepane" action
 		"""
 
-		self.remove_section_from_app_list(self.view.sidepane_section)
-		self.remove_all_buttons_from_section(self.view.sidepane_section)
+		self.remove_section_from_app_list(self.view.SIDEPANE_SECTION)
+		self.remove_all_buttons_from_section(self.view.SIDEPANE_SECTION)
  		self.remove_all_buttons_from_section(self.view.SIDE_PANE)
 		self.settings['side pane items'].append(clicked_app_info)
-		self.fill_favorites_list(self.view.sidepane_section, 'side pane items')
+		self.fill_favorites_list(self.view.SIDEPANE_SECTION, 'side pane items')
 		self.view.SIDE_PANE.queue_resize() # required! or sidepane's allocation will be x,y,width,0 when first item is added
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or sidepane will obscure the mode switcher button
 
@@ -2440,11 +2431,11 @@ class Cardapio(dbus.service.Object):
 		Handle the "remove from sidepane" action
 		"""
 
-		self.remove_section_from_app_list(self.view.sidepane_section)
-		self.remove_all_buttons_from_section(self.view.sidepane_section)
+		self.remove_section_from_app_list(self.view.SIDEPANE_SECTION)
+		self.remove_all_buttons_from_section(self.view.SIDEPANE_SECTION)
  		self.remove_all_buttons_from_section(self.view.SIDE_PANE)
 		self.settings['side pane items'].remove(clicked_app_info)
-		self.fill_favorites_list(self.view.sidepane_section, 'side pane items')
+		self.fill_favorites_list(self.view.SIDEPANE_SECTION, 'side pane items')
 		self.view.get_widget('SideappSubdivider').queue_resize() # required! or an extra space will show up where but button used to be
 
 
@@ -2892,7 +2883,7 @@ class Cardapio(dbus.service.Object):
 		self.no_results_to_show = True
 
 		for sec in self.section_list:
-			if self.section_list[sec]['has entries'] and self.section_list[sec]['is system section'] == self.in_system_menu_mode:
+			if self.section_list[sec]['must show'] and self.section_list[sec]['is system section'] == self.in_system_menu_mode:
 				self.view.show_section(sec)
 				self.no_results_to_show = False
 			else:
@@ -2902,7 +2893,7 @@ class Cardapio(dbus.service.Object):
 			self.view.hide_no_results_text()
 
 		if self.selected_section is not None:
-			widget = self.section_list[self.selected_section]['category']
+			widget = self.section_list[self.selected_section]['category button']
 			self.view.set_sidebar_button_toggled(widget, False)
 
 		self.selected_section = None
@@ -2923,7 +2914,7 @@ class Cardapio(dbus.service.Object):
 
 		# untoggle the currently-toggled button, if any
 		if self.selected_section is not None:
-			widget = self.section_list[self.selected_section]['category']
+			widget = self.section_list[self.selected_section]['category button']
 			self.view.set_sidebar_button_toggled(widget, False)
 
 		# untoggled and make sensitive the "All" buttons
@@ -2952,7 +2943,7 @@ class Cardapio(dbus.service.Object):
 
 			return
 
-		if self.section_list[self.selected_section]['has entries']:
+		if self.section_list[self.selected_section]['must show']:
 			self.view.show_section(self.selected_section)
 			self.view.hide_no_results_text()
 
@@ -2967,18 +2958,18 @@ class Cardapio(dbus.service.Object):
 		there is no text in the search entry
 		"""
 
-		self.disappear_with_section_and_category_button(self.view.subfolders_section)
-		self.disappear_with_section_and_category_button(self.view.session_section)
-		self.disappear_with_section_and_category_button(self.view.system_section)
-		self.disappear_with_section_and_category_button(self.view.sidepane_section)
-		self.disappear_with_section_and_category_button(self.view.uncategorized_section)
+		self.disappear_with_section_and_category_button(self.view.SUBFOLDERS_SECTION)
+		self.disappear_with_section_and_category_button(self.view.SESSION_SECTION)
+		self.disappear_with_section_and_category_button(self.view.SYSTEM_SECTION)
+		self.disappear_with_section_and_category_button(self.view.SIDEPANE_SECTION)
+		self.disappear_with_section_and_category_button(self.view.UNCATEGORIZED_SECTION)
 
 		self.disappear_with_all_transitory_plugin_sections()
 
 
 	def disappear_with_section_and_category_button(self, section):
 		"""
-		Mark a section as empty, hide its slab, and hide its category button
+		Mark a section as empty, hide it, and hide its category button
 		"""
 
 		self.mark_section_empty_and_hide_category_button(section)
@@ -2997,7 +2988,7 @@ class Cardapio(dbus.service.Object):
 
 	def disappear_with_all_transitory_plugin_sections(self):
 		"""
-		Hide the section slabs for all plugins that are marked as transitory
+		Hide the section for all plugins that are marked as transitory
 		"""
 
 		for plugin in self.active_plugin_instances:
@@ -3010,10 +3001,9 @@ class Cardapio(dbus.service.Object):
 		Mark a section as empty (no search results) and hide its sidebar button
 		"""
 
-		if not self.section_list[section]['has entries']: return
-		self.section_list[section]['has entries'] = False
-		# TODO MVC
-		self.section_list[section]['category'].hide()
+		if not self.section_list[section]['must show']: return
+		self.section_list[section]['must show'] = False
+		self.view.hide_button(self.section_list[section]['category button'])
 
 
 	def mark_section_has_entries_and_show_category_button(self, section):
@@ -3023,14 +3013,12 @@ class Cardapio(dbus.service.Object):
 
 		# check first for speed improvement (since this function usually gets
 		# called several times, once for each app in the section)
-		if self.section_list[section]['has entries']: return
+		if self.section_list[section]['must show']: return
 
-		self.section_list[section]['has entries'] = True
-		# TODO MVC
-		self.section_list[section]['category'].show()
+		self.section_list[section]['must show'] = True
+		self.view.show_button(self.section_list[section]['category button'])
 
-
-
+	
 import __builtin__
 __builtin__._ = _
 __builtin__.CardapioPluginInterface = CardapioPluginInterface
