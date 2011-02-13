@@ -1661,30 +1661,13 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		if self.settings['window size'] is not None:
-			# TODO MVC
-			self.view.window.resize(*self.settings['window size'])
+			self.view.resize_main_window(*self.settings['window size'])
 
 		if x is None or y is None:
 			x, y = self.choose_coordinates_for_window()
 
 		x, y, anchor_right, anchor_bottom = self.get_coordinates_inside_screen(x, y, force_anchor_right, force_anchor_bottom)
-
-		if anchor_right:
-			# TODO MVC
-			if anchor_bottom: self.view.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_EAST)
-			else: self.view.window.set_gravity(gtk.gdk.GRAVITY_NORTH_EAST)
-
-		else:
-			# TODO MVC
-			if anchor_bottom: self.view.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
-			else: self.view.window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
-
-		if gtk.ver[0] == 2 and gtk.ver[1] <= 21 and gtk.ver[2] < 5:
-			# TODO MVC
-			gtk_window_move_with_gravity(self.view.window, x, y)
-		else:
-			# TODO MVC
-			self.view.window.move(x, y)
+		self.view.move_main_window(x, y, anchor_right, anchor_bottom)
 
 		if self.settings['mini mode']:
 			self.view.set_main_splitter_position(0)

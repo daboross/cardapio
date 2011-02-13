@@ -560,10 +560,23 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
-	# This method is required by the View API
 	def hide_pane(self, pane):
 		"""
 		Hide the pane given by one of the *_PANE constants
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
+	def resize_main_window(self, width, height):
+		"""
+		Resizes the main Cardapio window
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
+	def move_main_window(self, x, y, anchor_right, anchor_bottom):
+		"""
+		Moves the main Cardapio window, obeying the anchor_* booleans
 		"""
 		raise NotImplementedError("You must implement this method!")
 

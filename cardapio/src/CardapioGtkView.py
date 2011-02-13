@@ -1695,3 +1695,63 @@ class CardapioGtkView(CardapioViewInterface):
 		button.hide()
 
 
+	# This method is required by the View API
+	def resize_main_window(self, width, height):
+		"""
+		Resizes the main Cardapio window
+		"""
+		self.window.resize(width, height)
+
+
+	# This method is required by the View API
+	def move_main_window(self, x, y, anchor_right, anchor_bottom):
+		"""
+		Moves the main Cardapio window, obeying the anchor_* booleans
+		"""
+
+		if anchor_right:
+			if anchor_bottom: self.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_EAST)
+			else: self.window.set_gravity(gtk.gdk.GRAVITY_NORTH_EAST)
+
+		else:
+			if anchor_bottom: self.window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
+			else: self.window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
+
+		if gtk.ver[0] == 2 and gtk.ver[1] <= 21 and gtk.ver[2] < 5:
+			# TODO MVC
+			_move_main_window_with_gravity_hack(self.window, x, y)
+		else:
+			# TODO MVC
+			self.window.move(x, y)
+
+
+	def _move_main_window_with_gravity_hack(self, x, y):
+		"""
+		For some reason, GTK 2.20.x in Ubuntu 10.04 (Lucid) does not 
+		respect the set_gravity command, so here we fix that.
+		"""
+
+		gravity = self.window.get_gravity()
+		width, height = self.window.get_size()
+
+		if gravity == gtk.gdk.GRAVITY_NORTH_WEST:
+			pass
+
+		elif gravity == gtk.gdk.GRAVITY_NORTH_EAST:
+			x -= width
+
+		elif gravity == gtk.gdk.GRAVITY_SOUTH_WEST:
+			y -= height
+
+		elif gravity == gtk.gdk.GRAVITY_SOUTH_EAST:
+			x -= width
+			y -= height
+
+		# NOTE: There are other gravity constants in GDK, but we do not implement
+		# them here because they're not used in Cardapio.
+
+		self.window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
+		self.window.move(x, y)
+
+
+
