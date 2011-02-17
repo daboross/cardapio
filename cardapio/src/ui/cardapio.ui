@@ -43,8 +43,7 @@
                       <object class="GtkAlignment" id="alignment1">
                         <property name="visible">True</property>
                         <property name="bottom_padding">4</property>
-                        <property name="left_padding">4</property>
-                        <property name="right_padding">4</property>
+                        <property name="left_padding">3</property>
                         <child>
                           <object class="GtkHBox" id="hbox1">
                             <property name="visible">True</property>
@@ -53,7 +52,8 @@
                               <object class="GtkLabel" id="label1">
                                 <property name="visible">True</property>
                                 <property name="label" translatable="yes">Data has recently changed! Menu will be updated soon.</property>
-                                <property name="wrap">True</property>
+                                <property name="ellipsize">end</property>
+                                <property name="width_chars">10</property>
                               </object>
                               <packing>
                                 <property name="position">0</property>

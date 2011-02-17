@@ -79,7 +79,7 @@ class SettingsHelper:
 		self.read_config_option(s, 'open on hover'              , False                    ) # bool
 		self.read_config_option(s, 'open categories on hover'   , False                    ) # bool
 		self.read_config_option(s, 'min search string length'   , 3                        ) # int, number of characters
-		self.read_config_option(s, 'menu rebuild delay'         , 3                        , force_update_from_version = [0,9,96]) # seconds
+		#self.read_config_option(s, 'menu rebuild delay'         , 3                        , force_update_from_version = [0,9,96]) # seconds
 		self.read_config_option(s, 'search results limit'       , 5                        ) # int, number of results
 		self.read_config_option(s, 'long search results limit'  , 15                       ) # int, number of results
 		self.read_config_option(s, 'local search update delay'  , 100                      , force_update_from_version = [0,9,96]) # msec
