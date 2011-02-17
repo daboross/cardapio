@@ -182,6 +182,13 @@ class CardapioGtkView(CardapioViewInterface):
 		self.get_widget('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
 		self.get_widget('NavigationButtonsBackground').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
 
+		# TODO: I would love to assign some existing theme color on ReloadMessageBar,
+		# but I don't know which color I can use for this. Is there a named
+		# "message bar" color, that is used by Evince, for instance?
+		#
+		# self.get_widget('ReloadMessageBar').modify_bg(gtk.STATE_NORMAL, ??)
+		# self.get_widget('ReloadMessageBar').modify_fg(gtk.STATE_NORMAL, ??)
+
 
 	def on_mainwindow_destroy(self, *dummy):
 		"""
@@ -373,6 +380,11 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		self.message_window.hide()
+
+		# ensure window is hidden immediately
+		gtk.gdk.flush()
+		while gtk.events_pending():
+			gtk.main_iteration()
 
 
 	# This method is required by the View API
@@ -1758,5 +1770,26 @@ class CardapioGtkView(CardapioViewInterface):
 		Sets the title of the subfolder section
 		"""
 		self.subfolders_label.set_text(title)
+
+
+	def on_reload_button_clicked(self, widget):
+		self.cardapio.rebuild_now()
+
+
+	# This method is required by the View API
+	def show_rebuild_required_bar(self):
+		"""
+		Shows the "rebuild required" bar, which allows the user to click the
+		"reload" button, which rebuilds all of Cardapio's menus
+		"""
+		self.get_widget('ReloadMessageBar').show()
+
+
+	# This method is required by the View API
+	def hide_rebuild_required_bar(self):
+		"""
+		Hide the "rebuild required" bar.
+		"""
+		self.get_widget('ReloadMessageBar').hide()
 
 

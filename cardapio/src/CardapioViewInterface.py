@@ -595,3 +595,18 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
+	def show_rebuild_required_bar(self):
+		"""
+		Shows the "rebuild required" bar, which allows the user to click the
+		"reload" button, which rebuilds all of Cardapio's menus
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
+	def hide_rebuild_required_bar(self):
+		"""
+		Hide the "rebuild required" bar.
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+

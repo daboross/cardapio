@@ -192,8 +192,6 @@ class Cardapio(dbus.service.Object):
 		self.opened_last_app_in_background = False
 		self.keybinding                    = None
 		self.reset_search_timer            = None
-		self.rebuilding                    = False
-		self.must_rebuild                  = False
 		self.rebuild_timer                 = None
 		self.search_timer_local            = None
 		self.search_timer_remote           = None
@@ -676,18 +674,18 @@ class Cardapio(dbus.service.Object):
 		self.view.apply_settings()
 
 
-	def reset_model(self):
+	def reset_model(self, reset_all = True):
 		"""
 		Resets the data structures that contain all data related to Cardapio's
 		main operation mode
 		"""
 
-		self.app_list              = []  # holds a list of all apps for searching purposes
-		self.sys_list              = []  # holds a list of all apps in the system menus
-		self.section_list          = {}  # holds a list of all sections to allow us to reference them by their section
-		self.current_query         = ''
-		self.subfolder_stack       = []
-		self.selected_section      = None
+		self.app_list               = []  # holds a list of all apps for searching purposes
+		self.sys_list               = []  # holds a list of all apps in the system menus
+		self.section_list           = {}  # holds a list of all sections to allow us to reference them by their section
+		self.current_query          = ''
+		self.subfolder_stack        = []
+		self.selected_section       = None
 
 
 	def load_settings(self):
@@ -746,12 +744,12 @@ class Cardapio(dbus.service.Object):
 		self.fill_favorites_list(self.view.SIDEPANE_SECTION, 'side pane items')
 
 		self.apply_settings()
-
 		self.view.post_build_ui()
-
 		self.view.hide_message_window()
 
 
+	# TODO: make rebuild smarter: only rebuild whatever is absolutely necessary
+	# This method is called from the View API
 	def rebuild_ui(self, show_message = False):
 		"""
 		Rebuild the UI after a timer (this is called when the menu data changes,
@@ -760,20 +758,13 @@ class Cardapio(dbus.service.Object):
 
 		# don't interrupt the user if a rebuild was requested while the window was shown
 		# (instead, the rebuild will happen when self.hide() is called)
-		if self.rebuilding: 
+		if (not show_message) and self.view.is_window_visible(): 
 			logging.info('Rebuild postponed: Cardapio is visible!')
-			return False # Required! makes this a "one-shot" timer, rather than "periodic"
-
-		# perform time-sensitive actions...
-
-		self.must_rebuild = False
-		self.rebuilding = True
+			return False # Required! Keeps this timer running
 
 		if self.rebuild_timer is not None:
 			glib.source_remove(self.rebuild_timer)
 			self.rebuild_timer = None
-
-		# ok, now that we're done with time-sensitive stuff, do normal actions
 
 		logging.info('Rebuilding UI')
 
@@ -795,7 +786,8 @@ class Cardapio(dbus.service.Object):
 			# (leak solved!)
 
 		self.reset_search()
-		self.rebuilding = False
+
+		self.view.hide_rebuild_required_bar()
 
 		return False
 		# Required! makes this a "one-shot" timer, rather than "periodic"
@@ -950,7 +942,15 @@ class Cardapio(dbus.service.Object):
 		self.schedule_rebuild()
 
 
-	# This method is called from the View API
+	# This method is called from the View API 
+	def rebuild_now(self):
+		"""
+		Rebuilds the Cardapio UI immediately. Should *never* be called from a plugin!
+		"""
+		self.rebuild_ui(show_message = True)
+
+
+	# This method is called from the View API and plugin API
 	def schedule_rebuild(self):
 		"""
 		Rebuilds the Cardapio UI after a timer
@@ -959,7 +959,7 @@ class Cardapio(dbus.service.Object):
 		if self.rebuild_timer is not None:
 			glib.source_remove(self.rebuild_timer)
 
-		self.must_rebuild = True
+		self.view.show_rebuild_required_bar()
 		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.rebuild_ui)
 
 
@@ -1501,7 +1501,7 @@ class Cardapio(dbus.service.Object):
 		if self.rebuild_timer is not None:
 			glib.source_remove(self.rebuild_timer)
 
-		self.must_rebuild = True
+		self.view.show_rebuild_required_bar()
 		self.rebuild_timer = glib.timeout_add_seconds(self.settings['menu rebuild delay'], self.plugin_on_reload_permission_granted, plugin)
 
 
@@ -1512,6 +1512,7 @@ class Cardapio(dbus.service.Object):
 
 		self.rebuild_timer = None
 		plugin.on_reload_permission_granted()
+		self.view.hide_rebuild_required_bar()
 
 		return False
 		# Required! makes this a "one-shot" timer, rather than "periodic"
@@ -1806,10 +1807,11 @@ class Cardapio(dbus.service.Object):
 
 		self.opened_last_app_in_background = False
 
-		if self.must_rebuild:
+		if self.rebuild_timer is not None:
 			# build the UI *after* showing the window, so the user gets the
 			# satisfaction of seeing the window pop up, even if it's incomplete...
-			self.rebuild_ui(show_message = True)
+			#self.rebuild_ui(show_message = True)
+			self.view.show_rebuild_required_bar()
 
 
 	def hide(self):
@@ -1835,11 +1837,6 @@ class Cardapio(dbus.service.Object):
 		self.cancel_all_plugins()
 
 		logging.info('(RSS = %s)' % get_memory_usage())
-
-		if self.must_rebuild:
-			# if a rebuild was requested while the window was shown, build the
-			# UI *after* hiding the window
-			self.rebuild_ui(show_message = False)
 
 		return False # used for when hide() is called from a timer
 
