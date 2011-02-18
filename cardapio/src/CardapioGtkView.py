@@ -1739,7 +1739,7 @@ class CardapioGtkView(CardapioViewInterface):
 			else: self.main_window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
 
 		if gtk.ver[0] == 2 and gtk.ver[1] <= 21 and gtk.ver[2] < 5:
-			_move_main_window_with_gravity_hack(self.main_window, x, y)
+			self._move_main_window_with_gravity_hack(x, y)
 		else:
 			self.main_window.move(x, y)
 

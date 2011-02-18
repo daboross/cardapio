@@ -31,7 +31,6 @@ import sys
 
 try:
 	from SettingsHelper import *
-	from hacks import *
 	from CardapioGtkView import *
 	from OptionsWindow import *
 	from CardapioPluginInterface import CardapioPluginInterface
