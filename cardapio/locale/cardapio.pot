@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-18 14:03+0100\n"
+"POT-Creation-Date: 2011-02-18 15:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -689,7 +689,7 @@ msgstr ""
 msgid "_Edit Menus"
 msgstr ""
 
-#: src/gnomepanel/CardapioGnomeApplet.py:66 src/ui/cardapio.ui:943
+#: src/gnomepanel/CardapioGnomeApplet.py:66 src/ui/cardapio.ui:944
 msgid "_About Cardapio"
 msgstr ""
 
@@ -705,137 +705,143 @@ msgstr ""
 msgid "Cardapio"
 msgstr ""
 
-#: src/ui/cardapio.ui:55 src/ui/cardapio.ui:56
-msgid "Data has recently changed! Menu will be updated soon."
+#: src/ui/cardapio.ui:55
+msgid ""
+"Data has recently changed!\n"
+"This menu will be updated momentarily, so as not to interrupt your browsing."
 msgstr ""
 
-#: src/ui/cardapio.ui:66
-msgid "Refresh now"
+#: src/ui/cardapio.ui:57
+msgid "This menu will be updated momentarily."
 msgstr ""
 
-#: src/ui/cardapio.ui:137 src/ui/cardapio.ui:371
+#: src/ui/cardapio.ui:67
+msgid "Update now"
+msgstr ""
+
+#: src/ui/cardapio.ui:138 src/ui/cardapio.ui:372
 msgid "Search"
 msgstr ""
 
-#: src/ui/cardapio.ui:212
+#: src/ui/cardapio.ui:213
 msgid "View"
 msgstr ""
 
-#: src/ui/cardapio.ui:288
+#: src/ui/cardapio.ui:289
 msgid "_Control Center"
 msgstr ""
 
-#: src/ui/cardapio.ui:826
+#: src/ui/cardapio.ui:827
 msgid "Cardapio Website"
 msgstr ""
 
-#: src/ui/cardapio.ui:827
+#: src/ui/cardapio.ui:828
 msgid ""
 "GNU General Public License v3\n"
 "http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
 msgstr ""
 
-#: src/ui/cardapio.ui:833
+#: src/ui/cardapio.ui:834
 msgid "See https://translations.launchpad.net/cardapio"
 msgstr ""
 
-#: src/ui/cardapio.ui:900
+#: src/ui/cardapio.ui:901
 msgid ""
 "<big>Rebuilding...</big>\n"
 "This should take a few seconds"
 msgstr ""
 
-#: src/ui/cardapio.ui:929
+#: src/ui/cardapio.ui:930
 msgid "Edit Menus"
 msgstr ""
 
-#: src/ui/cardapio.ui:974
+#: src/ui/cardapio.ui:975
 msgid "_Launch"
 msgstr ""
 
-#: src/ui/cardapio.ui:976
+#: src/ui/cardapio.ui:977
 msgid "Launch this item"
 msgstr ""
 
-#: src/ui/cardapio.ui:985
+#: src/ui/cardapio.ui:986
 msgid "_Launch in Background"
 msgstr ""
 
-#: src/ui/cardapio.ui:987
+#: src/ui/cardapio.ui:988
 msgid ""
 "Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-"
 "Click)"
 msgstr ""
 
-#: src/ui/cardapio.ui:996
+#: src/ui/cardapio.ui:997
 msgid "Peek _Inside Folder"
 msgstr ""
 
-#: src/ui/cardapio.ui:998
+#: src/ui/cardapio.ui:999
 msgid "Show contents of this folder within Cardapio"
 msgstr ""
 
-#: src/ui/cardapio.ui:1007
+#: src/ui/cardapio.ui:1008
 msgid "Open Parent _Folder"
 msgstr ""
 
-#: src/ui/cardapio.ui:1009
+#: src/ui/cardapio.ui:1010
 msgid "Open this item's parent folder in the file browser"
 msgstr ""
 
-#: src/ui/cardapio.ui:1018
+#: src/ui/cardapio.ui:1019
 msgid "_Unmount"
 msgstr ""
 
-#: src/ui/cardapio.ui:1020
+#: src/ui/cardapio.ui:1021
 msgid "Safely eject this mount"
 msgstr ""
 
-#: src/ui/cardapio.ui:1034
+#: src/ui/cardapio.ui:1035
 msgid "_Pin This Item"
 msgstr ""
 
-#: src/ui/cardapio.ui:1036
+#: src/ui/cardapio.ui:1037
 msgid "Place this item into the \"Pinned Items\" list"
 msgstr ""
 
-#: src/ui/cardapio.ui:1045
+#: src/ui/cardapio.ui:1046
 msgid "_Unpin This Item"
 msgstr ""
 
-#: src/ui/cardapio.ui:1047
+#: src/ui/cardapio.ui:1048
 msgid "Remove this item from the \"Pinned Items\" list"
 msgstr ""
 
-#: src/ui/cardapio.ui:1056
+#: src/ui/cardapio.ui:1057
 msgid "_Add to Side Pane"
 msgstr ""
 
-#: src/ui/cardapio.ui:1058
+#: src/ui/cardapio.ui:1059
 msgid "Place this item in the side pane"
 msgstr ""
 
-#: src/ui/cardapio.ui:1067
+#: src/ui/cardapio.ui:1068
 msgid "_Remove from Side Pane"
 msgstr ""
 
-#: src/ui/cardapio.ui:1069
+#: src/ui/cardapio.ui:1070
 msgid "Remove this item from the side pane"
 msgstr ""
 
-#: src/ui/cardapio.ui:1148 src/ui/cardapio.ui:1163
+#: src/ui/cardapio.ui:1149 src/ui/cardapio.ui:1164
 msgid "translators: just enter any text here"
 msgstr ""
 
-#: src/ui/cardapio.ui:1188
+#: src/ui/cardapio.ui:1189
 msgid "Run in _Terminal"
 msgstr ""
 
-#: src/ui/cardapio.ui:1202
+#: src/ui/cardapio.ui:1203
 msgid "_Display"
 msgstr ""
 
-#: src/ui/cardapio.ui:1232
+#: src/ui/cardapio.ui:1233
 msgid "_Run"
 msgstr ""
 
