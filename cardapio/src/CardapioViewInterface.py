@@ -610,3 +610,18 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
+	def set_screen(self, screen_number):
+		"""
+		Sets the screen where the view will be shown (given as an integer)
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
+	def get_screen_with_pointer(self):
+		"""
+		Returns the number of the screen that currently contains the mouse
+		pointer
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+

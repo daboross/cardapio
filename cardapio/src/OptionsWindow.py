@@ -80,11 +80,11 @@ class OptionsWindow:
 		are supported by the current panel (if any)
 		"""
 
-		if self.cardapio.panel_applet is None \
-				or self.cardapio.panel_applet.panel_type == PANEL_TYPE_DOCKY:
+		if self.cardapio.applet is None \
+				or self.cardapio.applet.panel_type == PANEL_TYPE_DOCKY:
 			self.get_widget('AppletOptionPane').hide()
 
-		elif self.cardapio.panel_applet.panel_type is PANEL_TYPE_AWN:
+		elif self.cardapio.applet.panel_type is PANEL_TYPE_AWN:
 			self.get_widget('LabelAppletLabel').hide()
 			self.get_widget('OptionAppletLabel').hide()
 

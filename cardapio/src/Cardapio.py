@@ -203,7 +203,7 @@ class Cardapio(dbus.service.Object):
 		self.bookmark_monitor              = None
 		self.volume_monitor                = None
 		self.last_visibility_toggle        = 0
-		self.panel_applet                  = panel_applet
+		self.applet                        = panel_applet
 
 		self.package_root = '' if (__package__ is None) else ( __package__ + '.' )
 
@@ -220,7 +220,7 @@ class Cardapio(dbus.service.Object):
 		logging.info('...done setting up UI!')
 
 		logging.info('Setting up panel applet (if any)...')
-		self.setup_panel_applet()
+		self.setup_applet()
 		logging.info('...done setting up panel applet!')
 			
 		logging.info('Setting up Plugins...')
@@ -348,22 +348,23 @@ class Cardapio(dbus.service.Object):
 		self.options_window.setup_ui()
 
 
-	def setup_panel_applet(self):
+	def setup_applet(self):
 		"""
 		Prepares Cardapio's applet in any of the compatible panels.
 		"""
 
-		if self.panel_applet is None:
-			self.panel_applet = CardapioAppletInterface()
+		if self.applet is None:
+			self.applet = CardapioAppletInterface()
 
-		if self.panel_applet.panel_type == PANEL_TYPE_GNOME2:
+		if self.applet.panel_type == PANEL_TYPE_GNOME2:
 			self.view.remove_about_context_menu_items()
+
+		if self.settings['show titlebar']:
+			self.view.show_window_frame()
+		else:
 			self.view.hide_window_frame()
 
-		else:
-			self.view.show_window_frame()
-
-		self.panel_applet.setup(self)
+		self.applet.setup(self)
 
 
 	def get_plugin_class(self, basename):
@@ -674,8 +675,8 @@ class Cardapio(dbus.service.Object):
 		self.set_keybinding()
 
 		# set up applet
-		if self.panel_applet.panel_type is not None:
-			self.panel_applet.update_from_user_settings(self.settings)
+		if self.applet.panel_type is not None:
+			self.applet.update_from_user_settings(self.settings)
 
 		# set up everything else
 		self.view.apply_settings()
@@ -909,7 +910,7 @@ class Cardapio(dbus.service.Object):
 		# by ignoring this focus-out we actually make sure that Cardapio will be
 		# hidden after all. Silly.
 		mouse_x, mouse_y = self.view.get_cursor_coordinates()
-		if self.panel_applet.has_mouse_cursor(mouse_x, mouse_y): return
+		if self.applet.has_mouse_cursor(mouse_x, mouse_y): return
 
 		# If the last app was opened in the background, make sure Cardapio
 		# doesn't hide when the app gets focused
@@ -917,7 +918,7 @@ class Cardapio(dbus.service.Object):
 		if self.opened_last_app_in_background:
 
 			self.opened_last_app_in_background = False
-			self.view.show_main_window()
+			self.show_main_window_on_best_screen()
 			return
 
 		self.hide()
@@ -929,7 +930,7 @@ class Cardapio(dbus.service.Object):
 		Handler for when the cursor leaves the Cardapio window.
 		If using 'open on hover', this hides the Cardapio window after a delay.
 		"""
-		if self.panel_applet.panel_type is None: return
+		if self.applet.panel_type is None: return
 
 		# TODO - Delete this line on Feb 28th
 		#if self.settings['open on hover'] and not self.view.focus_out_blocked:
@@ -944,7 +945,7 @@ class Cardapio(dbus.service.Object):
 		nothing. If in launcher mode, this terminates Cardapio.
 		"""
 
-		if self.panel_applet.panel_type is not None:
+		if self.applet.panel_type is not None:
 			# keep window alive if in panel mode
 			return True
 
@@ -1625,10 +1626,10 @@ class Cardapio(dbus.service.Object):
 		window_width, window_height = self.view.get_window_size()
 		screen_x, screen_y, screen_width, screen_height = self.view.get_screen_dimensions()
 
-		if self.panel_applet.panel_type != None:
-			orientation = self.panel_applet.get_orientation()
-			x, y = self.panel_applet.get_position()
-			w, h = self.panel_applet.get_size()
+		if self.applet.panel_type != None:
+			orientation = self.applet.get_orientation()
+			x, y = self.applet.get_position()
+			w, h = self.applet.get_size()
 			if orientation == POS_LEFT: x += w
 			if orientation == POS_TOP : y += h
 
@@ -1660,8 +1661,8 @@ class Cardapio(dbus.service.Object):
 		anchor_right  = False
 		anchor_bottom = False
 
-		orientation = self.panel_applet.get_orientation()
-		w, h = self.panel_applet.get_size()
+		orientation = self.applet.get_orientation()
+		w, h = self.applet.get_size()
 
 		# if the window won't fit horizontally, flip it over its y axis
 		if max_window_x > max_screen_x: 
@@ -1806,12 +1807,12 @@ class Cardapio(dbus.service.Object):
 		elif not self.settings['keep search results']:
 			self.switch_modes(show_system_menus = False, toggle_mode_button = True)
 
-		self.panel_applet.draw_toggled_state(True)
+		self.applet.draw_toggled_state(True)
 
 		self.restore_dimensions(x, y, force_anchor_right = False, force_anchor_bottom = False)
 
 		self.view.focus_search_entry()
-		self.view.show_main_window()
+		self.show_main_window_on_best_screen()
 
  		self.view.scroll_to_top()
 
@@ -1821,6 +1822,20 @@ class Cardapio(dbus.service.Object):
 		self.opened_last_app_in_background = False
 
 
+	def show_main_window_on_best_screen(self):
+		"""
+		Shows the Cardapio window on the best screen: if there is an applet,
+		shows Cardapio on the screen where the applet is drawn. Otherwise, show
+		wherever the mouse pointer is.
+		"""
+		if self.applet.panel_type is None:
+			self.view.set_screen(self.view.get_screen_with_pointer())
+		else:
+			self.view.set_screen(self.applet.get_screen_number())
+
+		self.view.show_main_window()
+
+
 	def hide(self):
 		"""
 		Hides the Cardapio window.
@@ -1828,7 +1843,7 @@ class Cardapio(dbus.service.Object):
 
 		if not self.visible: return
 
-		self.panel_applet.draw_toggled_state(False)
+		self.applet.draw_toggled_state(False)
 
 		self.visible = False
 		self.last_visibility_toggle = time()
@@ -1868,7 +1883,7 @@ class Cardapio(dbus.service.Object):
 		cursor_in_window_y = (window_y <= mouse_y <= window_y + window_height)
 		if cursor_in_window_x and cursor_in_window_y: return
 
-		if self.panel_applet.has_mouse_cursor(mouse_x, mouse_y): return
+		if self.applet.has_mouse_cursor(mouse_x, mouse_y): return
 
 		self.hide()
 
@@ -2826,7 +2841,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		try:
-			if self.panel_applet.panel_type is not None: # TODO: Why is this check here? Makes no sense!
+			if self.applet.panel_type is not None: # TODO: Why is this check here? Makes no sense!
 				# allow launched apps to use Ubuntu's AppMenu
 				os.environ['UBUNTU_MENUPROXY'] = 'libappmenu.so'
 

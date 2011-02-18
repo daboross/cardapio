@@ -392,3 +392,12 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 		self.cardapio.launch_edit_app()
 
 
+	def get_screen_number(self):
+		"""
+		Returns the number of the screen where the applet is placed
+		"""
+		screen = self.button.get_screen()
+		if screen is None: return 0
+		return screen.get_number()
+
+

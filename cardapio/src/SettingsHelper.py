@@ -94,6 +94,7 @@ class SettingsHelper:
 		self.read_config_option(s, 'side pane items'            , default_side_pane_items  )
 		self.read_config_option(s, 'active plugins'             , ['pinned', 'places', 'applications', 'tracker', 'google', 'command_launcher', 'software_center'])
 		self.read_config_option(s, 'plugin settings'            , {}                       )
+		self.read_config_option(s, 'show titlebar'              , False                    ) # bool
 
 		# these are a bit of a hack:
 		self.read_config_option(s, 'handler for ftp paths'      , r"nautilus '%s'"         ) # a command line using %s

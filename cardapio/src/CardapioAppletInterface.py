@@ -83,6 +83,13 @@ class CardapioAppletInterface:
 		pass
 
 
+	def get_screen_number(self):
+		"""
+		Returns the number of the screen where the applet is placed
+		"""
+		pass
+
+
 	def has_mouse_cursor(self, mouse_x, mouse_y):
 		"""
 		Returns true if the given coordinates is on top of the applet, and False
@@ -91,4 +98,5 @@ class CardapioAppletInterface:
 		x, y = self.get_position()
 		w, h = self.get_size()
 		return ((x <= mouse_x <= x + w) and (y <= mouse_y <= y + h))
+
 

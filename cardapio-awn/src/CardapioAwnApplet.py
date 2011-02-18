@@ -160,3 +160,12 @@ class CardapioAwnApplet(CardapioAppletInterface):
 		self.cardapio.handle_mainwindow_cursor_leave()
 
 
+	def get_screen_number(self):
+		"""
+		Returns the number of the screen where the applet is placed
+		"""
+		screen = self.applet.get_screen()
+		if screen is None: return 0
+		return screen.get_number()
+
+

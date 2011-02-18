@@ -58,6 +58,9 @@ class CardapioGtkView(CardapioViewInterface):
 		self.auto_toggled_view_mode_button = False # used to stop the on_toggle handler at times
 		self.previously_focused_widget     = None
 		self.clicked_app_info              = None
+		self.display                       = gtk.gdk.display_get_default()
+		self.screen                        = self.display.get_default_screen()
+		self.root_window                   = gtk.gdk.get_default_root_window()
 
 
 	# This method is required by the View API
@@ -448,6 +451,7 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		window.stick()
+		window.set_screen(self.screen)
 		window.show_now()
 
 		# for compiz, this must take place twice!!
@@ -753,17 +757,22 @@ class CardapioGtkView(CardapioViewInterface):
 		determined, returns the size of the whole screen instead.
 		"""
 
-		root_window = gtk.gdk.get_default_root_window()
 		screen_property = gtk.gdk.atom_intern('_NET_WORKAREA')
-		screen_dimensions = root_window.property_get(screen_property)[2]
+		screen_dimensions = self.root_window.property_get(screen_property)[2]
 
 		if screen_dimensions:
-			return (screen_dimensions[0], screen_dimensions[1],
-				screen_dimensions[2], screen_dimensions[3])
+			screen_x = screen_dimensions[0]
+			screen_y = screen_dimensions[1]
+			screen_width = screen_dimensions[2]
+			screen_height = screen_dimensions[3]
 
 		else:
 			logging.warn('Could not get dimensions of usable screen area. Using max screen area instead.')
-			return (0, 0, gtk.gdk.screen_width(), gtk.gdk.screen_height())
+			screen_x = screen_y = 0
+			screen_width  = self.screen.get_width()
+			screen_height = self.screen.get_height()
+
+		return (screen_x, screen_y, screen_width, screen_height)
 
 
 	def on_mainwindow_focus_out(self, widget, event):
@@ -1791,5 +1800,24 @@ class CardapioGtkView(CardapioViewInterface):
 		Hide the "rebuild required" bar.
 		"""
 		self.get_widget('ReloadMessageBar').hide()
+
+
+	# This method is required by the View API
+	def set_screen(self, screen_number):
+		"""
+		Sets the screen where the view will be shown (given as an integer)
+		"""
+		self.screen = self.display.get_screen(screen_number)
+		self.root_window = self.screen.get_root_window()
+
+
+	# This method is required by the View API
+	def get_screen_with_pointer(self):
+		"""
+		Returns the number of the screen that currently contains the mouse
+		pointer
+		"""
+		screen, dummy, dummy, dummy = self.display.get_pointer()
+		return screen.get_number()
 
 
