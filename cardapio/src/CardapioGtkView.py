@@ -1773,7 +1773,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	def on_reload_button_clicked(self, widget):
-		self.cardapio.rebuild_now()
+		self.cardapio.handle_reload_clicked()
 
 
 	# This method is required by the View API

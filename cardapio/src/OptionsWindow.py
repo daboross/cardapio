@@ -307,10 +307,10 @@ class OptionsWindow:
 		if width > 1:
 			label.set_size_request(width - self.scrollbar_width - 20, -1)
 
-		# The -20 is a hack because some themes add extra padding that I need to
-		# account for. Since I don't know where that padding is comming from, I
-		# just enter a value (20px) that is larger than I assume any theme would
-		# ever use.
+		# HACK: The -20 is a hack because some themes add extra padding that I
+		# need to account for. Since I don't know where that padding is comming
+		# from, I just enter a value (20px) that is larger than I assume any
+		# theme would ever use.
 
 
 	def apply_plugins_from_option_window(self, *dummy):
@@ -328,18 +328,7 @@ class OptionsWindow:
 
 			iter_ = self.plugin_tree_model.iter_next(iter_)
 
-		self.dialog.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.WATCH))
-
-		# ensure cursor is rendered immediately
-		gtk.gdk.flush()
-		while gtk.events_pending():
-			gtk.main_iteration()
-
-		self.cardapio.activate_plugins_from_settings() # investigate memory usage here
-
-		self.dialog.window.set_cursor(None)
-
-		self.cardapio.schedule_rebuild()
+		self.cardapio.schedule_rebuild(reactivate_plugins = True)
 
 
 	def on_plugin_state_toggled(self, cell, path):

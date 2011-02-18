@@ -457,6 +457,10 @@ class Cardapio(dbus.service.Object):
 		Initializes plugins in the database if the user's settings say so.
 		"""
 
+		self.must_activate_plugins = False
+
+		# remove existing plugins
+
 		for basename in self.plugin_database:
 			plugin = self.plugin_database[basename]['instance']
 			if plugin is not None: plugin.__del__()
@@ -464,6 +468,8 @@ class Cardapio(dbus.service.Object):
 
 		self.active_plugin_instances = []
 		self.keyword_to_plugin_mapping = {}
+
+		# active plugins listed in self.settings['plugin settings']
 
 		all_plugin_settings = self.settings['plugin settings']
 
@@ -749,7 +755,6 @@ class Cardapio(dbus.service.Object):
 		self.view.hide_message_window()
 
 
-	# TODO: make rebuild smarter: only rebuild whatever is absolutely necessary
 	# This method is called from the View API
 	def rebuild_ui(self, show_message = False):
 		"""
@@ -757,18 +762,26 @@ class Cardapio(dbus.service.Object):
 		for example)
 		"""
 
+		# TODO: make rebuild smarter: only rebuild whatever is absolutely necessary
+
+		# TODO: make rebuild even smarter: use a "double buffer" approach, where
+		# things are rebuilt into a second copy of the model/ui, which at the end is
+		# swapped in. This way, Cardapio should *never* be temporarily inaccessible
+		# due to a rebuild.
+
+		if self.rebuild_timer is not None:
+			glib.source_remove(self.rebuild_timer)
+			self.rebuild_timer = None
+
 		# don't interrupt the user if a rebuild was requested while the window was shown
 		# (instead, the rebuild will happen when self.hide() is called)
 		if (not show_message) and self.view.is_window_visible(): 
 			logging.info('Rebuild postponed: Cardapio is visible!')
 			self.must_rebuild = True
-			return False
+			return False # Required! Makes sure this is a one-shot timer
 
+		self.view.hide_rebuild_required_bar()
 		self.must_rebuild = False
-
-		if self.rebuild_timer is not None:
-			glib.source_remove(self.rebuild_timer)
-			self.rebuild_timer = None
 
 		logging.info('Rebuilding UI')
 
@@ -776,6 +789,7 @@ class Cardapio(dbus.service.Object):
 			self.view.show_message_window()
 
 		self.reset_model()
+		if self.must_activate_plugins: self.activate_plugins_from_settings()
 		self.build_ui()
 
 		gc.collect()
@@ -786,12 +800,11 @@ class Cardapio(dbus.service.Object):
 			#glib.idle_add(plugin.on_reload_permission_granted)
 
 			# so now I'm back to doing this the regular way:
-			plugin.on_reload_permission_granted
+			plugin.on_reload_permission_granted()
 			# (leak solved!)
 
-		self.reset_search()
-
-		self.view.hide_rebuild_required_bar()
+		self.reset_search_query()
+		self.view.focus_search_entry()
 
 		return False
 		# Required! makes this a "one-shot" timer, rather than "periodic"
@@ -955,21 +968,25 @@ class Cardapio(dbus.service.Object):
 
 
 	# This method is called from the View API 
-	def rebuild_now(self):
+	def handle_reload_clicked(self):
 		"""
 		Rebuilds the Cardapio UI immediately. Should *never* be called from a plugin!
 		"""
 		self.rebuild_ui(show_message = True)
 
-
+	
 	# This method is called from the View API and plugin API
-	def schedule_rebuild(self):
+	def schedule_rebuild(self, reactivate_plugins = False):
 		"""
 		Rebuilds the Cardapio UI after a timer
 		"""
 
 		if self.rebuild_timer is not None:
 			glib.source_remove(self.rebuild_timer)
+
+		if reactivate_plugins:
+			self.must_activate_plugins = True
+		#else: don't set to False because we want to avoid race conditions
 
 		self.view.show_rebuild_required_bar()
 		self.rebuild_timer = glib.timeout_add(self.settings['keep results duration'], self.rebuild_ui)
@@ -1510,24 +1527,8 @@ class Cardapio(dbus.service.Object):
 		database
 		"""
 
-		if self.rebuild_timer is not None:
-			glib.source_remove(self.rebuild_timer)
-
-		self.view.show_rebuild_required_bar()
-		self.rebuild_timer = glib.timeout_add(self.settings['keep results duration'], self.plugin_on_reload_permission_granted, plugin)
-
-
-	def plugin_on_reload_permission_granted(self, plugin):
-		"""
-		Tell the plugin that it may rebuild its database now
-		"""
-
-		self.rebuild_timer = None
-		plugin.on_reload_permission_granted()
-		self.view.hide_rebuild_required_bar()
-
-		return False
-		# Required! makes this a "one-shot" timer, rather than "periodic"
+		# TODO: do this in a smarter way
+		self.schedule_rebuild()
 
 
 	def cancel_all_plugins(self):
@@ -1819,12 +1820,6 @@ class Cardapio(dbus.service.Object):
 
 		self.opened_last_app_in_background = False
 
-		if self.rebuild_timer is not None:
-			# build the UI *after* showing the window, so the user gets the
-			# satisfaction of seeing the window pop up, even if it's incomplete...
-			#self.rebuild_ui(show_message = True)
-			self.view.show_rebuild_required_bar()
-
 
 	def hide(self):
 		"""
@@ -1850,8 +1845,7 @@ class Cardapio(dbus.service.Object):
 
 		logging.info('(RSS = %s)' % get_memory_usage())
 
-		if self.must_rebuild:
-			self.schedule_rebuild()
+		if self.must_rebuild: self.schedule_rebuild()
 
 		return False # used for when hide() is called from a timer
 
@@ -3068,4 +3062,5 @@ __builtin__.subprocess  = subprocess
 __builtin__.get_output  = get_output
 __builtin__.fatal_error = fatal_error
 __builtin__.which       = which
+
 
