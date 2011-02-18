@@ -1194,8 +1194,13 @@ class Cardapio(dbus.service.Object):
 		count = 0
 		limit = self.settings['long search results limit']
 		base_text = base_text.lower()
+		ignore_hidden = True
 		
 		if base_text:
+			# show hidden files if user query is something like 'hi/there/.dude'
+			if base_text[0] == '.': 
+				ignore_hidden = False
+				base_text = base_text[1:]
 			matches = [f for f in os.listdir(path) if f.lower().find(base_text) != -1]
 		else:
 			matches = os.listdir(path)
@@ -1203,7 +1208,7 @@ class Cardapio(dbus.service.Object):
 		for filename in sorted(matches, key = str.lower):
 
 			# ignore hidden files
-			if filename[0] == '.': continue
+			if filename[0] == '.' and ignore_hidden: continue
 
 			if count >= limit: 
 				self.add_app_button(_('Show additional results'), 'system-file-manager', self.view.SUBFOLDERS_SECTION, 'xdg', path, _('Show additional search results in a file browser'), None)
