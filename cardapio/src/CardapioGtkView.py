@@ -85,14 +85,6 @@ class CardapioGtkView(CardapioViewInterface):
 		self.context_menu              = self.get_widget('CardapioContextMenu')
 		self.app_context_menu          = self.get_widget('AppContextMenu')
 		self.app_menu_separator        = self.get_widget('AppMenuSeparator')
-		self.pin_menuitem              = self.get_widget('PinMenuItem')
-		self.unpin_menuitem            = self.get_widget('UnpinMenuItem')
-		self.add_side_pane_menuitem    = self.get_widget('AddSidePaneMenuItem')
-		self.remove_side_pane_menuitem = self.get_widget('RemoveSidePaneMenuItem')
-		self.open_app_menuitem         = self.get_widget('OpenAppMenuItem')
-		self.open_parent_menuitem      = self.get_widget('OpenParentFolderMenuItem')
-		self.peek_inside_menuitem      = self.get_widget('PeekInsideMenuItem')
-		self.eject_menuitem            = self.get_widget('EjectMenuItem')
 		self.view_mode_button          = self.get_widget('ViewModeButton')
 		self.main_splitter             = self.get_widget('MainSplitter')
 		self.navigation_buttons_pane   = self.get_widget('NavigationButtonsBackground')
@@ -105,14 +97,14 @@ class CardapioGtkView(CardapioViewInterface):
 		self.SIDE_PANE                 = self.get_widget('SideappPane')
 		self.LEFT_SESSION_PANE         = self.get_widget('LeftSessionPane')
 		self.RIGHT_SESSION_PANE        = self.get_widget('RightSessionPane')
-		self.PIN_MENUITEM              = self.pin_menuitem
-		self.UNPIN_MENUITEM            = self.unpin_menuitem
-		self.ADD_SIDE_PANE_MENUITEM    = self.add_side_pane_menuitem
-		self.REMOVE_SIDE_PANE_MENUITEM = self.remove_side_pane_menuitem
-		self.OPEN_MENUITEM             = self.open_app_menuitem
-		self.OPEN_PARENT_MENUITEM      = self.open_parent_menuitem
-		self.PEEK_INSIDE_MENUITEM      = self.peek_inside_menuitem
-		self.EJECT_MENUITEM            = self.eject_menuitem
+		self.PIN_MENUITEM              = self.get_widget('PinMenuItem')
+		self.UNPIN_MENUITEM            = self.get_widget('UnpinMenuItem')
+		self.ADD_SIDE_PANE_MENUITEM    = self.get_widget('AddSidePaneMenuItem')
+		self.REMOVE_SIDE_PANE_MENUITEM = self.get_widget('RemoveSidePaneMenuItem')
+		self.OPEN_MENUITEM             = self.get_widget('OpenAppMenuItem')
+		self.OPEN_PARENT_MENUITEM      = self.get_widget('OpenParentFolderMenuItem')
+		self.PEEK_INSIDE_MENUITEM      = self.get_widget('PeekInsideMenuItem')
+		self.EJECT_MENUITEM            = self.get_widget('EjectMenuItem')
 
 		# start with any search entry -- doesn't matter which
 		self.search_entry = self.get_widget('TopLeftSearchEntry')

@@ -2587,9 +2587,11 @@ class Cardapio(dbus.service.Object):
 			self.view.show_context_menu_option(self.view.ADD_SIDE_PANE_MENUITEM)
 			self.view.hide_context_menu_option(self.view.REMOVE_SIDE_PANE_MENUITEM)
 
-		if self.app_info_points_to_valid_folder:
-			self.view.show_context_menu_option(self.view.OPEN_PARENT_MENUITEM)
+		folder_or_file = self.app_is_valid_folder_or_file(app_info)
+		if folder_or_file == 1:
 			self.view.show_context_menu_option(self.view.PEEK_INSIDE_MENUITEM)
+		if folder_or_file:
+			self.view.show_context_menu_option(self.view.OPEN_PARENT_MENUITEM)
 
 		# figure out whether to show the 'eject' menuitem
 		if app_info['command'] in self.volumes:
@@ -2598,32 +2600,28 @@ class Cardapio(dbus.service.Object):
 		self.setup_plugin_context_menu(app_info)
 
 
-	def app_info_points_to_valid_folder(self, app_info):
+	def app_is_valid_folder_or_file(self, app_info):
 		"""
-		Returns True if the given app_info points to a local folder that exists
+		Returns 1 if the given app_info points to a local folder that exists, 
+		2 if a file, and 0 if neither.
 		"""
 
 		app_type = app_info['type']
+		if app_type != 'xdg': return 0
 
-		if app_type == 'app' or app_type == 'raw': return False
-
-		# TODO: move this into Controller
-		# figure out whether to show the 'open parent folder' menuitem
 		split_command = urllib2.splittype(app_info['command'])
 
-		if app_type == 'xdg' or len(split_command) == 2:
+		path_type, canonical_path = split_command
+		dummy, extension = os.path.splitext(canonical_path)
 
-			path_type, canonical_path = split_command
-			dummy, extension = os.path.splitext(canonical_path)
+		# don't show it for network://, trash://, or .desktop files
+		if path_type not in ('computer', 'network', 'trash') and extension != '.desktop':
 
-			# don't show it for network://, trash://, or .desktop files
-			if path_type not in ('computer', 'network', 'trash') and extension != '.desktop':
+			unescaped_path = self.unescape_url(canonical_path)
+			if os.path.isdir(unescaped_path): return 1
+			elif os.path.isfile(unescaped_path): return 2
 
-				#if os.path.exists(self.unescape_url(canonical_path)): 
-				if os.path.isdir(self.unescape_url(canonical_path)): 
-					return True
-
-		return False
+		return 0
 
 
 	# This method is called from the View API
@@ -2701,7 +2699,7 @@ class Cardapio(dbus.service.Object):
 		or launch the item in the app_info
 		"""
 
-		if self.app_info_points_to_valid_folder(app_info):
+		if self.app_is_valid_folder_or_file(app_info) == 1:
 			self.peek_inside_folder(app_info)
 
 		else:
