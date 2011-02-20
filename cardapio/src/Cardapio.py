@@ -204,8 +204,6 @@ class Cardapio(dbus.service.Object):
 		self.last_visibility_toggle        = 0
 		self.applet                        = panel_applet
 
-		self.package_root = '' if (__package__ is None) else ( __package__ + '.' )
-
 		logging.info('Loading menus...')
 		self.load_menus()
 		logging.info('...done loading menus!')
@@ -368,13 +366,17 @@ class Cardapio(dbus.service.Object):
 
 	def get_plugin_class(self, basename):
 		"""
-		Returns the CardapioPlugin class from the plugin at plugins/basename.py.
+		Returns the CardapioPlugin class from the plugin at basename.py.
 		If it fails, it returns a string decribing the error.
 		"""
 
-		package = '%splugins.%s' % (self.package_root, basename)
+		if __package__ is None:
+			package = basename
+		else:
+			package = __package__ + '.plugins.' + basename
+
 		try:
-			plugin_module = __import__(package, fromlist = 'CardapioPlugin', level = -1)
+			plugin_module = __import__(package, fromlist = ['CardapioPlugin'], level = -1)
 		except:
 			return 'Could not import the plugin module'
 
@@ -425,18 +427,26 @@ class Cardapio(dbus.service.Object):
 				}
 
 		plugin_dirs = [
+			os.path.join(DesktopEntry.xdg_config_home, 'Cardapio', 'plugins'),
 			os.path.join(self.cardapio_path, 'plugins'),
-			os.path.join(DesktopEntry.xdg_config_home, 'Cardapio', 'plugins')
 			]
 
+		# prepend in inverse order, to make sure ~/.config/Cardapio/plugins
+		# ends up being the first on the list
+		if plugin_dirs[1] not in sys.path: sys.path = [plugin_dirs[1]] + sys.path
+		if plugin_dirs[0] not in sys.path: sys.path = [plugin_dirs[0]] + sys.path
+
 		for plugin_dir in plugin_dirs:
+
 			for root, dir_, files in os.walk(plugin_dir):
 				for file_ in files:
-					if len(file_) > 3 and file_[-3:] == '.py' and file_[0] != '_':
+					if len(file_) > 3 and file_[-3:] == '.py' and file_[0] != '_' and file_[0] != '.':
 						basename = file_[:-3]
 						plugin_class = self.get_plugin_class(basename)
 
-						if type(plugin_class) is str: continue
+						if type(plugin_class) is str: 
+							logging.warn('[%s] %s' % (basename, plugin_class))
+							continue
 
 						self.plugin_database[basename] = {
 							'name'              : plugin_class.name,
@@ -481,7 +491,7 @@ class Cardapio(dbus.service.Object):
 			plugin_class = self.get_plugin_class(basename)
 
 			if type(plugin_class) is str:
-				logging.error('[%s] %s' % (basename, plugin_class))
+				logging.warn('[%s] %s' % (basename, plugin_class))
 				self.settings['active plugins'].remove(basename)
 				continue
 
@@ -491,8 +501,8 @@ class Cardapio(dbus.service.Object):
 				plugin = plugin_class(self.safe_cardapio_proxy)
 
 			except Exception, exception:
-				logging.error('[%s] Plugin did not load properly: uncaught exception.' % basename)
-				logging.error(exception)
+				logging.warn('[%s] Plugin did not load properly: uncaught exception.' % basename)
+				logging.warn(exception)
 				self.settings['active plugins'].remove(basename)
 				continue
 
@@ -556,7 +566,7 @@ class Cardapio(dbus.service.Object):
 			write = logging.error
 
 		elif is_warning:
-			write = logging.warning
+			write = logging.warn
 
 		elif is_debug:
 			write = logging.debug
@@ -866,7 +876,8 @@ class Cardapio(dbus.service.Object):
 
 		for basename in plugin_list:
 
-			plugin_info = self.plugin_database[basename]
+			try: plugin_info = self.plugin_database[basename]
+			except: continue
 
 			is_active   = (basename in self.settings['active plugins'])
 			is_core     = (basename in self.core_plugins)
