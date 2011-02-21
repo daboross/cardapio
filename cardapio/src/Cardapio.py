@@ -1075,12 +1075,22 @@ class Cardapio(dbus.service.Object):
 		in_subfolder_search_mode = (text and text.find('/') != -1)
 
 		if in_subfolder_search_mode:
+
 			# MUST run these lines BEFORE disappering with all sections
-			first_app_info    = self.view.get_first_visible_app()
-			# TODO MVC: there should be no need for get_first_visible_app. Instead,
-			# the model should know the top app already!
+			first_app_info = self.view.get_first_visible_app()
+
+			# TODO MVC: (about the line above ^) there should be no need for
+			# asking the view what is the first visible app (with
+			# get_first_visible_app). Instead, the model should know the top
+			# app already! Except this is not exactly that straight-forward,
+			# since it depends on the plugin ordering chosen by the user. And to
+			# further complicate matters, some plugins respond after a
+			# local/remote delay. So I have to think about the best way to solve
+			# this issue...
+
 			selected_app_info = self.view.get_selected_app()
 			self.view.show_navigation_buttons()
+
 		else:
 			self.subfolder_stack = []
 			self.view.hide_navigation_buttons()
