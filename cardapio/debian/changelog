@@ -1,3 +1,30 @@
+cardapio (0.9.170-ubuntu1-natty1) natty; urgency=low
+
+   * Removed the blocking "rebuilding" message, and made it inline instead. This
+   means Cardapio is always accessible when the user summons it.
+   * Made software center plugin *not* update its list during a rebuild, because
+   the apt module for Python is full of memory leaks.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Feb 2011 23:01:00 +0100
+
+cardapio (0.9.170-ubuntu1-maverick1) maverick; urgency=low
+
+   * Removed the blocking "rebuilding" message, and made it inline instead. This
+   means Cardapio is always accessible when the user summons it.
+   * Made software center plugin *not* update its list during a rebuild, because
+   the apt module for Python is full of memory leaks.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Feb 2011 23:01:00 +0100
+
+cardapio (0.9.170-ubuntu1-lucid1) lucid; urgency=low
+
+   * Removed the blocking "rebuilding" message, and made it inline instead. This
+   means Cardapio is always accessible when the user summons it.
+   * Made software center plugin *not* update its list during a rebuild, because
+   the apt module for Python is full of memory leaks.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Feb 2011 23:01:00 +0100
+
 cardapio (0.9.169-ubuntu1-natty1) natty; urgency=low
 
    * Removed the blocking "rebuilding" message, and made it inline instead. This

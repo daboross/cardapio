@@ -215,7 +215,8 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def on_reload_permission_granted(self):
 
-		self.cache.open(None)
+		pass
+		# self.cache.open(None) # There's a memory leak in this line!
 
 
 	def on_packages_changed(self, monitor, file, other_file, event):
