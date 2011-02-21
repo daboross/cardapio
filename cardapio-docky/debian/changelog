@@ -1,3 +1,21 @@
+cardapio-docky (0.9.170-ubuntu1-natty1) natty; urgency=low
+
+   * Updated API.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Feb 2011 23:01:00 +0100
+
+cardapio-docky (0.9.170-ubuntu1-maverick1) maverick; urgency=low
+
+   * Updated API.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Feb 2011 23:01:00 +0100
+
+cardapio-docky (0.9.170-ubuntu1-lucid1) lucid; urgency=low
+
+   * Updated API.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Feb 2011 23:01:00 +0100
+
 cardapio-docky (0.9.158-ubuntu1-maverick1) maverick; urgency=low
 
    * Small updates to the code to make it compatible with Cardapio 0.9.158
