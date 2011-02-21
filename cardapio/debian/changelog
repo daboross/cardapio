@@ -1,3 +1,24 @@
+cardapio (0.9.169-ubuntu1-natty1) natty; urgency=low
+
+   * Removed the blocking "rebuilding" message, and made it inline instead. This
+   means Cardapio is always accessible when the user summons it.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Feb 2011 23:01:00 +0100
+
+cardapio (0.9.169-ubuntu1-maverick1) maverick; urgency=low
+
+   * Removed the blocking "rebuilding" message, and made it inline instead. This
+   means Cardapio is always accessible when the user summons it.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Feb 2011 23:01:00 +0100
+
+cardapio (0.9.169-ubuntu1-lucid1) lucid; urgency=low
+
+   * Removed the blocking "rebuilding" message, and made it inline instead. This
+   means Cardapio is always accessible when the user summons it.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Feb 2011 23:01:00 +0100
+
 cardapio (0.9.168-ubuntu1-maverick1) maverick; urgency=low
 
    * New feature: keep results for a few seconds after Cardapio is closed

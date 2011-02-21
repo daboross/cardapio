@@ -135,7 +135,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.168'
+	version = '0.9.169'
 
 	core_plugins = [
 			'applications',
