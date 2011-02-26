@@ -34,13 +34,6 @@ except Exception, exception:
 	fatal_error('Fatal error loading Cardapio', exception)
 	sys.exit(1)
 
-
-def start_cardapio(show):
-	Cardapio(show = show)
-	gtk.gdk.threads_enter()
-	gtk.main()
-	gtk.gdk.threads_leave()
-
 # main
 DBusGMainLoop(set_as_default=True)
 bus = dbus.SessionBus()
@@ -49,80 +42,107 @@ bus_request_name = bus.request_name(Cardapio.bus_name_str)
 # make sure Cardapio shows even if using Ubuntu's AppMenu
 os.environ['UBUNTU_MENUPROXY'] = ''
 
-if len(sys.argv) == 2:
 
-	if sys.argv[1] == 'run-in-window':
-
-		from gnomepanel.CardapioGnomeAppletFactory import CardapioGnomeAppletFactory
-
-		# open new Cardapio instance
-		main_window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-		main_window.set_title('Cardapio')
-		main_window.connect('destroy', gtk.main_quit)
-		app = gnomeapplet.Applet()
-		CardapioGnomeAppletFactory(app, None)
-		app.reparent(main_window)
-		main_window.show_all()
-		gtk.gdk.threads_enter()
-		gtk.main()
-		gtk.gdk.threads_leave()
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-	elif sys.argv[1] == 'hidden':
+def start_cardapio(show):
 
-		# if there's no other instance, start hidden Cardapio
-		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
-			start_cardapio(show = Cardapio.DONT_SHOW)
-
-
-	elif sys.argv[1] == 'show' or sys.argv[1] == 'show-near-mouse':
-
-		# if there's no other instance - start Cardapio
-		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
-			if sys.argv[1] == 'show-near-mouse':
-				start_cardapio(show = Cardapio.SHOW_NEAR_MOUSE)
-			else:
-				start_cardapio(show = Cardapio.SHOW_CENTERED)
-
-		# if there is - "show / hide" it or "show / hide" it near the
-		# mouse pointer
-		else:
-			if sys.argv[1] == 'show-near-mouse':
-				show_hide_near_mouse = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_mouse')
-				show_hide_near_mouse()
-			else:
-				show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide')
-				show_hide()
+	Cardapio(show = show)
+	gtk.gdk.threads_enter()
+	gtk.main()
+	gtk.gdk.threads_leave()
 
 
-	elif sys.argv[1] == 'docky-open':
-
-		# if there's no other instance - start hidden Cardapio
-		if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
-			start_cardapio(show = Cardapio.DONT_SHOW)
-
-		else:
-			from docky.DockySettingsHelper import *
-
-			try:
-				settings_helper = DockySettingsHelper()
-				dock_num = settings_helper.get_main_dock()
-
-				x, y, force_anchor_right, force_anchor_bottom = settings_helper.get_best_position(dock_num)
-
-				show_hide_near_point = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_point')
-				show_hide_near_point(x, y, force_anchor_right, force_anchor_bottom)
-
-			except MainDockError:
-				fatal_error('Cardapio error!', "Couldn't find the main dock of Docky!")
-
-			except Exception, exception:
-				fatal_error('Unknown error with Cardapio in Docky!', exception)
-
-else:
+def cardapio_run_in_window():
 
 	from gnomepanel.CardapioGnomeAppletFactory import CardapioGnomeAppletFactory
 
-	gnomeapplet.bonobo_factory('OAFIID:GNOME_Cardapio_Factory',
-			gnomeapplet.Applet.__gtype__, 'Cardapio', '0', CardapioGnomeAppletFactory)
+	# open new Cardapio instance
+	main_window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+	main_window.set_title('Cardapio')
+	main_window.connect('destroy', gtk.main_quit)
+	app = gnomeapplet.Applet()
+	CardapioGnomeAppletFactory(app, None)
+	app.reparent(main_window)
+	main_window.show_all()
+	gtk.gdk.threads_enter()
+	gtk.main()
+	gtk.gdk.threads_leave()
+
+
+def cardapio_run_standalone_but_hidden():
+
+	# if there's no other instance, start hidden Cardapio
+	if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
+		start_cardapio(show = Cardapio.DONT_SHOW)
+
+
+def cardapio_show(centered = False):
+
+	if centered:
+		position = Cardapio.SHOW_CENTERED
+		dbus_method = 'show_hide'
+	else:
+		position = Cardapio.SHOW_NEAR_MOUSE
+		dbus_method = 'show_hide_near_mouse'
+
+	# if there's no other instance - start Cardapio
+	if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
+		start_cardapio(show = position)
+
+	# if there is - "show / hide" it
+	else:
+		show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method(dbus_method)
+		show_hide()
+
+
+def cardapio_show_near_docky():
+
+	# if there's no other instance - start hidden Cardapio
+	if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
+		start_cardapio(show = Cardapio.DONT_SHOW)
+
+	else:
+		from docky.DockySettingsHelper import DockySettingsHelper
+
+		try:
+			settings_helper = DockySettingsHelper()
+			dock_num = settings_helper.get_main_dock()
+
+			x, y, force_anchor_right, force_anchor_bottom = settings_helper.get_best_position(dock_num)
+
+			show_hide_near_point = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_point')
+			show_hide_near_point(x, y, force_anchor_right, force_anchor_bottom)
+
+		except MainDockError:
+			fatal_error('Cardapio error!', "Couldn't find the main dock of Docky!")
+
+		except Exception, exception:
+			fatal_error('Unknown error with Cardapio in Docky!', exception)
+
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+
+if len(sys.argv) == 2:
+
+	if sys.argv[1] == 'run-in-window':
+		cardapio_run_in_window()
+
+	elif sys.argv[1] == 'hidden':
+		cardapio_run_standalone_but_hidden()
+
+	elif sys.argv[1] == 'show':
+		cardapio_show(centered = True)
+
+	elif sys.argv[1] == 'show-near-mouse':
+		cardapio_show(centered = False)
+
+	elif sys.argv[1] == 'docky-open':
+		cardapio_show_near_docky()
+
+else:
+	cardapio_show(centered = True)
+
 
