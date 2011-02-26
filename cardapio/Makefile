@@ -23,8 +23,8 @@ install: install_docky_helper
 	# remove old files which have been renamed
 	rm -rf $(PREFIX)/lib/cardapio/cardapio.py
 	rm -rf $(PREFIX)/lib/cardapio/cardapio.pyc
-	rm -rf $(PREFIX)/bin/cardapio/plugins/firefox_bookmarks.py
-	rm -rf $(PREFIX)/bin/cardapio/plugins/firefox_bookmarks.pyc
+	rm -rf $(PREFIX)/lib/cardapio/plugins/firefox_bookmarks.py
+	rm -rf $(PREFIX)/lib/cardapio/plugins/firefox_bookmarks.pyc
 	
 	mkdir -p $(PREFIX)/lib/cardapio
 	cp -f src/cardapio $(PREFIX)/lib/cardapio/
@@ -47,8 +47,6 @@ install: install_docky_helper
 	cp -f src/IconHelper.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/SettingsHelper.py $(PREFIX)/lib/cardapio/
 	cp -f src/SettingsHelper.pyc $(PREFIX)/lib/cardapio/
-	cp -f src/hacks.py $(PREFIX)/lib/cardapio/
-	cp -f src/hacks.pyc $(PREFIX)/lib/cardapio/
 	cp -f res/cardapio.desktop $(PREFIX)/lib/cardapio/
 	
 	mkdir -p $(PREFIX)/lib/cardapio/ui

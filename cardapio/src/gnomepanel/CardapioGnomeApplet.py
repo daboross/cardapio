@@ -29,7 +29,6 @@ except Exception, exception:
 	sys.exit(1)
 
 
-
 class CardapioGnomeApplet(CardapioAppletInterface):
 
 	PANEL_SIZE_CHANGE_IGNORE_INTERVAL = 200 # milliseconds
@@ -37,7 +36,18 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 
 	panel_type = PANEL_TYPE_GNOME2
 
+	# Added this to fix a bug where CardapioGnomeApplet was being
+	# reinstantiated (possibly by Gnome Panel) right after it was destroyed! As
+	# a hackish fix I make sure CardapioGnomeApplet is a singleton using the
+	# variable below. Eek.
+	_singleton_instance = None
+
 	def __init__(self, applet):
+
+		if CardapioGnomeApplet._singleton_instance is not None:
+			return CardapioGnomeApplet._singleton_instance
+
+		CardapioGnomeApplet._singleton_instance = self
 
 		self.applet = applet
 		self.button = gtk.ImageMenuItem()
@@ -245,7 +255,7 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 				# the applet
 
 				widget.emit_stop_by_name('button-press-event')
-				self.cardapio_hide()
+				self.cardapio.hide()
 
 
 	def _on_panel_button_toggled(self, widget, event, ignore_main_button):

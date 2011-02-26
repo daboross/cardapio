@@ -266,6 +266,7 @@ class Cardapio(dbus.service.Object):
 
 		logging.info('Exiting...')
 		self.view.quit()
+		sys.exit()
 
 
 	def setup_log_file(self, debug):
