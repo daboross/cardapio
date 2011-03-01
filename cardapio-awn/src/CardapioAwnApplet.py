@@ -51,9 +51,9 @@ class CardapioAwnApplet(CardapioAppletInterface):
 		self.edit = gtk.ImageMenuItem(gtk.STOCK_EDIT)
 		self.about = gtk.ImageMenuItem(gtk.STOCK_ABOUT)
 
-		self.preferences.connect('activate', self.cardapio.open_options_dialog)
-		self.edit.connect('activate', self.cardapio.launch_edit_app)
-		self.about.connect('activate', self.cardapio.open_about_dialog)
+		self.preferences.connect('activate', self._open_options_dialog)
+		self.edit.connect('activate', self._launch_edit_app)
+		self.about.connect('activate', self._open_about_dialog)
 
 		self.menu = self.applet.dialog.menu
 		self.menu.insert(self.preferences, 0)
@@ -158,6 +158,18 @@ class CardapioAwnApplet(CardapioAppletInterface):
 
 	def _on_applet_cursor_leave(self, widget, event):
 		self.cardapio.handle_mainwindow_cursor_leave()
+
+
+	def _open_options_dialog(self, widget):
+		self.cardapio.open_options_dialog()
+
+
+	def _launch_edit_app(self, widget):
+		self.cardapio.launch_edit_app()
+
+
+	def _open_about_dialog(self, widget):
+		self.cardapio.open_about_dialog()
 
 
 	def get_screen_number(self):
