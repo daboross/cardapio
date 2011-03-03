@@ -39,6 +39,7 @@ binary-arch: build install
 #	dh_installinfo
 	dh_installman
 	dh_link usr/lib/cardapio/cardapio usr/bin/cardapio
+	dh_link usr/lib/cardapio/cardapio-gnome-panel-applet usr/bin/cardapio-gnome-panel-applet
 	dh_strip
 	dh_compress
 	dh_fixperms
