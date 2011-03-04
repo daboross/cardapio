@@ -128,14 +128,15 @@ class Cardapio(dbus.service.Object):
 	distro_name = platform.linux_distribution()[0]
 
 	MIN_VISIBILITY_TOGGLE_INTERVAL    = 0.200 # seconds (this is a bit of a hack to fix some focus problems)
-	FOCUS_BLOCK_INTERVAL              = 50  # milliseconds
+	FOCUS_BLOCK_INTERVAL              = 50    # milliseconds
+	PLUGIN_REBUILD_DELAY              = 30000 # milliseconds
 
 	LOG_FILE_MAX_SIZE                 = 1000000 # bytes
 
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.172'
+	version = '0.9.173'
 
 	core_plugins = [
 			'applications',
@@ -692,6 +693,14 @@ class Cardapio(dbus.service.Object):
 		self.view.apply_settings()
 
 
+	def apply_plugin_settings(self):
+		"""
+		Setup plugin-related UI elements according to the user preferences
+		"""
+
+		self.schedule_rebuild(reactivate_plugins = True)
+
+
 	def reset_model(self, reset_all = True):
 		"""
 		Resets the data structures that contain all data related to Cardapio's
@@ -987,7 +996,7 @@ class Cardapio(dbus.service.Object):
 		self.rebuild_ui(show_message = True)
 
 	
-	# This method is called from the View API and plugin API
+	# This method is called from the View API 
 	def schedule_rebuild(self, reactivate_plugins = False):
 		"""
 		Rebuilds the Cardapio UI after a timer
@@ -1000,8 +1009,15 @@ class Cardapio(dbus.service.Object):
 			self.must_activate_plugins = True
 		#else: don't set to False because we want to avoid race conditions
 
+		if reactivate_plugins:
+			rebuild_delay = Cardapio.PLUGIN_REBUILD_DELAY
+			# this larger delay makes it a bit nicer to reorganize plugins,
+			# since it keeps Cardapio from reloading all the time
+		else:
+			rebuild_delay = self.settings['keep results duration']
+
 		self.view.show_rebuild_required_bar()
-		self.rebuild_timer = glib.timeout_add(self.settings['keep results duration'], self.rebuild_ui)
+		self.rebuild_timer = glib.timeout_add(rebuild_delay, self.rebuild_ui)
 
 
 	# This method is called from the View API

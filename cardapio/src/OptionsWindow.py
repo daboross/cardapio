@@ -60,6 +60,7 @@ class OptionsWindow:
 		self.dialog                 = self.get_widget('OptionsDialog')
 
 		self.drag_allowed_cursor = gtk.gdk.Cursor(gtk.gdk.FLEUR)
+		#self.busy_cursor = gtk.gdk.Cursor(gtk.gdk.WATCH)
 
 		self.prepare_panel_related_options()
 		self.read_gtk_theme_info()
@@ -328,7 +329,7 @@ class OptionsWindow:
 
 			iter_ = self.plugin_tree_model.iter_next(iter_)
 
-		self.cardapio.schedule_rebuild(reactivate_plugins = True)
+		self.cardapio.apply_plugin_settings()
 
 
 	def on_plugin_state_toggled(self, cell, path):
