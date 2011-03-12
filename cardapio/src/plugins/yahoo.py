@@ -41,7 +41,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	url = ''
 	help_text = ''
 
-	plugin_api_version = 1.40
+	plugin_api_version = 1.39
 
 	search_delay_type = 'remote'
 
