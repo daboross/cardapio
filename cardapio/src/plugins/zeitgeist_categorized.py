@@ -36,7 +36,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	category_name      = [_('Today'), _('This week'), _('This month'), _('All time')]
 	category_icon      = ['document-open-recent']*4
 	category_tooltip   = [_('Files you used today'), _('Files you used this week'), _('Files you used this month'), _('All other files')]
-	hide_from_sidebar  = False
+	hide_from_sidebar  = [False]*4
 
 	DAY = 1000*60*60*24 # one day in milliseconds
 
