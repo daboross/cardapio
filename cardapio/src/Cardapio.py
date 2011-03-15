@@ -255,8 +255,8 @@ class Cardapio(dbus.service.Object):
 
 		try:
 			self.settings.save()
-		except Exception, ex:
-			logging.error('Error while saving settings: %s' % ex)
+		except Exception, exception:
+			logging.error('Error while saving settings: %s' % exception)
 
 
 	def quit(self):
@@ -449,7 +449,7 @@ class Cardapio(dbus.service.Object):
 						plugin_class = self.load_plugin_class(basename)
 
 						if type(plugin_class) is str: 
-							logging.warn('[%s] %s' % (basename, plugin_class))
+							logging.error('[%s] %s' % (basename, plugin_class))
 							continue
 
 						self.plugin_database[basename] = {
@@ -486,13 +486,12 @@ class Cardapio(dbus.service.Object):
 		for basename in self.settings['active plugins']:
 
 			if basename in self.builtin_plugins: continue
-			# HERE: if something breaks in here it seems to affect line 2359: plugin = ...
 
 			basename = str(basename)
 			plugin_class = self.load_plugin_class(basename)
 
 			if type(plugin_class) is str:
-				logging.warn('[%s] %s' % (basename, plugin_class))
+				logging.error('[%s] %s' % (basename, plugin_class))
 				self.settings['active plugins'].remove(basename)
 				continue
 
@@ -505,8 +504,8 @@ class Cardapio(dbus.service.Object):
 					plugin = plugin_class(self.safe_cardapio_proxy, category)
 
 				except Exception, exception:
-					logging.warn('[%s] Plugin did not load properly: uncaught exception.' % basename)
-					logging.warn(exception)
+					logging.error('[%s] Plugin did not load properly: uncaught exception.' % basename)
+					logging.error(exception)
 					self.settings['active plugins'].remove(basename)
 					error = True
 					break
@@ -538,10 +537,18 @@ class Cardapio(dbus.service.Object):
 				plugin.__show_only_with_keyword = show_only_with_keyword
 
 				if plugin_class.category_count > 1:
-					plugin.category_name     = plugin_class.category_name[category]
-					plugin.category_icon     = plugin_class.category_icon[category]
-					plugin.category_tooltip  = plugin_class.category_tooltip[category]
-					plugin.hide_from_sidebar = plugin_class.hide_from_sidebar[category]
+					try:
+						plugin.category_name     = plugin_class.category_name[category]
+						plugin.category_icon     = plugin_class.category_icon[category]
+						plugin.category_tooltip  = plugin_class.category_tooltip[category]
+						plugin.hide_from_sidebar = plugin_class.hide_from_sidebar[category]
+
+					except Exception, exception:
+						logging.error('[%s] Error in plugin syntax!' % basename)
+						logging.error(exception)
+						error = True
+						break
+
 
 				if plugin.search_delay_type is not None:
 					plugin.search_delay_type = plugin.search_delay_type.partition(' search update delay')[0]
@@ -555,7 +562,7 @@ class Cardapio(dbus.service.Object):
 				self.active_plugin_instances.append(plugin)
 
 			if error: 
-				logging.info('[%s]             ...failed!' % basename)
+				logging.error('[%s]             ...failed!' % basename)
 			else:
 				logging.info('[%s]             ...done!' % basename)
 
@@ -2367,7 +2374,14 @@ class Cardapio(dbus.service.Object):
 			else:
 
 				for category in xrange(plugin_class.category_count):
-					plugin = self.plugin_database[basename]['instances'][category]
+
+					try:
+						plugin = self.plugin_database[basename]['instances'][category]
+					except Exception, exception:
+						logging.error('[%s] No such category in this plugin!' % basename)
+						logging.error(exception)
+						continue
+						
 					if plugin is None: continue
 					plugin.section, dummy = self.add_section(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hidden_when_no_query = plugin.hide_from_sidebar)
 
