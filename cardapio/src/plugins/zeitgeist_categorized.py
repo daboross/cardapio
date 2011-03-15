@@ -111,7 +111,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		now = int(self.time() * 1000)
 
 		if self.category == 0:
-			self.time_range = self.datamodel.TimeRange.from_seconds_ago(self.DAY)
+			self.time_range = self.datamodel.TimeRange(now - self.DAY, now)
 
 		elif self.category == 1:
 			self.time_range = self.datamodel.TimeRange(now - 7*self.DAY, now - self.DAY)

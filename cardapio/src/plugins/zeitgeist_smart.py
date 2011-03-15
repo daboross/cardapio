@@ -133,7 +133,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			result_type = self.datamodel.ResultType.MostRecentSubjects
 
 		if self.category == 1:
-			self.time_range = self.datamodel.TimeRange.from_seconds_ago(self.DAY)
+			self.time_range = self.datamodel.TimeRange(now - self.DAY, now)
 
 		elif self.category == 2:
 			self.time_range = self.datamodel.TimeRange(now - 7*self.DAY, now - self.DAY)
