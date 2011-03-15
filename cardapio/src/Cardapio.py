@@ -153,7 +153,8 @@ class Cardapio(dbus.service.Object):
 			'zeitgeist_simple',
 			]
 
-	required_plugins = ['applications', 'places', 'pinned']
+	required_plugins = ['pinned']
+	builtin_plugins = ['applications', 'places', 'pinned']
 
 	DONT_SHOW       = 0
 	SHOW_CENTERED   = 1
@@ -206,10 +207,6 @@ class Cardapio(dbus.service.Object):
 		self.volume_monitor                = None
 		self.last_visibility_toggle        = 0
 		self.applet                        = panel_applet
-
-		logging.info('Loading menus...')
-		self.load_menus()
-		logging.info('...done loading menus!')
 
 		logging.info('Setting up DBus...')
 		self.setup_dbus()
@@ -488,7 +485,8 @@ class Cardapio(dbus.service.Object):
 
 		for basename in self.settings['active plugins']:
 
-			if basename in self.required_plugins: continue
+			if basename in self.builtin_plugins: continue
+			# HERE: if something breaks in here it seems to affect line 2359: plugin = ...
 
 			basename = str(basename)
 			plugin_class = self.load_plugin_class(basename)
@@ -733,6 +731,11 @@ class Cardapio(dbus.service.Object):
 		self.subfolder_stack        = []
 		self.selected_section       = None
 
+		self.volumes                = {}  # holds a list of all storage volumes found in the system
+
+		self.builtin_applications_plugin_active = False
+		self.builtin_places_plugin_active       = False
+
 
 	def load_settings(self):
 		"""
@@ -774,18 +777,23 @@ class Cardapio(dbus.service.Object):
 		self.view.pre_build_ui()
 
 		self.clear_all_panes()
+		self.view.hide_view_mode_button()
 		self.view.build_all_sections_sidebar_buttons(_('All'), _('Show all categories'))
 
 		self.build_special_sections()
 		self.build_reorderable_sections()
 
-		if not self.have_control_center:
-			self.view.hide_view_mode_button()
+		if self.builtin_places_plugin_active:
+			self.fill_places_list()
 
-		self.fill_places_list()
-		self.fill_session_list()
-		self.fill_system_list()
-		self.fill_uncategorized_list()
+		if self.builtin_applications_plugin_active:
+			self.fill_session_list()
+			self.fill_system_list()
+			self.fill_uncategorized_list()
+
+			if self.have_control_center:
+				self.view.show_view_mode_button()
+
 		self.fill_favorites_list(self.view.FAVORITES_SECTION, 'pinned items')
 		self.fill_favorites_list(self.view.SIDEPANE_SECTION, 'side pane items')
 
@@ -1171,6 +1179,8 @@ class Cardapio(dbus.service.Object):
 		"""
 		Start a menu search
 		"""
+
+		if not self.builtin_applications_plugin_active: return False
 
 		self.view.hide_pane(self.view.APPLICATION_PANE) # for speed
 
@@ -2022,8 +2032,6 @@ class Cardapio(dbus.service.Object):
 		else:
 			volume_monitor_already_existed = True
 
-		self.volumes = {}
-
 		for mount in self.volume_monitor.get_mounts():
 
 			volume = mount.get_volume()
@@ -2270,6 +2278,8 @@ class Cardapio(dbus.service.Object):
 		Populate the Applications list by reading the Gnome menus
 		"""
 
+		self.load_menus()
+
 		for node in self.app_tree.root.contents:
 			if isinstance(node, gmenu.Directory):
 				self.add_section(node.name, node.icon, node.get_comment(), node = node, hidden_when_no_query = False)
@@ -2345,9 +2355,11 @@ class Cardapio(dbus.service.Object):
 				self.view.build_uncategorized_section(_('Uncategorized'), _('Items that are not under any menu category'))
 				self.view.build_session_section(_('Session'), None)
 				self.view.build_system_section(_('System'), None)
+				self.builtin_applications_plugin_active = True
 
 			elif basename == 'places':
 				self.view.build_places_section(plugin_class.category_name, plugin_class.category_tooltip)
+				self.builtin_places_plugin_active = True
 
 			elif basename == 'pinned':
 				self.view.build_pinneditems_section(plugin_class.category_name, plugin_class.category_tooltip)
@@ -2666,6 +2678,8 @@ class Cardapio(dbus.service.Object):
 		# figure out whether to show the 'eject' menuitem
 		if app_info['command'] in self.volumes:
 			self.view.show_context_menu_option(self.view.EJECT_MENUITEM)
+			# NOTE: 'eject' only appears if the Places plugin is active!
+			# (otherwise, self.volumes is empty)
 
 		self.setup_plugin_context_menu(app_info)
 
@@ -3078,10 +3092,12 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self.disappear_with_section_and_category_button(self.view.SUBFOLDERS_SECTION)
-		self.disappear_with_section_and_category_button(self.view.SESSION_SECTION)
-		self.disappear_with_section_and_category_button(self.view.SYSTEM_SECTION)
 		self.disappear_with_section_and_category_button(self.view.SIDEPANE_SECTION)
-		self.disappear_with_section_and_category_button(self.view.UNCATEGORIZED_SECTION)
+
+		if self.builtin_applications_plugin_active:
+			self.disappear_with_section_and_category_button(self.view.SESSION_SECTION)
+			self.disappear_with_section_and_category_button(self.view.SYSTEM_SECTION)
+			self.disappear_with_section_and_category_button(self.view.UNCATEGORIZED_SECTION)
 
 		self.disappear_with_all_transitory_plugin_sections()
 

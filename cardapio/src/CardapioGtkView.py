@@ -605,6 +605,11 @@ class CardapioGtkView(CardapioViewInterface):
 
 		self.view_mode_button.show()
 
+		# Sometimes Gtk seems to not show the button unless I hide/show its
+		# parent viewport 
+		self.get_widget('SideappViewport').hide()
+		self.get_widget('SideappViewport').show()
+
 
 	# This method is required by the View API
 	def hide_view_mode_button(self):
@@ -1505,8 +1510,12 @@ class CardapioGtkView(CardapioViewInterface):
 			for category_button in category_buttons:
 				category_button.child.child.get_children()[1].hide()
 
-			self.session_button_locksys.child.child.get_children()[1].hide()
-			self.session_button_logout.child.child.get_children()[1].hide()
+			try:
+				self.session_button_locksys.child.child.get_children()[1].hide()
+				self.session_button_logout.child.child.get_children()[1].hide()
+			except:
+				pass
+
 			self.RIGHT_SESSION_PANE.set_homogeneous(False)
 
 			self.get_widget('ViewLabel').set_size_request(0, 0) # required! otherwise a weird margin appears
@@ -1539,8 +1548,12 @@ class CardapioGtkView(CardapioViewInterface):
 			for category_button in category_buttons:
 				category_button.child.child.get_children()[1].show()
 
-			self.session_button_locksys.child.child.get_children()[1].show()
-			self.session_button_logout.child.child.get_children()[1].show()
+			try:
+				self.session_button_locksys.child.child.get_children()[1].show()
+				self.session_button_logout.child.child.get_children()[1].show()
+			except:
+				pass
+
 			self.RIGHT_SESSION_PANE.set_homogeneous(True)
 
 			self.get_widget('ViewLabel').set_size_request(-1, -1)
