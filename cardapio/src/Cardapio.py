@@ -556,9 +556,10 @@ class Cardapio(dbus.service.Object):
 				self.keyword_to_plugin_mapping[keyword].append(plugin)
 				self.active_plugin_instances.append(plugin)
 
-			if error: continue
-
-			logging.info('[%s]             ...done!' % basename)
+			if error: 
+				logging.info('[%s]             ...failed!' % basename)
+			else:
+				logging.info('[%s]             ...done!' % basename)
 
 		gc.collect()
 
