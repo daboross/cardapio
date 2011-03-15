@@ -37,6 +37,5 @@ if __name__ == '__main__':
 		'copyright-year' : '2010',
 		'authors'        : [ 'Pawel Bara, Thiago Teixeira' ],
 	}, 
-	['no-tooltip']
-	)
+	['no-tooltip'])
 

@@ -54,6 +54,7 @@ class CardapioAwnApplet(CardapioAppletInterface):
 		self.preferences.connect('activate', self._open_options_dialog)
 		self.edit.connect('activate', self._launch_edit_app)
 		self.about.connect('activate', self._open_about_dialog)
+		self.applet.connect('unmap-event', self._on_applet_destroy)
 
 		self.menu = self.applet.dialog.menu
 		self.menu.insert(self.preferences, 0)
@@ -170,6 +171,10 @@ class CardapioAwnApplet(CardapioAppletInterface):
 
 	def _open_about_dialog(self, widget):
 		self.cardapio.open_about_dialog()
+
+
+	def _on_applet_destroy(self, *args):
+		self.cardapio.save_and_quit()
 
 
 	def get_screen_number(self):
