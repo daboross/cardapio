@@ -25,7 +25,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	help_text          = ''
 	version            = '1.41'
 
-	plugin_api_version = 1.39
+	plugin_api_version = 1.40
 
 	search_delay_type  = 'remote'
 
@@ -33,11 +33,12 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	category_name      = _('Localized Web Results')
 	category_icon      = 'system-search'
-	category_tooltip  = _('Results found with Google in you system language')
+	icon               = 'system-search'
+	category_tooltip   = _('Results found with Google in you system language')
 	hide_from_sidebar  = True
 
 
-	def __init__(self, cardapio_proxy): 
+	def __init__(self, cardapio_proxy, category): 
 
 		self.c = cardapio_proxy
 

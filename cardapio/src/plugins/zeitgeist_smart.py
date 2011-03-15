@@ -1,28 +1,57 @@
+#  
+#  Copyright (C) 2010 Cardapio Team (tvst@hotmail.com)
+# 
+#  This program is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 3 of the License, or
+#  (at your option) any later version.
+# 
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+# 
+#  You should have received a copy of the GNU General Public License
+#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
 class CardapioPlugin(CardapioPluginInterface):
 
 	author             = _('Cardapio Team')
-	name               = _('Recent documents')
-	description        = _('Search for your most recently used files')
+	name               = _('Recent documents (smart)')
+	description        = _('Search for your most recently used files in categorized fashion, but save space when no query is entered.')
+	icon               = 'document-open-recent'
 
 	url                = ''
 	help_text          = ''
-	version            = '0.992'
+	version            = '0.995'
 
-	plugin_api_version = 1.39
+	plugin_api_version = 1.40
 
 	search_delay_type  = 'local'
 
 	default_keyword    = 'zgeist'
 
-	category_name      = _('Recent Documents')
-	category_icon      = 'document-open-recent'
-	category_tooltip   = _('Files that you have used recently')
+	category_count     = 5
+	category_name      = [
+			_('Recent Documents'), _('Today'), _('This week'), 
+			_('This month'), _('All time')]
+	category_icon      = ['document-open-recent']*5
+	category_tooltip   = [
+			_('Files that you have used recently'), 
+			_('Files you used today'), 
+			_('Files you used this week'), 
+			_('Files you used this month'), 
+			_('All other files')]
+	hide_from_sidebar  = [False, True, True, True, True]
 
-	hide_from_sidebar  = False
+	DAY = 1000*60*60*24 # one day in milliseconds
 
-	recency_in_days = 30
+	def __init__(self, cardapio_proxy, category): 
 
-	def __init__(self, cardapio_proxy): 
+		# NOTE: Right now Cardapio creates a separate instance for each
+		# category. This is very wasteful! We should instead create a single
+		# instance and pass the category to the search() method instead.
 
 		self.c = cardapio_proxy
 
@@ -32,17 +61,20 @@ class CardapioPlugin(CardapioPluginInterface):
 			import urllib2, os
 			from zeitgeist.client import ZeitgeistClient
 			from zeitgeist import datamodel
+			import time
 
 		except Exception, exception:
-			self.cardapio.write_to_log(self, 'Could not import certain modules', is_error = True)
-			self.cardapio.write_to_log(self, exception, is_error = True)
+			self.c.write_to_log(self, 'Could not import certain modules', is_error = True)
+			self.c.write_to_log(self, exception, is_error = True)
 			return
 		
-		self.urllib2         = urllib2
-		self.os              = os
-		self.datamodel       = datamodel
+		self.urllib2   = urllib2
+		self.os        = os
+		self.time      = time.time
+		self.datamodel = datamodel
+		self.category  = category
 
-		if 'ZeitgeistClient' not in globals():
+		if 'ZeitgeistClient' not in locals():
 			self.c.write_to_log(self, 'Could not import Zeitgeist', is_error = True)
 			return
 
@@ -81,13 +113,36 @@ class CardapioPlugin(CardapioPluginInterface):
 			'context menu' : None,
 			}
 
-		self.time_range = self.datamodel.TimeRange.always()
-
 		self.event_template = self.datamodel.Event()
 		self.loaded = True
 
 
 	def search(self, text, result_limit):
+
+		now = int(self.time() * 1000)
+		result_type = self.datamodel.ResultType.MostPopularSubjects
+
+		if self.category == 0:
+
+			# hide this category if we're actually searching for something
+			if text: 
+				self.c.handle_search_result(self, [], text)
+				return
+
+			self.time_range = self.datamodel.TimeRange.always()
+			result_type = self.datamodel.ResultType.MostRecentSubjects
+
+		if self.category == 1:
+			self.time_range = self.datamodel.TimeRange.from_seconds_ago(self.DAY)
+
+		elif self.category == 2:
+			self.time_range = self.datamodel.TimeRange(now - 7*self.DAY, now - self.DAY)
+
+		elif self.category == 3:
+			self.time_range = self.datamodel.TimeRange(now - 30*self.DAY, now - 7*self.DAY)
+
+		else:
+			self.time_range = self.datamodel.TimeRange(0, now - 30*self.DAY)
 
 		self.current_query = text
 
@@ -107,7 +162,8 @@ class CardapioPlugin(CardapioPluginInterface):
 				self.handle_search_result, 
 				timerange = self.time_range, 
 				num_events = result_limit,
-				result_type = self.datamodel.ResultType.MostRecentSubjects
+				#storage_state = self.datamodel.StorageState.Available, # not yet implemented in Zeitgeist!
+				result_type = result_type
 				)
 
 

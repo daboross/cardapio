@@ -15,24 +15,26 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-class CardapioPluginInterface:
+class CardapioPluginInterface(object):
 	# for documentation, see: https://answers.launchpad.net/cardapio/+faq/1172
 
 	author      = ''
 	name        = ''
 	description = ''
+	icon        = ''
 
 	# not yet used:
 	url         = ''
 	help_text   = ''
 	version     = ''
 
-	plugin_api_version = 1.39
+	plugin_api_version = 1.40
 
 	search_delay_type = 'local'
 
 	default_keyword  = ''
 
+	category_count   = 1
 	category_name    = ''
 	category_icon    = ''
 	category_tooltip = ''
@@ -41,7 +43,7 @@ class CardapioPluginInterface:
 
 	hide_from_sidebar = True
 
-	def __init__(self, cardapio_proxy):
+	def __init__(self, cardapio_proxy, category = 1):
 		"""
 		REQUIRED
 

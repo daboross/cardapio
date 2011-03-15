@@ -25,7 +25,7 @@ class CardapioPlugin (CardapioPluginInterface):
 	help_text          = ''
 	version            = '1.13'
 
-	plugin_api_version = 1.39
+	plugin_api_version = 1.40
 
 	search_delay_type  = None
 
@@ -33,6 +33,7 @@ class CardapioPlugin (CardapioPluginInterface):
 
 	category_name      = _('Run Command')
 	category_icon      = 'system-run'
+	icon               = 'system-run'
 	category_tooltip   = _('Run system commands, just like in the command-line')
 
 	fallback_icon      = 'system-run'
@@ -40,7 +41,7 @@ class CardapioPlugin (CardapioPluginInterface):
 	hide_from_sidebar  = True 		
 
 
-	def __init__(self, cardapio_proxy):
+	def __init__(self, cardapio_proxy, category):
 		'''	
 		This method is called when the plugin is enabled.
 		Nothing much to be done here except initialize variables and set loaded to True

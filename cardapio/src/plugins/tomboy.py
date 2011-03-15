@@ -41,19 +41,20 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	default_keyword = 'tomboy'
 
-	plugin_api_version = 1.39
+	plugin_api_version = 1.40
 
 	search_delay_type = 'local'
 
 	category_name = _('Tomboy Results')
 	category_tooltip = _('Your Tomboy notes')
 
+	icon          = 'tomboy'
 	category_icon = 'tomboy'
 	fallback_icon = ''
 
 	hide_from_sidebar = True
 
-	def __init__(self, cardapio_proxy):
+	def __init__(self, cardapio_proxy, category):
 
 		self.cardapio = cardapio_proxy
 

@@ -26,7 +26,7 @@ class CardapioPlugin (CardapioPluginInterface):
 	help_text = ''
 	version = '1.24'
 
-	plugin_api_version = 1.39
+	plugin_api_version = 1.40
 
 	search_delay_type = None
 
@@ -34,6 +34,7 @@ class CardapioPlugin (CardapioPluginInterface):
 
 	category_name     = _('Virtual Machines')
 	category_icon     = 'VBox'
+	icon              = 'VBox'
 	category_tooltip  = _('Your VirtualBox virtual machines')
 
 	hide_from_sidebar = False
@@ -41,7 +42,7 @@ class CardapioPlugin (CardapioPluginInterface):
 	# Set to "True" to only show it when searching		
 
 
-	def __init__(self, cardapio_proxy):
+	def __init__(self, cardapio_proxy, category):
 		'''	
 		This method is called when the plugin is enabled.
 		Here the variables are initialized an the list of virtual machines is built.

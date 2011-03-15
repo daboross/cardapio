@@ -47,13 +47,16 @@ class CardapioPlugin (CardapioPluginInterface):
     author = 'plugin author'
     name = _('plugin name')
     description = _('plugin description')
+	icon = '' # the icon to show when listing the plugin in the options window
+    # (icons can be gtk icons, named icons from the icon theme, or even
+    # filesystem paths)
 
     # not yet used:
     url = 'http://www.pluginurl.com'
     help_text = 'a larger description of the plugin'
     version = '0.1.2.3'
 
-    plugin_api_version = 1.39 # must be 1.39 to work with the current version of Cardapio
+    plugin_api_version = 1.40 # must be 1.40 to work with the current version of Cardapio
 
     search_delay_type = 'local'
     # must be one of:
@@ -72,11 +75,19 @@ class CardapioPlugin (CardapioPluginInterface):
 
     # the icon that will be shown next to the plugin category name
     category_icon = '' 
-    # (icons can be gtk icons, named icons from the icon theme, or even
-    # filesystem paths)
 
     # the tooltip that will be shown when the cursor hovers the category button
     category_tooltip = ''
+
+	# the number of sidebar categories defined by this plugin. Generally, this
+	# should be 1.
+	category_count = 1
+	#
+	# For plugins such as the Zeitgeist plugin, which creates several sidebar
+	# categories (such as "today", "this week", etc), this number should be
+	# greater than 1. In that case, category_name, category_icon, and
+	# category_tooltip should all be defined as arrays of strings -- one string
+	# for each sidebar category.
 
     # the icon that will be used for all search items for which Cardapio cannot
     # find the assigned icon
@@ -100,7 +111,7 @@ class CardapioPlugin (CardapioPluginInterface):
 
 #          ~
 
-    def __init__(self, cardapio_proxy):
+    def __init__(self, cardapio_proxy, category):
 		"""
 		REQUIRED
 
@@ -134,8 +145,9 @@ class CardapioPlugin (CardapioPluginInterface):
 
         # Do stuff here. For example:
 
-        self.loaded = False
+        self.loaded         = False
         self.cardapio_proxy = cardapio_proxy
+        self.category       = category
 
         # Do some other initialization
         

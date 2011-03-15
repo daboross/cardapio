@@ -148,7 +148,9 @@ class Cardapio(dbus.service.Object):
 			'software_center',
 			'tracker',
 			'tracker_fts',
-			'zg_recent_documents',
+			'zeitgeist_smart',
+			'zeitgeist_categorized',
+			'zeitgeist_simple',
 			]
 
 	required_plugins = ['applications', 'places', 'pinned']
@@ -366,7 +368,7 @@ class Cardapio(dbus.service.Object):
 		self.applet.setup(self)
 
 
-	def get_plugin_class(self, basename):
+	def load_plugin_class(self, basename):
 		"""
 		Returns the CardapioPlugin class from the plugin at basename.py.
 		If it fails, it returns a string decribing the error.
@@ -398,35 +400,38 @@ class Cardapio(dbus.service.Object):
 
 		self.plugin_database = {}
 
-		self.plugin_database['applications'] = {
-				'name'              : _('Application menu'),
-				'author'            : _('Cardapio Team'),
-				'description'       : _('Displays installed applications'),
-				'version'           : self.version,
-				'category name'     : None,
-				'category icon'     : 'applications-other',
-				'instance'          : None,
-				}
+		plugin_class = CardapioPluginInterface(None)
+		plugin_class.name              = _('Application menu')
+		plugin_class.author            = _('Cardapio Team')
+		plugin_class.description       = _('Displays installed applications')
+		plugin_class.icon              = 'applications-other'
+		plugin_class.version           = self.version
+		plugin_class.category_name     = None
+		plugin_class.category_tooltip  = None
+		plugin_class.category_icon     = 'applications-other'
+		self.plugin_database['applications'] = {'class' : plugin_class, 'instances' : []}
 
-		self.plugin_database['places'] = {
-				'name'              : _('Places menu'),
-				'author'            : _('Cardapio Team'),
-				'description'       : _('Displays a list of folders'),
-				'version'           : self.version,
-				'category name'     : None,
-				'category icon'     : 'folder',
-				'instance'          : None,
-				}
+		plugin_class = CardapioPluginInterface(None)
+		plugin_class.name              = _('Places menu')
+		plugin_class.author            = _('Cardapio Team')
+		plugin_class.description       = _('Displays a list of folders')
+		plugin_class.icon              = 'folder'
+		plugin_class.version           = self.version
+		plugin_class.category_name     = _('Places')
+		plugin_class.category_tooltip  = _('Access documents and folders')
+		plugin_class.category_icon     = 'folder'
+		self.plugin_database['places'] = {'class' : plugin_class, 'instances' : []}
 
-		self.plugin_database['pinned'] = {
-				'name'              : _('Pinned items'),
-				'author'            : _('Cardapio Team'),
-				'description'       : _('Displays the items that you marked as "pinned" using the context menu'),
-				'version'           : self.version,
-				'category name'     : None,
-				'category icon'     : 'emblem-favorite',
-				'instance'          : None,
-				}
+		plugin_class = CardapioPluginInterface(None)
+		plugin_class.name              = _('Pinned items')
+		plugin_class.author            = _('Cardapio Team')
+		plugin_class.description       = _('Displays the items that you marked as "pinned" using the context menu')
+		plugin_class.icon              = 'emblem-favorite'
+		plugin_class.version           = self.version
+		plugin_class.category_name     = _('Pinned items')
+		plugin_class.category_tooltip  = _('Your favorite items')
+		plugin_class.category_icon     = 'emblem-favorite'
+		self.plugin_database['pinned'] = {'class' : plugin_class, 'instances' : []}
 
 		plugin_dirs = [
 			os.path.join(DesktopEntry.xdg_config_home, 'Cardapio', 'plugins'),
@@ -444,20 +449,15 @@ class Cardapio(dbus.service.Object):
 				for file_ in files:
 					if len(file_) > 3 and file_[-3:] == '.py' and file_[0] != '_' and file_[0] != '.':
 						basename = file_[:-3]
-						plugin_class = self.get_plugin_class(basename)
+						plugin_class = self.load_plugin_class(basename)
 
 						if type(plugin_class) is str: 
 							logging.warn('[%s] %s' % (basename, plugin_class))
 							continue
 
 						self.plugin_database[basename] = {
-							'name'              : plugin_class.name,
-							'author'            : plugin_class.author,
-							'description'       : plugin_class.description,
-							'version'           : plugin_class.version,
-							'category name'     : plugin_class.category_name,
-							'category icon'     : plugin_class.category_icon,
-							'instance'          : None,
+							'class'     : plugin_class,
+							'instances' : [],
 							}
 
 		# TODO: figure out how to make Python unmap all the memory that gets
@@ -474,9 +474,10 @@ class Cardapio(dbus.service.Object):
 		# remove existing plugins
 
 		for basename in self.plugin_database:
-			plugin = self.plugin_database[basename]['instance']
-			if plugin is not None: plugin.__del__()
-			self.plugin_database[basename]['instance'] = None
+			plugins = self.plugin_database[basename]['instances']
+			for plugin in plugins:
+				if plugin is not None: plugin.__del__()
+			self.plugin_database[basename]['instances'] = []
 
 		self.active_plugin_instances = []
 		self.keyword_to_plugin_mapping = {}
@@ -490,7 +491,7 @@ class Cardapio(dbus.service.Object):
 			if basename in self.required_plugins: continue
 
 			basename = str(basename)
-			plugin_class = self.get_plugin_class(basename)
+			plugin_class = self.load_plugin_class(basename)
 
 			if type(plugin_class) is str:
 				logging.warn('[%s] %s' % (basename, plugin_class))
@@ -499,48 +500,65 @@ class Cardapio(dbus.service.Object):
 
 			logging.info('[%s] Initializing...' % basename)
 
-			try:
-				plugin = plugin_class(self.safe_cardapio_proxy)
+			error = False
 
-			except Exception, exception:
-				logging.warn('[%s] Plugin did not load properly: uncaught exception.' % basename)
-				logging.warn(exception)
-				self.settings['active plugins'].remove(basename)
-				continue
+			for category in xrange(plugin_class.category_count):
+				try:
+					plugin = plugin_class(self.safe_cardapio_proxy, category)
 
-			if not plugin.loaded:
-				self.plugin_write_to_log(plugin, 'Plugin did not load properly')
-				self.settings['active plugins'].remove(basename)
-				continue
+				except Exception, exception:
+					logging.warn('[%s] Plugin did not load properly: uncaught exception.' % basename)
+					logging.warn(exception)
+					self.settings['active plugins'].remove(basename)
+					error = True
+					break
+
+				if not plugin.loaded:
+					self.plugin_write_to_log(plugin, 'Plugin did not load properly')
+					self.settings['active plugins'].remove(basename)
+					error = True
+					break
+
+				keyword = plugin.default_keyword
+				show_only_with_keyword = False
+
+				if basename in all_plugin_settings:
+
+					plugin_settings = all_plugin_settings[basename]
+
+					if 'keyword' in plugin_settings:
+						keyword = plugin_settings['keyword']
+
+					if 'show only with keyword' in plugin_settings:
+						show_only_with_keyword = plugin_settings['show only with keyword']
+
+				all_plugin_settings[basename] = {}
+				all_plugin_settings[basename]['keyword'] = keyword
+				all_plugin_settings[basename]['show only with keyword'] = show_only_with_keyword
+
+				plugin.__is_running = False
+				plugin.__show_only_with_keyword = show_only_with_keyword
+
+				if plugin_class.category_count > 1:
+					plugin.category_name     = plugin_class.category_name[category]
+					plugin.category_icon     = plugin_class.category_icon[category]
+					plugin.category_tooltip  = plugin_class.category_tooltip[category]
+					plugin.hide_from_sidebar = plugin_class.hide_from_sidebar[category]
+
+				if plugin.search_delay_type is not None:
+					plugin.search_delay_type = plugin.search_delay_type.partition(' search update delay')[0]
+
+				if category == 0: 
+					self.plugin_database[basename]['instances'] = []
+					self.keyword_to_plugin_mapping[keyword]     = []
+
+				self.plugin_database[basename]['instances'].append(plugin)
+				self.keyword_to_plugin_mapping[keyword].append(plugin)
+				self.active_plugin_instances.append(plugin)
+
+			if error: continue
 
 			logging.info('[%s]             ...done!' % basename)
-
-			keyword = plugin.default_keyword
-			show_only_with_keyword = False
-
-			if basename in all_plugin_settings:
-
-				plugin_settings = all_plugin_settings[basename]
-
-				if 'keyword' in plugin_settings:
-					keyword = plugin_settings['keyword']
-
-				if 'show only with keyword' in plugin_settings:
-					show_only_with_keyword = plugin_settings['show only with keyword']
-
-			all_plugin_settings[basename] = {}
-			all_plugin_settings[basename]['keyword'] = keyword
-			all_plugin_settings[basename]['show only with keyword'] = show_only_with_keyword
-
-			plugin.__is_running             = False
-			plugin.__show_only_with_keyword = show_only_with_keyword
-
-			if plugin.search_delay_type is not None:
-				plugin.search_delay_type = plugin.search_delay_type.partition(' search update delay')[0]
-
-			self.active_plugin_instances.append(plugin)
-			self.plugin_database[basename]['instance'] = plugin
-			self.keyword_to_plugin_mapping[keyword] = plugin
 
 		gc.collect()
 
@@ -814,16 +832,18 @@ class Cardapio(dbus.service.Object):
 
 		gc.collect()
 
-		for plugin in self.active_plugin_instances:
+		if not self.must_activate_plugins:
+			for plugin in self.active_plugin_instances:
 
-			# trying to be too clever here, ended up causing a memory leak:
-			#glib.idle_add(plugin.on_reload_permission_granted)
+				# trying to be too clever here, ended up causing a memory leak:
+				#glib.idle_add(plugin.on_reload_permission_granted)
 
-			# so now I'm back to doing this the regular way:
-			plugin.on_reload_permission_granted()
-			# (leak solved!)
+				# so now I'm back to doing this the regular way:
+				plugin.on_reload_permission_granted()
+				# (leak solved!)
 
-		self.reset_search_query()
+		#self.reset_search_query()
+		self.reset_search()
 		self.view.focus_search_entry()
 
 		return False
@@ -872,6 +892,7 @@ class Cardapio(dbus.service.Object):
 		self.options_window.show()
 
 
+	# This method is called from OptionsWindow
 	def plugin_iterator(self):
 		"""
 		Iterates first through all active plugins in their user-specified order,
@@ -881,29 +902,33 @@ class Cardapio(dbus.service.Object):
 		plugin_list = []
 		plugin_list += [basename for basename in self.settings['active plugins']]
 
-		inactive_plugins = [basename for basename in self.plugin_database if basename not in plugin_list]
-		plugin_list += sorted(inactive_plugins) # TODO: sort by regular name instead of basename
+		inactive_plugins = [
+				(self.plugin_database[basename]['class'].name.lower(), basename) 
+				for basename in self.plugin_database if basename not in plugin_list]
+		inactive_plugins = [plugin_tuple[1] for plugin_tuple in sorted(inactive_plugins)]
+		plugin_list += inactive_plugins
 
 		for basename in plugin_list:
 
-			try: plugin_info = self.plugin_database[basename]
+			try: plugin_class = self.plugin_database[basename]['class']
 			except: continue
 
 			is_active   = (basename in self.settings['active plugins'])
 			is_core     = (basename in self.core_plugins)
 			is_required = (basename in self.required_plugins)
 
-			yield (basename, plugin_info, is_active, is_core, is_required)
+			yield (basename, plugin_class, is_active, is_core, is_required)
 
 
-	def get_plugin_info(self, plugin_basename):
+	# This method is called from OptionsWindow
+	def get_plugin_class(self, plugin_basename):
 		"""
-		Given the plugin filename (without the .py) this method returns a
-		dictionary containing information about the plugin, such as its full
-		name, version, author, and so on.
+		Given the plugin filename (without the .py) this method returns the
+		CardapioPlugin class containing information about the plugin, such as
+		its full name, version, author, and so on.
 		"""
 
-		return self.plugin_database[plugin_basename]
+		return self.plugin_database[plugin_basename]['class']
 
 
 	# This method is called from the View API
@@ -1312,7 +1337,7 @@ class Cardapio(dbus.service.Object):
 
 		if not keyword_exists: return True
 
-		plugin = self.keyword_to_plugin_mapping[keyword]
+		plugin = self.keyword_to_plugin_mapping[keyword][0] # TODO TODO
 
 		self.cancel_all_plugins()
 		self.cancel_all_plugin_timers()
@@ -1404,6 +1429,9 @@ class Cardapio(dbus.service.Object):
 				continue
 
 			if plugin.hide_from_sidebar and query_is_too_short:
+				continue
+
+			if plugin.hide_from_sidebar == -1:
 				continue
 
 			plugin.__is_running = True
@@ -2305,6 +2333,12 @@ class Cardapio(dbus.service.Object):
 
 		for basename in self.settings['active plugins']:
 
+			if basename not in self.plugin_database:
+				self.settings['active plugins'].remove(basename)
+				continue
+
+			plugin_class = self.plugin_database[basename]['class']
+
 			if basename == 'applications':
 				self.build_applications_list()
 				self.view.build_uncategorized_section(_('Uncategorized'), _('Items that are not under any menu category'))
@@ -2312,20 +2346,17 @@ class Cardapio(dbus.service.Object):
 				self.view.build_system_section(_('System'), None)
 
 			elif basename == 'places':
-				self.view.build_places_section(_('Places'), _('Access documents and folders'))
+				self.view.build_places_section(plugin_class.category_name, plugin_class.category_tooltip)
 
 			elif basename == 'pinned':
-				self.view.build_pinneditems_section(_('Pinned items'), _('Your favorite items'))
-
-			elif basename in self.plugin_database:
-
-				plugin = self.plugin_database[basename]['instance']
-				if plugin is None: continue
-
-				plugin.section, dummy = self.add_section(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hidden_when_no_query = plugin.hide_from_sidebar)
+				self.view.build_pinneditems_section(plugin_class.category_name, plugin_class.category_tooltip)
 
 			else:
-				self.settings['active plugins'].remove(basename)
+
+				for category in xrange(plugin_class.category_count):
+					plugin = self.plugin_database[basename]['instances'][category]
+					if plugin is None: continue
+					plugin.section, dummy = self.add_section(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hidden_when_no_query = plugin.hide_from_sidebar)
 
 
 	def remove_all_buttons_from_section(self, section):
@@ -2628,7 +2659,7 @@ class Cardapio(dbus.service.Object):
 		folder_or_file = self.app_is_valid_folder_or_file(app_info)
 		if folder_or_file == 1:
 			self.view.show_context_menu_option(self.view.PEEK_INSIDE_MENUITEM)
-		if folder_or_file:
+		if folder_or_file > 0:
 			self.view.show_context_menu_option(self.view.OPEN_PARENT_MENUITEM)
 
 		# figure out whether to show the 'eject' menuitem
@@ -2647,9 +2678,7 @@ class Cardapio(dbus.service.Object):
 		app_type = app_info['type']
 		if app_type != 'xdg': return 0
 
-		split_command = urllib2.splittype(app_info['command'])
-
-		path_type, canonical_path = split_command
+		path_type, canonical_path = urllib2.splittype(app_info['command'])
 		dummy, extension = os.path.splitext(canonical_path)
 
 		# don't show it for network://, trash://, or .desktop files

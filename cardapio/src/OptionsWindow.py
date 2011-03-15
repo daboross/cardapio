@@ -132,10 +132,10 @@ class OptionsWindow:
 
 		for plugin_tuple in self.cardapio.plugin_iterator():
 
-			basename, plugin_info, is_active, is_core, is_required = plugin_tuple
+			basename, plugin_class, is_active, is_core, is_required = plugin_tuple
 
-			name = plugin_info['name']
-			icon_pixbuf = self.cardapio.icon_helper.get_icon_pixbuf(plugin_info['category icon'], icon_size, 'package-x-generic')
+			name = plugin_class.name
+			icon_pixbuf = self.cardapio.icon_helper.get_icon_pixbuf(plugin_class.icon, icon_size, 'package-x-generic')
 
 			if is_required : title = '<b>%s</b>' % name
 			self.plugin_tree_model.append([basename, name, name, is_active, is_core, not is_required, icon_pixbuf])
@@ -289,14 +289,19 @@ class OptionsWindow:
 
 		if iter_ is None:
 			is_core = True
-			plugin_info = {'name': '', 'version': '', 'author': '', 'description': ''}
+			plugin_class = CardapioPluginInterface(None)
 
 		else:
 			is_core  = self.plugin_tree_model.get_value(iter_, 4)
 			basename = self.plugin_tree_model.get_value(iter_, 0)
-			plugin_info = self.cardapio.get_plugin_info(basename)
+			plugin_class = self.cardapio.get_plugin_class(basename)
 
-		description = _('<b>Plugin:</b> %(name)s %(version)s\n<b>Author:</b> %(author)s\n<b>Description:</b> %(description)s') % plugin_info
+		description = _('<b>Plugin:</b> %(name)s %(version)s\n<b>Author:</b> %(author)s\n<b>Description:</b> %(description)s') % {
+				'name'        : plugin_class.name,
+				'version'     : plugin_class.version,
+				'author'      : plugin_class.author,
+				'description' : plugin_class.description,
+				}
 		if not is_core  : description += '\n<small>(' + _('This is a community-supported plugin') + ')</small>'
 
 		label = self.get_widget('OptionPluginInfo')

@@ -25,7 +25,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	help_text          = ''
 	version            = '1.43'
 
-	plugin_api_version = 1.39
+	plugin_api_version = 1.40
 
 	search_delay_type  = 'local'
 
@@ -33,11 +33,12 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	category_name      = _('Results within files')
 	category_icon      = 'system-search'
+	icon               = 'system-search'
 	category_tooltip   = _('Results found inside the files in your computer')
 	hide_from_sidebar  = True
 
 
-	def __init__(self, cardapio_proxy):
+	def __init__(self, cardapio_proxy, category):
 
 		self.c = cardapio_proxy
 

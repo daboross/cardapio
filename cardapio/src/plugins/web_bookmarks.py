@@ -24,11 +24,12 @@ class CardapioPlugin (CardapioPluginInterface):
 	help_text          = ''
 	version            = '1.0'
 
-	plugin_api_version = 1.39
+	plugin_api_version = 1.40
 
 	search_delay_type  = None
 	category_name      = _('Web Bookmarks')
 	category_icon      = 'html'
+	icon               = 'html'
 	category_tooltip   = _('Pages bookmarked in Firefox, Chrome, or Chromium')
 
 	fallback_icon      = 'html'
@@ -36,7 +37,7 @@ class CardapioPlugin (CardapioPluginInterface):
 	hide_from_sidebar  = True
 
 
-	def __init__(self, cardapio_proxy):
+	def __init__(self, cardapio_proxy, category):
 		'''	
 		This method is called when the plugin is enabled.
 		Nothing much to be done here except initialize variables and set loaded to True

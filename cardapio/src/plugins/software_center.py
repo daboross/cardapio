@@ -25,7 +25,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	help_text          = ''
 	version            = '1.24'
 
-	plugin_api_version = 1.39
+	plugin_api_version = 1.40
 
 	search_delay_type  = 'remote' # HACK: this should be 'local', but searching
 	                              # the software center DB can be pretty slow, so we set 
@@ -35,6 +35,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	default_keyword    = 'softwarecenter'
 	category_name      = _('Available Software')
 	category_icon      = 'softwarecenter'
+	icon               = 'softwarecenter'
 	category_tooltip   = _('Software available to install on your system')
 
 	fallback_icon      = 'applications-other'
@@ -42,7 +43,7 @@ class CardapioPlugin(CardapioPluginInterface):
 	hide_from_sidebar = True 
 
 
-	def __init__(self, cardapio_proxy):
+	def __init__(self, cardapio_proxy, category):
 		'''	
 		This method is called when the plugin is enabled.
 		Nothing much to be done here except initialize variables and set loaded to True
