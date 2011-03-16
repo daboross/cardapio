@@ -25,6 +25,7 @@ try:
 	from IconHelper import *
 	import os
 	import gtk
+	import glib
 	import urllib2
 
 	from time import time
@@ -48,6 +49,8 @@ class CardapioGtkView(CardapioViewInterface):
 	CATEGORY_BUTTON           = 1
 	SESSION_BUTTON            = 2
 	SIDEPANE_BUTTON           = 3
+
+	FOCUS_BLOCK_INTERVAL = 50    # milliseconds
 
 	def __init__(self, cardapio):
 
@@ -341,7 +344,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 			self.block_focus_out_event()
-			glib.timeout_add(Cardapio.FOCUS_BLOCK_INTERVAL, self.unblock_focus_out_event)
+			glib.timeout_add(self.FOCUS_BLOCK_INTERVAL, self.unblock_focus_out_event)
 
 
 	# This method is required by the View API

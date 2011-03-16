@@ -128,7 +128,6 @@ class Cardapio(dbus.service.Object):
 	distro_name = platform.linux_distribution()[0]
 
 	MIN_VISIBILITY_TOGGLE_INTERVAL    = 0.200 # seconds (this is a bit of a hack to fix some focus problems)
-	FOCUS_BLOCK_INTERVAL              = 50    # milliseconds
 	PLUGIN_REBUILD_DELAY              = 30000 # milliseconds
 
 	LOG_FILE_MAX_SIZE                 = 1000000 # bytes
