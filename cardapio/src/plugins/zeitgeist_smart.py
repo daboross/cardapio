@@ -45,8 +45,6 @@ class CardapioPlugin(CardapioPluginInterface):
 			_('All other files')]
 	hide_from_sidebar  = [False, True, True, True, True]
 
-	DAY = 1000*60*60*24 # one day in milliseconds
-
 	def __init__(self, cardapio_proxy, category): 
 
 		# NOTE: Right now Cardapio creates a separate instance for each
@@ -70,7 +68,6 @@ class CardapioPlugin(CardapioPluginInterface):
 		
 		self.urllib2   = urllib2
 		self.os        = os
-		self.time      = time.time
 		self.datamodel = datamodel
 		self.category  = category
 
@@ -114,35 +111,36 @@ class CardapioPlugin(CardapioPluginInterface):
 			}
 
 		self.event_template = self.datamodel.Event()
+
+		DAY = 1000*60*60*24 # one day in milliseconds
+		now = int(time.time() * 1000)
+		self.result_type = self.datamodel.ResultType.MostPopularSubjects
+
+		if category == 0:
+			self.time_range = self.datamodel.TimeRange.always()
+			self.result_type = self.datamodel.ResultType.MostRecentSubjects
+
+		if category == 1:
+			self.time_range = self.datamodel.TimeRange(now - DAY, now)
+
+		elif category == 2:
+			self.time_range = self.datamodel.TimeRange(now - 7*DAY, now - DAY)
+
+		elif category == 3:
+			self.time_range = self.datamodel.TimeRange(now - 30*DAY, now - 7*DAY)
+
+		else:
+			self.time_range = self.datamodel.TimeRange(0, now - 30*DAY)
+
 		self.loaded = True
 
 
 	def search(self, text, result_limit):
 
-		now = int(self.time() * 1000)
-		result_type = self.datamodel.ResultType.MostPopularSubjects
-
-		if self.category == 0:
-
-			# hide this category if we're actually searching for something
-			if text: 
-				self.c.handle_search_result(self, [], text)
-				return
-
-			self.time_range = self.datamodel.TimeRange.always()
-			result_type = self.datamodel.ResultType.MostRecentSubjects
-
-		if self.category == 1:
-			self.time_range = self.datamodel.TimeRange(now - self.DAY, now)
-
-		elif self.category == 2:
-			self.time_range = self.datamodel.TimeRange(now - 7*self.DAY, now - self.DAY)
-
-		elif self.category == 3:
-			self.time_range = self.datamodel.TimeRange(now - 30*self.DAY, now - 7*self.DAY)
-
-		else:
-			self.time_range = self.datamodel.TimeRange(0, now - 30*self.DAY)
+		# hide this category if we're actually searching for something
+		if self.category == 0 and text: 
+			self.c.handle_search_result(self, [], text)
+			return
 
 		self.current_query = text
 
@@ -163,7 +161,7 @@ class CardapioPlugin(CardapioPluginInterface):
 				timerange = self.time_range, 
 				num_events = result_limit,
 				#storage_state = self.datamodel.StorageState.Available, # not yet implemented in Zeitgeist!
-				result_type = result_type
+				result_type = self.result_type
 				)
 
 

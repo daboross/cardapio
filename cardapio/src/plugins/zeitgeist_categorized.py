@@ -38,8 +38,6 @@ class CardapioPlugin(CardapioPluginInterface):
 	category_tooltip   = [_('Files you used today'), _('Files you used this week'), _('Files you used this month'), _('All other files')]
 	hide_from_sidebar  = [False]*4
 
-	DAY = 1000*60*60*24 # one day in milliseconds
-
 	def __init__(self, cardapio_proxy, category): 
 
 		self.c = cardapio_proxy
@@ -61,7 +59,6 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.os        = os
 		self.time      = time.time
 		self.datamodel = datamodel
-		self.category  = category
 
 		if 'ZeitgeistClient' not in locals():
 			self.c.write_to_log(self, 'Could not import Zeitgeist', is_error = True)
@@ -105,23 +102,25 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.event_template = self.datamodel.Event()
 		self.loaded = True
 
+		DAY = 1000*60*60*24 # one day in milliseconds
+		now = int(self.time() * 1000)
+
+		if category == 0:
+			self.time_range = self.datamodel.TimeRange(now - DAY, now)
+
+		elif category == 1:
+			self.time_range = self.datamodel.TimeRange(now - 7*DAY, now - DAY)
+
+		elif category == 2:
+			self.time_range = self.datamodel.TimeRange(now - 30*DAY, now - 7*DAY)
+
+		else:
+			self.time_range = self.datamodel.TimeRange(0, now - 30*DAY)
+
 
 	def search(self, text, result_limit):
 
-		now = int(self.time() * 1000)
-
-		if self.category == 0:
-			self.time_range = self.datamodel.TimeRange(now - self.DAY, now)
-
-		elif self.category == 1:
-			self.time_range = self.datamodel.TimeRange(now - 7*self.DAY, now - self.DAY)
-
-		elif self.category == 2:
-			self.time_range = self.datamodel.TimeRange(now - 30*self.DAY, now - 7*self.DAY)
-
-		else:
-			self.time_range = self.datamodel.TimeRange(0, now - 30*self.DAY)
-
+		return
 		self.current_query = text
 
 		text = text.lower()
