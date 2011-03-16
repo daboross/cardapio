@@ -87,7 +87,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		try:
 			self.bus = dbus.SessionBus()
 			# we track Pidgin's on / off status
-			self.bus.watch_name_owner(self.dpidgin_bus_name, self.on_dbus_name_change)
+			self.watch = self.bus.watch_name_owner(self.dpidgin_bus_name, self.on_dbus_name_change)
 
 			self.loaded = True
 
@@ -105,6 +105,10 @@ class CardapioPlugin(CardapioPluginInterface):
 			 'away' : 'user-away', 'extended_away' : 'user-away',
 			 'mobile' : 'user-available', 'tune' : 'user-available',
 			 'mood' : 'user-available' }
+
+	def __del__(self):
+		if self.loaded:
+			self.watch.cancel()
 
 	def on_dbus_name_change(self, connection_name):
 		"""

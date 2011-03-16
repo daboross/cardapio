@@ -75,13 +75,17 @@ class CardapioPlugin(CardapioPluginInterface):
 		try:
 			self.bus = dbus.SessionBus()
 			# we track Tomboy's on / off status
-			self.bus.watch_name_owner(self.dtomboy_bus_name, self.on_dbus_name_change)
+			self.watch = self.bus.watch_name_owner(self.dtomboy_bus_name, self.on_dbus_name_change)
 
 			self.loaded = True
 
 		except DBusException as ex:
 			self.cardapio.write_to_log(self, 'Tomboy plugin initialization error: {0}'.format(str(ex)), is_error = True)
 			self.loaded = False
+
+	def __del__(self):
+		if self.loaded:
+			self.watch.cancel()
 
 	def on_dbus_name_change(self, connection_name):
 		"""
