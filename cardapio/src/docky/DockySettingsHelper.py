@@ -138,8 +138,9 @@ class DockySettingsHelper:
 		zoom_percent = self.get_zoom_percentage(dock_num)
 		position = self.get_position(dock_num)
 
-		# mouse position and screen size
-		mouse_x, mouse_y, dummy = gtk.gdk.get_default_root_window().get_pointer()
+		# get the screen that contains the pointer, mouse position and screen size
+		screen, mouse_x, mouse_y, dummy = gtk.gdk.display_get_default().get_pointer()
+		#mouse_x, mouse_y, dummy = gtk.gdk.get_default_root_window().get_pointer()
 		screen_width, screen_height = gtk.gdk.screen_width(), gtk.gdk.screen_height()
 
 		# offsets from screen's borders
