@@ -74,9 +74,15 @@ def get_output(shell_command):
 
 
 import gc
-
+#
+# When debugging leaks:
+#from guppy import hpy
+#h = hpy()
+#
 def get_memory_usage():
 	gc.collect()
+	#print h.heap()
+	#print h.setref()
 	return get_output("ps -A -o rss -o cmd | awk '/cardapio / && !/awk/ {print $1}'")
 
 

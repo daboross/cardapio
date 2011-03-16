@@ -816,6 +816,8 @@ class Cardapio(dbus.service.Object):
 		for example)
 		"""
 
+		# (this method is verified leak-free when no plugins are loaded)
+
 		# TODO: make rebuild smarter: only rebuild whatever is absolutely necessary
 
 		# TODO: make rebuild even smarter: use a "double buffer" approach, where
@@ -2312,6 +2314,7 @@ class Cardapio(dbus.service.Object):
 		if node is not None:
 			# add all apps in this category to application pane
 			self.add_tree_to_app_list(node, section, app_list)
+			# TODO: fix small leak in the call above
 
 		# add category to category pane
 		title_str, tooltip = self.sanitize_button_info(title_str, tooltip)
@@ -2358,7 +2361,7 @@ class Cardapio(dbus.service.Object):
 			plugin_class = self.plugin_database[basename]['class']
 
 			if basename == 'applications':
-				self.build_applications_list()
+				self.build_applications_list() 
 				self.view.build_uncategorized_section(_('Uncategorized'), _('Items that are not under any menu category'))
 				self.view.build_session_section(_('Session'), None)
 				self.view.build_system_section(_('System'), None)
