@@ -138,10 +138,14 @@ class DockySettingsHelper:
 		zoom_percent = self.get_zoom_percentage(dock_num)
 		position = self.get_position(dock_num)
 
-		# get the screen that contains the pointer, mouse position and screen size
-		screen, mouse_x, mouse_y, dummy = gtk.gdk.display_get_default().get_pointer()
-		#mouse_x, mouse_y, dummy = gtk.gdk.get_default_root_window().get_pointer()
-		screen_width, screen_height = gtk.gdk.screen_width(), gtk.gdk.screen_height()
+		display = gtk.gdk.display_get_default()
+		screen = display.get_default_screen()
+
+		monitor = self.gconf_client.get_int(self.docky_iface_gconf_root + dock_num + '/MonitorNumber')
+		monitor_x, monitor_y, monitor_width, monitor_height =\
+				screen.get_monitor_geometry(monitor)
+
+		dummy, mouse_x, mouse_y, dummy = display.get_pointer()
 
 		# offsets from screen's borders
 		horizontal_offset = self.get_horizontal_offset(dock_num)
@@ -160,19 +164,19 @@ class DockySettingsHelper:
 		# calculating final position...
 		if position == 'Bottom':
 			x = mouse_x - half_zoomed_icon_size 
-			y = screen_height - icon_size - vertical_offset
+			y = monitor_y + monitor_height - icon_size - vertical_offset
 			force_anchor_bottom = True
 
 		elif position == 'Top':
 			x = mouse_x - half_zoomed_icon_size 
-			y = icon_size + vertical_offset
+			y = monitor_y + icon_size + vertical_offset
 
 		elif position == 'Left':
-			x = icon_size  + horizontal_offset
+			x = monitor_x + icon_size + horizontal_offset
 			y = mouse_y - half_zoomed_icon_size 
 
 		elif position == 'Right':
-			x = screen_width - icon_size - horizontal_offset
+			x = monitor_x + monitor_width - icon_size - horizontal_offset
 			y = mouse_y - half_zoomed_icon_size
 			force_anchor_right = True
 

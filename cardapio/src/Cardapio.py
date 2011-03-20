@@ -1713,7 +1713,6 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		window_width, window_height = self.view.get_window_size()
-		screen_x, screen_y, screen_width, screen_height = self.view.get_screen_dimensions()
 
 		if self.applet.panel_type != None:
 			orientation = self.applet.get_orientation()
@@ -1723,8 +1722,15 @@ class Cardapio(dbus.service.Object):
 			if orientation == POS_TOP : y += h
 
 		else:
-			x = (screen_width - window_width)/2
-			y = (screen_height - window_height)/2
+
+			# show cardapio on center of the monitor that contains the mouse cursor
+
+			cursor_x, cursor_y = self.view.get_cursor_coordinates()
+			monitor_x, monitor_y, monitor_width, monitor_height = \
+					self.view.get_monitor_dimensions(cursor_x, cursor_y)
+
+			x = monitor_x + (monitor_width - window_width)/2
+			y = monitor_y + (monitor_height - window_height)/2
 
 		return x, y
 
@@ -1741,11 +1747,14 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		window_width, window_height = self.view.get_window_size()
+
 		screen_x, screen_y, screen_width, screen_height = self.view.get_screen_dimensions()
+		monitor_x, monitor_y, monitor_width, monitor_height = self.view.get_monitor_dimensions(x, y)
 
 		# maximal coordinates of window and usable screen
-		max_window_x, max_window_y = x + window_width, y + window_height
-		max_screen_x, max_screen_y = screen_x + screen_width, screen_y + screen_height
+		max_window_x , max_window_y  = x + window_width         , y + window_height
+		max_screen_x , max_screen_y  = screen_x + screen_width  , screen_y + screen_height
+		max_monitor_x, max_monitor_y = monitor_x + monitor_width, monitor_y + monitor_height
 
 		anchor_right  = False
 		anchor_bottom = False
@@ -1754,12 +1763,12 @@ class Cardapio(dbus.service.Object):
 		w, h = self.applet.get_size()
 
 		# if the window won't fit horizontally, flip it over its y axis
-		if max_window_x > max_screen_x: 
+		if max_window_x > max_screen_x or max_window_x > max_monitor_x: 
 			anchor_right = True
 			if orientation == POS_TOP or orientation == POS_BOTTOM: x += w 
 
 		# if the window won't fit horizontally, flip it over its x axis
-		if max_window_y > max_screen_y: 
+		if max_window_y > max_screen_y or max_window_y > max_monitor_y: 
 			anchor_bottom = True
 			if orientation == POS_LEFT or orientation == POS_RIGHT: y += h
 

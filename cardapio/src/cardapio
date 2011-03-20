@@ -104,7 +104,7 @@ def cardapio_show_near_docky():
 		start_cardapio(show = Cardapio.DONT_SHOW)
 
 	else:
-		from docky.DockySettingsHelper import DockySettingsHelper
+		from docky.DockySettingsHelper import DockySettingsHelper, MainDockError
 
 		try:
 			settings_helper = DockySettingsHelper()
@@ -115,8 +115,8 @@ def cardapio_show_near_docky():
 			show_hide_near_point = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_point')
 			show_hide_near_point(x, y, force_anchor_right, force_anchor_bottom)
 
-		except MainDockError:
-			fatal_error('Cardapio error!', "Couldn't find the main dock of Docky!")
+		except MainDockError, exception:
+			fatal_error('Cardapio error!', "Couldn't find the main dock of Docky! " + str(exception))
 
 		except Exception, exception:
 			fatal_error('Unknown error with Cardapio in Docky!', exception)

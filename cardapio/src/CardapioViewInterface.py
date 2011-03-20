@@ -266,6 +266,15 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
+	def get_monitor_dimensions(self, x, y):
+		"""
+		Returns the dimensions of the monitor that contains the point x,y.  It
+		would be *great* if these dimensions could be the *usable* dimensions,
+		but it seems that the xdesktop spec does not define a way to get this...
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
 	def get_screen_dimensions(self):
 		"""
 		Returns usable dimensions of the current desktop in a form of

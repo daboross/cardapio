@@ -750,6 +750,19 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
+	def get_monitor_dimensions(self, x, y):
+		"""
+		Returns the dimensions of the monitor that contains the point x,y.  It
+		would be *great* if these dimensions could be the *usable* dimensions,
+		but it seems that the xdesktop spec does not define a way to get this...
+		"""
+
+		monitor = self.screen.get_monitor_at_point(x, y)
+		monitor_dimensions = self.screen.get_monitor_geometry(monitor)
+		return monitor_dimensions
+
+
+	# This method is required by the View API
 	def get_screen_dimensions(self):
 		"""
 		Returns usable dimensions of the current desktop in a form of
