@@ -137,6 +137,12 @@ class CardapioGtkView(CardapioViewInterface):
 
 		self.main_window.set_keep_above(True)
 
+		# turn on RGBA
+		main_window_screen = self.main_window.get_screen()
+		colormap = main_window_screen.get_rgba_colormap()
+		if colormap is not None and self.cardapio.settings['allow transparency']: 
+			gtk.widget_set_default_colormap(colormap)
+
 		# make edges draggable
 		self.get_widget('MarginLeft').realize()
 		self.get_widget('MarginRight').realize()
