@@ -95,7 +95,7 @@ class SettingsHelper:
 		self.read_config_option(s, 'active plugins'             , ['pinned', 'places', 'applications', 'tracker', 'google', 'command_launcher', 'software_center'])
 		self.read_config_option(s, 'plugin settings'            , {}                       )
 		self.read_config_option(s, 'show titlebar'              , False                    ) # bool
-		self.read_config_option(s, 'allow transparency'         , True                     ) # bool
+		self.read_config_option(s, 'allow transparency'         , False                    ) # bool
 
 		# these are a bit of a hack:
 		self.read_config_option(s, 'handler for ftp paths'      , r"nautilus '%s'"         ) # a command line using %s
