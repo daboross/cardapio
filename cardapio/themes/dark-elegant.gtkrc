@@ -159,7 +159,7 @@ style "cardapio-apppane-button"
 	bg[INSENSITIVE] = "#EEEEEE"
 	bg[ACTIVE]      = "#EEEEEE"
 	bg[SELECTED]    = "#EEEEEE"
-	bg[PRELIGHT]    = "#EEEEEE"
+	bg[PRELIGHT]    = "#F7F7F7"
 
 	engine "murrine" 
 	{
@@ -251,6 +251,44 @@ widget "CardapioWindow*Scrollbar" style:highest "cardapio-sidebar-scrollbars"
 
 
 
+# Reload Message bar .......................................................
+
+style "cardapio-reload-button" = "cardapio-sidebar-button"
+{
+	fg[NORMAL]      = "#EEEEEE"
+	fg[INSENSITIVE] = "#AAAAAA"
+	fg[ACTIVE]      = "#FFFFFF"
+	fg[SELECTED]    = "#FFFFFF"
+	fg[PRELIGHT]    = "#FFFFFF"
+	bg[NORMAL]      = "#992222"
+	bg[INSENSITIVE] = "#111111"
+	bg[ACTIVE]      = "#661111"
+	bg[SELECTED]    = "#111111"
+	bg[PRELIGHT]    = "#CC1111"
+
+	engine "murrine" 
+	{
+		textstyle           = 1                     # 0 = normal, 1 = inset, 2 = inv.inset, 3 = shadow, 4 = topleft shadow
+		lightborder_shade   = 1.10                  # sets lightborder amount for buttons or widgets.
+		lightborderstyle    = 0                     # 0 = lightborder on top side, 1 = lightborder on all sides.
+		highlight_shade     = 1.00                  # shade for gradient hightlight.
+		gradient_shades     = {1.10,1.00,1.00,0.95} # rendering of gradients.
+		gradient_colors     = FALSE
+		glowstyle           = 1                     # 0 = top glow, 1 = bottom glow, 2 = top and bottom glow, 3 = horizontal glow, 4 = centered glow
+		glow_shade          = 0.3                   # changes the glow amount
+		focus_color         = "#FF0000"
+		focusstyle          = 3
+	}
+}
+widget "CardapioWindow*ReloadMessageBar*Button*" style:highest "cardapio-reload-button"
+
+style "cardapio-reload-label" 
+{
+	fg[NORMAL]      = "#F7F7F7"
+}
+widget "CardapioWindow*ReloadMessageBar*Label" style:highest "cardapio-reload-label"
+
+
 # Main Pane Scrollbar ......................................................
 
 style "cardapio-apppane-scrollbar-bg"
@@ -295,4 +333,18 @@ style "cardapio-apppane-scrollbars"
 }
 widget "CardapioWindow*MainPaneBorder*Scrollbar" style:highest "cardapio-apppane-scrollbars"
 
+
+
+# App Pane separator .......................................................
+
+style "cardapio-apppane-separator"
+{
+	bg[NORMAL]      = "#BBBBBB"
+
+	engine "murrine" 
+	{
+		contrast = 0.0
+	}
+}
+widget "CardapioWindow*MainPaneSeparator" style:highest "cardapio-apppane-separator"
 
