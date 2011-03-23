@@ -1,0 +1,298 @@
+# Main colors ..............................................................
+
+style "cardapio-background"
+{
+	xthickness = 1
+	ythickness = 1
+
+	fg[NORMAL]        = "#AAAAAA"
+	fg[INSENSITIVE]   = "#AAAAAA"
+	fg[ACTIVE]        = "#FFFFFF"
+	fg[SELECTED]      = "#FFFFFF"
+	fg[PRELIGHT]      = "#FFFFFF"
+	bg[NORMAL]        = "#222222"
+	bg[INSENSITIVE]   = "#111111"
+	bg[ACTIVE]        = "#111111"
+	bg[SELECTED]      = "#111111"
+	bg[PRELIGHT]      = "#111111"
+	text[NORMAL]      = "#333333"
+	text[INSENSITIVE] = "#333333"
+	text[ACTIVE]      = "#FFFFFF"
+	text[SELECTED]    = "#FFFFFF"
+	text[PRELIGHT]    = "#FFFFFF"
+	base[NORMAL]      = "#EEEEEE"
+	base[INSENSITIVE] = "#EEEEEE"
+	base[ACTIVE]      = "#111111"
+	base[SELECTED]    = "#111111"
+	base[PRELIGHT]    = "#111111"
+
+	engine "murrine" {
+		border_colors   = FALSE
+		gradient_colors = FALSE
+		focusstyle      = 3
+		focus_color     = "#FFFFFF"
+		roundness       = 2
+	}
+}
+widget "CardapioWindow*" style:highest "cardapio-background"
+
+
+
+# Transparent borders ......................................................
+
+style "cardapio-background-transparent" = "cardapio-background"
+{
+	engine "murrine" {
+		rgba = TRUE
+	}
+}
+widget "CardapioWindow.MainWindowBorder.Margins.MarginTop" style:highest "cardapio-background-transparent"
+widget "CardapioWindow.MainWindowBorder.Margins.MarginTopLeft" style:highest "cardapio-background-transparent"
+widget "CardapioWindow.MainWindowBorder.Margins.MarginTopRight" style:highest "cardapio-background-transparent"
+widget "CardapioWindow.MainWindowBorder.Margins.MarginBottom" style:highest "cardapio-background-transparent"
+widget "CardapioWindow.MainWindowBorder.Margins.MarginBottomLeft" style:highest "cardapio-background-transparent"
+widget "CardapioWindow.MainWindowBorder.Margins.MarginBottomRight" style:highest "cardapio-background-transparent"
+widget "CardapioWindow.MainWindowBorder.Margins.MarginLeft" style:highest "cardapio-background-transparent"
+widget "CardapioWindow.MainWindowBorder.Margins.MarginRight" style:highest "cardapio-background-transparent"
+
+
+
+# Entry ....................................................................
+
+style "cardapio-entry" = "cardapio-background"
+{
+	xthickness = 3
+	ythickness = 3
+}
+widget "CardapioWindow*Entry*" style:highest "cardapio-entry"
+
+
+
+# Sidebar buttons ..........................................................
+
+style "cardapio-sidebar-button"
+{
+	xthickness = 3
+	ythickness = 3
+	GtkButton::default-border         = {0, 0, 0, 0}
+	GtkButton::inner-border           = {2, 2, 0, 0}
+	GtkButton::default-outside-border = {0, 0, 0, 0}
+
+	fg[NORMAL]      = "#AAAAAA"
+	fg[INSENSITIVE] = "#AAAAAA"
+	fg[ACTIVE]      = "#FFFFFF"
+	fg[SELECTED]    = "#FFFFFF"
+	fg[PRELIGHT]    = "#FFFFFF"
+	bg[NORMAL]      = "#222222"
+	bg[INSENSITIVE] = "#111111"
+	bg[ACTIVE]      = "#111111"
+	bg[SELECTED]    = "#111111"
+	bg[PRELIGHT]    = "#111111"
+
+	engine "murrine" 
+	{
+		contrast            = 1.0                   # theme contrast.
+		glazestyle          = 0                     # 0 = flat hilight, 1 = curved hilight, 2 = concave style, 3 = top curved hilight, 4 = beryl hilight.
+		scrollbarstyle      = 0                     # 0 = nothing, 1 = circles, 2 = handles, 3 = diagonal stripes, 4 = diagonal stripes and handles, 5 = horizontal stripes, 6 = horizontal stripes and handles.
+		stepperstyle        = 2                     # 0 = standard, 1 = integrated stepper handles, 2 = squared steppers with a rounded slider
+		roundness           = 2                     # Overall roundness of the theme.
+		reliefstyle         = 3                     # shadows around widgets.
+		text_shade          = 1.5
+		border_shades       = {1.22,0.98}
+		border_colors       = FALSE
+		shadow_shades       = {1.20,0.85}
+		textstyle           = 0                     # 0 = normal, 1 = inset, 2 = inv.inset, 3 = shadow, 4 = topleft shadow
+		lightborder_shade   = 1.00                  # sets lightborder amount for buttons or widgets.
+		lightborderstyle    = 1                     # 0 = lightborder on top side, 1 = lightborder on all sides.
+		highlight_shade     = 1.00                  # shade for gradient hightlight.
+		gradient_shades     = {1.00,1.00,1.00,1.00} # rendering of gradients.
+		gradient_colors     = FALSE
+		glowstyle           = 1                     # 0 = top glow, 1 = bottom glow, 2 = top and bottom glow, 3 = horizontal glow, 4 = centered glow
+		glow_shade          = 8.0                   # changes the glow amount
+		focus_color         = "#AAAAAA"
+		focusstyle          = 3
+	}
+}
+widget "CardapioWindow*Button*" style:highest "cardapio-sidebar-button"
+
+
+
+# Sidebar headers ..........................................................
+
+style "cardapio-sidebar-header"
+{
+	font_name = "7"
+	fg[NORMAL] = "#777777"
+}
+widget "CardapioWindow*ViewLabel"         style:highest "cardapio-sidebar-header"
+widget "CardapioWindow*SearchLabel"       style:highest "cardapio-sidebar-header"
+
+
+
+# App Pane background, buttons and headers .................................
+
+style "cardapio-apppane-workaround"
+{
+	text[NORMAL] = "#333333" # IMPORTANT: Cardapio application button color
+	base[NORMAL] = "#EEEEEE" # IMPORTANT: Cardapio application pane background color
+}
+widget "ApplicationPane" style "cardapio-apppane-workaround"
+
+
+
+# App Pane buttons .........................................................
+
+style "cardapio-apppane-button"
+{
+	xthickness = 3
+	ythickness = 3
+	GtkButton::default-border         = {0, 0, 0, 0}
+	GtkButton::inner-border           = {2, 2, 0, 0}
+	GtkButton::default-outside-border = {0, 0, 0, 0}
+
+	fg[NORMAL]      = "#333333"
+	fg[INSENSITIVE] = "#AAAAAA"
+	fg[ACTIVE]      = "#222222"
+	fg[SELECTED]    = "#222222"
+	fg[PRELIGHT]    = "#222222"
+	bg[NORMAL]      = "#EEEEEE"
+	bg[INSENSITIVE] = "#EEEEEE"
+	bg[ACTIVE]      = "#EEEEEE"
+	bg[SELECTED]    = "#EEEEEE"
+	bg[PRELIGHT]    = "#EEEEEE"
+
+	engine "murrine" 
+	{
+		contrast            = 1.0                   # theme contrast.
+		glazestyle          = 0                     # 0 = flat hilight, 1 = curved hilight, 2 = concave style, 3 = top curved hilight, 4 = beryl hilight.
+		scrollbarstyle      = 0                     # 0 = nothing, 1 = circles, 2 = handles, 3 = diagonal stripes, 4 = diagonal stripes and handles, 5 = horizontal stripes, 6 = horizontal stripes and handles.
+		stepperstyle        = 2                     # 0 = standard, 1 = integrated stepper handles, 2 = squared steppers with a rounded slider
+		roundness           = 2                     # Overall roundness of the theme.
+		reliefstyle         = 3                     # shadows around widgets.
+		border_shades       = {1.22,0.98}
+		border_colors       = FALSE
+		shadow_shades       = {1.20,0.85}
+		textstyle           = 0                     # 0 = normal, 1 = inset, 2 = inv.inset, 3 = shadow, 4 = topleft shadow
+		lightborder_shade   = 1.10                  # sets lightborder amount for buttons or widgets.
+		lightborderstyle    = 1                     # 0 = lightborder on top side, 1 = lightborder on all sides.
+		highlight_shade     = 1.00                  # shade for gradient hightlight.
+		gradient_shades     = {1.00,1.00,1.00,1.00} # rendering of gradients.
+		gradient_colors     = FALSE
+		glowstyle           = 1                     # 0 = top glow, 1 = bottom glow, 2 = top and bottom glow, 3 = horizontal glow, 4 = centered glow
+		glow_shade          = 1.5                   # changes the glow amount
+		focus_color         = "#777777"
+		focusstyle          = 3
+	}
+}
+widget "CardapioWindow*MainPaneBorder*Button*" style:highest "cardapio-apppane-button"
+
+
+
+# App Pane headers .........................................................
+
+style "cardapio-apppane-header"
+{
+	font_name = "7"
+	text[NORMAL] = "#AAAAAA" # <-- Doesn't work since Cardapio programatically changes this
+}
+widget "CardapioWindow*GtkFrame.GtkLabel" style:highest "cardapio-apppane-header"
+
+
+
+# Scrollbars ...............................................................
+
+style "cardapio-apppane-scrolledwin"
+{
+	GtkScrolledWindow::scrollbars-within-bevel   = 1
+	GtkScrolledWindow::scrollbar-spacing         = 3
+}
+widget "CardapioWindow*ScrolledWindow" style:highest "cardapio-apppane-scrolledwin"
+
+
+
+# Sidebar Scrollbar ........................................................
+
+style "cardapio-sidebar-scrollbars"
+{
+	GtkScrollbar::has-backward-stepper           = 0
+	GtkScrollbar::has-forward-stepper            = 0
+	GtkScrollbar::has-secondary-forward-stepper  = 0
+	GtkScrollbar::has-secondary-backward-stepper = 0
+
+	GtkScrollbar::min-slider-length = 35
+	GtkRange::slider-width          = 6 # Scrollbar width.
+	GtkScrollbar::slider-width      = 6 # Scrollbar width.
+	GtkRange::trough-border         = 1   # margin inside trough (would like to set 0, but becomes square)
+	GtkRange::trough-under-steppers = 1
+
+	bg[SELECTED] = "#555555"
+
+	engine "murrine" {
+		roundness          = 2
+		contrast           = 0.0
+		prelight_shade     = 1.10 # how much to light up the scroll thumb when hovered
+		lightborder_shade  = 1.00
+		lightborderstyle   = 0
+		reliefstyle        = 0
+		highlight_shade    = 1.00
+		border_shades      = {1.00, 1.00}
+		border_colors      = {"#555555", "#555555"}
+		trough_shades      = {1.0,1.0}
+		scrollbarstyle     = 0
+		glazestyle         = 0
+		colorize_scrollbar = TRUE
+	    glowstyle          = 1
+	    glow_shade         = 1.00
+		gradient_shades    = {1.00,1.00,1.00,1.00}
+		gradient_colors     = FALSE
+	}
+}
+widget "CardapioWindow*Scrollbar" style:highest "cardapio-sidebar-scrollbars"
+
+
+
+# Main Pane Scrollbar ......................................................
+
+style "cardapio-apppane-scrollbar-bg"
+{
+	bg[NORMAL] = "#EEEEEE"
+}
+widget "CardapioWindow*MainPaneBorder" style:highest "cardapio-apppane-scrollbar-bg"
+
+style "cardapio-apppane-scrollbars"
+{
+	GtkScrollbar::has-backward-stepper           = 0
+	GtkScrollbar::has-forward-stepper            = 0
+	GtkScrollbar::has-secondary-forward-stepper  = 0
+	GtkScrollbar::has-secondary-backward-stepper = 0
+
+	GtkScrollbar::min-slider-length = 35
+	GtkRange::slider-width          = 6 # Scrollbar width.
+	GtkScrollbar::slider-width      = 6 # Scrollbar width.
+	GtkRange::trough-border         = 1 # margin inside trough (would like to set 0, but becomes square)
+	GtkRange::trough-under-steppers = 1
+
+	bg[SELECTED] = "#AAAAAA"
+
+	engine "murrine" {
+		roundness          = 2
+		contrast           = 0.0
+		prelight_shade     = 1.10 # how much to light up the scroll thumb when hovered
+		lightborder_shade  = 1.00
+		lightborderstyle   = 0
+		reliefstyle        = 0
+		highlight_shade    = 1.00
+		border_colors      = {"#AAAAAA", "#AAAAAA"}
+		trough_shades      = {1.0,1.0}
+		scrollbarstyle     = 0
+		glazestyle         = 0
+		colorize_scrollbar = TRUE
+	    glowstyle          = 1
+	    glow_shade         = 1.00
+		gradient_shades    = {1.00,1.00,1.00,1.00}
+		gradient_colors     = FALSE
+	}
+}
+widget "CardapioWindow*MainPaneBorder*Scrollbar" style:highest "cardapio-apppane-scrollbars"
+
+
