@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-15 09:43+0100\n"
+"POT-Creation-Date: 2011-03-24 22:37+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,38 +17,38 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/Cardapio.py:337
+#: src/Cardapio.py:333
 msgid "No results to show"
 msgstr ""
 
-#: src/Cardapio.py:338
+#: src/Cardapio.py:334
 #, python-format
 msgid "No results to show in \"%(category_name)s\""
 msgstr ""
 
-#: src/Cardapio.py:339
+#: src/Cardapio.py:335
 msgid "Searching..."
 msgstr ""
 
-#: src/Cardapio.py:340
+#: src/Cardapio.py:336
 msgid "Search timed out"
 msgstr ""
 
-#: src/Cardapio.py:342
+#: src/Cardapio.py:338
 #, python-format
 msgid "Do you want to run \"%(file_name)s\", or display its contents?"
 msgstr ""
 
-#: src/Cardapio.py:343
+#: src/Cardapio.py:339
 #, python-format
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr ""
 
-#: src/Cardapio.py:404
+#: src/Cardapio.py:400
 msgid "Application menu"
 msgstr ""
 
-#: src/Cardapio.py:405 src/Cardapio.py:416 src/Cardapio.py:427
+#: src/Cardapio.py:401 src/Cardapio.py:412 src/Cardapio.py:423
 #: src/plugins/google.py:20 src/plugins/google_localized.py:20
 #: src/plugins/tracker.py:20 src/plugins/tracker_fts.py:20
 #: src/plugins/zeitgeist_categorized.py:20 src/plugins/zeitgeist_simple.py:20
@@ -56,160 +56,160 @@ msgstr ""
 msgid "Cardapio Team"
 msgstr ""
 
-#: src/Cardapio.py:406
+#: src/Cardapio.py:402
 msgid "Displays installed applications"
 msgstr ""
 
-#: src/Cardapio.py:415
+#: src/Cardapio.py:411
 msgid "Places menu"
 msgstr ""
 
-#: src/Cardapio.py:417
+#: src/Cardapio.py:413
 msgid "Displays a list of folders"
 msgstr ""
 
-#: src/Cardapio.py:420
+#: src/Cardapio.py:416
 msgid "Places"
 msgstr ""
 
-#: src/Cardapio.py:421
+#: src/Cardapio.py:417
 msgid "Access documents and folders"
 msgstr ""
 
-#: src/Cardapio.py:426 src/Cardapio.py:431
+#: src/Cardapio.py:422 src/Cardapio.py:427
 msgid "Pinned items"
 msgstr ""
 
-#: src/Cardapio.py:428
+#: src/Cardapio.py:424
 msgid "Displays the items that you marked as \"pinned\" using the context menu"
 msgstr ""
 
-#: src/Cardapio.py:432
+#: src/Cardapio.py:428
 msgid "Your favorite items"
 msgstr ""
 
-#: src/Cardapio.py:776
+#: src/Cardapio.py:787
 msgid "All"
 msgstr ""
 
-#: src/Cardapio.py:776
+#: src/Cardapio.py:787
 msgid "Show all categories"
 msgstr ""
 
-#: src/Cardapio.py:1252
+#: src/Cardapio.py:1271
 msgid "Filesystem Root"
 msgstr ""
 
-#: src/Cardapio.py:1276 src/plugins/amazon.py:278 src/plugins/bing.py:151
+#: src/Cardapio.py:1295 src/plugins/amazon.py:278 src/plugins/bing.py:151
 #: src/plugins/ebay.py:245 src/plugins/ebay.py:261 src/plugins/google.py:85
 #: src/plugins/google_localized.py:89 src/plugins/tracker.py:72
 #: src/plugins/tracker_fts.py:71 src/plugins/yahoo.py:171
-#: src/plugins/you_tube.py:158 src/plugins/zeitgeist_categorized.py:97
-#: src/plugins/zeitgeist_simple.py:93 src/plugins/zeitgeist_smart.py:108
+#: src/plugins/you_tube.py:158 src/plugins/zeitgeist_categorized.py:94
+#: src/plugins/zeitgeist_simple.py:93 src/plugins/zeitgeist_smart.py:105
 msgid "Show additional results"
 msgstr ""
 
-#: src/Cardapio.py:1276
+#: src/Cardapio.py:1295
 msgid "Show additional search results in a file browser"
 msgstr ""
 
-#: src/Cardapio.py:1987 src/Cardapio.py:2344
+#: src/Cardapio.py:2015 src/Cardapio.py:2373
 msgid "Uncategorized"
 msgstr ""
 
-#: src/Cardapio.py:1987
+#: src/Cardapio.py:2015
 msgid "Other configuration tools"
 msgstr ""
 
-#: src/Cardapio.py:2040
+#: src/Cardapio.py:2066
 msgid "Network"
 msgstr ""
 
-#: src/Cardapio.py:2040
+#: src/Cardapio.py:2066
 msgid "Browse the contents of the network"
 msgstr ""
 
-#: src/Cardapio.py:2044
+#: src/Cardapio.py:2070
 msgid "Connect to Server"
 msgstr ""
 
-#: src/Cardapio.py:2044
+#: src/Cardapio.py:2070
 msgid "Connect to a remote computer or shared disk"
 msgstr ""
 
-#: src/Cardapio.py:2046
+#: src/Cardapio.py:2072
 msgid "Trash"
 msgstr ""
 
-#: src/Cardapio.py:2046
+#: src/Cardapio.py:2072
 msgid "Open the trash"
 msgstr ""
 
-#: src/Cardapio.py:2060
+#: src/Cardapio.py:2086
 msgid "Home"
 msgstr ""
 
-#: src/Cardapio.py:2060
+#: src/Cardapio.py:2086
 msgid "Open your personal folder"
 msgstr ""
 
-#: src/Cardapio.py:2076
+#: src/Cardapio.py:2102
 msgid "Desktop"
 msgstr ""
 
-#: src/Cardapio.py:2229
+#: src/Cardapio.py:2255
 msgid "Lock Screen"
 msgstr ""
 
-#: src/Cardapio.py:2230
+#: src/Cardapio.py:2256
 msgid "Protect your computer from unauthorized use"
 msgstr ""
 
-#: src/Cardapio.py:2236
+#: src/Cardapio.py:2262
 msgid "Log Out..."
 msgstr ""
 
-#: src/Cardapio.py:2237
+#: src/Cardapio.py:2263
 msgid "Log out of this session to log in as a different user"
 msgstr ""
 
-#: src/Cardapio.py:2243
+#: src/Cardapio.py:2269
 msgid "Shut Down..."
 msgstr ""
 
-#: src/Cardapio.py:2244
+#: src/Cardapio.py:2270
 msgid "Shut down the system"
 msgstr ""
 
-#: src/Cardapio.py:2324
+#: src/Cardapio.py:2353
 msgid "Folder Contents"
 msgstr ""
 
-#: src/Cardapio.py:2324
+#: src/Cardapio.py:2353
 msgid "Look inside folders"
 msgstr ""
 
-#: src/Cardapio.py:2332
+#: src/Cardapio.py:2361
 msgid "Side Pane"
 msgstr ""
 
-#: src/Cardapio.py:2332
+#: src/Cardapio.py:2361
 msgid "Items pinned to the side pane"
 msgstr ""
 
-#: src/Cardapio.py:2344
+#: src/Cardapio.py:2373
 msgid "Items that are not under any menu category"
 msgstr ""
 
-#: src/Cardapio.py:2345
+#: src/Cardapio.py:2374
 msgid "Session"
 msgstr ""
 
-#: src/Cardapio.py:2346
+#: src/Cardapio.py:2375
 msgid "System"
 msgstr ""
 
-#: src/CardapioGtkView.py:123 src/gnomepanel/CardapioGnomeApplet.py:78
+#: src/CardapioGtkView.py:126 src/gnomepanel/CardapioGnomeApplet.py:78
 #, python-format
 msgid "_About %(distro_name)s"
 msgstr ""
@@ -413,7 +413,7 @@ msgstr ""
 msgid "Your online Pidgin buddies"
 msgstr ""
 
-#: src/plugins/pidgin.py:171
+#: src/plugins/pidgin.py:175
 msgid "Talk to this buddy"
 msgstr ""
 
@@ -475,23 +475,23 @@ msgstr ""
 msgid "Your Tomboy notes"
 msgstr ""
 
-#: src/plugins/tomboy.py:131
+#: src/plugins/tomboy.py:135
 msgid "Create this note"
 msgstr ""
 
-#: src/plugins/tomboy.py:132
+#: src/plugins/tomboy.py:136
 msgid "Create a new note with this title in Tomboy"
 msgstr ""
 
-#: src/plugins/tomboy.py:142
+#: src/plugins/tomboy.py:146
 msgid "Show additional notes"
 msgstr ""
 
-#: src/plugins/tomboy.py:143
+#: src/plugins/tomboy.py:147
 msgid "Show additional notes in Tomboy"
 msgstr ""
 
-#: src/plugins/tomboy.py:222
+#: src/plugins/tomboy.py:226
 msgid "Open this note"
 msgstr ""
 
@@ -704,8 +704,8 @@ msgstr ""
 msgid "All other files"
 msgstr ""
 
-#: src/plugins/zeitgeist_categorized.py:98 src/plugins/zeitgeist_simple.py:94
-#: src/plugins/zeitgeist_smart.py:109
+#: src/plugins/zeitgeist_categorized.py:95 src/plugins/zeitgeist_simple.py:94
+#: src/plugins/zeitgeist_smart.py:106
 msgid "Show additional search results in Sezen"
 msgstr ""
 
