@@ -135,7 +135,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.173'
+	version = '0.9.174'
 
 	core_plugins = [
 			'applications',
@@ -191,7 +191,6 @@ class Cardapio(dbus.service.Object):
 		self.reset_model()
 		self.visible                       = False
 		self.no_results_to_show            = False
-		self.opened_last_app_in_background = False
 		self.keybinding                    = None
 		self.reset_search_timer            = None
 		self.must_rebuild                  = False
@@ -976,12 +975,6 @@ class Cardapio(dbus.service.Object):
 
 		# If the last app was opened in the background, make sure Cardapio
 		# doesn't hide when the app gets focused
-
-		if self.opened_last_app_in_background:
-
-			self.opened_last_app_in_background = False
-			self.show_main_window_on_best_screen()
-			return
 
 		self.hide()
 
@@ -1917,8 +1910,6 @@ class Cardapio(dbus.service.Object):
 		self.visible = True
 		self.last_visibility_toggle = time()
 
-		self.opened_last_app_in_background = False
-
 
 	def show_main_window_on_best_screen(self):
 		"""
@@ -2820,8 +2811,6 @@ class Cardapio(dbus.service.Object):
 
 		command = app_info['command']
 		command_type = app_info['type']
-
-		self.opened_last_app_in_background = not hide
 
 		if command_type == 'app':
 			self.launch_desktop(command, hide)

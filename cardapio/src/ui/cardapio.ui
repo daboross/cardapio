@@ -824,7 +824,7 @@ This menu will be updated momentarily, so as not to interrupt your browsing.</pr
     <property name="border_width">5</property>
     <property name="type_hint">normal</property>
     <property name="program_name">Cardapio</property>
-    <property name="version">0.9.173</property>
+    <property name="version">0.9.174</property>
     <property name="website">http://launchpad.net/cardapio</property>
     <property name="website_label" translatable="yes">Cardapio Website</property>
     <property name="license" translatable="yes">GNU General Public License v3
