@@ -1160,6 +1160,11 @@ class CardapioGtkView(CardapioViewInterface):
 		y = int(event.y_root)
 
 		self.block_focus_out_event()
+
+		# ungrab keyboard events (these were grabbed in block_focus_out_event(),
+		# above) which cause resize to fail
+		gtk.gdk.keyboard_ungrab(0)
+
 		self.main_window.window.begin_resize_drag(edge, event.button, x, y, event.time)
 
 
