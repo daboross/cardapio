@@ -472,7 +472,6 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		if not self.focus_out_blocked:
-			gtk.gdk.keyboard_grab(self.main_window.window, True)
 			self.main_window.handler_block_by_func(self.on_mainwindow_focus_out)
 			self.main_window.handler_block_by_func(self.on_mainwindow_cursor_leave)
 			self.focus_out_blocked = True
@@ -484,7 +483,6 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		if self.focus_out_blocked:
-			gtk.gdk.keyboard_ungrab(0)
 			self.main_window.handler_unblock_by_func(self.on_mainwindow_focus_out)
 			self.main_window.handler_unblock_by_func(self.on_mainwindow_cursor_leave)
 			self.focus_out_blocked = False
@@ -555,6 +553,9 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 		Show context menu for app buttons
 		"""
+
+		# no need to ungrab/regrab keyboard focus here, since this is already
+		# handled in on_mainwindow_button_pressed()
 
 		time = gtk.get_current_event().time
 		self.app_context_menu.popup(None, None, None, 3, time)
