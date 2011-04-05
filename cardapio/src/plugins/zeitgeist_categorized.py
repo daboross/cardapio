@@ -74,7 +74,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		bus = dbus.SessionBus()
 
 		if bus.request_name('org.freedesktop.Tracker1') != dbus.bus.REQUEST_NAME_REPLY_IN_QUEUE:
-			self.c.write_to_log(self, 'Could not find Zeitgeist full-text-search', is_error = True)
+			self.c.write_to_log(self, 'Could not find Tracker, which is required for Zeitgeist full-text-search', is_error = True)
 			return 
 
 		try:
