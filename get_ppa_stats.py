@@ -4,7 +4,7 @@ from launchpadlib.launchpad import Launchpad
 PPAOWNER = "cardapio-team" # the launchpad PPA owener. It's usually the first part of a PPA. Example: in "webupd8team/vlmc", the owner is "webupd8team".
 PPA = "unstable"           # the PPA to get stats for. It's the second part of a PPA. Example: in "webupd8team/vlmc", the PPA is "vlmc"
 
-dists = ['maverick', 'lucid']
+dists = ['natty', 'maverick', 'lucid']
 archs = ['i386', 'amd64']
 
 url = r'https://api.edge.launchpad.net/devel/ubuntu/%s/%s'
