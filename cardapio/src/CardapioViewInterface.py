@@ -305,9 +305,9 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
-	def get_first_visible_app(self):
+	def get_nth_visible_app(self, n):
 		"""
-		Returns the app_info for the first app in the right pane, if any.
+		Returns the app_info for the nth app in the right pane, if any.
 		"""
 		raise NotImplementedError("You must implement this method!")
 

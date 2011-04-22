@@ -728,7 +728,9 @@ class CardapioGtkView(CardapioViewInterface):
 		w = self.main_window.get_focus()
 
 		if w != self.search_entry and w == self.previously_focused_widget:
+
 			if event.is_modifier: return
+			if self.handle_if_key_combo(event): return
 
 			self.main_window.set_focus(self.search_entry)
 			self.search_entry.set_position(len(self.search_entry.get_text()))
@@ -737,6 +739,21 @@ class CardapioGtkView(CardapioViewInterface):
 
 		else:
 			self.previously_focused_widget = None
+
+
+	def handle_if_key_combo(self, event):
+		"""
+		If the event describes a key combo (a regular key plus Alt or Ctrl),
+		this method tells the model to process the combo, and returns True.
+		Otherwise, returns False.
+		"""
+
+		if event.state & gtk.gdk.MOD1_MASK: 
+			if 48 <= event.keyval <= 57: 
+				self.cardapio.handle_special_key_pressed(key = event.keyval - 48, alt = True)
+				return True
+
+		return False
 
 
 	def on_mainwindow_key_pressed(self, widget, event):
@@ -843,9 +860,9 @@ class CardapioGtkView(CardapioViewInterface):
 		return (len(self.search_entry.get_text().strip()) == 0)
 
 
-	def get_first_visible_app_widget(self):
+	def get_nth_visible_app_widget(self, n = 1):
 		"""
-		Returns the first app in the right pane, if any.
+		Returns the nth app in the right pane, if any.
 		"""
 
 		for section in self.APPLICATION_PANE.get_children():
@@ -858,7 +875,8 @@ class CardapioGtkView(CardapioViewInterface):
 				if not child.get_visible(): continue
 				if type(child) != gtk.Button: continue
 
-				return child
+				n = n - 1
+				if n == 0: return child
 
 		return None
 
@@ -869,17 +887,17 @@ class CardapioGtkView(CardapioViewInterface):
 		Focuses the first visible button in the app pane.
 		"""
 
-		first_app_widget = self.get_first_visible_app_widget()
+		first_app_widget = self.get_nth_visible_app_widget(1)
 		if first_app_widget is not None:
 			self.main_window.set_focus(first_app_widget)
 
 
 	# This method is required by the View API
-	def get_first_visible_app(self):
+	def get_nth_visible_app(self, n):
 		"""
-		Returns the app_info for the first app in the right pane, if any.
+		Returns the app_info for the nth app in the right pane, if any.
 		"""
-		widget = self.get_first_visible_app_widget()
+		widget = self.get_nth_visible_app_widget(n)
 		if widget is None: return None
 		return widget.app_info
 
@@ -986,6 +1004,10 @@ class CardapioGtkView(CardapioViewInterface):
 
 		elif event.keyval == gtk.gdk.keyval_from_name('Escape'):
 			self.cardapio.handle_search_entry_escape_pressed()
+
+		elif self.handle_if_key_combo(event): 
+			# this case is handled inherently by the handle_* function above
+			pass 
 
 		else: return False
 		return True

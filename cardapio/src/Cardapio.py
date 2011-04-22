@@ -1103,6 +1103,23 @@ class Cardapio(dbus.service.Object):
 		return keyword[1:], text
 
 
+	# This method is called from the View API
+	def handle_special_key_pressed(self, key, alt = False, ctrl = False):
+		"""
+		Handler for when an Alt/Ctrl combo is pressed and Cardapio is active.
+		"""
+
+		if alt:
+			if type(key) == int and 1 <= key <= 9:
+				print 'alt combo with ' + str(key)
+
+				app_info = self.view.get_nth_visible_app(key)
+
+				if app_info is not None:
+					self.launch_app(app_info, ctrl == False)
+
+
+	# This method is called from the View API
 	def handle_search_entry_changed(self):
 		"""
 		Handler for when the user types something in the search entry
@@ -1129,11 +1146,11 @@ class Cardapio(dbus.service.Object):
 		if in_subfolder_search_mode:
 
 			# MUST run these lines BEFORE disappering with all sections
-			first_app_info = self.view.get_first_visible_app()
+			first_app_info = self.view.get_nth_visible_app(1)
 
 			# TODO MVC: (about the line above ^) there should be no need for
 			# asking the view what is the first visible app (with
-			# get_first_visible_app). Instead, the model should know the top
+			# get_nth_visible_app). Instead, the model should know the top
 			# app already! Except this is not exactly that straight-forward,
 			# since it depends on the plugin ordering chosen by the user. And to
 			# further complicate matters, some plugins respond after a
@@ -1633,6 +1650,7 @@ class Cardapio(dbus.service.Object):
 				logging.error(exception)
 
 
+	# This method is called from the View API
 	def handle_search_entry_activate(self):
 		"""
 		Handler for when the user presses Enter on the search entry
@@ -1643,7 +1661,7 @@ class Cardapio(dbus.service.Object):
 			self.disappear_with_all_transitory_sections() 
 			return
 
-		app_info = self.view.get_first_visible_app()
+		app_info = self.view.get_nth_visible_app(1)
 		# TODO MVC: there should be no need for get_first_visible_app. Instead,
 		# the model should know the top app already!
 
