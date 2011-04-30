@@ -39,6 +39,7 @@ class CardapioAwnApplet(CardapioAppletInterface):
 		self.applet_press_handler = None
 		self.applet_enter_handler = None
 		self.applet_leave_handler = None
+		self.autohide_cookie      = None
 
 		self.applet.tooltip.set('Cardapio')
 
@@ -144,6 +145,16 @@ class CardapioAwnApplet(CardapioAppletInterface):
 
 	def draw_toggled_state(self, state):
 		pass
+
+
+	def disable_autohide(self, state):
+
+		if state:
+			self.autohide_cookie = self.applet.inhibit_autohide('Showing Cardapio')
+
+		elif self.autohide_cookie != None:
+			self.applet.uninhibit_autohide(self.autohide_cookie)
+			self.autohide_cookie = None
 
 
 	def _on_applet_clicked(self, widget, ignore_main_button):

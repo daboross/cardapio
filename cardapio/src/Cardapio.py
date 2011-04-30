@@ -135,7 +135,7 @@ class Cardapio(dbus.service.Object):
 	bus_name_str = 'org.varal.Cardapio'
 	bus_obj_str  = '/org/varal/Cardapio'
 
-	version = '0.9.175'
+	version = '0.9.176'
 
 	core_plugins = [
 			'applications',
@@ -1917,6 +1917,7 @@ class Cardapio(dbus.service.Object):
 			self.switch_modes(show_system_menus = False, toggle_mode_button = True)
 
 		self.applet.draw_toggled_state(True)
+		self.applet.disable_autohide(True)
 
 		self.restore_dimensions(x, y, force_anchor_right = False, force_anchor_bottom = False)
 
@@ -1951,6 +1952,7 @@ class Cardapio(dbus.service.Object):
 		if not self.visible: return
 
 		self.applet.draw_toggled_state(False)
+		self.applet.disable_autohide(False)
 
 		self.visible = False
 		self.last_visibility_toggle = time()

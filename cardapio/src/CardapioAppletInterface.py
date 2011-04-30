@@ -100,3 +100,12 @@ class CardapioAppletInterface:
 		return ((x <= mouse_x <= x + w) and (y <= mouse_y <= y + h))
 
 
+	def disable_autohide(self, state):
+		"""
+		If state is True, then this tells the applet not to autohide its panel, even
+		if Cardapio overlaps it. If False, it tells the applet that the panel can now
+		be autohidden as normal (undoes the effect of True).
+		"""
+		pass
+
+
