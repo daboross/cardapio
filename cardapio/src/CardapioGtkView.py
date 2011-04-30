@@ -1797,7 +1797,9 @@ class CardapioGtkView(CardapioViewInterface):
 			if anchor_bottom: self.main_window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
 			else: self.main_window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
 
-		if gtk.ver[0] == 2 and gtk.ver[1] <= 21 and gtk.ver[2] < 5:
+		# There has been a regression in Ubuntu 11.04, so I'm making the hack permanent. Ugh.
+		#if gtk.ver[0] == 2 and gtk.ver[1] <= 21 and gtk.ver[2] < 5:
+		if True:
 			self._move_main_window_with_gravity_hack(x, y)
 		else:
 			self.main_window.move(x, y)
