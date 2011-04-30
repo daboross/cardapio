@@ -8,7 +8,7 @@ Homepage: https://launchpad.net/cardapio
 
 Package: cardapio-docky
 Architecture: any
-Depends: cardapio (>= 0.9.157), docky
+Depends: cardapio (>= 0.9.157), docky, python-dockmanager | python-docky
 Description: Cardapio helper for Docky
  Cardapio is a launcher that can work in two modes: as a panel applet 
  (in which case it is an alternative to Gnome's application menu 
