@@ -30,7 +30,8 @@ try:
 	import subprocess
 
 except ImportError, e:
-	exit()
+	print(e)
+	exit(255)
 
 
 # note - this is duplicated in misc.py
@@ -56,7 +57,13 @@ def install_cardapio_launcher():
 
 	gconf_client = gconf.client_get_default()
 
-	new_command = which('cardapio') + ' docky-open'
+	cardapio_cmd = which('cardapio')
+
+	if cardapio_cmd == None: 
+		print "Error! Cardapio not found!"
+		exit(254)
+
+	new_command = cardapio_cmd + ' docky-open'
 	new_label   = ''
 
 	current_command = gconf_client.get_string(docky_item_gconf_root + '/DockyItemCommand')
@@ -138,7 +145,7 @@ if __name__ == "__main__":
 	mainloop = gobject.MainLoop(is_running = True)
 
 	atexit.register (cleanup)
-	signal(SIGTERM, lambda signum, stack_frame: exit(0))
+	signal(SIGTERM, lambda signum, stack_frame: exit(253))
 
 	mainloop.run()
 
