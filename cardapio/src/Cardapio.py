@@ -2074,6 +2074,8 @@ class Cardapio(dbus.service.Object):
 
 		self.add_app_button(_('Network'), 'network', section, 'xdg', 'network://', _('Browse the contents of the network'), self.app_list)
 
+		# TODO: DE-independence
+
 		connect_to_server_app_path = which('nautilus-connect-server')
 		if connect_to_server_app_path is not None:
 			self.add_app_button(_('Connect to Server'), 'network-server', section, 'raw', connect_to_server_app_path, _('Connect to a remote computer or shared disk'), self.app_list)
