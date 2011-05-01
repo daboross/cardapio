@@ -1,5 +1,5 @@
 #
-#  Cardapio is an alternative Gnome menu applet, launcher, and much more!
+#  Cardapio is an alternative menu applet, launcher, and much more!
 #
 #  Copyright (C) 2010 Cardapio Team (tvst@hotmail.com)
 #
@@ -16,13 +16,6 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-
-# TODO: fix shift-tab from first app widget
-# TODO: alt-1, ..., alt-9, alt-0 should activate 1st, ..., 9th, 10th results
-# TODO: ctrl-1, ..., ctrl-9, ctrl-0 should activate categories
-# TODO: grid view / multiple columns when window is wide enough (like gnome-control-center)
-# TODO: add "most recent" and "most frequent" with a zeitgeist plugin
-# plus other TODO's elsewhere in the code...
 
 # these imports are outside of the "try" block because it defines
 # the function fatal_error(), which is used in the "except"
@@ -887,6 +880,11 @@ class Cardapio(dbus.service.Object):
 		Opens either the "About Gnome" dialog, or the "About Ubuntu" dialog,
 		or the "About Cardapio" dialog
 		"""
+
+		# TODO: DE-independence 
+		# figure out how to discover which DE is being used. If not Gnome,
+		# remove the "About Gnome" menu item and add "About $DE". Also, what should
+		# be called for the AboutDistro if not yelp? 
 
 		if verb == 'AboutGnome':
 			self.launch_raw('gnome-about')
@@ -2261,6 +2259,8 @@ class Cardapio(dbus.service.Object):
 		Populate the Session list
 		"""
 
+		# TODO: DE-independence 
+
 		items = [
 			[
 				_('Lock Screen'),
@@ -2305,6 +2305,8 @@ class Cardapio(dbus.service.Object):
 		"""
 		Populate the Applications list by reading the Gnome menus
 		"""
+
+		# TODO: DE-independence 
 
 		self.load_menus()
 
@@ -2514,6 +2516,8 @@ class Cardapio(dbus.service.Object):
 		parent widget
 		"""
 
+		# TODO: DE-independence 
+
 		for node in tree.contents:
 
 			if isinstance(node, gmenu.Entry):
@@ -2531,6 +2535,7 @@ class Cardapio(dbus.service.Object):
 		Opens Gnome's menu editor.
 		"""
 
+		# TODO: DE-independence 
 		self.launch_raw('alacarte')
 
 
@@ -2981,6 +2986,7 @@ class Cardapio(dbus.service.Object):
 		Returns true if the libraries for launching in a terminal are installed
 		"""
 
+		# TODO: DE-independence 
 		return (gnome_execute_terminal_shell is not None)
 
 
@@ -2989,6 +2995,7 @@ class Cardapio(dbus.service.Object):
 		Run a command inside Gnome's default terminal
 		"""
 
+		# TODO: DE-independence 
 		try:
 			if self.can_launch_in_terminal():
 				gnome_execute_terminal_shell(self.home_folder_path, path)
