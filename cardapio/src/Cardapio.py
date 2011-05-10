@@ -184,6 +184,7 @@ class Cardapio(dbus.service.Object):
 		self.reset_model()
 		self.visible                       = False
 		self.no_results_to_show            = False
+		self.opened_last_app_in_background = False
 		self.keybinding                    = None
 		self.reset_search_timer            = None
 		self.must_rebuild                  = False
@@ -973,6 +974,12 @@ class Cardapio(dbus.service.Object):
 
 		# If the last app was opened in the background, make sure Cardapio
 		# doesn't hide when the app gets focused
+
+		if self.opened_last_app_in_background:
+
+			self.opened_last_app_in_background = False
+			self.show_main_window_on_best_screen()
+			return
 
 		self.hide()
 
@@ -1915,7 +1922,7 @@ class Cardapio(dbus.service.Object):
 			self.switch_modes(show_system_menus = False, toggle_mode_button = True)
 
 		self.applet.draw_toggled_state(True)
-		self.applet.disable_autohide(True)
+		#self.applet.disable_autohide(True)
 
 		self.restore_dimensions(x, y, force_anchor_right = False, force_anchor_bottom = False)
 
@@ -1926,6 +1933,8 @@ class Cardapio(dbus.service.Object):
 
 		self.visible = True
 		self.last_visibility_toggle = time()
+
+		self.opened_last_app_in_background = False
 
 
 	def show_main_window_on_best_screen(self):
@@ -1950,7 +1959,7 @@ class Cardapio(dbus.service.Object):
 		if not self.visible: return
 
 		self.applet.draw_toggled_state(False)
-		self.applet.disable_autohide(False)
+		#self.applet.disable_autohide(False)
 
 		self.visible = False
 		self.last_visibility_toggle = time()
@@ -2811,6 +2820,7 @@ class Cardapio(dbus.service.Object):
 
 		elif button == 2:
 			self.launch_app(app_info, hide = False)
+			#self.view.block_focus_out_event()
 
 		elif button == 3:
 			self.setup_app_context_menu(app_info)
@@ -2838,6 +2848,8 @@ class Cardapio(dbus.service.Object):
 
 		command = app_info['command']
 		command_type = app_info['type']
+
+		self.opened_last_app_in_background = not hide
 
 		if command_type == 'app':
 			self.launch_desktop(command, hide)

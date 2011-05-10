@@ -338,6 +338,8 @@ class CardapioGtkView(CardapioViewInterface):
 		window
 		"""
 
+		# TODO NOW: consider case where cursor is inside the APPLET too!
+
 		if not self.is_cursor_inside_window(self.main_window):
 			# since we grab keyboard/pointer focus, we want to make sure Cardapio hides
 			# when the user clicks outside its window
@@ -405,8 +407,18 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		self.show_window_on_top(self.main_window)
-		gtk.gdk.keyboard_grab(self.main_window.window)
-		gtk.gdk.pointer_grab(self.main_window.window, True, gtk.gdk.BUTTON_PRESS_MASK)
+
+		# NOTE: I would love to use keyboard_grab rather than have to keep track
+		# of opened_last_app_in_background in Cardapio.py, especially because
+		# that approach breaks with some apps like Firefox. However, using
+		# keyboard_grab introduces tons of issues itself. For instance, it
+		# blocks mouse clicks outside of Cardapio from closing the Cardapio
+		# window. It also blocks the shortcut key from being used to close
+		# Cardapio. In sum, this whole situation is a mess. And it would be
+		# great if someone could help...
+
+		#gtk.gdk.keyboard_grab(self.main_window.window)
+		#gtk.gdk.pointer_grab(self.main_window.window, True, gtk.gdk.BUTTON_PRESS_MASK)
 
 
 	# This method is required by the View API
@@ -415,9 +427,10 @@ class CardapioGtkView(CardapioViewInterface):
 		Hides Cardapio's main window
 		"""
 
-		#if self.focus_out_blocked: return
-		gtk.gdk.keyboard_ungrab(0)
-		gtk.gdk.pointer_ungrab(0)
+		# see the note in show_main_window()
+		#gtk.gdk.pointer_ungrab(0)
+		#gtk.gdk.keyboard_ungrab(0)
+
 		self.main_window.hide()
 
 
@@ -1204,10 +1217,9 @@ class CardapioGtkView(CardapioViewInterface):
 
 		self.block_focus_out_event()
 
-		# ungrab keyboard events (these were grabbed in block_focus_out_event(),
-		# above) which cause resize to fail
-		gtk.gdk.keyboard_ungrab(0)
-		gtk.gdk.pointer_ungrab(0)
+		# see the note in show_main_window()
+		#gtk.gdk.keyboard_ungrab(0)
+		#gtk.gdk.pointer_ungrab(0)
 
 		self.main_window.window.begin_resize_drag(edge, event.button, x, y, event.time)
 
