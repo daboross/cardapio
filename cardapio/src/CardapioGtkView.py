@@ -160,6 +160,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.get_widget('MarginBottom').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_SIDE))
 		self.get_widget('MarginBottomLeft').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_LEFT_CORNER))
 		self.get_widget('MarginBottomRight').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_RIGHT_CORNER))
+		self.main_window.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.ARROW))
 
 
 	def on_gtk_settings_changed(self, gobj, property_changed):
@@ -337,6 +338,12 @@ class CardapioGtkView(CardapioViewInterface):
 		window
 		"""
 
+		if not self.is_cursor_inside_window(self.main_window):
+			# since we grab keyboard/pointer focus, we want to make sure Cardapio hides
+			# when the user clicks outside its window
+			self.hide_main_window()
+			return False
+
 		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
 			self.block_focus_out_event()
 			self.context_menu.popup(None, None, None, event.button, event.time)
@@ -399,6 +406,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 		self.show_window_on_top(self.main_window)
 		gtk.gdk.keyboard_grab(self.main_window.window)
+		gtk.gdk.pointer_grab(self.main_window.window, True, gtk.gdk.BUTTON_PRESS_MASK)
 
 
 	# This method is required by the View API
@@ -409,6 +417,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 		#if self.focus_out_blocked: return
 		gtk.gdk.keyboard_ungrab(0)
+		gtk.gdk.pointer_ungrab(0)
 		self.main_window.hide()
 
 
@@ -553,9 +562,6 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 		Show context menu for app buttons
 		"""
-
-		# no need to ungrab/regrab keyboard focus here, since this is already
-		# handled in on_mainwindow_button_pressed()
 
 		time = gtk.get_current_event().time
 		self.app_context_menu.popup(None, None, None, 3, time)
@@ -775,6 +781,20 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 		mouse_x, mouse_y, dummy = gtk.gdk.get_default_root_window().get_pointer()
 		return mouse_x, mouse_y
+
+
+	def is_cursor_inside_window(self, window):
+		"""
+		Returns True if the mouse cursor is inside the given window. False
+		otherwise.
+		"""
+
+		mouse_x, mouse_y = self.get_cursor_coordinates()
+
+		x0, y0 = window.get_position()
+		w, h = list(window.get_size())
+
+		return (x0 <= mouse_x <= x0+w and y0 <= mouse_y <= y0+h)
 
 
 	# This method is required by the View API
@@ -1187,6 +1207,7 @@ class CardapioGtkView(CardapioViewInterface):
 		# ungrab keyboard events (these were grabbed in block_focus_out_event(),
 		# above) which cause resize to fail
 		gtk.gdk.keyboard_ungrab(0)
+		gtk.gdk.pointer_ungrab(0)
 
 		self.main_window.window.begin_resize_drag(edge, event.button, x, y, event.time)
 
