@@ -1,19 +1,21 @@
-Source: cardapio
+Source: cardapio-gnomepanel
 Section: gnome
 Priority: extra
 Maintainer: tvst <tvst@hotmail.com>
-Build-Depends: debhelper (>= 7), python-support (>= 0.6), cdbs (>= 0.4.49), python-dev
-Recommends: tracker (>= 0.9.0)
+Build-Depends: debhelper (>= 7), cdbs (>= 0.4.49)
 Standards-Version: 3.8.3
 Homepage: https://launchpad.net/cardapio
 
-Package: cardapio
+Package: cardapio-gnomepanel
 Architecture: any
-Depends: cardapio-gnomeapplet | cardapio-awn | cardapio-docky, ${shlibs:Depends}, ${misc:Depends}, python-gtk2 (>= 2.17), python-tk, python-gmenu, python-keybinder, xdg-user-dirs, xdg-user-dirs-gtk
-Description: An alternative Gnome menu, launcher, and much more!
+Depends: cardapio, gnome-panel, python-gnomepanel
+Description: Cardapio applet for Gnome Panel
  Cardapio is a launcher that can work in two modes: as a panel applet 
  (in which case it is an alternative to Gnome's application menu 
  applet) or as a launcher (in which case it is a lightweight 
  alternative to Gnome Do). Either way, it features a beautiful, 
  well-thought-out interface, supports tracker searching, and much more. 
- Give it a try today!
+ Give it a try today! 
+ .
+ This package installs a panel applet that lets you easily add Cardapio to your
+ Gnome panel.
