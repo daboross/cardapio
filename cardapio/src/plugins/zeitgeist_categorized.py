@@ -73,19 +73,20 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		bus = dbus.SessionBus()
 
-		if bus.request_name('org.freedesktop.Tracker1') != dbus.bus.REQUEST_NAME_REPLY_IN_QUEUE:
-			self.c.write_to_log(self, 'Could not find Tracker, which is required for Zeitgeist full-text-search', is_error = True)
-			return 
+		self.fts = None
 
-		try:
-			fts_object = bus.get_object('org.gnome.zeitgeist.Engine', '/org/gnome/zeitgeist/index/activity')
-			self.fts = dbus.Interface(fts_object, 'org.gnome.zeitgeist.Index')
-		except Exception, exception:
-			self.c.write_to_log(self, 'Could not connect to Zeitgeist full-text-search', is_error = True)
-			self.c.write_to_log(self, exception, is_error = True)
-			return 
+		if bus.request_name('org.freedesktop.Tracker1') != dbus.bus.REQUEST_NAME_REPLY_IN_QUEUE:
+			self.c.write_to_log(self, 'Could not find Tracker, which is required for Zeitgeist full-text-search', is_warning = True)
+
+			try:
+				fts_object = bus.get_object('org.gnome.zeitgeist.Engine', '/org/gnome/zeitgeist/index/activity')
+				self.fts = dbus.Interface(fts_object, 'org.gnome.zeitgeist.Index')
+			except Exception, exception:
+				self.c.write_to_log(self, 'Could not connect to Zeitgeist full-text-search', is_warning = True)
+				self.c.write_to_log(self, exception, is_warning = True)
 
 		self.have_sezen = which('sezen')
+
 		if not self.have_sezen:
 			self.c.write_to_log(self, 'Sezen not found, so you will not see the "Show additional results" button.', is_warning = True)
 

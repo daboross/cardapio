@@ -24,7 +24,6 @@ import sys
 try:
 	from Cardapio import Cardapio
 
-	import os
 	import gtk
 	import dbus
 	from dbus.mainloop.glib import DBusGMainLoop
@@ -34,13 +33,9 @@ except Exception, exception:
 	sys.exit(1)
 
 # main
-DBusGMainLoop(set_as_default=True)
+DBusGMainLoop(set_as_default = True)
 bus = dbus.SessionBus()
 bus_request_name = bus.request_name(Cardapio.bus_name_str)
-
-# make sure Cardapio shows even if using Ubuntu's AppMenu
-os.environ['UBUNTU_MENUPROXY'] = ''
-
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -55,8 +50,12 @@ def start_cardapio(show):
 
 def cardapio_run_in_window():
 
+	import os
 	import gnomeapplet
 	from gnomepanel.CardapioGnomeAppletFactory import CardapioGnomeAppletFactory
+
+	# make sure Cardapio shows even if using Ubuntu's AppMenu
+	os.environ['UBUNTU_MENUPROXY'] = ''
 
 	# open new Cardapio instance
 	main_window = gtk.Window(gtk.WINDOW_TOPLEVEL)
@@ -141,6 +140,16 @@ if len(sys.argv) == 2:
 
 	elif sys.argv[1] == 'docky-open':
 		cardapio_show_near_docky()
+
+	elif sys.argv[1] == '--help':
+		print('Usage: cardapio [option]')
+		print('Options:')
+		print('  show             - Show Cardapio centered. This is the default behavior.')
+		print('  show-near-mouse  - Show Cardapio close to the mouse pointer.')
+		print('  hidden           - Load Cardapio but do not show it yet.')
+		#print('  options          - Show Cardapio\'s preferences window')
+		print('  run-in-window    - Used for debugging the Gnome Panel applet.')
+		print('If Cardapio is already loaded, both "show" and "show-near-mouse" simply show the existing instance. That is, they do not load a new Cardapio instance.')
 
 else:
 	cardapio_show(centered = True)
