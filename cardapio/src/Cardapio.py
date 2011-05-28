@@ -898,6 +898,7 @@ class Cardapio(dbus.service.Object):
 
 
 	# This method is called from the View API
+	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
 	def open_options_dialog(self):
 		"""
 		Show the Options Dialog and populate its widgets with values from the

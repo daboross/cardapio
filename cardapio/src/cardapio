@@ -81,10 +81,10 @@ def cardapio_show(centered = False):
 
 	if centered:
 		position = Cardapio.SHOW_CENTERED
-		dbus_method = 'show_hide'
+		dbus_method_name = 'show_hide'
 	else:
 		position = Cardapio.SHOW_NEAR_MOUSE
-		dbus_method = 'show_hide_near_mouse'
+		dbus_method_name = 'show_hide_near_mouse'
 
 	# if there's no other instance - start Cardapio
 	if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
@@ -92,8 +92,21 @@ def cardapio_show(centered = False):
 
 	# if there is - "show / hide" it
 	else:
-		show_hide = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method(dbus_method)
-		show_hide()
+		dbus_method = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method(dbus_method_name)
+		dbus_method()
+
+
+def cardapio_open_options_dialog():
+
+	# if there's no other instance, quit
+	if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
+		print('Cardapio is not running. Aborting...')
+		sys.exit(2)
+
+	# if there is, show its options dialog
+	dbus_method_name = 'open_options_dialog'
+	dbus_method = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method(dbus_method_name)
+	dbus_method()
 
 
 def cardapio_show_near_docky():
@@ -111,8 +124,9 @@ def cardapio_show_near_docky():
 
 			x, y, force_anchor_right, force_anchor_bottom = settings_helper.get_best_position(dock_num)
 
-			show_hide_near_point = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method('show_hide_near_point')
-			show_hide_near_point(x, y, force_anchor_right, force_anchor_bottom)
+			dbus_method_name = 'show_hide_near_point'
+			dbus_method = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method(dbus_method_name)
+			dbus_method(x, y, force_anchor_right, force_anchor_bottom)
 
 		except MainDockError, exception:
 			fatal_error('Cardapio error!', "Couldn't find the main dock of Docky! " + str(exception))
@@ -141,13 +155,16 @@ if len(sys.argv) == 2:
 	elif sys.argv[1] == 'docky-open':
 		cardapio_show_near_docky()
 
+	elif sys.argv[1] == 'options':
+		cardapio_open_options_dialog()
+
 	elif sys.argv[1] == '--help':
 		print('Usage: cardapio [option]')
 		print('Options:')
 		print('  show             - Show Cardapio centered. This is the default behavior.')
 		print('  show-near-mouse  - Show Cardapio close to the mouse pointer.')
 		print('  hidden           - Load Cardapio but do not show it yet.')
-		#print('  options          - Show Cardapio\'s preferences window')
+		print('  options          - Show Cardapio\'s preferences window')
 		print('  run-in-window    - Used for debugging the Gnome Panel applet.')
 		print('If Cardapio is already loaded, both "show" and "show-near-mouse" simply show the existing instance. That is, they do not load a new Cardapio instance.')
 
