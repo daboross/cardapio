@@ -98,6 +98,8 @@ uninstall: uninstall_docky_helper
 
 install_docky_helper:
 	if test -d $(PREFIX)/share/dockmanager; then \
+		mkdir -p $(PREFIX)/share/dockmanager/metadata; \
+		mkdir -p $(PREFIX)/share/dockmanager/scripts; \
 		cp -f src/docky/cardapio_helper.py.info $(PREFIX)/share/dockmanager/metadata/; \
 		cp -f src/docky/cardapio_helper.py $(PREFIX)/share/dockmanager/scripts/; \
 		chmod +x $(PREFIX)/share/dockmanager/scripts/cardapio_helper.py; \
