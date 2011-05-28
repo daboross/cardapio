@@ -1,0 +1,661 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cardapio\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2011-03-24 22:37+0100\n"
+"PO-Revision-Date: 2011-04-20 14:25+0000\n"
+"Last-Translator: Robert Roth <evfool@gmail.com>\n"
+"Language-Team: Hungarian <hu@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
+"X-Generator: Launchpad (build 12981)\n"
+
+msgid "\"%(file_name)s\" is an executable text file."
+msgstr "„%(file_name)s” egy végrehajtható szöveges fájl"
+
+msgid "<b>Appearance</b>"
+msgstr "<b>Megjelenés</b>"
+
+msgid "<b>Behavior</b>"
+msgstr "<b>Viselkedés</b>"
+
+msgid ""
+"<b>Plugin:</b> %(name)s %(version)s\n"
+"<b>Author:</b> %(author)s\n"
+"<b>Description:</b> %(description)s"
+msgstr ""
+"<b>Bővítmény:</b> %(name)s %(version)s\n"
+"<b>Szerző:</b> %(author)s\n"
+"<b>Leírás:</b> %(description)s"
+
+msgid "A menu with search capabilities."
+msgstr "Egy menü keresési lehetőségekkel."
+
+msgid "Access applications, folders, system settings, etc."
+msgstr "Alkalmazások, mappák és rendszerbeállítások elérése"
+
+msgid "Access documents and folders"
+msgstr "Dokumentumok és mappák elérése"
+
+msgid "All"
+msgstr "Minden"
+
+msgid "Amazon"
+msgstr "Amazon"
+
+msgid "Amazon Results"
+msgstr "Amazon találatok"
+
+msgid "Applet"
+msgstr "Kisalkalmazás"
+
+msgid "Application menu"
+msgstr "Alkalmazás menü"
+
+msgid "Available Software"
+msgstr "Elérhető szoftverek"
+
+msgid "Bing"
+msgstr "Bing"
+
+msgid "Bing Results"
+msgstr "Bing találatok"
+
+msgid "Browse the contents of the network"
+msgstr "A hálózat tartalmának tallózása"
+
+msgid "Cardapio"
+msgstr "Cardapio"
+
+msgid "Cardapio Properties"
+msgstr "Cardapio tulajdonságok"
+
+msgid "Cardapio Team"
+msgstr "Cardapio csoport"
+
+msgid "Cardapio Website"
+msgstr "Cardapio weboldala"
+
+msgid ""
+"Chrome bookmark:\n"
+"%s"
+msgstr ""
+"Chrome könyvjelző:\n"
+"%s"
+
+msgid ""
+"Chromium bookmark:\n"
+"%s"
+msgstr ""
+"Chromium könyvjelző:\n"
+"%s"
+
+msgid "Command Launcher"
+msgstr "Parancsindító"
+
+msgid "Connect to Server"
+msgstr "Kapcsolódás kiszolgálóhoz"
+
+msgid "Connect to a remote computer or shared disk"
+msgstr "Kapcsolódás távoli számítógéphez vagy megosztott lemezhez"
+
+msgid "Create a new note with this title in Tomboy"
+msgstr "Jegyzet létrehozása Tomboyban ezzel a címmel"
+
+msgid "Create this note"
+msgstr "Jegyzet létrehozása"
+
+msgid "Description:"
+msgstr "Leírás:"
+
+msgid "Desktop"
+msgstr "Asztal"
+
+msgid "Displays a list of folders"
+msgstr "Mappalista megjelenítése"
+
+msgid "Displays installed applications"
+msgstr "Telepített alkalmazások megjelenítése"
+
+msgid "Displays the items that you marked as \"pinned\" using the context menu"
+msgstr "Megjeleníti a rögzített elemeket a helyi menüben"
+
+msgid "Do you want to run \"%(file_name)s\", or display its contents?"
+msgstr ""
+"Kívánja futtatni a \"%(file_name)s\" fájlt, vagy megjeleníti a tartalmát?"
+
+msgid "Drag to reorder plugins"
+msgstr "Fogja a bővítmények átrendezéséhez"
+
+msgid "Edit Menus"
+msgstr "Menük szerkesztése"
+
+msgid "Execute '%s' As Root"
+msgstr "'%s' végrehajtása rendszergazdaként"
+
+msgid "Execute '%s' In Terminal"
+msgstr "'%s' végrehajtása terminálban"
+
+msgid "Execute the command '%s' inside a new terminal window"
+msgstr "'%s' végrehajtása új terminálablakban"
+
+msgid "Execute the command '%s' with administrative rights"
+msgstr "'%s' végrehajtása adminisztrátori jogokkal"
+
+msgid "File search"
+msgstr "Fájlkeresés"
+
+msgid "Files that you have used recently"
+msgstr "Fájlok, melyeket az utóbbi időben használt"
+
+msgid "Filesystem Root"
+msgstr "Gyökérfájlrendszer"
+
+msgid "Firefox Bookmarks"
+msgstr "Firefox könyvjelzők"
+
+msgid ""
+"Firefox bookmark:\n"
+"%s"
+msgstr ""
+"Firefox könyvjelző:\n"
+"%s"
+
+msgid "Folder Contents"
+msgstr "Könyvtár tartalma"
+
+msgid "Full-text file search"
+msgstr "Teljes szöveges fájlkereső"
+
+msgid ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+msgstr ""
+"GNU Általános Nyilvános Licenc v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+
+msgid "General"
+msgstr "Általános"
+
+msgid "Get help with %(distro_name)s"
+msgstr "Segítség a(z) %(distro_name)shoz"
+
+msgid "Go To \"%s\""
+msgstr "\"%s\" megnyitása"
+
+msgid "Go To \"%s\" in Chromium"
+msgstr "\"%s\" megnyitása Chromiummal"
+
+msgid "Go To \"%s\" in Firefox"
+msgstr "\"%s\" megnyitása Firefoxszal"
+
+msgid "Go To \"%s\" in Google Chrome"
+msgstr "\"%s\" megnyitása Google Chrome-al"
+
+msgid "Google"
+msgstr "Google"
+
+msgid "Google localized results"
+msgstr "Google helyi találatok"
+
+msgid "Grab new shortcut"
+msgstr "Új gyorsbillentyű felvétele"
+
+msgid "Help and Support"
+msgstr "Súgó és támogatás"
+
+msgid "Home"
+msgstr "Saját mappa"
+
+msgid "Icon:"
+msgstr "Ikon:"
+
+msgid "Install this package without opening the Software Center"
+msgstr "Csomag telepítése a Szoftverközpont megnyitása nélkül"
+
+msgid "Items found on eBay"
+msgstr "Találatok az eBay-en"
+
+msgid "Items pinned to the side pane"
+msgstr "Az oldalsávra rögzített elemek"
+
+msgid "Items that are not under any menu category"
+msgstr "Elemek, melyek egyik menükategóriába sem tartoznak"
+
+msgid "Keep search results when Cardapio is hidden"
+msgstr "Keresési találatok megtartása, amikor a Cardapio rejtve van"
+
+msgid "Label:"
+msgstr "Címke:"
+
+msgid ""
+"Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-"
+"Click)"
+msgstr ""
+"Indítás a Cardapio elrejtése nélkül (ugyanaz, mint a középső egérgombbal "
+"vagy a CTRL-lal való kattintás)"
+
+msgid ""
+"Lets you choose from thousands of free applications available for Ubuntu"
+msgstr "Válogasson az Ubuntuhoz elérhető több ezer ingyenes alkalmazás közül"
+
+msgid "Local Results"
+msgstr "Helyi találatok"
+
+msgid "Localized Web Results"
+msgstr "Helyi webes találatok"
+
+msgid "Lock Screen"
+msgstr "Képernyő zárolása"
+
+msgid "Log Out..."
+msgstr "Kijelentkezés…"
+
+msgid "Log out of this session to log in as a different user"
+msgstr "Kijelentkezés a munkamenetből, más felhasználóként való belépéshez"
+
+msgid "Look inside folders"
+msgstr "Mappák tartalmának megjelenítése"
+
+msgid "Menu"
+msgstr "Menü"
+
+msgid "Network"
+msgstr "Hálózat"
+
+msgid "No results to show"
+msgstr "Nincsenek megjeleníthető találatok"
+
+msgid "No results to show in \"%(category_name)s\""
+msgstr "Nincsenek megjeleníthető találatok a „%(category_name)s” kategóriában"
+
+msgid "Open Parent _Folder"
+msgstr "_Szülőmappa megnyitása"
+
+msgid "Open Software Center"
+msgstr "Szoftverközpont megnyitása"
+
+msgid "Open categories when cursor hovers them"
+msgstr "Kategóriák megnyitása egérkurzor fölévitelre"
+
+msgid "Open in Chromium"
+msgstr "Megnyitás Chromiummal"
+
+msgid "Open in Firefox"
+msgstr "Megnyitás Firefoxszal"
+
+msgid "Open in Google Chrome"
+msgstr "Megnyitás Google Chrome-al"
+
+msgid "Open menu when cursor hovers the applet"
+msgstr "Menü megnyitása, amikor az egérkurzor a kisalkalmazás fölé ér"
+
+msgid "Open the trash"
+msgstr "A Kuka megnyitása"
+
+msgid "Open this item's parent folder in the file browser"
+msgstr "Ezen elem szülőmappájának megnyitása a fájlböngészőben"
+
+msgid "Open this note"
+msgstr "Jegyzet megnyitása"
+
+msgid "Open your personal folder"
+msgstr "A személyes mappájának megnyitása"
+
+msgid "Other configuration tools"
+msgstr "Egyéb beállítások"
+
+msgid "Pages bookmarked in Firefox, Chrome, or Chromium"
+msgstr "Firefox, Chrome vagy Chromium könyvjelzők"
+
+msgid "Peek _Inside Folder"
+msgstr "_Tartalom megtekintése"
+
+msgid "Perform a search using Microsoft's Bing"
+msgstr "Keresés a Microsoft Bing keresőjével"
+
+msgid "Perform a search using Yahoo"
+msgstr "Keresés a Yahoo keresőjével"
+
+msgid ""
+"Perform quick Google searches <b>limited to</b> the system's default language"
+msgstr ""
+"Gyors Google kereséseket tesz lehetővé a <b>rendszer alapértelmezett "
+"nyelvére korlátozva</b>"
+
+msgid "Perform quick Google searches in <b>all</b> languages"
+msgstr "Gyors Google kereséseket tesz lehetővé <b>minden</b> nyelven"
+
+msgid "Pidgin"
+msgstr "Pidgin"
+
+msgid "Pidgin Buddies"
+msgstr "Pidgin partnerek"
+
+msgid "Pinned items"
+msgstr "Rögzített elemek"
+
+msgid "Place this item in the side pane"
+msgstr "Elem elhelyezése az oldalsávra"
+
+msgid "Place this item into the \"Pinned Items\" list"
+msgstr "Elem elhelyezése a „Rögzített elemek” listában"
+
+msgid "Places"
+msgstr "Helyek"
+
+msgid "Places menu"
+msgstr "Helyek menü"
+
+msgid "Plugins"
+msgstr "Bővítmények"
+
+msgid "Protect your computer from unauthorized use"
+msgstr "A jogosulatlan hozzáféréstől védi a számítógépét"
+
+msgid "Recent Documents"
+msgstr "Legutóbbi dokumentumok"
+
+msgid "Recording..."
+msgstr "Felvétel..."
+
+msgid "Reduce the size of Cardapio's main window"
+msgstr "Cardapio ablakméretének csökkentése"
+
+msgid "Remove this item from the \"Pinned Items\" list"
+msgstr "Elem eltávolítása a „Rögzített elemek” listából"
+
+msgid "Remove this item from the side pane"
+msgstr "Elem eltávolítása az oldalsávról"
+
+msgid "Results found in Amazon"
+msgstr "Találatok az Amazonon"
+
+msgid "Results found in Wikipedia"
+msgstr "Találatok a Wikipédián"
+
+msgid "Results found in YouTube"
+msgstr "A YouTube-al kapott eredmények"
+
+msgid "Results found in your computer"
+msgstr "Találatok a számítógépen"
+
+msgid "Results found inside the files in your computer"
+msgstr "Fájlon belüli találatok a számítógépen"
+
+msgid "Results found using Bing"
+msgstr "A Binggel kapott eredmények"
+
+msgid "Results found using Yahoo"
+msgstr "A Yahooval kapott eredmények"
+
+msgid "Results found with Google"
+msgstr "Google keresési találatok"
+
+msgid "Results found with Google in you system language"
+msgstr "Google találatok a rendszer nyelve szerint"
+
+msgid "Results within files"
+msgstr "Fájlon belüli találatok"
+
+msgid "Run Command"
+msgstr "Parancs végrehajtása"
+
+msgid "Run commands from the search box"
+msgstr "Parancsok indítása a keresőből"
+
+msgid "Run in _Terminal"
+msgstr "Futtatás _terminálban"
+
+msgid "Run system commands, just like in the command-line"
+msgstr "Parancsok végrehajtása, hasonlóan a parancssorhoz"
+
+msgid "Safely eject this mount"
+msgstr "Meghajtó biztonságos leválasztása"
+
+msgid "Search"
+msgstr "Keresés"
+
+msgid "Search <b>inside</b> local files and folders indexed with Tracker"
+msgstr ""
+"Keresés a Tracker által indexelt helyi fájlok és mappák <b>tartalmában</b>"
+
+msgid "Search for Firefox Bookmarks"
+msgstr "Firefox könyvjelzők keresése"
+
+msgid "Search for Tomboy notes"
+msgstr "Keresés a Tomboy jegyzetek között"
+
+msgid "Search for and start VirtualBox virtual machines from the menu"
+msgstr "VirtualBox virtuális gépek keresése és indítása a menüből"
+
+msgid "Search for items on eBay"
+msgstr "Keresés az eBay-en"
+
+msgid "Search for more software in the Software Center"
+msgstr "További szoftverek keresése a Szoftverközpontban"
+
+msgid "Search for new applications in the Software Center"
+msgstr "Új alkalmazások keresése a Szoftverközpontban"
+
+msgid "Search for online Pidgin buddies"
+msgstr "Keresés az elérhető Pidgin partnerek között"
+
+msgid "Search for pages bookmarked in Firefox, Chrome, or Chromium"
+msgstr "Keresés a Firefox, Chrome vagy Chromium könyvjelzői között"
+
+msgid "Search for results in Amazon"
+msgstr "Keresés az Amazon segítségével"
+
+msgid "Search for results in Wikipedia"
+msgstr "Keresés a Wikipédiában"
+
+msgid "Search for results in YouTube"
+msgstr "Keresés a YouTubeon"
+
+msgid "Search for your most recently used files."
+msgstr "Keresés a legutóbb használt fájlok között"
+
+msgid "Search local files and folders indexed with Tracker"
+msgstr "Keresés a Tracker által indexelt helyi fájlok és mappák között"
+
+msgid "Search timed out"
+msgstr "Időtúllépés kereséskor"
+
+msgid "Searching..."
+msgstr "Keresés..."
+
+msgid "See https://translations.launchpad.net/cardapio"
+msgstr "Lásd: https://translations.launchpad.net/cardapio"
+
+msgid "Session"
+msgstr "Munkamenet"
+
+msgid "Shortcut key:"
+msgstr "Gyorsbillentyű:"
+
+msgid "Show %s in the Software Center"
+msgstr "%s megjelenítése a Szoftverközpontban"
+
+msgid "Show additional notes"
+msgstr "További jegyzetek megjelenítése"
+
+msgid "Show additional notes in Tomboy"
+msgstr "További jegyzetek megjelenítése a Tomboyban"
+
+msgid "Show additional results"
+msgstr "További találatok megjelenítése"
+
+msgid "Show additional search results in Sezen"
+msgstr "További keresési találatok megjelenítése a Sezenben"
+
+msgid "Show additional search results in a file browser"
+msgstr "További keresési eredmények megjelenítése a fájlböngészőben"
+
+msgid "Show additional search results in the Tracker search tool"
+msgstr "További keresési találatok megjelenítése a Tracker keresőben"
+
+msgid "Show additional search results in your web browser"
+msgstr "További keresési találatok megjelenítése a böngészőben"
+
+msgid "Show all categories"
+msgstr "Az összes kategória megjelenítése"
+
+msgid "Show contents of this folder within Cardapio"
+msgstr "Ezen mappa tartalmának megjelenítés Cardapio-val"
+
+msgid "Show session buttons in bottom pane"
+msgstr "Munkamenet gombjainak megjelenítése az alsó sávban"
+
+msgid "Shut Down..."
+msgstr "Leállítás…"
+
+msgid "Shut down the system"
+msgstr "A rendszer leállítása"
+
+msgid "Side Pane"
+msgstr "Oldalsáv"
+
+msgid "Software Center"
+msgstr "Szoftverközpont"
+
+msgid "Software available to install on your system"
+msgstr "Szoftverek, melyek elérhetőek telepítésre az Ön rendszerén"
+
+msgid ""
+"Start virtual machine %(name)s\n"
+"OS Type: %(os)s"
+msgstr ""
+"%(name)s virtuális gép indítása\n"
+"Operációs rendszer: %(os)s"
+
+msgid "System"
+msgstr "Rendszer"
+
+msgid "Talk to this buddy"
+msgstr "Beszélgetés ezzel a partnerrel"
+
+msgid "This is a community-supported plugin"
+msgstr "Ez egy közösségi támogatottságú bővítmény"
+
+msgid "This month"
+msgstr "Ebben a hónapban"
+
+msgid "This week"
+msgstr "Ezen a héten"
+
+msgid "Tomboy"
+msgstr "Tomboy"
+
+msgid "Tomboy Results"
+msgstr "Tomboy találatok"
+
+msgid "Trash"
+msgstr "Kuka"
+
+msgid "Ubuntu Software Center"
+msgstr "Ubuntu szoftverközpont"
+
+msgid "Uncategorized"
+msgstr "Kategorizálatlan"
+
+msgid "View"
+msgstr "Nézet"
+
+msgid "Virtual Machines"
+msgstr "Virtuális gépek"
+
+msgid "VirtualBox"
+msgstr "VirtualBox"
+
+msgid "Web Bookmarks"
+msgstr "Könyvjelzők"
+
+msgid "Web Results"
+msgstr "Webes találatok"
+
+msgid "Web bookmarks in Firefox"
+msgstr "Könyvjelzők a Firefoxban"
+
+msgid "Wikipedia"
+msgstr "Wikipédia"
+
+msgid "Wikipedia Results"
+msgstr "Wikipédia találatok"
+
+msgid "Yahoo"
+msgstr "Yahoo"
+
+msgid "Yahoo Results"
+msgstr "Yahoo találatok"
+
+msgid "YouTube"
+msgstr "YouTube"
+
+msgid "YouTube Results"
+msgstr "YouTube találatok"
+
+msgid "Your Tomboy notes"
+msgstr "A Tomboy jegyzetei"
+
+msgid "Your VirtualBox virtual machines"
+msgstr "VirtualBox virtuális gépek"
+
+msgid "Your favorite items"
+msgstr "Kedvenc elemei"
+
+msgid "Your online Pidgin buddies"
+msgstr "Az elérhető Pidgin partnerei"
+
+msgid "_About %(distro_name)s"
+msgstr "A(z) _%(distro_name)s névjegye"
+
+msgid "_About Cardapio"
+msgstr "A _Cardapio névjegye"
+
+msgid "_About Gnome"
+msgstr "A _GNOME névjegye"
+
+msgid "_Add to Side Pane"
+msgstr "_Oldalsávhoz adás"
+
+msgid "_Control Center"
+msgstr "_Vezérlőközpont"
+
+msgid "_Display"
+msgstr "_Megjelenítés"
+
+msgid "_Edit Menus"
+msgstr "_Menük szerkesztése"
+
+msgid "_Install %s"
+msgstr "%s _telepítése"
+
+msgid "_Pin This Item"
+msgstr "Elem _rögzítése"
+
+msgid "_Properties"
+msgstr "_Tulajdonságok"
+
+msgid "_Remove from Side Pane"
+msgstr "_Eltávolítás az Oldalsávról"
+
+msgid "_Run"
+msgstr "_Futtatás"
+
+msgid "_Unmount"
+msgstr "_Leválasztás"
+
+msgid "_Unpin This Item"
+msgstr "Elem _feloldása"
+
+msgid "eBay"
+msgstr "eBay"
+
+msgid "eBay Results"
+msgstr "eBay találatok"
+
+msgid "translators: just enter any text here"
+msgstr "translators: just enter any text here"

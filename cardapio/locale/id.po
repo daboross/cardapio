@@ -1,0 +1,103 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cardapio\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2011-03-24 22:37+0100\n"
+"PO-Revision-Date: 2010-06-14 09:06+0000\n"
+"Last-Translator: La Ode Adam Saputra <laode.saputra@gmail.com>\n"
+"Language-Team: Indonesian <id@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
+"X-Generator: Launchpad (build 12981)\n"
+
+msgid "Access applications, folders, system settings, etc."
+msgstr "Mengakses aplikasi, folder, pengaturan sistem, dll"
+
+msgid "Access documents and folders"
+msgstr "Akses dokumen dan folder"
+
+msgid "All"
+msgstr "Semua"
+
+msgid "Cardapio"
+msgstr "Cardapio"
+
+msgid "Desktop"
+msgstr "Desktop"
+
+msgid "Help and Support"
+msgstr "Bantuan dan Dukungan"
+
+msgid "Home"
+msgstr "Beranda"
+
+msgid ""
+"Lets you choose from thousands of free applications available for Ubuntu"
+msgstr ""
+"Memungkinkan Anda memilih dari ribuan aplikasi bebas yang tersedia bagi "
+"Ubuntu"
+
+msgid "Local Results"
+msgstr "Hasil Lokal"
+
+msgid "Lock Screen"
+msgstr "Kunci Layar"
+
+msgid "Log Out..."
+msgstr "Keluar..."
+
+msgid "Log out of this session to log in as a different user"
+msgstr "Keluar dari sesi ini untuk masuk sebagai pengguna lain"
+
+msgid "No results to show"
+msgstr "Tidak ada hasil yang ditampilkan"
+
+msgid "No results to show in \"%(category_name)s\""
+msgstr "Tidak ada hasil yang ditampilkan di \"%(category_name)s\""
+
+msgid "Open the trash"
+msgstr "Buka tong sampah"
+
+msgid "Open your personal folder"
+msgstr "Buka folder pribadi Anda"
+
+msgid "Protect your computer from unauthorized use"
+msgstr "Kunci komputer Anda dari orang yang tidak berhak"
+
+msgid "Search"
+msgstr "Cari"
+
+msgid "Session"
+msgstr "Sesi"
+
+msgid "Show all categories"
+msgstr "Tampilkan seluruh kategori"
+
+msgid "Shut Down..."
+msgstr "Matikan..."
+
+msgid "Shut down the system"
+msgstr "Matikan sistem"
+
+msgid "System"
+msgstr "Sistem"
+
+msgid "Trash"
+msgstr "Tong Sampah"
+
+msgid "Web Results"
+msgstr "Hasil Web"
+
+msgid "_About Cardapio"
+msgstr "_Tentang Cardapio"
+
+msgid "_About Gnome"
+msgstr "_Tentang Gnome"
+
+msgid "_Edit Menus"
+msgstr "_Ubah Menus"
+
+msgid "_Properties"
+msgstr "_Properti"

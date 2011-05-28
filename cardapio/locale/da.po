@@ -1,0 +1,711 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cardapio\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2011-03-24 22:37+0100\n"
+"PO-Revision-Date: 2011-04-01 18:51+0000\n"
+"Last-Translator: Kenneth Terkelsen <Unknown>\n"
+"Language-Team: Danish <da@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
+"X-Generator: Launchpad (build 12981)\n"
+
+msgid "\"%(file_name)s\" is an executable text file."
+msgstr "\"%(file_name)s\" er en eksekverbar tekst fil."
+
+msgid "<b>Appearance</b>"
+msgstr "<b>Udseende</b>"
+
+msgid "<b>Behavior</b>"
+msgstr "<b>Opførelse</b>"
+
+msgid ""
+"<b>Plugin:</b> %(name)s %(version)s\n"
+"<b>Author:</b> %(author)s\n"
+"<b>Description:</b> %(description)s"
+msgstr ""
+"<b>Udviddelse:</b> %(name)s %(version)s\n"
+"<b>Forfatter:</b> %(author)s\n"
+"<b>Beskrivelse:</b> %(description)s"
+
+msgid ""
+"<big>Rebuilding...</big>\n"
+"This should take a few seconds"
+msgstr ""
+"<big>Genopbygger...</big>\n"
+"Dette tager et øjeblik"
+
+msgid "A menu with search capabilities."
+msgstr "En menu med søgemuligheder."
+
+msgid "Access applications, folders, system settings, etc."
+msgstr "Tilgå programmer, mapper, system indstillinger osv."
+
+msgid "Access documents and folders"
+msgstr "Tilgå dokumenter og mapper"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "All other files"
+msgstr "Alle andre filer"
+
+msgid "All time"
+msgstr "Altid"
+
+msgid "Amazon"
+msgstr "Amazon"
+
+msgid "Amazon Results"
+msgstr "Amazon Resultater"
+
+msgid "Applet"
+msgstr "Applet"
+
+msgid "Application menu"
+msgstr "Program menu"
+
+msgid "Available Software"
+msgstr "Tilgængelig Software"
+
+msgid "Bing"
+msgstr "Bing"
+
+msgid "Bing Results"
+msgstr "Bing Resultater"
+
+msgid "Browse the contents of the network"
+msgstr "Se indholdet af netværket"
+
+msgid "Cardapio"
+msgstr "Cardapio"
+
+msgid "Cardapio Properties"
+msgstr "Cardapio Egenskaber"
+
+msgid "Cardapio Team"
+msgstr "Cardapio Holdet"
+
+msgid "Cardapio Website"
+msgstr "Cardapio Webside"
+
+msgid ""
+"Chrome bookmark:\n"
+"%s"
+msgstr ""
+"Chrome bogmærke:\n"
+"%s"
+
+msgid ""
+"Chromium bookmark:\n"
+"%s"
+msgstr ""
+"Chromium bogmærke:\n"
+"%s"
+
+msgid "Command Launcher"
+msgstr "Kommando afvikler"
+
+msgid "Connect to Server"
+msgstr "Forbind til en Server"
+
+msgid "Connect to a remote computer or shared disk"
+msgstr "Forbind til en fjerncomputer eller delt disk"
+
+msgid "Create a new note with this title in Tomboy"
+msgstr "Opret en ny note med denne titel i Tomboy"
+
+msgid "Create this note"
+msgstr "Opret denne note"
+
+msgid ""
+"Data has recently changed!\n"
+"This menu will be updated momentarily, so as not to interrupt your browsing."
+msgstr ""
+"Dataen har ændret sig fornylig!\n"
+"Denne menu vil blive opdateret løbende for ikke at forstyrre din browsing."
+
+msgid "Description:"
+msgstr "Beskrivelse:"
+
+msgid "Desktop"
+msgstr "Skrivebord"
+
+msgid "Displays a list of folders"
+msgstr "Viser en liste af mapper"
+
+msgid "Displays installed applications"
+msgstr "Viser installerede programmer"
+
+msgid "Displays the items that you marked as \"pinned\" using the context menu"
+msgstr ""
+"Viser de objekter du har markeret som \"fastgjort\" ved hjælp af lokalmenuen"
+
+msgid "Do you want to run \"%(file_name)s\", or display its contents?"
+msgstr "Vil du starte \"%(file_name)s\", eller vise dets indhold?"
+
+msgid "Drag to reorder plugins"
+msgstr "Træk for at reorganisere udviddelser"
+
+msgid "Edit Menus"
+msgstr "Rediger Menuer"
+
+msgid "Execute '%s' As Root"
+msgstr "Kør '%s' som superbruger (root)"
+
+msgid "Execute '%s' In Terminal"
+msgstr "Kør '%s' i en terminal"
+
+msgid "Execute the command '%s' inside a new terminal window"
+msgstr "Kør kommandoen '%s' inden i et nyt terminal vindue"
+
+msgid "Execute the command '%s' with administrative rights"
+msgstr "Kør kommandoen '%s' med administrative rettigheder"
+
+msgid "File search"
+msgstr "Filsøgning"
+
+msgid "Files that you have used recently"
+msgstr "Filer du senest har brugt"
+
+msgid "Files you used this month"
+msgstr "Filer brugt i denne måned"
+
+msgid "Files you used this week"
+msgstr "Filer brugt i denne uge"
+
+msgid "Files you used today"
+msgstr "Filer brugt i dag"
+
+msgid "Filesystem Root"
+msgstr "Roden af filsystemet"
+
+msgid "Firefox Bookmarks"
+msgstr "Firefox Bogmærker"
+
+msgid ""
+"Firefox bookmark:\n"
+"%s"
+msgstr ""
+"Firefox bogmærke:\n"
+"%s"
+
+msgid "Folder Contents"
+msgstr "Mappe Indhold"
+
+msgid "Full-text file search"
+msgstr "Fuld-tekst filsøgning"
+
+msgid ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+msgstr ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+
+msgid "General"
+msgstr "Generelt"
+
+msgid "Get help with %(distro_name)s"
+msgstr "Få hjælp til %(distro_name)s"
+
+msgid "Go To \"%s\""
+msgstr "Gå til \"%s\""
+
+msgid "Go To \"%s\" in Chromium"
+msgstr "Gå til \"%s\" i Chromium"
+
+msgid "Go To \"%s\" in Firefox"
+msgstr "Gå til \"%s\" i Firefox"
+
+msgid "Go To \"%s\" in Google Chrome"
+msgstr "Gå til \"%s\" i Goole Chrome"
+
+msgid "Google"
+msgstr "Google"
+
+msgid "Google localized results"
+msgstr "Google lokaliserede resultater"
+
+msgid "Grab new shortcut"
+msgstr "Fang ny genvejstast"
+
+msgid "Help and Support"
+msgstr "Hjælp og support"
+
+msgid "Home"
+msgstr "Hjem"
+
+msgid "Icon:"
+msgstr "Ikon:"
+
+msgid "Install this package without opening the Software Center"
+msgstr "Installer denne pakke uden at åbne Software Centeret"
+
+msgid "Items found on eBay"
+msgstr "Emner fundet hos eBay"
+
+msgid "Items pinned to the side pane"
+msgstr "Objekter fastgjort til sidepanelet"
+
+msgid "Items that are not under any menu category"
+msgstr "Objekter der ikke er under nogen menu kategori"
+
+msgid "Keep search results when Cardapio is hidden"
+msgstr "Behold søgeresultater når Cardapio er skjult"
+
+msgid "Label:"
+msgstr "Mærkat:"
+
+msgid "Launch this item"
+msgstr "Start dette objekt"
+
+msgid ""
+"Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-"
+"Click)"
+msgstr ""
+"Start dette objekt med lad være med at skjule Cardapio (det samme som Midter-"
+"Klik eller CTRL-Klik)"
+
+msgid ""
+"Lets you choose from thousands of free applications available for Ubuntu"
+msgstr ""
+"Lader dig vælge imellem tusinder af gratis programmer tilgægelig for Ubuntu"
+
+msgid "Local Results"
+msgstr "Lokale Resultater"
+
+msgid "Localized Web Results"
+msgstr "Lokaliserede Web Resultater"
+
+msgid "Lock Screen"
+msgstr "Lås Skærm"
+
+msgid "Log Out..."
+msgstr "Log ud..."
+
+msgid "Log out of this session to log in as a different user"
+msgstr "Log ud af denne session for at logge ind som en anden bruger"
+
+msgid "Look inside folders"
+msgstr "Se hvad der er i mapperne"
+
+msgid "Menu"
+msgstr "Menu"
+
+msgid "Network"
+msgstr "Netværk"
+
+msgid "No results to show"
+msgstr "Ingen resultater at vise"
+
+msgid "No results to show in \"%(category_name)s\""
+msgstr "Ingen resultater at vise i \"%(category_name)s\""
+
+msgid "Open Parent _Folder"
+msgstr "Åben Beslægtet _Mappe"
+
+msgid "Open Software Center"
+msgstr "Åben Software Center"
+
+msgid "Open categories when cursor hovers them"
+msgstr "Åben kategorier når musen er over dem"
+
+msgid "Open in Chromium"
+msgstr "Åben i Chromium"
+
+msgid "Open in Firefox"
+msgstr "Åben i Firefox"
+
+msgid "Open in Google Chrome"
+msgstr "Åben i Google Chrome"
+
+msgid "Open menu when cursor hovers the applet"
+msgstr "Åben menuen når musen er over Cardapio applet'en"
+
+msgid "Open the trash"
+msgstr "Åben papirkurven"
+
+msgid "Open this item's parent folder in the file browser"
+msgstr "Åben dette emnes beslægtede mappe i en filbrowser"
+
+msgid "Open this note"
+msgstr "Åben denne note"
+
+msgid "Open your personal folder"
+msgstr "Åben din personlig mappe"
+
+msgid "Other configuration tools"
+msgstr "Andre konfigureringsværktøjer"
+
+msgid "Pages bookmarked in Firefox, Chrome, or Chromium"
+msgstr "Sider bogmærket i Firefox, Chrome eller Chromium"
+
+msgid "Peek _Inside Folder"
+msgstr "Se _Ind i Mappen"
+
+msgid "Perform a search using Microsoft's Bing"
+msgstr "Foretag en søgning med Microsofts Bing"
+
+msgid "Perform a search using Yahoo"
+msgstr "Foretag en søgning med hjælp fra Yahoo"
+
+msgid ""
+"Perform quick Google searches <b>limited to</b> the system's default language"
+msgstr ""
+"Foretag hurtige Google søgninger <b>begrænset til</b> systemets standard "
+"sprog"
+
+msgid "Perform quick Google searches in <b>all</b> languages"
+msgstr "Foretag hurtige Google søgninger i <b>alle</b> sprog"
+
+msgid "Pidgin"
+msgstr "Pidgin"
+
+msgid "Pidgin Buddies"
+msgstr "Pidgin Venner"
+
+msgid "Pinned items"
+msgstr "Fastgjorte objekter"
+
+msgid "Place this item in the side pane"
+msgstr "Placer dette emne i sidepanelet"
+
+msgid "Place this item into the \"Pinned Items\" list"
+msgstr "Placer dette emne i den \"Fastgjorte Emner\" liste"
+
+msgid "Places"
+msgstr "Steder"
+
+msgid "Places menu"
+msgstr "Steder menu"
+
+msgid "Plugins"
+msgstr "Udviddelser"
+
+msgid "Protect your computer from unauthorized use"
+msgstr "Beskyt din computer mod uautoriseret brug"
+
+msgid "Recent Documents"
+msgstr "Seneste Dokumenter"
+
+msgid "Recent documents (categorized)"
+msgstr "Seneste dokumenter (kategoriseret)"
+
+msgid "Recent documents (simple)"
+msgstr "Seneste dokumenter (simpel)"
+
+msgid "Recording..."
+msgstr "Optager..."
+
+msgid "Reduce the size of Cardapio's main window"
+msgstr "Reducér størrelsen af Cardapios hovedvindue"
+
+msgid "Remove this item from the \"Pinned Items\" list"
+msgstr "Fjern dette emne fra \"Fastgjorte Emner\" listen"
+
+msgid "Remove this item from the side pane"
+msgstr "Fjern dette emne fra sidepanelet"
+
+msgid "Results found in Amazon"
+msgstr "Resultater fundet hos Amazon"
+
+msgid "Results found in Wikipedia"
+msgstr "Resultater fundet hos Wikipedia"
+
+msgid "Results found in YouTube"
+msgstr "Resultater fundet hos YouTube"
+
+msgid "Results found in your computer"
+msgstr "Resultater fundet på din computer"
+
+msgid "Results found inside the files in your computer"
+msgstr "Resultater fundet inden i filerne på din computer"
+
+msgid "Results found using Bing"
+msgstr "Resultater fundet ved hjælp af Bing"
+
+msgid "Results found using Yahoo"
+msgstr "Resultater fundet med hjælp fra Yahoo"
+
+msgid "Results found with Google"
+msgstr "Resultater fundet ved hjælp af Google"
+
+msgid "Results found with Google in you system language"
+msgstr "Resultater fundet ved hjælp af Google i dit systems standard sprog"
+
+msgid "Results within files"
+msgstr "Resultater inde i filer"
+
+msgid "Run Command"
+msgstr "Kør kommando"
+
+msgid "Run commands from the search box"
+msgstr "Kør kommandoer fra søgefeltet"
+
+msgid "Run in _Terminal"
+msgstr "Kør i en _Terminal"
+
+msgid "Run system commands, just like in the command-line"
+msgstr "Kør system kommandoer ligesom med kommandolinien"
+
+msgid "Safely eject this mount"
+msgstr "Sikker fjernelse af denne montering"
+
+msgid "Search"
+msgstr "Søg"
+
+msgid "Search <b>inside</b> local files and folders indexed with Tracker"
+msgstr "Søg <b>inden i</b> lokale filer og mapper indekseret med Tracker"
+
+msgid "Search for Firefox Bookmarks"
+msgstr "Søg efter Firefox Bogmærker"
+
+msgid "Search for Tomboy notes"
+msgstr "Søg efter Tomboy noter"
+
+msgid "Search for and start VirtualBox virtual machines from the menu"
+msgstr "Søg efter og start VirtualBox virtuelle maskiner fra menuen"
+
+msgid "Search for items on eBay"
+msgstr "Søg efter emner på eBay"
+
+msgid "Search for more software in the Software Center"
+msgstr "Søg efter mere software i Software Centeret"
+
+msgid "Search for new applications in the Software Center"
+msgstr "Søg efter nye programmer i Software Centeret"
+
+msgid "Search for online Pidgin buddies"
+msgstr "Søg efter online Pidgin venner"
+
+msgid "Search for pages bookmarked in Firefox, Chrome, or Chromium"
+msgstr "Søg efter sider der er bogmærket i Firefox, Chrome eller Chromium"
+
+msgid "Search for results in Amazon"
+msgstr "Søg efter resultater hos Amazon"
+
+msgid "Search for results in Wikipedia"
+msgstr "Søg efter resultater hos Wikipedia"
+
+msgid "Search for results in YouTube"
+msgstr "Søg efter resultater hos YouTube"
+
+msgid "Search for your most recently used files."
+msgstr "Søg efter dine senest brugte filer."
+
+msgid "Search local files and folders indexed with Tracker"
+msgstr "Søg i lokale filer og mapper der er indekseret med Tracker"
+
+msgid "Search timed out"
+msgstr "Søgetid udløbet"
+
+msgid "Searching..."
+msgstr "Søger..."
+
+msgid "See https://translations.launchpad.net/cardapio"
+msgstr "Se https://translations.launchpad.net/cardapio"
+
+msgid "Session"
+msgstr "Session"
+
+msgid "Shortcut key:"
+msgstr "Genvejstast:"
+
+msgid "Show %s in the Software Center"
+msgstr "Vis %s i Software Centeret"
+
+msgid "Show additional notes"
+msgstr "Vis ydreligere noter"
+
+msgid "Show additional notes in Tomboy"
+msgstr "Vis ydreligere noter i Tomboy"
+
+msgid "Show additional results"
+msgstr "Vis ydreligere resultater"
+
+msgid "Show additional search results in Sezen"
+msgstr "Vis ydrerligere søgeresultater i Sezen"
+
+msgid "Show additional search results in a file browser"
+msgstr "Vis ydreligere søgeresultater i en filbrowser"
+
+msgid "Show additional search results in the Tracker search tool"
+msgstr "Vis ydreligere søgeresultater i Tracker søgeværktøjet"
+
+msgid "Show additional search results in your web browser"
+msgstr "Vis ydreligere søgeresultater i din web browser"
+
+msgid "Show all categories"
+msgstr "Vis alle kategorier"
+
+msgid "Show contents of this folder within Cardapio"
+msgstr "Vis indholdet af denne mappe inden i Cardapio"
+
+msgid "Show session buttons in bottom pane"
+msgstr "Vis sessonsknapper i bundpanelet"
+
+msgid "Shut Down..."
+msgstr "Luk ned..."
+
+msgid "Shut down the system"
+msgstr "Lukker computeren ned"
+
+msgid "Side Pane"
+msgstr "Sidepanel"
+
+msgid "Software Center"
+msgstr "Software Center"
+
+msgid "Software available to install on your system"
+msgstr "Software tilgængelig for installation til dit system"
+
+msgid ""
+"Start virtual machine %(name)s\n"
+"OS Type: %(os)s"
+msgstr ""
+"Start virtuelle maskine %(name)s\n"
+"OS Type: %(os)s"
+
+msgid "System"
+msgstr "System"
+
+msgid "Talk to this buddy"
+msgstr "Snak med denne ven"
+
+msgid "This is a community-supported plugin"
+msgstr "Dette er en samfunds-understøttet udviddelse"
+
+msgid "This menu will be updated momentarily."
+msgstr "Denne menu vil blive opdateret løbende."
+
+msgid "This month"
+msgstr "Denne måned"
+
+msgid "This week"
+msgstr "Denne uge"
+
+msgid "Today"
+msgstr "I dag"
+
+msgid "Tomboy"
+msgstr "Tomboy"
+
+msgid "Tomboy Results"
+msgstr "Tomboy Resultater"
+
+msgid "Trash"
+msgstr "Papirkurv"
+
+msgid "Ubuntu Software Center"
+msgstr "Ubuntu Softwarecenter"
+
+msgid "Uncategorized"
+msgstr "Ukategoriseret"
+
+msgid "Update now"
+msgstr "Opdatér nu"
+
+msgid "View"
+msgstr "Vis"
+
+msgid "Virtual Machines"
+msgstr "Virtuelle Maskiner"
+
+msgid "VirtualBox"
+msgstr "VirtualBox"
+
+msgid "Web Bookmarks"
+msgstr "Web Bogmærker"
+
+msgid "Web Results"
+msgstr "Web Resultater"
+
+msgid "Web bookmarks in Firefox"
+msgstr "Bogmærker i Firefox"
+
+msgid "Wikipedia"
+msgstr "Wikipedia"
+
+msgid "Wikipedia Results"
+msgstr "Wikipedia Resultater"
+
+msgid "Yahoo"
+msgstr "Yahoo"
+
+msgid "Yahoo Results"
+msgstr "Yahoo Resultater"
+
+msgid "YouTube"
+msgstr "YouTube"
+
+msgid "YouTube Results"
+msgstr "YouTube Resultater"
+
+msgid "Your Tomboy notes"
+msgstr "Dine Tomboy noter"
+
+msgid "Your VirtualBox virtual machines"
+msgstr "Dine VirtualBox virtuelle maskiner"
+
+msgid "Your favorite items"
+msgstr "Dine favorit emner"
+
+msgid "Your online Pidgin buddies"
+msgstr "Dine online Pidgin venner"
+
+msgid "_About %(distro_name)s"
+msgstr "_Om %(distro_name)s"
+
+msgid "_About Cardapio"
+msgstr "_Om Cardapio"
+
+msgid "_About Gnome"
+msgstr "_Om Gnome"
+
+msgid "_Add to Side Pane"
+msgstr "_Tilføj til sidepanel"
+
+msgid "_Control Center"
+msgstr "_Kontrol Center"
+
+msgid "_Display"
+msgstr "_Vis"
+
+msgid "_Edit Menus"
+msgstr "_Rediger Menuer"
+
+msgid "_Install %s"
+msgstr "_Intallér %s"
+
+msgid "_Launch"
+msgstr "_Start"
+
+msgid "_Pin This Item"
+msgstr "_Fastgør Dette Emne"
+
+msgid "_Properties"
+msgstr "_Egenskaber"
+
+msgid "_Remove from Side Pane"
+msgstr "_Fjern fra sidepanelet"
+
+msgid "_Run"
+msgstr "_Kør"
+
+msgid "_Unmount"
+msgstr "_Afmontér"
+
+msgid "_Unpin This Item"
+msgstr "_Frigør Dette Emne"
+
+msgid "eBay"
+msgstr "eBay"
+
+msgid "eBay Results"
+msgstr "eBay Resultater"
+
+msgid "translators: just enter any text here"
+msgstr "oversættere: indtast tekst her"

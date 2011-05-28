@@ -1,0 +1,734 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cardapio\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2011-03-24 22:37+0100\n"
+"PO-Revision-Date: 2011-03-17 12:49+0000\n"
+"Last-Translator: Jiri Grönroos <Unknown>\n"
+"Language-Team: Finnish <fi@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
+"X-Generator: Launchpad (build 12981)\n"
+
+msgid "\"%(file_name)s\" is an executable text file."
+msgstr "\"%(file_name)s\" on suoritettava tekstitiedosto."
+
+msgid "<b>Appearance</b>"
+msgstr "<b>Ulkoasu</b>"
+
+msgid "<b>Behavior</b>"
+msgstr "<b>Toiminta</b>"
+
+msgid ""
+"<b>Plugin:</b> %(name)s %(version)s\n"
+"<b>Author:</b> %(author)s\n"
+"<b>Description:</b> %(description)s"
+msgstr ""
+"<b>Liitännäinen:</b> %(name)s %(version)s\n"
+"<b>Tekijä:</b> %(author)s\n"
+"<b>Kuvaus:</b> %(description)s"
+
+msgid ""
+"<big>Rebuilding...</big>\n"
+"This should take a few seconds"
+msgstr ""
+"<big>Päivitetään...</big>\n"
+"Päivitys kestää vain hetken"
+
+msgid "A menu with search capabilities."
+msgstr "Valikko hakuominaisuuksin varustettuna."
+
+msgid "Access applications, folders, system settings, etc."
+msgstr "Sovellukset, kansiot, järjestelmän asetukset yms."
+
+msgid "Access documents and folders"
+msgstr "Asiakirjat ja kansiot"
+
+msgid "All"
+msgstr "Kaikki"
+
+msgid "All other files"
+msgstr "Kaikki muut tiedostot"
+
+msgid "All time"
+msgstr "Koko ajalta"
+
+msgid "Amazon"
+msgstr "Amazon"
+
+msgid "Amazon Results"
+msgstr "Amazon-tulokset"
+
+msgid "Applet"
+msgstr "Sovelma"
+
+msgid "Application menu"
+msgstr "Sovellukset-valikko"
+
+msgid "Available Software"
+msgstr "Saatavilla olevat ohjelmistot"
+
+msgid "Bing"
+msgstr "Bing"
+
+msgid "Bing Results"
+msgstr "Bing-tulokset"
+
+msgid "Browse the contents of the network"
+msgstr "Selaa verkkoa"
+
+msgid "Cardapio"
+msgstr "Cardapio"
+
+msgid "Cardapio Properties"
+msgstr "Cardapion ominaisuudet"
+
+msgid "Cardapio Team"
+msgstr "Cardapio-kehittäjät"
+
+msgid "Cardapio Website"
+msgstr "Cardapion verkkosivu"
+
+msgid ""
+"Chrome bookmark:\n"
+"%s"
+msgstr ""
+"Chrome-kirjanmerkki:\n"
+"%s"
+
+msgid ""
+"Chromium bookmark:\n"
+"%s"
+msgstr ""
+"Chromium-kirjanmerkki:\n"
+"%s"
+
+msgid "Command Launcher"
+msgstr "Komentokäynnistin"
+
+msgid "Connect to Server"
+msgstr "Yhdistä palvelimelle"
+
+msgid "Connect to a remote computer or shared disk"
+msgstr "Yhdistä etätietokoneeseen tai jaettuun levyyn"
+
+msgid "Create a new note with this title in Tomboy"
+msgstr "Luo uusi Tomboy-muistiinpano tällä otsikolla"
+
+msgid "Create this note"
+msgstr "Luo muistiinpano"
+
+msgid ""
+"Data has recently changed!\n"
+"This menu will be updated momentarily, so as not to interrupt your browsing."
+msgstr ""
+"Tiedot muuttuivat äskettäin!\n"
+"Valikko päivitetään hetken päästä."
+
+msgid "Description:"
+msgstr "Kuvaus:"
+
+msgid "Desktop"
+msgstr "Työpöytä"
+
+msgid "Displays a list of folders"
+msgstr "Näyttää listan kansioista"
+
+msgid "Displays installed applications"
+msgstr "Näyttää asennetut sovellukset"
+
+msgid "Displays the items that you marked as \"pinned\" using the context menu"
+msgstr "Näyttää ne kohteet, jotka olet lisännyt suosikkeihin"
+
+msgid "Do you want to run \"%(file_name)s\", or display its contents?"
+msgstr ""
+"Haluatko suorittaa tiedoston \"%(file_name)s\" vai näyttää sen sisällön?"
+
+msgid "Drag to reorder plugins"
+msgstr "Vedä järjestääksesi liitännäiset uudelleen"
+
+msgid "Edit Menus"
+msgstr "Muokkaa valikkoja"
+
+msgid "Execute '%s' As Root"
+msgstr "Suorita '%s' ylläpitäjän oikeuksin"
+
+msgid "Execute '%s' In Terminal"
+msgstr "Suorita '%s' päätteessä"
+
+msgid "Execute the command '%s' inside a new terminal window"
+msgstr "Suorita komento '%s' uudessa pääteikkunassa"
+
+msgid "Execute the command '%s' with administrative rights"
+msgstr "Suorita komento '%s' ylläpitäjän oikeuksin"
+
+msgid "File search"
+msgstr "Tiedostojen haku"
+
+msgid "Files that you have used recently"
+msgstr "Tiedostot, joita olet käyttänyt äskettäin."
+
+msgid "Files you used this month"
+msgstr "Tässä kuussa käyttämäsi tiedostot"
+
+msgid "Files you used this week"
+msgstr "Tällä viikolla käyttämäsi tiedostot"
+
+msgid "Files you used today"
+msgstr "Tänään käyttämäsi tiedostot"
+
+msgid "Filesystem Root"
+msgstr "Tiedostojärjestelmän juuri"
+
+msgid "Firefox Bookmarks"
+msgstr "Firefox-kirjanmerkit"
+
+msgid ""
+"Firefox bookmark:\n"
+"%s"
+msgstr ""
+"Firefox-kirjanmerkki:\n"
+"%s"
+
+msgid "Folder Contents"
+msgstr "Kansion sisältö"
+
+msgid "Full-text file search"
+msgstr "Tekstihaku tiedostoista"
+
+msgid ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+msgstr ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+
+msgid "General"
+msgstr "Yleiset"
+
+msgid "Get help with %(distro_name)s"
+msgstr "Apua jakelun %(distro_name)s käyttöön"
+
+msgid "Go To \"%s\""
+msgstr "Siirry sivulle \"%s\""
+
+msgid "Go To \"%s\" in Chromium"
+msgstr "Siirry sivulle \"%s\" käyttäen Chromiumia"
+
+msgid "Go To \"%s\" in Firefox"
+msgstr "Siirry sivulle \"%s\" käyttäen Firefoxia"
+
+msgid "Go To \"%s\" in Google Chrome"
+msgstr "Siirry sivulle \"%s\" käyttäen Google Chromea"
+
+msgid "Google"
+msgstr "Google"
+
+msgid "Google localized results"
+msgstr "Paikalliset Google-tulokset"
+
+msgid "Grab new shortcut"
+msgstr "Aseta uusi pikanäppäin"
+
+msgid "Help and Support"
+msgstr "Ohjeet ja tuki"
+
+msgid "Home"
+msgstr "Koti"
+
+msgid "Icon:"
+msgstr "Kuvake:"
+
+msgid "Install this package without opening the Software Center"
+msgstr "Asenna tämä paketti avaamatta sovellusvalikoimaa"
+
+msgid "Items found on eBay"
+msgstr "eBaysta löytyneet kohteet"
+
+msgid "Items pinned to the side pane"
+msgstr "Sivupaneeliin kiinnitetyt kohteet"
+
+msgid "Items that are not under any menu category"
+msgstr "Kohteet, jotka eivät sovi muiden luokkien alle"
+
+msgid "Keep search results when Cardapio is hidden"
+msgstr "Säilytä hakutulokset Cardapion ollessa piilotettuna"
+
+msgid "Label:"
+msgstr "Teksti:"
+
+msgid "Launch in _Background"
+msgstr "Käynnistä tau_stalla"
+
+msgid "Launch this item"
+msgstr "Käynnistä tämä kohde"
+
+msgid ""
+"Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-"
+"Click)"
+msgstr ""
+"Käynnistä kohde, mutta älä piilota Cardapio-valikkoa (sama toiminto kuin "
+"hiiren keskimmäisellä painikkeella tai CTRL-näppäimen ja hiiren vasemman "
+"painikkeen yhdistelmällä)"
+
+msgid ""
+"Lets you choose from thousands of free applications available for Ubuntu"
+msgstr ""
+"Valitse haluamasi tuhansista ilmaisista Ubuntulle saatavilla olevista "
+"sovelluksista."
+
+msgid "Local Results"
+msgstr "Paikalliset tulokset"
+
+msgid "Localized Web Results"
+msgstr "Paikalliset www-hakutulokset"
+
+msgid "Lock Screen"
+msgstr "Lukitse näyttö"
+
+msgid "Log Out..."
+msgstr "Kirjaudu ulos…"
+
+msgid "Log out of this session to log in as a different user"
+msgstr "Kirjaudu ulos tästä istunnosta toisena käyttäjänä kirjautumista varten"
+
+msgid "Look inside folders"
+msgstr "Tutki kansioiden sisältöä"
+
+msgid "Menu"
+msgstr "Valikko"
+
+msgid "Network"
+msgstr "Verkko"
+
+msgid "No results to show"
+msgstr "Ei näytettäviä tuloksia"
+
+msgid "No results to show in \"%(category_name)s\""
+msgstr "\"%(category_name)s\" ei sisällä näytettäviä kohteita"
+
+msgid "Open Parent _Folder"
+msgstr "Avaa _ylähakemisto"
+
+msgid "Open Software Center"
+msgstr "Avaa sovelluskeskus"
+
+msgid "Open categories when cursor hovers them"
+msgstr "Avaa näkymä hiiren ollessa kohdistettuna siihen"
+
+msgid "Open in Chromium"
+msgstr "Avaa käyttäen Chromiumia"
+
+msgid "Open in Firefox"
+msgstr "Avaa käyttäen Firefoxia"
+
+msgid "Open in Google Chrome"
+msgstr "Avaa käyttäen Google Chromea"
+
+msgid "Open menu when cursor hovers the applet"
+msgstr "Avaa valikko hiiren ollessa kohdistettuna sovelmaan"
+
+msgid "Open the trash"
+msgstr "Avaa roskakori"
+
+msgid "Open this item's parent folder in the file browser"
+msgstr "Avaa ylätason kansion tiedostoselaimessa"
+
+msgid "Open this note"
+msgstr "Avaa tämä muistiinpano"
+
+msgid "Open your personal folder"
+msgstr "Avaa kotikansio"
+
+msgid "Other configuration tools"
+msgstr "Muut hallintatyökalut"
+
+msgid "Pages bookmarked in Firefox, Chrome, or Chromium"
+msgstr "Firefoxin, Chromen tai Chromiumin kirjanmerkit"
+
+msgid "Peek _Inside Folder"
+msgstr "Kurkkaa ka_nsioon"
+
+msgid "Perform a search using Microsoft's Bing"
+msgstr "Suorita haku käyttäen Microsoftin Bing-hakua"
+
+msgid "Perform a search using Yahoo"
+msgstr "Suorita haku käyttäen Yahoota"
+
+msgid ""
+"Perform quick Google searches <b>limited to</b> the system's default language"
+msgstr "Suorita Google-haku käyttäen järjestelmän <b>oletuskieltä</b>"
+
+msgid "Perform quick Google searches in <b>all</b> languages"
+msgstr "Suorita Google-haku <b>kaikilla</b> kielillä"
+
+msgid "Pidgin"
+msgstr "Pidgin"
+
+msgid "Pidgin Buddies"
+msgstr "Pidgin-kaverit"
+
+msgid "Pinned items"
+msgstr "Suosikit"
+
+msgid "Place this item in the side pane"
+msgstr "Aseta kohde sivupaneeliin"
+
+msgid "Place this item into the \"Pinned Items\" list"
+msgstr "Aseta kohde suosikkeihin"
+
+msgid "Places"
+msgstr "Sijainnit"
+
+msgid "Places menu"
+msgstr "Sijainnit-valikko"
+
+msgid "Plugins"
+msgstr "Liitännäiset"
+
+msgid "Protect your computer from unauthorized use"
+msgstr "Lukitse tietokoneen näyttö ja estä luvaton käyttö"
+
+msgid "Recent Documents"
+msgstr "Viimeaikaiset asiakirjat"
+
+msgid "Recent documents (categorized)"
+msgstr "Viimeisimmät asiakirjat (luokitellut)"
+
+msgid "Recent documents (simple)"
+msgstr "Viimeisimmät asiakirjat (pelkistetty)"
+
+msgid "Recent documents (smart)"
+msgstr "Viimeisimmät asiakirjat (älykäs)"
+
+msgid "Recording..."
+msgstr "Odottaa pikanäppäintä..."
+
+msgid "Reduce the size of Cardapio's main window"
+msgstr "Pienennä Cardapion pääikkunan kokoa"
+
+msgid "Remove this item from the \"Pinned Items\" list"
+msgstr "Poista kohde suosikeista"
+
+msgid "Remove this item from the side pane"
+msgstr "Poista kohde sivupaneelista"
+
+msgid "Results found in Amazon"
+msgstr "Amazonista löytyneet hakutulokset"
+
+msgid "Results found in Wikipedia"
+msgstr "Wikipedian palauttamat tulokset"
+
+msgid "Results found in YouTube"
+msgstr "YouTuben palauttamat tulokset"
+
+msgid "Results found in your computer"
+msgstr "Tietokoneeltasi löytyvät hakutulokset"
+
+msgid "Results found inside the files in your computer"
+msgstr "Tietokoneesi tiedostoista löytyvät tulokset"
+
+msgid "Results found using Bing"
+msgstr "Bingin palauttamat tulokset"
+
+msgid "Results found using Yahoo"
+msgstr "Yahoon palauttamat tulokset"
+
+msgid "Results found with Google"
+msgstr "Google-tulokset"
+
+msgid "Results found with Google in you system language"
+msgstr "Google-tulokset järjestelmäsi oletuskielellä"
+
+msgid "Results within files"
+msgstr "Tulokset tiedostoista"
+
+msgid "Run Command"
+msgstr "Suorita komento"
+
+msgid "Run commands from the search box"
+msgstr "Suorita komentoja hakukentästä"
+
+msgid "Run in _Terminal"
+msgstr "Suorita _päätteessä"
+
+msgid "Run system commands, just like in the command-line"
+msgstr "Suorita järjestelmäkomentoja kuten päätteestä"
+
+msgid "Safely eject this mount"
+msgstr "Irrota laite turvallisesti"
+
+msgid "Search"
+msgstr "Etsi"
+
+msgid "Search <b>inside</b> local files and folders indexed with Tracker"
+msgstr ""
+"Etsi Trackerin indeksoimien kansioiden ja tiedostojen <b>tekstisisällöstä</"
+"b>."
+
+msgid "Search for Firefox Bookmarks"
+msgstr "Etsi Firefox-kirjanmerkkejä"
+
+msgid "Search for Tomboy notes"
+msgstr "Etsi Tomboy-muistiinpanoista"
+
+msgid "Search for and start VirtualBox virtual machines from the menu"
+msgstr "Etsi ja käynnistä VirtualBox-virtuaalikoneita valikosta"
+
+msgid "Search for items on eBay"
+msgstr "Etsi kohteita eBaysta"
+
+msgid "Search for more software in the Software Center"
+msgstr "Etsi lisää ohjelmia käyttäen sovelluskeskusta"
+
+msgid "Search for new applications in the Software Center"
+msgstr "Etsi ja asenna uusia ohjelmia käyttäen sovellusvalikoimaa"
+
+msgid "Search for online Pidgin buddies"
+msgstr "Etsi verkossa olevia Pidgin-kontakteja"
+
+msgid "Search for pages bookmarked in Firefox, Chrome, or Chromium"
+msgstr "Etsi sivuja Firefoxin, Chromen tai Chromiumin kirjanmerkeistä"
+
+msgid "Search for results in Amazon"
+msgstr "Hakutulokset Amazonista"
+
+msgid "Search for results in Wikipedia"
+msgstr "Etsi tuloksia Wikipediasta"
+
+msgid "Search for results in YouTube"
+msgstr "Etsi tuloksia YouTubesta"
+
+msgid ""
+"Search for your most recently used files in categorized fashion, but save "
+"space when no query is entered."
+msgstr ""
+"Etsi äskettäin käytettyjä tiedostoja luokkiin jaettuna, mutta säästä tilaa "
+"kun hakuehtoja ei ole kirjoitettu."
+
+msgid ""
+"Search for your most recently used files, divided into categories depending "
+"on <i>when</i> they were last accessed."
+msgstr ""
+"Etsi äskettäin käytettyjä tiedostoja - jaetaan luokkiin <i>viimeisimmän "
+"käyttökerran</i> mukaan."
+
+msgid "Search for your most recently used files."
+msgstr "Etsi viimeaikaisista tiedostoista."
+
+msgid "Search local files and folders indexed with Tracker"
+msgstr ""
+"Etsi paikallisten tiedostojen ja kansioiden joukosta käyttäen Trackeria"
+
+msgid "Search timed out"
+msgstr "Haku aikakatkaistu"
+
+msgid "Searching..."
+msgstr "Etsitään..."
+
+msgid "See https://translations.launchpad.net/cardapio"
+msgstr "Vieraile https://translations.launchpad.net/cardapio"
+
+msgid "Session"
+msgstr "Istunto"
+
+msgid "Shortcut key:"
+msgstr "Pikanäppäin:"
+
+msgid "Show %s in the Software Center"
+msgstr "Näytä %s sovellusvalikoimassa"
+
+msgid "Show additional notes"
+msgstr "Näytä muut muistiinpanot"
+
+msgid "Show additional notes in Tomboy"
+msgstr "Näytä muut muistiinpanot Tomboyssa"
+
+msgid "Show additional results"
+msgstr "Näytä lisää tuloksia"
+
+msgid "Show additional search results in Sezen"
+msgstr "Näytä lisää hakutuloksia käyttäen Sezeniä"
+
+msgid "Show additional search results in a file browser"
+msgstr "Näytä lisää hakutuloksia tiedostoselaimessa"
+
+msgid "Show additional search results in the Tracker search tool"
+msgstr "Näytä lisää tuloksia Tracker-etsintätyökalussa"
+
+msgid "Show additional search results in your web browser"
+msgstr "Näytä lisää tuloksia nettiselaimessa"
+
+msgid "Show all categories"
+msgstr "Näytä kaikki luokat"
+
+msgid "Show contents of this folder within Cardapio"
+msgstr "Näytä tämän kansion sisältö Cardapiossa"
+
+msgid "Show session buttons in bottom pane"
+msgstr "Näytä istuntopainikkeet valikon alaosassa"
+
+msgid "Shut Down..."
+msgstr "Sammuta…"
+
+msgid "Shut down the system"
+msgstr "Sammuta tietokone"
+
+msgid "Side Pane"
+msgstr "Sivupaneeli"
+
+msgid "Software Center"
+msgstr "Sovellusvalikoima"
+
+msgid "Software available to install on your system"
+msgstr "Koneellesi asennettavissa olevat ohjelmistot"
+
+msgid ""
+"Start virtual machine %(name)s\n"
+"OS Type: %(os)s"
+msgstr ""
+"Käynnistä virtuaalikone %(name)s\n"
+"Käyttöjärjestelmän tyyppi: %(os)s"
+
+msgid "System"
+msgstr "Järjestelmä"
+
+msgid "Talk to this buddy"
+msgstr "Keskustele tämän kaverin kanssa"
+
+msgid "This is a community-supported plugin"
+msgstr "Tämä on yhteisön tukema liitännäinen"
+
+msgid "This menu will be updated momentarily."
+msgstr "Valikko päivitetään hetken päästä."
+
+msgid "This month"
+msgstr "Tässä kuussa"
+
+msgid "This week"
+msgstr "Tällä viikolla"
+
+msgid "Today"
+msgstr "Tänään"
+
+msgid "Tomboy"
+msgstr "Tomboy"
+
+msgid "Tomboy Results"
+msgstr "Tomboy-tulokset"
+
+msgid "Trash"
+msgstr "Roskakori"
+
+msgid "Ubuntu Software Center"
+msgstr "Ubuntun sovellusvalikoima"
+
+msgid "Uncategorized"
+msgstr "Luokittelemattomat"
+
+msgid "Update now"
+msgstr "Päivitä nyt"
+
+msgid "View"
+msgstr "Näkymä"
+
+msgid "Virtual Machines"
+msgstr "Virtuaalikoneet"
+
+msgid "VirtualBox"
+msgstr "VirtualBox"
+
+msgid "Web Bookmarks"
+msgstr "Www-kirjanmerkit"
+
+msgid "Web Results"
+msgstr "Www-tulokset"
+
+msgid "Web bookmarks in Firefox"
+msgstr "Firefoxin web-kirjanmerkit"
+
+msgid "Wikipedia"
+msgstr "Wikipedia"
+
+msgid "Wikipedia Results"
+msgstr "Wikipedia-tulokset"
+
+msgid "Yahoo"
+msgstr "Yahoo"
+
+msgid "Yahoo Results"
+msgstr "Yahoo-tulokset"
+
+msgid "YouTube"
+msgstr "YouTube"
+
+msgid "YouTube Results"
+msgstr "YouTube-tulokset"
+
+msgid "Your Tomboy notes"
+msgstr "Tomboy-muistiinpanot"
+
+msgid "Your VirtualBox virtual machines"
+msgstr "VirtualBox-virtuaalikoneet"
+
+msgid "Your favorite items"
+msgstr "Suosikkikohteesi"
+
+msgid "Your online Pidgin buddies"
+msgstr "Etsi verkossa olevia Pidgin-kavereitasi"
+
+msgid "_About %(distro_name)s"
+msgstr "_Tietoja - %(distro_name)s"
+
+msgid "_About Cardapio"
+msgstr "_Tietoja - Cardapio"
+
+msgid "_About Gnome"
+msgstr "_Tietoja - Gnome"
+
+msgid "_Add to Side Pane"
+msgstr "Li_sää sivupaneeliin"
+
+msgid "_Control Center"
+msgstr "_Hallintakeskus"
+
+msgid "_Display"
+msgstr "_Näytä"
+
+msgid "_Edit Menus"
+msgstr "_Muokkaa valikoita"
+
+msgid "_Install %s"
+msgstr "_Asenna %s"
+
+msgid "_Launch"
+msgstr "_Käynnistä"
+
+msgid "_Pin This Item"
+msgstr "K_iinnitä kohde"
+
+msgid "_Properties"
+msgstr "_Ominaisuudet"
+
+msgid "_Remove from Side Pane"
+msgstr "Po_ista sivupaneelista"
+
+msgid "_Run"
+msgstr "_Suorita"
+
+msgid "_Unmount"
+msgstr "_Irrota"
+
+msgid "_Unpin This Item"
+msgstr "P_oista kohteen kiinnitys"
+
+msgid "eBay"
+msgstr "eBay"
+
+msgid "eBay Results"
+msgstr "eBay-tulokset"
+
+msgid "translators: just enter any text here"
+msgstr "translators: just enter any text here"

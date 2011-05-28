@@ -1,0 +1,730 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cardapio\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2011-03-24 22:37+0100\n"
+"PO-Revision-Date: 2011-05-09 09:03+0000\n"
+"Last-Translator: DAG Software <Unknown>\n"
+"Language-Team: Slovak <sk@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
+"X-Generator: Launchpad (build 12981)\n"
+
+msgid "\"%(file_name)s\" is an executable text file."
+msgstr "\"%(file_name)s\" je spustiteľný textový súbor."
+
+msgid "<b>Appearance</b>"
+msgstr "<b>Vzhľad</b>"
+
+msgid "<b>Behavior</b>"
+msgstr "<b>Správanie</b>"
+
+msgid ""
+"<b>Plugin:</b> %(name)s %(version)s\n"
+"<b>Author:</b> %(author)s\n"
+"<b>Description:</b> %(description)s"
+msgstr ""
+"<b>Plugin:</b> %(name)s %(version)s\n"
+"<b>Autor:</b> %(author)s\n"
+"<b>Popis:</b> %(description)s"
+
+msgid ""
+"<big>Rebuilding...</big>\n"
+"This should take a few seconds"
+msgstr ""
+"<big>Zostavovanie...</big>\n"
+"Toto môže trvať niekoľko sekúnd."
+
+msgid "A menu with search capabilities."
+msgstr "Menu s vyhľadávacími schopnosťami."
+
+msgid "Access applications, folders, system settings, etc."
+msgstr "Prístup k aplikáciám, priečinkom, systémovím nastaveniam, atď."
+
+msgid "Access documents and folders"
+msgstr "Umožňuje pristupovať k dokumentom a priečinkom"
+
+msgid "All"
+msgstr "Všetko"
+
+msgid "All other files"
+msgstr "Všetky ostatné súbory"
+
+msgid "All time"
+msgstr "Za celý čas"
+
+msgid "Amazon"
+msgstr "Amazon"
+
+msgid "Amazon Results"
+msgstr "Výsledky z Amazonu"
+
+msgid "Applet"
+msgstr "Applet"
+
+msgid "Application menu"
+msgstr "Menu aplikácie"
+
+msgid "Available Software"
+msgstr "Dostupný software"
+
+msgid "Bing"
+msgstr "Bing"
+
+msgid "Bing Results"
+msgstr "Bing výsledky"
+
+msgid "Browse the contents of the network"
+msgstr "Prehliadať obsah siete"
+
+msgid "Cardapio"
+msgstr "Cardapio"
+
+msgid "Cardapio Properties"
+msgstr "Vlastnosti Cardapia"
+
+msgid "Cardapio Team"
+msgstr "Cardapio tým"
+
+msgid "Cardapio Website"
+msgstr "Webstránka Cardapia"
+
+msgid ""
+"Chrome bookmark:\n"
+"%s"
+msgstr ""
+"Záložky Chrome:\n"
+"%s"
+
+msgid ""
+"Chromium bookmark:\n"
+"%s"
+msgstr ""
+"Záložky Chromia:\n"
+"%s"
+
+msgid "Command Launcher"
+msgstr "Spúšťač príkazov"
+
+msgid "Connect to Server"
+msgstr "Pripojiť k serveru"
+
+msgid "Connect to a remote computer or shared disk"
+msgstr "Pripojiť sa k vzdialenému počítaču alebo sdieľanému disku"
+
+msgid "Create a new note with this title in Tomboy"
+msgstr "Vytvoriť novú poznámku s tímto názvom v Tomboyi"
+
+msgid "Create this note"
+msgstr "Vytvoriť túto poznámku"
+
+msgid ""
+"Data has recently changed!\n"
+"This menu will be updated momentarily, so as not to interrupt your browsing."
+msgstr ""
+"Dáta boli nedávno zmenené!\n"
+"Toto menu bude aktualizované okamžite, takže neprerušujte vaše prezeranie."
+
+msgid "Description:"
+msgstr "Popis:"
+
+msgid "Desktop"
+msgstr "Pracovná plocha"
+
+msgid "Displays a list of folders"
+msgstr "Zobrazí zoznam priečinkov"
+
+msgid "Displays installed applications"
+msgstr "Zobrazí nainštalované aplikácie"
+
+msgid "Displays the items that you marked as \"pinned\" using the context menu"
+msgstr ""
+"Zobrazí položky ktoré ste označili ako \"pripnuté\" pomocou kontextového menu"
+
+msgid "Do you want to run \"%(file_name)s\", or display its contents?"
+msgstr "Chcete spustiť \"%(file_name)s\", alebo chcete zobraziť obsah?"
+
+msgid "Drag to reorder plugins"
+msgstr "Presuňte pre zmenu poradia pluginov"
+
+msgid "Edit Menus"
+msgstr "Upraviť menu"
+
+msgid "Execute '%s' As Root"
+msgstr "Spustiť '%s' ako Root"
+
+msgid "Execute '%s' In Terminal"
+msgstr "Spustiť '%s' v Termináli"
+
+msgid "Execute the command '%s' inside a new terminal window"
+msgstr "Spustiť príkaz '%s' v novom okne terminálu"
+
+msgid "Execute the command '%s' with administrative rights"
+msgstr "Spustiť príkaz '%s' s právami administrátora"
+
+msgid "File search"
+msgstr "Hľadať súbor"
+
+msgid "Files that you have used recently"
+msgstr "Súbory, ktoré ste nedávno otvorili"
+
+msgid "Files you used this month"
+msgstr "Súbory, ktoré ste použili tento mesiac"
+
+msgid "Files you used this week"
+msgstr "Súbory, ktoré ste použili tento týždeň"
+
+msgid "Files you used today"
+msgstr "Súbory, ktoré ste použili dnes"
+
+msgid "Filesystem Root"
+msgstr "Koreňový priečinok súborového systému"
+
+msgid "Firefox Bookmarks"
+msgstr "Záložky Firefoxu"
+
+msgid ""
+"Firefox bookmark:\n"
+"%s"
+msgstr ""
+"Záložky Firefoxu:\n"
+"%s"
+
+msgid "Folder Contents"
+msgstr "Obsah priečinku"
+
+msgid "Full-text file search"
+msgstr "Fulltextové vyhľadávanie súborov"
+
+msgid ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+msgstr ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+
+msgid "General"
+msgstr "Všeobecné"
+
+msgid "Get help with %(distro_name)s"
+msgstr "Získajte pomoc s %(distro_name)s"
+
+msgid "Go To \"%s\""
+msgstr "Prejsť na \"%s\""
+
+msgid "Go To \"%s\" in Chromium"
+msgstr "Prejsť na \"%s\" v Chromiu"
+
+msgid "Go To \"%s\" in Firefox"
+msgstr "Prjesť na \"%s\" vo Firefoxe"
+
+msgid "Go To \"%s\" in Google Chrome"
+msgstr "Prejsť na \"%s\" v Google Chrome"
+
+msgid "Google"
+msgstr "Google"
+
+msgid "Google localized results"
+msgstr "Lokalizované Google výsledky"
+
+msgid "Grab new shortcut"
+msgstr "Zachytiť novú skratku"
+
+msgid "Help and Support"
+msgstr "Nápoveda a podpora"
+
+msgid "Home"
+msgstr "Domov"
+
+msgid "Icon:"
+msgstr "Ikona:"
+
+msgid "Install this package without opening the Software Center"
+msgstr "Nainštalovať tento balíček bez otvorenia Centra softwaru"
+
+msgid "Items found on eBay"
+msgstr "Položky nájdené na eBay"
+
+msgid "Items pinned to the side pane"
+msgstr "Položky pripnuté do bočného panelu"
+
+msgid "Items that are not under any menu category"
+msgstr "Položky, ktoré niesu pod žiadnou kategóriou v menu"
+
+msgid "Keep search results when Cardapio is hidden"
+msgstr "Uchovať výsledky hľadania keď je Cardapio skryté"
+
+msgid "Label:"
+msgstr "Štítok:"
+
+msgid "Launch in _Background"
+msgstr "Spustiť na _pozadí"
+
+msgid "Launch this item"
+msgstr "Spustiť túto položku"
+
+msgid ""
+"Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-"
+"Click)"
+msgstr ""
+"Spustiť túto položku ale neskryť Cardapio (rovnako ako klik stredným alebo "
+"CTRL+klik)"
+
+msgid ""
+"Lets you choose from thousands of free applications available for Ubuntu"
+msgstr "Vyberajte z tisícov slobodných aplikácií dostupných pre Ubuntu"
+
+msgid "Local Results"
+msgstr "Lokálne výsledky"
+
+msgid "Localized Web Results"
+msgstr "Lokalizované webové výsledky"
+
+msgid "Lock Screen"
+msgstr "Zamknúť obrazovku"
+
+msgid "Log Out..."
+msgstr "Odhlásiť..."
+
+msgid "Log out of this session to log in as a different user"
+msgstr "Odhlásiť sa z tejto relácie, aby sa mohol prihlásiť iný používateľ"
+
+msgid "Look inside folders"
+msgstr "Pozrieť do priečinkov"
+
+msgid "Menu"
+msgstr "Menu"
+
+msgid "Network"
+msgstr "Sieť"
+
+msgid "No results to show"
+msgstr "Žiadne výsledky na zobrazenie"
+
+msgid "No results to show in \"%(category_name)s\""
+msgstr "Žiadne výsledky na zobrazenie v \"%(category_name)s\""
+
+msgid "Open Parent _Folder"
+msgstr "Otvoriť rodičovský _priečinok"
+
+msgid "Open Software Center"
+msgstr "Otvorené Centrum softwaru"
+
+msgid "Open categories when cursor hovers them"
+msgstr "Otvoriť kategórie keď kurzor prejde ponad nich"
+
+msgid "Open in Chromium"
+msgstr "Otvoriť v Chromiu"
+
+msgid "Open in Firefox"
+msgstr "Otvoriť vo Firefoxe"
+
+msgid "Open in Google Chrome"
+msgstr "Otvoriť v Google Chrome"
+
+msgid "Open menu when cursor hovers the applet"
+msgstr "Otvoriť menu, keď kurzor prejde ponad applet"
+
+msgid "Open the trash"
+msgstr "Otvoriť kôš"
+
+msgid "Open this item's parent folder in the file browser"
+msgstr "Otvoriť rodičovský priečinok tohto v prehliadači súborov"
+
+msgid "Open this note"
+msgstr "Otvoriť túto poznámku"
+
+msgid "Open your personal folder"
+msgstr "Otvoriť váš osobný priečinok"
+
+msgid "Other configuration tools"
+msgstr "Iné konfiguračné nástroje"
+
+msgid "Pages bookmarked in Firefox, Chrome, or Chromium"
+msgstr "Záložky stránok vo Firefoxe, Chrome, alebo Chromiu"
+
+msgid "Peek _Inside Folder"
+msgstr "Nazr_ieť do priečinka"
+
+msgid "Perform a search using Microsoft's Bing"
+msgstr "Uskutočniť hľadanie pomocou Microsoft Bing"
+
+msgid "Perform a search using Yahoo"
+msgstr "Uskutočniť hľadanie pomocou Yahoo"
+
+msgid ""
+"Perform quick Google searches <b>limited to</b> the system's default language"
+msgstr ""
+"Vykonať rýchle Google vyhľadávania vo <b>obmedzené na</b> jazyk systému"
+
+msgid "Perform quick Google searches in <b>all</b> languages"
+msgstr "Vykonať rýchle Google vyhľadávania vo <b>všetkých</b> jazykoch"
+
+msgid "Pidgin"
+msgstr "Pidgin"
+
+msgid "Pidgin Buddies"
+msgstr "Pidgin kamaráti"
+
+msgid "Pinned items"
+msgstr "Pripnuté položky"
+
+msgid "Place this item in the side pane"
+msgstr "Umiestniť túto položku do bočného panela"
+
+msgid "Place this item into the \"Pinned Items\" list"
+msgstr "Umiestniť túto položku do zoznamu pripinutých položiek"
+
+msgid "Places"
+msgstr "Miesta"
+
+msgid "Places menu"
+msgstr "Menu miesta"
+
+msgid "Plugins"
+msgstr "Pluginy"
+
+msgid "Protect your computer from unauthorized use"
+msgstr "Ochrániť váš počítač pred neautorizovaným použitím"
+
+msgid "Recent Documents"
+msgstr "Nedávne dokumenty"
+
+msgid "Recent documents (categorized)"
+msgstr "Nedávne dokumenty (kategorizované)"
+
+msgid "Recent documents (simple)"
+msgstr "Nedávne dokumenty (jednoducho)"
+
+msgid "Recent documents (smart)"
+msgstr "Nedávne dokumenty (inteligentne)"
+
+msgid "Recording..."
+msgstr "Nahráva sa..."
+
+msgid "Reduce the size of Cardapio's main window"
+msgstr "Zmenšiť veľkosť hlavného okna Cardapia"
+
+msgid "Remove this item from the \"Pinned Items\" list"
+msgstr "Odstrániť túto položku zo zoznamu pripnutých položiek"
+
+msgid "Remove this item from the side pane"
+msgstr "Ostrániť túto položku z bočného panela"
+
+msgid "Results found in Amazon"
+msgstr "Výsledky nájdené v Amazone"
+
+msgid "Results found in Wikipedia"
+msgstr "Výsledky nájdené vo Wikipedii"
+
+msgid "Results found in YouTube"
+msgstr "Výsledky nájdené v YouTube"
+
+msgid "Results found in your computer"
+msgstr "Výsledky nájdené vo vašom počítači"
+
+msgid "Results found inside the files in your computer"
+msgstr "Výsledky nájdené vo vnútri súborov vo vašom počítači"
+
+msgid "Results found using Bing"
+msgstr "Výsledky nájdené pomocou Bingu"
+
+msgid "Results found using Yahoo"
+msgstr "Výsledky nájdené pomocou Yahoo"
+
+msgid "Results found with Google"
+msgstr "Výsledky nájdené s Googleom"
+
+msgid "Results found with Google in you system language"
+msgstr "Výsledky nájdené s Googleom vo vašom systémovom jazyku"
+
+msgid "Results within files"
+msgstr "Výsledky v rámci souborov"
+
+msgid "Run Command"
+msgstr "Spustiť príkaz"
+
+msgid "Run commands from the search box"
+msgstr "Spustiť príkazy z políčka hľadania"
+
+msgid "Run in _Terminal"
+msgstr "Spustiť v _termináli"
+
+msgid "Run system commands, just like in the command-line"
+msgstr "Spustiť systémové príkazy, len ako v príkazovom riadku"
+
+msgid "Safely eject this mount"
+msgstr "Bezpečne odstrániť toto pripojenie"
+
+msgid "Search"
+msgstr "Hľadať"
+
+msgid "Search <b>inside</b> local files and folders indexed with Tracker"
+msgstr ""
+"Hľadať <b>vo vnútri</b> lokálnych súborov a priečinkov indexovaných Trackerom"
+
+msgid "Search for Firefox Bookmarks"
+msgstr "Hľadať v záložkách Firefoxu"
+
+msgid "Search for Tomboy notes"
+msgstr "Hľadať v poznámkach Tomboya"
+
+msgid "Search for and start VirtualBox virtual machines from the menu"
+msgstr "Hľadať a spustiť virtuálny stroj VirtualBoxu z menu"
+
+msgid "Search for items on eBay"
+msgstr "Hľadať položky na eBay"
+
+msgid "Search for more software in the Software Center"
+msgstr "Hľadať viac softwaru v Centre softwaru"
+
+msgid "Search for new applications in the Software Center"
+msgstr "Hľadať nové aplikácie pomocou Centra softwaru"
+
+msgid "Search for online Pidgin buddies"
+msgstr "Hľadať v pripojených kamarátoch v Pidgine"
+
+msgid "Search for pages bookmarked in Firefox, Chrome, or Chromium"
+msgstr "Hľadať záložky stránok vo Firefoxe, Chrome, alebo Chromiu"
+
+msgid "Search for results in Amazon"
+msgstr "Hľadať výsledky v Amazone"
+
+msgid "Search for results in Wikipedia"
+msgstr "Hľadať výsledky na Wikipedii"
+
+msgid "Search for results in YouTube"
+msgstr "Hľadať výsledky v YouTube"
+
+msgid ""
+"Search for your most recently used files in categorized fashion, but save "
+"space when no query is entered."
+msgstr ""
+"Hľadať vaše nedávno používané súbory v kategorizovanom tvare, ale uložiť "
+"termín keď nieje vložený výraz."
+
+msgid ""
+"Search for your most recently used files, divided into categories depending "
+"on <i>when</i> they were last accessed."
+msgstr ""
+"Hľadať vaše nedávno používané súbory, rozdelené do kategórií podľa "
+"posledného prístupu."
+
+msgid "Search for your most recently used files."
+msgstr "Hľadať vaše nedávno používané súbory"
+
+msgid "Search local files and folders indexed with Tracker"
+msgstr "Hľadať lokálne súbory a priečinky indexované Trackerom"
+
+msgid "Search timed out"
+msgstr "Vypršal čas hľadania"
+
+msgid "Searching..."
+msgstr "Hľadanie..."
+
+msgid "See https://translations.launchpad.net/cardapio"
+msgstr "Pozrite https://translations.launchpad.net/cardapio"
+
+msgid "Session"
+msgstr "Relácia"
+
+msgid "Shortcut key:"
+msgstr "Klávesová skratka:"
+
+msgid "Show %s in the Software Center"
+msgstr "Zobraziť %s v Centre softwaru"
+
+msgid "Show additional notes"
+msgstr "Zobraziť ďalšie poznámky"
+
+msgid "Show additional notes in Tomboy"
+msgstr "Zobraziť ďalšie poznámky v Tomboyi"
+
+msgid "Show additional results"
+msgstr "Zobraziť ďalšie výsledky"
+
+msgid "Show additional search results in Sezen"
+msgstr "Zobraziť ďalšie výsledky hľadania v Sezen"
+
+msgid "Show additional search results in a file browser"
+msgstr "Zobraziť ďalšie výsledky hľadania v prehliadači súborov"
+
+msgid "Show additional search results in the Tracker search tool"
+msgstr "Zobraziť ďalšie výsledky hľadania vo vyhľadávacom nástroji Tracker"
+
+msgid "Show additional search results in your web browser"
+msgstr "Zobraziť ďalšie výsledky hľadania vo vašom prehliadači"
+
+msgid "Show all categories"
+msgstr "Zobraziť všetky kategórie"
+
+msgid "Show contents of this folder within Cardapio"
+msgstr "Zobraziť obsah tohto priečinka s Cardapiom"
+
+msgid "Show session buttons in bottom pane"
+msgstr "Zobraziť tlačítka relácie v spodnom políčku"
+
+msgid "Shut Down..."
+msgstr "Vypnúť..."
+
+msgid "Shut down the system"
+msgstr "Vypnúť systém"
+
+msgid "Side Pane"
+msgstr "Bočný panel"
+
+msgid "Software Center"
+msgstr "Centrum softwaru"
+
+msgid "Software available to install on your system"
+msgstr "Software dostupný pre nainštalovanie na váš systém"
+
+msgid ""
+"Start virtual machine %(name)s\n"
+"OS Type: %(os)s"
+msgstr ""
+"Spustiť virtuálny stroj %(name)s\n"
+"Typ OS: %(os)s"
+
+msgid "System"
+msgstr "Relácia"
+
+msgid "Talk to this buddy"
+msgstr "Hovoriť s týmto kamarátom"
+
+msgid "This is a community-supported plugin"
+msgstr "Toto je plugin podporovaný komunitou"
+
+msgid "This menu will be updated momentarily."
+msgstr "Toto menu bude aktualizované okamžite."
+
+msgid "This month"
+msgstr "Tento mesiac"
+
+msgid "This week"
+msgstr "Tento týždeň"
+
+msgid "Today"
+msgstr "Dnes"
+
+msgid "Tomboy"
+msgstr "Tomboy"
+
+msgid "Tomboy Results"
+msgstr "Výsledky Tomboya"
+
+msgid "Trash"
+msgstr "Kôš"
+
+msgid "Ubuntu Software Center"
+msgstr "Ubuntu centrum softwaru"
+
+msgid "Uncategorized"
+msgstr "Nezaradené"
+
+msgid "Update now"
+msgstr "Aktualizovať teraz"
+
+msgid "View"
+msgstr "Zobraziť"
+
+msgid "Virtual Machines"
+msgstr "Virtuálne stroje"
+
+msgid "VirtualBox"
+msgstr "VirtualBox"
+
+msgid "Web Bookmarks"
+msgstr "Webové záložky"
+
+msgid "Web Results"
+msgstr "Webové výsledky"
+
+msgid "Web bookmarks in Firefox"
+msgstr "Webové záložky vo Firefoxe"
+
+msgid "Wikipedia"
+msgstr "Wikipedia"
+
+msgid "Wikipedia Results"
+msgstr "Wikipedia výsledky"
+
+msgid "Yahoo"
+msgstr "Yahoo"
+
+msgid "Yahoo Results"
+msgstr "Výsledky z Yahoo"
+
+msgid "YouTube"
+msgstr "YouTube"
+
+msgid "YouTube Results"
+msgstr "Výsledky z YouTube"
+
+msgid "Your Tomboy notes"
+msgstr "Vaše Tomboy poznámky"
+
+msgid "Your VirtualBox virtual machines"
+msgstr "Vaše VirtualBox virtuálne stroje"
+
+msgid "Your favorite items"
+msgstr "Vaše obľúbené položky"
+
+msgid "Your online Pidgin buddies"
+msgstr "Vaši pripojený kamaráti v Pidgine"
+
+msgid "_About %(distro_name)s"
+msgstr "_O %(distro_name)s"
+
+msgid "_About Cardapio"
+msgstr "_O Cardapiu"
+
+msgid "_About Gnome"
+msgstr "_O Gnome"
+
+msgid "_Add to Side Pane"
+msgstr "Prid_ať do bočného panela"
+
+msgid "_Control Center"
+msgstr "Ovládacie _centrum"
+
+msgid "_Display"
+msgstr "_Zobraziť"
+
+msgid "_Edit Menus"
+msgstr "_Upraviť menu"
+
+msgid "_Install %s"
+msgstr "Na_inštalovať %s"
+
+msgid "_Launch"
+msgstr "_Spustiť"
+
+msgid "_Pin This Item"
+msgstr "_Pripnúť túto položku"
+
+msgid "_Properties"
+msgstr "_Vlastnosti"
+
+msgid "_Remove from Side Pane"
+msgstr "Ost_rániť z bočného panela"
+
+msgid "_Run"
+msgstr "_Spustiť"
+
+msgid "_Unmount"
+msgstr "_Odpojiť"
+
+msgid "_Unpin This Item"
+msgstr "Odopn_uť túto položku"
+
+msgid "eBay"
+msgstr "eBay"
+
+msgid "eBay Results"
+msgstr "eBay výsledky"
+
+msgid "translators: just enter any text here"
+msgstr "prekladatelia: len vložte nejaký text sem"

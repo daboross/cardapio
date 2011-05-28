@@ -1,0 +1,202 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cardapio\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2011-03-24 22:37+0100\n"
+"PO-Revision-Date: 2010-08-11 09:23+0000\n"
+"Last-Translator: zenixls2 <Unknown>\n"
+"Language-Team: Chinese (Traditional) <zh_TW@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
+"X-Generator: Launchpad (build 12981)\n"
+
+msgid "\"%(file_name)s\" is an executable text file."
+msgstr "\"%(file_name)s\"為可執行的文字檔"
+
+msgid ""
+"<b>Plugin:</b> %(name)s %(version)s\n"
+"<b>Author:</b> %(author)s\n"
+"<b>Description:</b> %(description)s"
+msgstr ""
+"<b>插件:</b> %(name)s %(version)s\n"
+"<b>作者:</b> %(author)s\n"
+"<b>描述:</b> %(description)s"
+
+msgid "Access applications, folders, system settings, etc."
+msgstr "存取應用程式、資料夾、系統設定等"
+
+msgid "All"
+msgstr "所有"
+
+msgid "Application menu"
+msgstr "應用程式選單"
+
+msgid "Cardapio Properties"
+msgstr "Cardapio屬性"
+
+msgid "Cardapio Team"
+msgstr "Cardapio團隊"
+
+msgid "Desktop"
+msgstr "桌面"
+
+msgid "Displays a list of folders"
+msgstr "顯示一整列資料夾"
+
+msgid "Displays installed applications"
+msgstr "顯示已安裝的應用程式"
+
+msgid "Edit Menus"
+msgstr "編輯選單"
+
+msgid "General"
+msgstr "一般的"
+
+msgid "Get help with %(distro_name)s"
+msgstr "取得%(distro_name)s協助"
+
+msgid "Help and Support"
+msgstr "幫助及支援"
+
+msgid "Home"
+msgstr "家目錄"
+
+msgid "Items pinned to the side pane"
+msgstr "釘在側邊欄的項目"
+
+msgid "Items that are not under any menu category"
+msgstr "不在任何分類下的項目"
+
+msgid "Keep search results when Cardapio is hidden"
+msgstr "當Cardapio隱藏時保留搜尋結果"
+
+msgid ""
+"Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-"
+"Click)"
+msgstr "啟動此項目但不隱藏Cardapio (和 Middle-Click 或 CTRL-Click 一樣)"
+
+msgid ""
+"Lets you choose from thousands of free applications available for Ubuntu"
+msgstr "讓您從 Ubuntu 裡數以千計的自由應用軟體中選擇所需要的軟體。"
+
+msgid "Lock Screen"
+msgstr "鎖住螢幕"
+
+msgid "Log Out..."
+msgstr "登出..."
+
+msgid "Log out of this session to log in as a different user"
+msgstr "登出這個作業階段，然後以其它使用者登入"
+
+msgid "No results to show"
+msgstr "無結果可顯示"
+
+msgid "No results to show in \"%(category_name)s\""
+msgstr "在\"%(category_name)s\"裡無結果可顯示"
+
+msgid "Open menu when cursor hovers the applet"
+msgstr "當指標經過程序時開啟選單"
+
+msgid "Open the trash"
+msgstr "開啟回收筒"
+
+msgid "Open this item's parent folder in the file browser"
+msgstr "在檔案瀏覽器開啟此項目的所在目錄"
+
+msgid "Open your personal folder"
+msgstr "開啟您的個人資料夾"
+
+msgid "Other configuration tools"
+msgstr "其他設定工具"
+
+msgid "Place this item in the side pane"
+msgstr "將此項目放置在側邊欄"
+
+msgid "Places"
+msgstr "位置"
+
+msgid "Places menu"
+msgstr "位置選單"
+
+msgid "Plugins"
+msgstr "插件"
+
+msgid "Protect your computer from unauthorized use"
+msgstr "保護電腦，避免別人在未經授權的情況下使用"
+
+msgid "Remove this item from the \"Pinned Items\" list"
+msgstr "自\"已釘上的項目\"列表移除此項目"
+
+msgid "Remove this item from the side pane"
+msgstr "自底部移除此項目"
+
+msgid "Run in _Terminal"
+msgstr "在終端機中執行(_T)"
+
+msgid "Search"
+msgstr "搜尋"
+
+msgid "Search timed out"
+msgstr "搜尋逾時"
+
+msgid "Searching..."
+msgstr "搜索中..."
+
+msgid "See https://translations.launchpad.net/cardapio"
+msgstr "見 https://translations.launchpad.net/cardapio"
+
+msgid "Session"
+msgstr "作業階段"
+
+msgid "Shortcut key:"
+msgstr "快捷鍵："
+
+msgid "Show all categories"
+msgstr "顯示所有分類"
+
+msgid "Show session buttons in bottom pane"
+msgstr "在底部顯示作業階段按鈕"
+
+msgid "Shut Down..."
+msgstr "關機..."
+
+msgid "Shut down the system"
+msgstr "關閉系統"
+
+msgid "Side Pane"
+msgstr "側邊欄"
+
+msgid "System"
+msgstr "系統"
+
+msgid "This is a community-supported plugin"
+msgstr "此為社群支持的插件"
+
+msgid "Trash"
+msgstr "回收筒"
+
+msgid "Ubuntu Software Center"
+msgstr "Ubuntu軟體中心"
+
+msgid "Uncategorized"
+msgstr "未分類"
+
+msgid "View"
+msgstr "檢視"
+
+msgid "_About %(distro_name)s"
+msgstr "關於%(distro_name)s(_A)"
+
+msgid "_About Cardapio"
+msgstr "關於Cardapio(_A)"
+
+msgid "_About Gnome"
+msgstr "關於Gnome(_A)"
+
+msgid "_Edit Menus"
+msgstr "編輯選單(_E)"
+
+msgid "_Properties"
+msgstr "屬性(_P)"

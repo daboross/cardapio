@@ -1,0 +1,585 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cardapio\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2011-03-24 22:37+0100\n"
+"PO-Revision-Date: 2011-01-06 16:37+0000\n"
+"Last-Translator: Ekrem Kocadere <ekocadere@hotmail.com>\n"
+"Language-Team: Turkish <tr@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
+"X-Generator: Launchpad (build 12981)\n"
+
+msgid "\"%(file_name)s\" is an executable text file."
+msgstr "\"%(file_name)s\", çalıştırılabilir bir metin dosyası."
+
+msgid "<b>Appearance</b>"
+msgstr "<b>Görünüm</b>"
+
+msgid "<b>Behavior</b>"
+msgstr "<b>Davranış</b>"
+
+msgid ""
+"<b>Plugin:</b> %(name)s %(version)s\n"
+"<b>Author:</b> %(author)s\n"
+"<b>Description:</b> %(description)s"
+msgstr ""
+"<b>Eklenti:</b> %(name)s %(version)s\n"
+"<b>Yazan:</b> %(author)s\n"
+"<b>Açıklama:</b> %(description)s"
+
+msgid "Access applications, folders, system settings, etc."
+msgstr "Uygulamalara, klasörlere, sistem ayarlarına erişim."
+
+msgid "Access documents and folders"
+msgstr "Belgelere ve klasörlere erişim"
+
+msgid "All"
+msgstr "Tümü"
+
+msgid "Amazon"
+msgstr "Amazon"
+
+msgid "Amazon Results"
+msgstr "Amazon Sonuçları"
+
+msgid "Applet"
+msgstr "Uygulamacık"
+
+msgid "Application menu"
+msgstr "Uygulama menüsü"
+
+msgid "Available Software"
+msgstr "Kullanılabilir Yazılım"
+
+msgid "Bing"
+msgstr "Bing"
+
+msgid "Bing Results"
+msgstr "Bing Sonuçları"
+
+msgid "Browse the contents of the network"
+msgstr "Ağ içeriğini tara"
+
+msgid "Cardapio"
+msgstr "Cardapio"
+
+msgid "Cardapio Properties"
+msgstr "Cardapio Özellikleri"
+
+msgid "Cardapio Team"
+msgstr "Cardapio Ekibi"
+
+msgid "Cardapio Website"
+msgstr "Cardapio Sitesi"
+
+msgid "Command Launcher"
+msgstr "Komut Çalıştırıcı"
+
+msgid "Connect to Server"
+msgstr "Sunucuya Bağlan"
+
+msgid "Connect to a remote computer or shared disk"
+msgstr "Uzaktaki bilgisayara ya da paylaşılan diske bağlan"
+
+msgid "Create a new note with this title in Tomboy"
+msgstr "Bu başlık altında bir Tomboy notu oluştur"
+
+msgid "Create this note"
+msgstr "Böyle bir not oluştur"
+
+msgid "Description:"
+msgstr "Açıklama:"
+
+msgid "Desktop"
+msgstr "Masaüstü"
+
+msgid "Displays a list of folders"
+msgstr "Bir dizin listesi gösterir"
+
+msgid "Displays installed applications"
+msgstr "Yüklü uygulamaları göster"
+
+msgid "Drag to reorder plugins"
+msgstr "Eklentileri yeniden sıralamak için sürükleyin"
+
+msgid "Edit Menus"
+msgstr "Menüleri Düzenle"
+
+msgid "Execute '%s' As Root"
+msgstr "'%s' komutunu Yetkili olarak çalıştır"
+
+msgid "Execute '%s' In Terminal"
+msgstr "'%s' komutunu Uçbirim'de çalıştır"
+
+msgid "Execute the command '%s' inside a new terminal window"
+msgstr "'%s' komutunu yeni bir uçbirim penceresinde çalıştır"
+
+msgid "Execute the command '%s' with administrative rights"
+msgstr "'%s' komutunu yönetici haklarıyla çalıştır"
+
+msgid "File search"
+msgstr "Dosya arama"
+
+msgid "Files that you have used recently"
+msgstr "Son kullanılan dosyalarınız"
+
+msgid "Firefox Bookmarks"
+msgstr "Firefox Yer İmleri"
+
+msgid "Folder Contents"
+msgstr "Klasör İçeriği"
+
+msgid "Full-text file search"
+msgstr "Tam metin dosya arama"
+
+msgid ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+msgstr ""
+"GNU Genel Kamu Lisansı v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+
+msgid "General"
+msgstr "Genel"
+
+msgid "Get help with %(distro_name)s"
+msgstr "Yardım: %(distro_name)s"
+
+msgid "Google"
+msgstr "Google"
+
+msgid "Google localized results"
+msgstr "Google yerel sonuçları"
+
+msgid "Help and Support"
+msgstr "Yardım ve Destek"
+
+msgid "Home"
+msgstr "Ev Dizini"
+
+msgid "Icon:"
+msgstr "Simge:"
+
+msgid "Install this package without opening the Software Center"
+msgstr "Bu paketi Yazılım Merkezi'ni açmadan yükle"
+
+msgid "Items found on eBay"
+msgstr "eBay'da bulunan sonuçlar"
+
+msgid "Items pinned to the side pane"
+msgstr "Yan panele sabitlenmiş öğeler"
+
+msgid "Items that are not under any menu category"
+msgstr "Hiçbir menüde olmayan öğeler"
+
+msgid "Keep search results when Cardapio is hidden"
+msgstr "Cardapio gizlendiğinde arama sonuçlarını koru"
+
+msgid ""
+"Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-"
+"Click)"
+msgstr ""
+"Bu öğeyi çalıştır ancak Carpadio'yu gizleme (Orta-Tıklama ya da CTRL-Tıklama "
+"ile aynı)"
+
+msgid ""
+"Lets you choose from thousands of free applications available for Ubuntu"
+msgstr ""
+"Ubuntu için mevcut olan binlerce ücretsiz uygulamadan istediğinizi seçin."
+
+msgid "Local Results"
+msgstr "Yerel Sonuçlar"
+
+msgid "Localized Web Results"
+msgstr "Yerelleştirilmiş Arama Sonuçları"
+
+msgid "Lock Screen"
+msgstr "Ekranı Kilitle"
+
+msgid "Log Out..."
+msgstr "Oturumu Kapat..."
+
+msgid "Log out of this session to log in as a different user"
+msgstr "Farklı bir kullanıcı ile giriş yapmak için bu oturumu kapat"
+
+msgid "Look inside folders"
+msgstr "Klasörlere gözat"
+
+msgid "Menu"
+msgstr "Menü"
+
+msgid "Network"
+msgstr "Ağ"
+
+msgid "No results to show"
+msgstr "Sonuç yok"
+
+msgid "No results to show in \"%(category_name)s\""
+msgstr "\"%(category_name)s\" için sonuç gösterilemiyor"
+
+msgid "Open Parent _Folder"
+msgstr "Ana _Klasörü Aç"
+
+msgid "Open Software Center"
+msgstr "Yazılım Merkezi'ni Aç"
+
+msgid "Open categories when cursor hovers them"
+msgstr "İmleç kategorilerin üzerine geldiğinde menüleri aç"
+
+msgid "Open in Chromium"
+msgstr "Chromium'da aç"
+
+msgid "Open in Firefox"
+msgstr "Firefox'ta aç"
+
+msgid "Open in Google Chrome"
+msgstr "Google Chrome'da aç"
+
+msgid "Open menu when cursor hovers the applet"
+msgstr "İmleç uygulamacık üzerine geldiğinde menüyü aç"
+
+msgid "Open the trash"
+msgstr "Çöpü aç"
+
+msgid "Open this item's parent folder in the file browser"
+msgstr "Bu öğenin ana klasörünü dosya tarayıcısında açın"
+
+msgid "Open this note"
+msgstr "Bu notu aç"
+
+msgid "Open your personal folder"
+msgstr "Kişisel klasörünüzü açın"
+
+msgid "Other configuration tools"
+msgstr "Diğer yapılandırma araçları"
+
+msgid "Perform a search using Microsoft's Bing"
+msgstr "Bing kullanarak bir arama gerçekleştir"
+
+msgid "Perform a search using Yahoo"
+msgstr "Yahoo ile bir arama yapın"
+
+msgid ""
+"Perform quick Google searches <b>limited to</b> the system's default language"
+msgstr ""
+"Varsayılan sistem diline göre <b>sınırlandırılmış</b> Google aramaları "
+"gerçekleştir"
+
+msgid "Perform quick Google searches in <b>all</b> languages"
+msgstr "Google aramalarını <b>tüm</b> dillerde gerçekleştir"
+
+msgid "Pidgin"
+msgstr "Pidgin"
+
+msgid "Pidgin Buddies"
+msgstr "Pidgin Dostları"
+
+msgid "Pinned items"
+msgstr "Askıdaki öğeler"
+
+msgid "Place this item in the side pane"
+msgstr "Bu öğeyi yan panele yerleştir"
+
+msgid "Place this item into the \"Pinned Items\" list"
+msgstr "Bu öğeyi \"Askıdaki Öğeler\" listesine ekle"
+
+msgid "Places"
+msgstr "Yerler"
+
+msgid "Places menu"
+msgstr "Yerler menüsü"
+
+msgid "Plugins"
+msgstr "Eklentiler"
+
+msgid "Protect your computer from unauthorized use"
+msgstr "Bilgisayarınızı yetkisiz kullanımdan koruyun"
+
+msgid "Recent Documents"
+msgstr "Son Kullanılan Belgeler"
+
+msgid "Recording..."
+msgstr "Kaydediliyor..."
+
+msgid "Reduce the size of Cardapio's main window"
+msgstr "Cardapio'nun ana penceresinin boyutunu küçült"
+
+msgid "Remove this item from the \"Pinned Items\" list"
+msgstr "Bu öğeyi \"Askıdaki Öğeler\" listesinden kaldır"
+
+msgid "Remove this item from the side pane"
+msgstr "Bu öğeyi yan panelden kaldır"
+
+msgid "Results found in Amazon"
+msgstr "Amazon'da bulunan sonuçlar"
+
+msgid "Results found in Wikipedia"
+msgstr "Vikipedi'de bulunan sonuçlar"
+
+msgid "Results found in YouTube"
+msgstr "YouTube'da bulunan sonuçlar"
+
+msgid "Results found in your computer"
+msgstr "Bilgisayarınızda bulunan sonuçlar"
+
+msgid "Results found inside the files in your computer"
+msgstr "Bilgisayarınızdaki dosyalarda bulunan sonuçlar"
+
+msgid "Results found using Bing"
+msgstr "Bing kullanarak bulunan sonuçlar"
+
+msgid "Results found using Yahoo"
+msgstr "Yahoo'da bulunan sonuçlar"
+
+msgid "Results found with Google"
+msgstr "Google ile bulunan sonuçlar"
+
+msgid "Results found with Google in you system language"
+msgstr "Google'ın sistem dilinize göre bulduğu sonuçlar"
+
+msgid "Results within files"
+msgstr "Dosya içindeki sonuçlar"
+
+msgid "Run Command"
+msgstr "Komut Çalıştır"
+
+msgid "Run commands from the search box"
+msgstr "Komutları arama kutusunu kullanarak çalıştır"
+
+msgid "Run in _Terminal"
+msgstr "_Uçbirimde Çalıştır"
+
+msgid "Run system commands, just like in the command-line"
+msgstr "Sistem komutlarını komut-satırındaki gibi çalıştır"
+
+msgid "Safely eject this mount"
+msgstr "Bağı güvenle kaldır"
+
+msgid "Search"
+msgstr "Ara"
+
+msgid "Search <b>inside</b> local files and folders indexed with Tracker"
+msgstr "Tracker ile indekslenmiş dosya ve klasörler <b>içindeki</b> sounçlar"
+
+msgid "Search for Firefox Bookmarks"
+msgstr "Firefox Yer İmlerini Ara"
+
+msgid "Search for Tomboy notes"
+msgstr "Tomboy notlarını ara"
+
+msgid "Search for and start VirtualBox virtual machines from the menu"
+msgstr "VirtualBox sanal makinaları menüden arayıp çalıştır"
+
+msgid "Search for items on eBay"
+msgstr "eBay'daki öğeleri ara"
+
+msgid "Search for more software in the Software Center"
+msgstr "Yazılım Merkezi'nda daha fazla yazılım ara"
+
+msgid "Search for new applications in the Software Center"
+msgstr "Yazılım Merkezi'de yeni uygulamalar arayın"
+
+msgid "Search for online Pidgin buddies"
+msgstr "Pidgin'deki çevrimiçi dostlarınızı arayın"
+
+msgid "Search for results in Amazon"
+msgstr "Amazon'daki sonuçları arayın"
+
+msgid "Search for results in Wikipedia"
+msgstr "Vikipedi'deki sonuçlar için arayın"
+
+msgid "Search for results in YouTube"
+msgstr "YouTube'daki sonuçları arayın"
+
+msgid "Search local files and folders indexed with Tracker"
+msgstr "Tracker ile indekslenmiş yerel dosyaları ve dizini ara"
+
+msgid "Search timed out"
+msgstr "Arama zaman aşımı"
+
+msgid "Searching..."
+msgstr "Aranıyor..."
+
+msgid "See https://translations.launchpad.net/cardapio"
+msgstr "Gözat: https://translations.launchpad.net/cardapio"
+
+msgid "Session"
+msgstr "Oturum"
+
+msgid "Shortcut key:"
+msgstr "Kısayol:"
+
+msgid "Show %s in the Software Center"
+msgstr "%s uygulamasını Yazılım Merkezi'nde göster"
+
+msgid "Show additional notes"
+msgstr "Ek notları göster"
+
+msgid "Show additional notes in Tomboy"
+msgstr "Ek notları Tomboy'da göster"
+
+msgid "Show additional results"
+msgstr "Ek sonuçları göster"
+
+msgid "Show additional search results in Sezen"
+msgstr "Sezen'deki ek arama sonuçlarını göster"
+
+msgid "Show additional search results in the Tracker search tool"
+msgstr "Tracker arama aracı kullanılarak bulunan ek arama sonuçları"
+
+msgid "Show additional search results in your web browser"
+msgstr "Ek sonuçları tarayıcıda göster"
+
+msgid "Show all categories"
+msgstr "Tüm kategorileri göster"
+
+msgid "Show contents of this folder within Cardapio"
+msgstr "Bu klasör içeriğini Carpadio'da göster"
+
+msgid "Show session buttons in bottom pane"
+msgstr "Oturum komutlarını alt panelde göster"
+
+msgid "Shut Down..."
+msgstr "Bilgisayarı Kapat..."
+
+msgid "Shut down the system"
+msgstr "Sistemi kapat"
+
+msgid "Side Pane"
+msgstr "Yan Panel"
+
+msgid "Software Center"
+msgstr "Yazılım Merkezi"
+
+msgid "Software available to install on your system"
+msgstr "Sisteminize yüklenebilecek mevcut yazılım"
+
+msgid ""
+"Start virtual machine %(name)s\n"
+"OS Type: %(os)s"
+msgstr ""
+"Sanal sistemi başlat: %(name)s\n"
+"Sistem türü: %(os)s"
+
+msgid "System"
+msgstr "Sistem"
+
+msgid "Talk to this buddy"
+msgstr "Arkadaşınızla konuşun"
+
+msgid "This is a community-supported plugin"
+msgstr "Bu, topluluk destekli bir eklentidir"
+
+msgid "Tomboy"
+msgstr "Tomboy"
+
+msgid "Tomboy Results"
+msgstr "Tomboy Sonuçları"
+
+msgid "Trash"
+msgstr "Çöp"
+
+msgid "Ubuntu Software Center"
+msgstr "Ubuntu Yazılım Merkezi"
+
+msgid "Uncategorized"
+msgstr "Sınıflandırılmamış"
+
+msgid "View"
+msgstr "Görünüm"
+
+msgid "Virtual Machines"
+msgstr "Sanal Makinalar"
+
+msgid "VirtualBox"
+msgstr "VirtualBox"
+
+msgid "Web Bookmarks"
+msgstr "Web Yer İmleri"
+
+msgid "Web Results"
+msgstr "Arama sonuçları"
+
+msgid "Wikipedia"
+msgstr "Vikipedi"
+
+msgid "Wikipedia Results"
+msgstr "Vikipedi Sonuçları"
+
+msgid "Yahoo"
+msgstr "Yahoo"
+
+msgid "Yahoo Results"
+msgstr "Yahoo Sonuçları"
+
+msgid "YouTube"
+msgstr "YouTube"
+
+msgid "YouTube Results"
+msgstr "YouTube Sonuçları"
+
+msgid "Your Tomboy notes"
+msgstr "Tomboy notlarınız"
+
+msgid "Your VirtualBox virtual machines"
+msgstr "VirtualBox sanal makinalarınız"
+
+msgid "Your favorite items"
+msgstr "Beğendiğiniz öğeler"
+
+msgid "Your online Pidgin buddies"
+msgstr "Çevrimiçi Pidgin Dostlarınız"
+
+msgid "_About %(distro_name)s"
+msgstr "%(distro_name)s _Hakkında"
+
+msgid "_About Cardapio"
+msgstr "Cardapio _Hakkında"
+
+msgid "_About Gnome"
+msgstr "Gnome _Hakkında"
+
+msgid "_Add to Side Pane"
+msgstr "Yan Panele _Ekle"
+
+msgid "_Control Center"
+msgstr "_Denetim Merkezi"
+
+msgid "_Display"
+msgstr "_Göster"
+
+msgid "_Edit Menus"
+msgstr "_Menüleri Düzenle"
+
+msgid "_Install %s"
+msgstr "_Yükle: %s"
+
+msgid "_Pin This Item"
+msgstr "Bu Öğeyi _Sabitle"
+
+msgid "_Properties"
+msgstr "_Tercihler"
+
+msgid "_Remove from Side Pane"
+msgstr "Yan Panelden _Kaldır"
+
+msgid "_Run"
+msgstr "_Çalıştır"
+
+msgid "_Unmount"
+msgstr "_Bağı Kaldır"
+
+msgid "_Unpin This Item"
+msgstr "Bu Öğeyi Askıdan _İndir"
+
+msgid "eBay"
+msgstr "eBay"
+
+msgid "eBay Results"
+msgstr "eBay Sonuçları"
+
+msgid "translators: just enter any text here"
+msgstr "çevirenler: Hasan Yılmaz"

@@ -1,0 +1,721 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cardapio\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2011-03-24 22:37+0100\n"
+"PO-Revision-Date: 2011-04-09 16:34+0000\n"
+"Last-Translator: TheCaméléon <Unknown>\n"
+"Language-Team: French <fr@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
+"X-Generator: Launchpad (build 12981)\n"
+
+msgid "\"%(file_name)s\" is an executable text file."
+msgstr "\"%(file_name)s\" est un fichier texte exécutable."
+
+msgid "<b>Appearance</b>"
+msgstr "<b>Apparence</b>"
+
+msgid "<b>Behavior</b>"
+msgstr "<b>Comportement</b>"
+
+msgid ""
+"<b>Plugin:</b> %(name)s %(version)s\n"
+"<b>Author:</b> %(author)s\n"
+"<b>Description:</b> %(description)s"
+msgstr ""
+"<b>Greffon:</b> %(name)s %(version)s\n"
+"<b>Auteur:</b> %(author)s\n"
+"<b>Description:</b> %(description)s"
+
+msgid ""
+"<big>Rebuilding...</big>\n"
+"This should take a few seconds"
+msgstr ""
+"<big>Reconstruction...</big>\n"
+"Cela devrait prendre quelques secondes"
+
+msgid "A menu with search capabilities."
+msgstr "Un menu avec avec des fonctions de recherche."
+
+msgid "Access applications, folders, system settings, etc."
+msgstr "Accéder aux programmes, dossiers, réglages du système, etc."
+
+msgid "Access documents and folders"
+msgstr "Accéder à vos documents et dossiers"
+
+msgid "All"
+msgstr "Tout"
+
+msgid "All other files"
+msgstr "Tous les autres fichiers"
+
+msgid "All time"
+msgstr "Tout le temps"
+
+msgid "Amazon"
+msgstr "Amazon"
+
+msgid "Amazon Results"
+msgstr "Résultats Amazon"
+
+msgid "Applet"
+msgstr "Applet"
+
+msgid "Application menu"
+msgstr "Menu Application"
+
+msgid "Available Software"
+msgstr "Logiciels Disponibles"
+
+msgid "Bing"
+msgstr "Bing"
+
+msgid "Bing Results"
+msgstr "Résultats Bing"
+
+msgid "Browse the contents of the network"
+msgstr "Parcourir le contenu du réseau"
+
+msgid "Cardapio"
+msgstr "Cardapio"
+
+msgid "Cardapio Properties"
+msgstr "Propriétés de Cardapio"
+
+msgid "Cardapio Team"
+msgstr "L'équipe de Cardapio"
+
+msgid "Cardapio Website"
+msgstr "Site de Cardapio"
+
+msgid ""
+"Chrome bookmark:\n"
+"%s"
+msgstr ""
+"Marque-page Chrome:\n"
+"%s"
+
+msgid ""
+"Chromium bookmark:\n"
+"%s"
+msgstr ""
+"Marque-page Chromium:\n"
+"%s"
+
+msgid "Command Launcher"
+msgstr "Interpréteur de commandes"
+
+msgid "Connect to Server"
+msgstr "Se connecter à un serveur"
+
+msgid "Connect to a remote computer or shared disk"
+msgstr "Se connecter à un ordinateur distant ou à un disque dur partagé"
+
+msgid "Create a new note with this title in Tomboy"
+msgstr "Créer une nouvelle note avec ce titre dans Tomboy"
+
+msgid "Create this note"
+msgstr "Créer cette note"
+
+msgid ""
+"Data has recently changed!\n"
+"This menu will be updated momentarily, so as not to interrupt your browsing."
+msgstr ""
+"Les données ont récemment changé !\n"
+"Ce menu sera mis à jour momentanément, afin de ne pas interrompre votre "
+"navigation."
+
+msgid "Description:"
+msgstr "Description:"
+
+msgid "Desktop"
+msgstr "Bureau"
+
+msgid "Displays a list of folders"
+msgstr "Affiche une liste des dossiers"
+
+msgid "Displays installed applications"
+msgstr "Affiche les applications installées"
+
+msgid "Displays the items that you marked as \"pinned\" using the context menu"
+msgstr "Affiche les éléments marqués comme \"épinglés\" via le menu contextuel"
+
+msgid "Do you want to run \"%(file_name)s\", or display its contents?"
+msgstr "Voulez-vous lancer « %(file_name)s » ou afficher son contenu ?"
+
+msgid "Drag to reorder plugins"
+msgstr "Glisser les greffons pour les organiser"
+
+msgid "Edit Menus"
+msgstr "Éditer les menus"
+
+msgid "Execute '%s' As Root"
+msgstr "Exécuter « %s » en tant que super-utilisateur"
+
+msgid "Execute '%s' In Terminal"
+msgstr "Exécuter « %s » dans le terminal"
+
+msgid "Execute the command '%s' inside a new terminal window"
+msgstr "Exécuter la commande « %s » dans une nouvelle fenêtre du terminal"
+
+msgid "Execute the command '%s' with administrative rights"
+msgstr "Exécuter la commande « %s » avec les droits administrateurs"
+
+msgid "File search"
+msgstr "Recherche de fichiers"
+
+msgid "Files that you have used recently"
+msgstr "Fichiers que vous avez utilisé récemment"
+
+msgid "Files you used this month"
+msgstr "Fichiers utilisés ce mois"
+
+msgid "Files you used this week"
+msgstr "Fichiers utilisés cette semaine"
+
+msgid "Files you used today"
+msgstr "Fichiers utilisés hier"
+
+msgid "Filesystem Root"
+msgstr "Racine du système de fichiers"
+
+msgid "Firefox Bookmarks"
+msgstr "Marque-pages de Firefox"
+
+msgid ""
+"Firefox bookmark:\n"
+"%s"
+msgstr ""
+"Marque-page Firefox:\n"
+"%s"
+
+msgid "Folder Contents"
+msgstr "Contenu du dossier"
+
+msgid "Full-text file search"
+msgstr "Recherche de texte dans les fichiers"
+
+msgid ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+msgstr ""
+"GNU General Public License v3\n"
+"http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
+
+msgid "General"
+msgstr "Général"
+
+msgid "Get help with %(distro_name)s"
+msgstr "Obtenez de l'aide pour %(distro_name)s"
+
+msgid "Go To \"%s\""
+msgstr "Aller à « %s »"
+
+msgid "Go To \"%s\" in Chromium"
+msgstr "Aller à \"%s\" dans Chromium"
+
+msgid "Go To \"%s\" in Firefox"
+msgstr "Aller à \"%s\" dans Firefox"
+
+msgid "Go To \"%s\" in Google Chrome"
+msgstr "Aller à \"%s\" dans Google Chrome"
+
+msgid "Google"
+msgstr "Google"
+
+msgid "Google localized results"
+msgstr "Résultats Google localisés"
+
+msgid "Grab new shortcut"
+msgstr "Changer le raccourcis clavier"
+
+msgid "Help and Support"
+msgstr "Aide et Support"
+
+msgid "Home"
+msgstr "Dossier personnel"
+
+msgid "Icon:"
+msgstr "Icône :"
+
+msgid "Install this package without opening the Software Center"
+msgstr "Installer ce paquet sans ouvrir la Logithèque"
+
+msgid "Items found on eBay"
+msgstr "Résultats eBay"
+
+msgid "Items pinned to the side pane"
+msgstr "Éléments épinglés dans le panneau latéral"
+
+msgid "Items that are not under any menu category"
+msgstr "Éléments qui rentrent dans aucune catégorie"
+
+msgid "Keep search results when Cardapio is hidden"
+msgstr "Garder les résultats de recherche quand Cardapio est masqué"
+
+msgid "Label:"
+msgstr "Libellé :"
+
+msgid "Launch in _Background"
+msgstr "Lancer en arrière-plan"
+
+msgid "Launch this item"
+msgstr "Lancer cet élément"
+
+msgid ""
+"Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-"
+"Click)"
+msgstr ""
+"Lance cet élément mais ne masque pas Cardapio (semblable à un Clic-Milieu ou "
+"un CTR-Clic)"
+
+msgid ""
+"Lets you choose from thousands of free applications available for Ubuntu"
+msgstr ""
+"Choisissez parmi les milliers d'applications libres disponibles pour Ubuntu"
+
+msgid "Local Results"
+msgstr "Résultats dans l'ordinateur"
+
+msgid "Localized Web Results"
+msgstr "Résultats Internet Localisés"
+
+msgid "Lock Screen"
+msgstr "Verrouiller l'écran"
+
+msgid "Log Out..."
+msgstr "Se déconnecter..."
+
+msgid "Log out of this session to log in as a different user"
+msgstr ""
+"Se déconnecte de cette session afin de se reconnecter sous un autre "
+"identifiant"
+
+msgid "Look inside folders"
+msgstr "Recherche à l'intérieur des dossiers"
+
+msgid "Menu"
+msgstr "Menu"
+
+msgid "Network"
+msgstr "Réseau"
+
+msgid "No results to show"
+msgstr "Aucun résultat"
+
+msgid "No results to show in \"%(category_name)s\""
+msgstr "Aucun résultat dans \"%(category_name)s\""
+
+msgid "Open Parent _Folder"
+msgstr "Ouvrir le dossier parent"
+
+msgid "Open Software Center"
+msgstr "Ouvrir la Logithèque"
+
+msgid "Open categories when cursor hovers them"
+msgstr "Ouvrir les catégories au passage de la souris"
+
+msgid "Open in Chromium"
+msgstr "Ouvrir dans Chromium"
+
+msgid "Open in Firefox"
+msgstr "Ouvrir dans Firefox"
+
+msgid "Open in Google Chrome"
+msgstr "Ouvrir dans Google Chrome"
+
+msgid "Open menu when cursor hovers the applet"
+msgstr "Ouvrir le menu lorsque le curseur est sur l'applet"
+
+msgid "Open the trash"
+msgstr "Ouvre la corbeille"
+
+msgid "Open this item's parent folder in the file browser"
+msgstr "Ouvrir le dossier parent de ce dossier dans le navigateur de fichier"
+
+msgid "Open this note"
+msgstr "Ouvrir cette note"
+
+msgid "Open your personal folder"
+msgstr "Ouvrir votre dossier personnel"
+
+msgid "Other configuration tools"
+msgstr "Autres outils de configuration"
+
+msgid "Pages bookmarked in Firefox, Chrome, or Chromium"
+msgstr "Marque-pages de Firefox, Chrome, ou Chromium"
+
+msgid "Peek _Inside Folder"
+msgstr "Naviguer à l'_intérieur du dossier"
+
+msgid "Perform a search using Microsoft's Bing"
+msgstr "Effectuer une recherche en utilisant Bing de Microsoft"
+
+msgid "Perform a search using Yahoo"
+msgstr "Effectuer une recherche en utilisant Yahoo"
+
+msgid ""
+"Perform quick Google searches <b>limited to</b> the system's default language"
+msgstr ""
+"Effectuer une recherche Google rapide <b>limitée à</b> la langue du système"
+
+msgid "Perform quick Google searches in <b>all</b> languages"
+msgstr "Effectuer une recherche Google rapide dans <b>toutes</b> les langues"
+
+msgid "Pidgin"
+msgstr "Pidgin"
+
+msgid "Pidgin Buddies"
+msgstr "Contacts Pidgin"
+
+msgid "Pinned items"
+msgstr "Éléments épinglés"
+
+msgid "Place this item in the side pane"
+msgstr "Mettre cet élément dans le panneau latéral"
+
+msgid "Place this item into the \"Pinned Items\" list"
+msgstr "Mettre cet élément dans la liste \"Éléments Épinglés\""
+
+msgid "Places"
+msgstr "Raccourcis"
+
+msgid "Places menu"
+msgstr "Menu Raccourcis"
+
+msgid "Plugins"
+msgstr "Greffons"
+
+msgid "Protect your computer from unauthorized use"
+msgstr "Interdit les utilisations non désirées de votre ordinateur"
+
+msgid "Recent Documents"
+msgstr "Documents récents"
+
+msgid "Recent documents (categorized)"
+msgstr "Documents récents (par catégorie)"
+
+msgid "Recent documents (simple)"
+msgstr "Documents récents (simple)"
+
+msgid "Recent documents (smart)"
+msgstr "Documents récents (intelligent)"
+
+msgid "Recording..."
+msgstr "Enregistrement en cours..."
+
+msgid "Reduce the size of Cardapio's main window"
+msgstr "Réduire la taille de la fenêtre principale de Cardapio"
+
+msgid "Remove this item from the \"Pinned Items\" list"
+msgstr "Enlever cet élément de la liste \"Éléments Épinglés\""
+
+msgid "Remove this item from the side pane"
+msgstr "Enlever cet élément du panneau latéral"
+
+msgid "Results found in Amazon"
+msgstr "Résultats trouvés sur Amazon"
+
+msgid "Results found in Wikipedia"
+msgstr "Résultats trouvés sur Wikipédia"
+
+msgid "Results found in YouTube"
+msgstr "Résultats trouvés sur YouTube"
+
+msgid "Results found in your computer"
+msgstr "Résultats dans l'ordinateur"
+
+msgid "Results found inside the files in your computer"
+msgstr "Résultats trouvés à l'intérieur des fichiers de votre ordinateur"
+
+msgid "Results found using Bing"
+msgstr "Résultats trouvés en utilisant Bing"
+
+msgid "Results found using Yahoo"
+msgstr "Résultats trouvés en utilisant Yahoo"
+
+msgid "Results found with Google"
+msgstr "Résultats Google"
+
+msgid "Results found with Google in you system language"
+msgstr "Résultats Google dans la langue de votre système"
+
+msgid "Results within files"
+msgstr "Résultats dans les fichiers"
+
+msgid "Run Command"
+msgstr "Exécuter la commande"
+
+msgid "Run commands from the search box"
+msgstr "Exécuter des commandes depuis la zone de recherche"
+
+msgid "Run in _Terminal"
+msgstr "Lancer dans un _Terminal"
+
+msgid "Run system commands, just like in the command-line"
+msgstr "Exécuter des commandes systèmes, comme avec la console"
+
+msgid "Safely eject this mount"
+msgstr "Ejecter le volume sans risque"
+
+msgid "Search"
+msgstr "Recherche"
+
+msgid "Search <b>inside</b> local files and folders indexed with Tracker"
+msgstr ""
+"Rechercher <b>à l'intérieur<b> des fichiers et dossiers indexés avec Tracker"
+
+msgid "Search for Firefox Bookmarks"
+msgstr "Rechercher des marque-pages de Firefox"
+
+msgid "Search for Tomboy notes"
+msgstr "Effectuer une recherche dans les notes Tomboy"
+
+msgid "Search for and start VirtualBox virtual machines from the menu"
+msgstr "Recherche et démarre des machines virtuelles VirtualBox depuis le menu"
+
+msgid "Search for items on eBay"
+msgstr "Effectuer une recherche sur eBay"
+
+msgid "Search for more software in the Software Center"
+msgstr "Voir plus de résultats dans la Logithèque"
+
+msgid "Search for new applications in the Software Center"
+msgstr "Recherche des nouvelles applications dans la Logithèque"
+
+msgid "Search for online Pidgin buddies"
+msgstr "Effectuer une recherche dans les contacts connectés de Pidgin"
+
+msgid "Search for pages bookmarked in Firefox, Chrome, or Chromium"
+msgstr "Rechercher des marque-pages de Firefox, Chrome, ou Chromium"
+
+msgid "Search for results in Amazon"
+msgstr "Effectuer une recherche Amazon"
+
+msgid "Search for results in Wikipedia"
+msgstr "Effectuer une recherche sur Wikipédia"
+
+msgid "Search for results in YouTube"
+msgstr "Effectuer une recherche sur YouThube"
+
+msgid "Search for your most recently used files."
+msgstr "Recherche vos fichiers utilisés récemment"
+
+msgid "Search local files and folders indexed with Tracker"
+msgstr "Recherche des fichiers et dossiers locaux indexés avec Tracker"
+
+msgid "Search timed out"
+msgstr "La recherche à dépassé le délai d'attente"
+
+msgid "Searching..."
+msgstr "Recherche en cours..."
+
+msgid "See https://translations.launchpad.net/cardapio"
+msgstr "Voir https://translations.launchpad.net/cardapio"
+
+msgid "Session"
+msgstr "Session"
+
+msgid "Shortcut key:"
+msgstr "Touche de Raccourci :"
+
+msgid "Show %s in the Software Center"
+msgstr "Voir %s dans la Logithèque"
+
+msgid "Show additional notes"
+msgstr "Afficher plus de notes"
+
+msgid "Show additional notes in Tomboy"
+msgstr "Afficher plus de notes dans Tomboy"
+
+msgid "Show additional results"
+msgstr "Plus de résultats..."
+
+msgid "Show additional search results in Sezen"
+msgstr "Voir plus de résultats dans Sezen"
+
+msgid "Show additional search results in a file browser"
+msgstr ""
+"Montrer les résultats additionnels de recherche dans un explorateur de "
+"fichiers"
+
+msgid "Show additional search results in the Tracker search tool"
+msgstr "Voir plus de résultats dans l'outil de recherche Tracker"
+
+msgid "Show additional search results in your web browser"
+msgstr "Voir plus de résultats dans votre navigateur"
+
+msgid "Show all categories"
+msgstr "Afficher toutes les catégories"
+
+msgid "Show contents of this folder within Cardapio"
+msgstr "Afficher le contenu de ce dossier dans Cardapio"
+
+msgid "Show session buttons in bottom pane"
+msgstr "Montrer les boutons de session en bas du panneau"
+
+msgid "Shut Down..."
+msgstr "Éteindre..."
+
+msgid "Shut down the system"
+msgstr "Termine votre session et éteint l'ordinateur"
+
+msgid "Side Pane"
+msgstr "Panneau latéral"
+
+msgid "Software Center"
+msgstr "Logithèque"
+
+msgid "Software available to install on your system"
+msgstr "Logiciels disponibles pour votre système"
+
+msgid ""
+"Start virtual machine %(name)s\n"
+"OS Type: %(os)s"
+msgstr ""
+"Lancer la machine virtuelle %(name)s\n"
+"Type d'OS: %(os)s"
+
+msgid "System"
+msgstr "Système"
+
+msgid "Talk to this buddy"
+msgstr "Parler à ce contact"
+
+msgid "This is a community-supported plugin"
+msgstr "Greffon fourni par la communauté"
+
+msgid "This menu will be updated momentarily."
+msgstr "Ce menu sera mis à jour momentanément."
+
+msgid "This month"
+msgstr "Ce mois"
+
+msgid "This week"
+msgstr "Cette semaine"
+
+msgid "Today"
+msgstr "Aujourd'hui"
+
+msgid "Tomboy"
+msgstr "Tomboy"
+
+msgid "Tomboy Results"
+msgstr "Résultats Tomboy"
+
+msgid "Trash"
+msgstr "Corbeille"
+
+msgid "Ubuntu Software Center"
+msgstr "Logithèque Ubuntu"
+
+msgid "Uncategorized"
+msgstr "Inclassable"
+
+msgid "Update now"
+msgstr "Mettre à jour maintenant"
+
+msgid "View"
+msgstr "Catégories"
+
+msgid "Virtual Machines"
+msgstr "Machines Virtuelles"
+
+msgid "VirtualBox"
+msgstr "VirtualBox"
+
+msgid "Web Bookmarks"
+msgstr "Marques-pages Web"
+
+msgid "Web Results"
+msgstr "Résultats Internet"
+
+msgid "Web bookmarks in Firefox"
+msgstr "Marque-pages web pour Firefox"
+
+msgid "Wikipedia"
+msgstr "Wikipédia"
+
+msgid "Wikipedia Results"
+msgstr "Résultats Wikipédia"
+
+msgid "Yahoo"
+msgstr "Yahoo"
+
+msgid "Yahoo Results"
+msgstr "Résultats Yahoo"
+
+msgid "YouTube"
+msgstr "YouTube"
+
+msgid "YouTube Results"
+msgstr "Résultats YouTube"
+
+msgid "Your Tomboy notes"
+msgstr "Vos notes Tomboy"
+
+msgid "Your VirtualBox virtual machines"
+msgstr "Vos machines virtuelles VirtualBox"
+
+msgid "Your favorite items"
+msgstr "Éléments favoris"
+
+msgid "Your online Pidgin buddies"
+msgstr "Vos contacts Pidgin connectés"
+
+msgid "_About %(distro_name)s"
+msgstr "_À propos de %(distro_name)s"
+
+msgid "_About Cardapio"
+msgstr "_À propos de Cardapio"
+
+msgid "_About Gnome"
+msgstr "_À propos de GNOME"
+
+msgid "_Add to Side Pane"
+msgstr "_Ajouter au panneau latéral"
+
+msgid "_Control Center"
+msgstr "_Centre de Contrôle"
+
+msgid "_Display"
+msgstr "_Afficher"
+
+msgid "_Edit Menus"
+msgstr "_Éditer les menus"
+
+msgid "_Install %s"
+msgstr "_Installer %s"
+
+msgid "_Launch"
+msgstr "_Lancer"
+
+msgid "_Pin This Item"
+msgstr "_Épingler cet élément"
+
+msgid "_Properties"
+msgstr "_Propriétés"
+
+msgid "_Remove from Side Pane"
+msgstr "_Enlever du panneau latéral"
+
+msgid "_Run"
+msgstr "_Lancer"
+
+msgid "_Unmount"
+msgstr "_Démonter"
+
+msgid "_Unpin This Item"
+msgstr "_Décoche cet item"
+
+msgid "eBay"
+msgstr "eBay"
+
+msgid "eBay Results"
+msgstr "Résultats eBay"
+
+msgid "translators: just enter any text here"
+msgstr "-"

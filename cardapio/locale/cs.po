@@ -1,0 +1,348 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: cardapio\n"
+"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2011-03-24 22:37+0100\n"
+"PO-Revision-Date: 2011-01-04 16:01+0000\n"
+"Last-Translator: Michal Přibyl <Unknown>\n"
+"Language-Team: Czech <cs@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
+"X-Generator: Launchpad (build 12981)\n"
+
+msgid "\"%(file_name)s\" is an executable text file."
+msgstr "\"%(file_name)s\" je spustitelný textový soubor."
+
+msgid ""
+"<b>Plugin:</b> %(name)s %(version)s\n"
+"<b>Author:</b> %(author)s\n"
+"<b>Description:</b> %(description)s"
+msgstr ""
+"<b>Plugin:</b> %(name)s %(version)s\n"
+"<b>Autorr:</b> %(author)s\n"
+"<b>Popis:</b> %(description)s"
+
+msgid "Access applications, folders, system settings, etc."
+msgstr "Přístup k aplikacím, složkám, systémovému nastavení, atd."
+
+msgid "Access documents and folders"
+msgstr "Umožňuje přistupovat k dokumentům, složkám a místům v síti"
+
+msgid "All"
+msgstr "Vše"
+
+msgid "Amazon"
+msgstr "Amazon"
+
+msgid "Amazon Results"
+msgstr "Výsledky z Amazon"
+
+msgid "Application menu"
+msgstr "Menu aplikace"
+
+msgid "Available Software"
+msgstr "Dostupný software"
+
+msgid "Bing"
+msgstr "Bing"
+
+msgid "Browse the contents of the network"
+msgstr "Procházet obsah sítě"
+
+msgid "Cardapio Team"
+msgstr "Cardapio tým"
+
+msgid "Cardapio Website"
+msgstr "Webová stránka Cardapia"
+
+msgid "Connect to Server"
+msgstr "Připojit k serveru"
+
+msgid "Connect to a remote computer or shared disk"
+msgstr "Připojit se ke vzdálenému počítači nebo sdílenému disku"
+
+msgid "Desktop"
+msgstr "Plocha"
+
+msgid "Displays a list of folders"
+msgstr "Zobrazí seznam složek"
+
+msgid "Displays installed applications"
+msgstr "Zobrazí nainstalované aplikace"
+
+msgid "Drag to reorder plugins"
+msgstr "Přesuňte pro změnu pořadí zásuvných modulů"
+
+msgid "Execute '%s' As Root"
+msgstr "Spustit '%s' jako Root"
+
+msgid "Execute '%s' In Terminal"
+msgstr "Spustit '%s' v Terminálu"
+
+msgid "Execute the command '%s' inside a new terminal window"
+msgstr "Spustit příkaz '%s' v novém terminálovém okně"
+
+msgid "Execute the command '%s' with administrative rights"
+msgstr "Spustit příkaz '%s' s právy administrátora"
+
+msgid "File search"
+msgstr "Vyhledávání souborů"
+
+msgid "Files that you have used recently"
+msgstr "Soubory, které jste nedávno otevřeli"
+
+msgid "Folder Contents"
+msgstr "Obsah složky"
+
+msgid "Full-text file search"
+msgstr "Fulltextové vyhledávání souborů"
+
+msgid "General"
+msgstr "Hlavní"
+
+msgid "Get help with %(distro_name)s"
+msgstr "Získejte pomoc s %(distro_name)s"
+
+msgid "Google"
+msgstr "Google"
+
+msgid "Help and Support"
+msgstr "Nápověda a podpora"
+
+msgid "Home"
+msgstr "Domovská složka"
+
+msgid "Install this package without opening the Software Center"
+msgstr "Nainstalovat tento balíček bez otevření Centra softwaru"
+
+msgid "Items found on eBay"
+msgstr "Položky nalezené na eBay"
+
+msgid "Items pinned to the side pane"
+msgstr "Položky připnuty do bočního panelu"
+
+msgid "Items that are not under any menu category"
+msgstr "Položky, které nejsou pod žádnou kategorií v menu"
+
+msgid ""
+"Lets you choose from thousands of free applications available for Ubuntu"
+msgstr "Vybírejte z tisíce svobodných aplikací dostupných pro Ubuntu"
+
+msgid "Local Results"
+msgstr "Místní výsledky"
+
+msgid "Lock Screen"
+msgstr "Uzamknout obrazovku"
+
+msgid "Log Out..."
+msgstr "Odhlásit..."
+
+msgid "Log out of this session to log in as a different user"
+msgstr ""
+"Odhlásí se z tohoto sezení, aby bylo možné přihlásit se jako jiný uživatel"
+
+msgid "Menu"
+msgstr "Nabídka"
+
+msgid "Network"
+msgstr "Síť"
+
+msgid "No results to show"
+msgstr "Žádné výsledky ke zobrazení"
+
+msgid "No results to show in \"%(category_name)s\""
+msgstr "Žádné výsledky ke zobrazení v \"%(category_name)s\""
+
+msgid "Open Software Center"
+msgstr "Otevřené Centrum softwaru"
+
+msgid "Open menu when cursor hovers the applet"
+msgstr "Otevřít menu, když kurzor najede na applet"
+
+msgid "Open the trash"
+msgstr "Otevřít koš"
+
+msgid "Open your personal folder"
+msgstr "Otevřít osobní složku"
+
+msgid "Other configuration tools"
+msgstr "Jiné konfigurační nástroje"
+
+msgid "Perform quick Google searches in <b>all</b> languages"
+msgstr "Provést rychlé Google vyhledávání ve <b>všech</b> jazycích"
+
+msgid "Pinned items"
+msgstr "Přišpendlené položky"
+
+msgid "Places"
+msgstr "Místa"
+
+msgid "Plugins"
+msgstr "Zásuvné moduly"
+
+msgid "Protect your computer from unauthorized use"
+msgstr "Chrání váš počítač před neautorizovaným použitím"
+
+msgid "Recent Documents"
+msgstr "Poslední dokumenty"
+
+msgid "Recording..."
+msgstr "Probíhá záznam..."
+
+msgid "Results found in Amazon"
+msgstr "Výsledky nalezené v Amazon"
+
+msgid "Results found in YouTube"
+msgstr "Výsledky nalezené v YouTube"
+
+msgid "Results found in your computer"
+msgstr "Výsledky nalezené v počítači"
+
+msgid "Results found inside the files in your computer"
+msgstr "Výsledky nalezené uvnitř souborů ve Vašem počítači"
+
+msgid "Results found using Bing"
+msgstr "Výsledky nalezené pomocí Bingu"
+
+msgid "Results found using Yahoo"
+msgstr "Výsledky nalezené pomocí Yahoo"
+
+msgid "Results found with Google"
+msgstr "Výsledky nalezené pomocí Google"
+
+msgid "Results within files"
+msgstr "Výsledky v rámci souborů"
+
+msgid "Run Command"
+msgstr "Spustit příkaz"
+
+msgid "Run in _Terminal"
+msgstr "Spustit v _terminálu"
+
+msgid "Search <b>inside</b> local files and folders indexed with Tracker"
+msgstr "Hledat <b>uvnitř</b> místních souborů a složek indexovaných Trackerem"
+
+msgid "Search for items on eBay"
+msgstr "Hledat položky na eBay"
+
+msgid "Search for more software in the Software Center"
+msgstr "Hledat více v Centru softwaru"
+
+msgid "Search for new applications in the Software Center"
+msgstr "Hledat nové aplikace pomocí Centra softwaru"
+
+msgid "Search for results in Amazon"
+msgstr "Hledat výsledky na Amazon"
+
+msgid "Search for results in YouTube"
+msgstr "Hledat výsledky v YouTube"
+
+msgid "Search local files and folders indexed with Tracker"
+msgstr "Hledat místní soubory a složky indexované pomocí Trackeru"
+
+msgid "Search timed out"
+msgstr "Hledání pozastaveno"
+
+msgid "Searching..."
+msgstr "Hledám..."
+
+msgid "Session"
+msgstr "Sezení"
+
+msgid "Show %s in the Software Center"
+msgstr "Zobrazit %s v Centru softwaru"
+
+msgid "Show additional results"
+msgstr "Zobrazit další výsledky"
+
+msgid "Show additional search results in the Tracker search tool"
+msgstr "Zobrazit další výsledky ve vyhledávacím přístroji Tracker"
+
+msgid "Show additional search results in your web browser"
+msgstr "Zobrazit další výsledky ve vašem prohlížeči"
+
+msgid "Show all categories"
+msgstr "Zobrazit všechny kategorie"
+
+msgid "Shut Down..."
+msgstr "Vypnout..."
+
+msgid "Shut down the system"
+msgstr "Vypnout systém"
+
+msgid "Side Pane"
+msgstr "Postranní panel"
+
+msgid "Software Center"
+msgstr "Centrum softwaru"
+
+msgid "Software available to install on your system"
+msgstr "Software dostupný pro instalaci na Váš systém"
+
+msgid "System"
+msgstr "Systém"
+
+msgid "Talk to this buddy"
+msgstr "Mluvit s tímto kamarádem"
+
+msgid "This is a community-supported plugin"
+msgstr "Tento plugin je podporován komunitou"
+
+msgid "Trash"
+msgstr "Koš"
+
+msgid "Ubuntu Software Center"
+msgstr "Centrum softwaru pro Ubuntu"
+
+msgid "Uncategorized"
+msgstr "Nezařazeno"
+
+msgid "VirtualBox"
+msgstr "VirtualBox"
+
+msgid "Web Results"
+msgstr "Webové výsledky"
+
+msgid "Yahoo Results"
+msgstr "Výsledky z Yahoo"
+
+msgid "YouTube"
+msgstr "YouTube"
+
+msgid "YouTube Results"
+msgstr "Výsledky z YouTube"
+
+msgid "_About %(distro_name)s"
+msgstr "_O %(distro_name)s"
+
+msgid "_About Cardapio"
+msgstr "_O Cardapiu"
+
+msgid "_About Gnome"
+msgstr "_O Gnome"
+
+msgid "_Display"
+msgstr "_Zobrazit"
+
+msgid "_Edit Menus"
+msgstr "_Upravit nabídky"
+
+msgid "_Install %s"
+msgstr "Nainstalovat %s"
+
+msgid "_Properties"
+msgstr "_Vlastnosti"
+
+msgid "_Remove from Side Pane"
+msgstr "_Ostranit z bočního panelu"
+
+msgid "_Run"
+msgstr "_Spustit"
+
+msgid "eBay"
+msgstr "ebay"
+
+msgid "eBay Results"
+msgstr "Výsledky z eBay"

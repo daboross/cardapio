@@ -8,7 +8,7 @@ Homepage: https://launchpad.net/cardapio
 
 Package: cardapio-gnomepanel
 Architecture: any
-Depends: cardapio, gnome-panel, python-gnomepanel
+Depends: cardapio, gnome-panel, python-gnomeapplet
 Description: Cardapio applet for Gnome Panel
  Cardapio is a launcher that can work in two modes: as a panel applet 
  (in which case it is an alternative to Gnome's application menu 
