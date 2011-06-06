@@ -100,11 +100,15 @@ class CardapioPlugin(CardapioPluginInterface):
 							nie:url ?uri;
 							nie:mimeType ?mime;
 							tracker:available true.
-						FILTER (fn:contains(?uri, "%s"))
+						FILTER (regex(?uri, "%s", "i"))
 						}
 					ORDER BY ASC(?uri)
 					LIMIT %d
 				""" 
+				# replaced: 
+				#   FILTER (fn:contains(?uri, "%s"))
+				# with:
+				#   FILTER (regex(?uri, "%s", "i"))
 
 		self.loaded = True
 
