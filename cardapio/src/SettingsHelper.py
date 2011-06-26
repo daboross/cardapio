@@ -92,7 +92,7 @@ class SettingsHelper:
 		self.read_config_option(s, 'applet icon'                , 'start-here'             , override_empty_str = False) # string (either a path to the icon, or an icon name)
 		self.read_config_option(s, 'pinned items'               , []                       )
 		self.read_config_option(s, 'side pane items'            , default_side_pane_items  )
-		self.read_config_option(s, 'active plugins'             , ['pinned', 'places', 'applications', 'tracker', 'google', 'command_launcher', 'software_center'])
+		self.read_config_option(s, 'active plugins'             , ['pinned', 'places', 'applications', 'zeitgeist_simple', 'google', 'command_launcher', 'software_center'])
 		self.read_config_option(s, 'plugin settings'            , {}                       )
 		self.read_config_option(s, 'show titlebar'              , False                    ) # bool
 		self.read_config_option(s, 'allow transparency'         , False                    ) # bool
