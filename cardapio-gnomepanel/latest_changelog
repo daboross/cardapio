@@ -1,6 +1,6 @@
-cardapio-docky (0.9.177-ubuntu1-XXXXX1) XXXXX; urgency=low
+cardapio-gnomepanel (0.9.182-ubuntu2-XXXXX1) XXXXX; urgency=low
 
-   * Bug-fix release.
+   * Fixing a packaging issue
 
- -- Thiago Teixeira <tvst@hotmail.com>  Sat, 30 Apr 2011 23:00:00 +0100
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:00:00 +0100
 

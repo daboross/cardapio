@@ -24,7 +24,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '0.995'
+	version            = '0.996'
 
 	plugin_api_version = 1.40
 
@@ -134,7 +134,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		all_events = []
 
-		if self.fts:
+		if self.fts is not None:
 			fts_results = None
 
 			# TODO: make this asynchronous somehow! (Need to talk to the developers

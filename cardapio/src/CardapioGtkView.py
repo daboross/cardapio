@@ -703,8 +703,8 @@ class CardapioGtkView(CardapioViewInterface):
 		from the options dialog.
 		"""
 
-		if not self.cardapio.settings['applet icon']: 
-			self.cardapio.settings['applet icon'] = 'start-here'
+		#if not self.cardapio.settings['applet icon']: 
+		#	self.cardapio.settings['applet icon'] = 'start-here'
 
 		if self.cardapio.settings['show session buttons']:
 			self.get_widget('SessionPane').show()

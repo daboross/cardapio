@@ -24,7 +24,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '0.995'
+	version            = '0.996'
 
 	plugin_api_version = 1.40
 
@@ -121,7 +121,7 @@ class CardapioPlugin(CardapioPluginInterface):
 			self.time_range = self.datamodel.TimeRange.always()
 			self.result_type = self.datamodel.ResultType.MostRecentSubjects
 
-		if category == 1:
+		elif category == 1:
 			self.time_range = self.datamodel.TimeRange(now - DAY, now)
 
 		elif category == 2:
@@ -138,7 +138,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def search(self, text, result_limit):
 
-		# hide this category if we're actually searching for something
+		# hide the 0th category if we're actually searching for something
 		if self.category == 0 and text: 
 			self.c.handle_search_result(self, [], text)
 			return
@@ -168,25 +168,27 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def handle_search_result(self, events):
 
-		fts_results = None
 		all_events = []
 
-		# TODO: make this asynchronous somehow! (Need to talk to the developers
-		# of the FTS extension to add this to the API)
-		if self.search_query:
+		if self.fts is not None:
+			fts_results = None
 
-			try:
-				fts_results, count = self.fts.Search(
-						self.search_query + '*', 
-						self.time_range, 
-						[], 0, self.result_limit, 2)
+			# TODO: make this asynchronous somehow! (Need to talk to the developers
+			# of the FTS extension to add this to the API)
+			if self.search_query:
 
-			except Exception, exception:
-				print exception
-				pass
+				try:
+					fts_results, count = self.fts.Search(
+							self.search_query + '*', 
+							self.time_range, 
+							[], 0, self.result_limit, 2)
 
-			if fts_results:
-				all_events = map(self.datamodel.Event, fts_results)
+				except Exception, exception:
+					print exception
+					pass
+
+				if fts_results:
+					all_events = map(self.datamodel.Event, fts_results)
 
 		parsed_results = [] 
 		all_events += events

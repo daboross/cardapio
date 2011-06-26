@@ -24,7 +24,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	url                = ''
 	help_text          = ''
-	version            = '0.995'
+	version            = '0.996'
 
 	plugin_api_version = 1.40
 
@@ -39,6 +39,10 @@ class CardapioPlugin(CardapioPluginInterface):
 	hide_from_sidebar  = [False]*4
 
 	def __init__(self, cardapio_proxy, category): 
+
+		# NOTE: Right now Cardapio creates a separate instance for each
+		# category. This is very wasteful! We should instead create a single
+		# instance and pass the category to the search() method instead.
 
 		self.c = cardapio_proxy
 
@@ -57,7 +61,6 @@ class CardapioPlugin(CardapioPluginInterface):
 		
 		self.urllib2   = urllib2
 		self.os        = os
-		self.time      = time.time
 		self.datamodel = datamodel
 
 		if 'ZeitgeistClient' not in locals():
@@ -101,10 +104,9 @@ class CardapioPlugin(CardapioPluginInterface):
 			}
 
 		self.event_template = self.datamodel.Event()
-		self.loaded = True
 
 		DAY = 1000*60*60*24 # one day in milliseconds
-		now = int(self.time() * 1000)
+		now = int(time.time() * 1000)
 
 		if category == 0:
 			self.time_range = self.datamodel.TimeRange(now - DAY, now)
@@ -118,10 +120,11 @@ class CardapioPlugin(CardapioPluginInterface):
 		else:
 			self.time_range = self.datamodel.TimeRange(0, now - 30*DAY)
 
+		self.loaded = True
+		
 
 	def search(self, text, result_limit):
 
-		return
 		self.current_query = text
 
 		text = text.lower()
@@ -147,25 +150,27 @@ class CardapioPlugin(CardapioPluginInterface):
 
 	def handle_search_result(self, events):
 
-		fts_results = None
 		all_events = []
 
-		# TODO: make this asynchronous somehow! (Need to talk to the developers
-		# of the FTS extension to add this to the API)
-		if self.search_query:
+		if self.fts is not None:
+			fts_results = None
 
-			try:
-				fts_results, count = self.fts.Search(
-						self.search_query + '*', 
-						self.time_range, 
-						[], 0, self.result_limit, 2)
+			# TODO: make this asynchronous somehow! (Need to talk to the developers
+			# of the FTS extension to add this to the API)
+			if self.search_query:
 
-			except Exception, exception:
-				print exception
-				pass
+				try:
+					fts_results, count = self.fts.Search(
+							self.search_query + '*', 
+							self.time_range, 
+							[], 0, self.result_limit, 2)
 
-			if fts_results:
-				all_events = map(self.datamodel.Event, fts_results)
+				except Exception, exception:
+					print exception
+					pass
+
+				if fts_results:
+					all_events = map(self.datamodel.Event, fts_results)
 
 		parsed_results = [] 
 		all_events += events

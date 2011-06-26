@@ -17,5 +17,5 @@ Description: Cardapio applet for Gnome Panel
  well-thought-out interface, supports tracker searching, and much more. 
  Give it a try today! 
  .
- This package installs a panel applet that lets you easily add Cardapio to your
- Gnome panel.
+ This is a dummy package that installs the dependencies required to 
+ allow Cardapio to run in the Gnome panel.

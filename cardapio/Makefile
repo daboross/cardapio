@@ -20,14 +20,17 @@ install: install_docky_helper
 	python -m compileall src/gnomepanel/
 	python -m compileall src/docky/
 	
-	# remove old files which have been renamed
+	# remove old files which have been renamed or moved to another package
 	rm -rf $(PREFIX)/lib/cardapio/cardapio.py
 	rm -rf $(PREFIX)/lib/cardapio/cardapio.pyc
 	rm -rf $(PREFIX)/lib/cardapio/plugins/firefox_bookmarks.py
 	rm -rf $(PREFIX)/lib/cardapio/plugins/firefox_bookmarks.pyc
+	#rm -f $(PREFIX)/lib/cardapio/cardapio-gnome-panel-applet
+	#rm -rf $(PREFIX)/bin/cardapio-gnome-panel-applet 
 	
 	mkdir -p $(PREFIX)/lib/cardapio
 	cp -f src/cardapio $(PREFIX)/lib/cardapio/
+	cp -f src/cardapio-gnome-panel-applet $(PREFIX)/lib/cardapio/
 	cp -f src/Cardapio.py $(PREFIX)/lib/cardapio/
 	cp -f src/Cardapio.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/CardapioGtkView.py $(PREFIX)/lib/cardapio/
@@ -74,6 +77,7 @@ install: install_docky_helper
 	
 	mkdir -p $(PREFIX)/bin
 	ln -fs $(PREFIX)/lib/cardapio/cardapio $(PREFIX)/bin/cardapio
+	ln -fs $(PREFIX)/lib/cardapio/cardapio-gnome-panel-applet $(PREFIX)/bin/cardapio-gnome-panel-applet
 	
 	mkdir -p $(DESTDIR)/usr/lib/bonobo/servers
 	#cp -f src/gnomepanel/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/
@@ -92,9 +96,16 @@ clean:
 uninstall: uninstall_docky_helper
 	rm -rf $(PREFIX)/lib/cardapio
 	rm -rf $(PREFIX)/bin/cardapio
+	rm -rf $(PREFIX)/bin/cardapio-gnome-panel-applet 
 	rm -rf $(PREFIX)/share/pixmaps/cardapio*
 	rm -f $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
-	find $(PREFIX)/share/locale -name '*cardapio.mo' -delete
+	find $(PREFIX)/share/locale -name '*cardapio.*' -delete
+	
+	# remove old files which have been renamed or moved to another package
+	rm -rf $(PREFIX)/lib/cardapio/cardapio.py
+	rm -rf $(PREFIX)/lib/cardapio/cardapio.pyc
+	rm -rf $(PREFIX)/lib/cardapio/plugins/firefox_bookmarks.py
+	rm -rf $(PREFIX)/lib/cardapio/plugins/firefox_bookmarks.pyc
 
 install_docky_helper:
 	if test -d $(PREFIX)/share/dockmanager; then \

@@ -22,6 +22,7 @@ import sys
 
 try:
 	import os
+	import urllib2
 	import gtk
 	from CardapioAppletInterface import PANEL_TYPE_DOCKY, PANEL_TYPE_AWN 
 
@@ -36,6 +37,9 @@ if gtk.ver < (2, 14, 0):
 
 
 class OptionsWindow:
+	
+	ICON_DEFAULT = 'start-here'
+	ICON_MISSING = 'image-missing'
 
 	def __init__(self, cardapio):
 
@@ -58,6 +62,13 @@ class OptionsWindow:
 		self.plugin_tree_model      = self.get_widget('PluginListstore')
 		self.plugin_checkbox_column = self.get_widget('PluginCheckboxColumn')
 		self.dialog                 = self.get_widget('OptionsDialog')
+
+		self.icon_button_default      = self.get_widget('OptionIconDefault')
+		self.icon_button_file         = self.get_widget('OptionIconFile')
+		self.icon_button_name         = self.get_widget('OptionIconName')
+		self.icon_button_none         = self.get_widget('OptionIconNone')
+		self.icon_button_name_entry   = self.get_widget('OptionIconNameEntry')
+		self.icon_button_file_chooser = self.get_widget('OptionIconFileChooser')
 
 		self.drag_allowed_cursor = gtk.gdk.Cursor(gtk.gdk.FLEUR)
 		#self.busy_cursor = gtk.gdk.Cursor(gtk.gdk.WATCH)
@@ -88,6 +99,7 @@ class OptionsWindow:
 		elif self.cardapio.applet.panel_type is PANEL_TYPE_AWN:
 			self.get_widget('LabelAppletLabel').hide()
 			self.get_widget('OptionAppletLabel').hide()
+			self.get_widget('OptionIconNone').hide()
 
 
 	def on_plugintreeview_hover(self, treeview, event):
@@ -119,12 +131,14 @@ class OptionsWindow:
 
 		self.set_widget_from_option('OptionKeybinding', 'keybinding')
 		self.set_widget_from_option('OptionAppletLabel', 'applet label')
-		self.set_widget_from_option('OptionAppletIcon', 'applet icon')
+		#self.set_widget_from_option('OptionAppletIcon', 'applet icon')
 		self.set_widget_from_option('OptionSessionButtons', 'show session buttons')
 		self.set_widget_from_option('OptionKeepResults', 'keep search results')
 		self.set_widget_from_option('OptionOpenOnHover', 'open on hover')
 		self.set_widget_from_option('OptionOpenCategoriesOnHover', 'open categories on hover')
 		self.set_widget_from_option('OptionMiniMode', 'mini mode')
+
+		self.set_icon_widgets()
 
 		icon_size = gtk.icon_size_lookup(4)[0] # 4 because it's that same as in the UI file
 
@@ -270,14 +284,67 @@ class OptionsWindow:
 
 		self.cardapio.settings['keybinding']               = self.get_widget('OptionKeybinding').get_text()
 		self.cardapio.settings['applet label']             = self.get_widget('OptionAppletLabel').get_text()
-		self.cardapio.settings['applet icon']              = self.get_widget('OptionAppletIcon').get_text()
+		#self.cardapio.settings['applet icon']              = self.get_widget('OptionAppletIcon').get_text()
 		self.cardapio.settings['show session buttons']     = self.get_widget('OptionSessionButtons').get_active()
 		self.cardapio.settings['keep search results']      = self.get_widget('OptionKeepResults').get_active()
 		self.cardapio.settings['open on hover']            = self.get_widget('OptionOpenOnHover').get_active()
 		self.cardapio.settings['open categories on hover'] = self.get_widget('OptionOpenCategoriesOnHover').get_active()
 		self.cardapio.settings['mini mode']                = self.get_widget('OptionMiniMode').get_active() 
 
+		if self.icon_button_file.get_active():
+
+			icon_name = self.icon_button_file_chooser.get_uri()
+
+			if not icon_name: icon_name = self.ICON_MISSING
+			else:
+				dummy, possible_path = urllib2.splittype(icon_name)
+
+				if os.path.exists(possible_path): icon_name = possible_path
+				else: icon_name = self.ICON_MISSING
+
+			self.cardapio.settings['applet icon'] = icon_name
+
+		elif self.icon_button_name.get_active():
+			icon_name = self.icon_button_name_entry.get_text()
+			if not icon_name: icon_name = self.ICON_MISSING
+			self.cardapio.settings['applet icon'] = icon_name
+
+		elif self.icon_button_none.get_active():
+			self.cardapio.settings['applet icon'] = ''
+
+		else:
+			self.cardapio.settings['applet icon'] = self.ICON_DEFAULT
+
 		self.cardapio.apply_settings()
+
+
+	def set_icon_widgets(self):
+		"""
+		Sets the value of icon-related widgets in the options window according
+		to the user options.
+		"""
+
+		icon_string = self.cardapio.settings['applet icon']
+		dummy, possible_path = urllib2.splittype(icon_string)
+
+		self.icon_button_none.set_active(False)
+		self.icon_button_default.set_active(False)
+		self.icon_button_file.set_active(False)
+		self.icon_button_name.set_active(False)
+
+		if not icon_string:
+			self.icon_button_none.set_active(True)
+
+		elif icon_string == self.ICON_DEFAULT:
+			self.icon_button_default.set_active(True)
+
+		elif os.path.exists(possible_path):
+			self.icon_button_file.set_active(True)
+			self.icon_button_file_chooser.set_uri(icon_string)
+
+		else:
+			self.icon_button_name.set_active(True)
+			self.icon_button_name_entry.set_text(icon_string)
 
 
 	def update_plugin_description(self, *dummy):

@@ -1,3 +1,293 @@
+cardapio (0.9.182-ubuntu2-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.182-ubuntu2-maverick1) maverick; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.182-ubuntu2-lucid1) lucid; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.182-ubuntu1-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.182-ubuntu1-maverick1) maverick; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.182-ubuntu1-lucid1) lucid; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.181-ubuntu2-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.181-ubuntu2-maverick1) maverick; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.181-ubuntu2-lucid1) lucid; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.181-ubuntu1-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.181-ubuntu1-maverick1) maverick; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.181-ubuntu1-lucid1) lucid; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.180-ubuntu2-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.180-ubuntu2-maverick1) maverick; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.180-ubuntu2-lucid1) lucid; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.180-ubuntu1-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.180-ubuntu1-maverick1) maverick; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.180-ubuntu1-lucid1) lucid; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.179-ubuntu1-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.179-ubuntu1-maverick1) maverick; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.179-ubuntu1-lucid1) lucid; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.179-ubuntu1-maverick1) maverick; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.179-ubuntu1-lucid1) lucid; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.179-ubuntu1-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.179-ubuntu1-maverick1) maverick; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.179-ubuntu1-lucid1) lucid; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.179-ubuntu1-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.179-ubuntu1-maverick1) maverick; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.179-ubuntu1-lucid1) lucid; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
 cardapio (0.9.178-ubuntu1-natty1) natty; urgency=low
 
    * Bug-fix release

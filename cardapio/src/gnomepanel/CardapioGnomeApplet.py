@@ -302,14 +302,17 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 
 		self.button.set_label(self.applet_label)
 
-		button_icon_pixbuf = self.icon_helper.get_icon_pixbuf(self.applet_icon, self._get_best_icon_size_for_panel(), 'start-here')
-		button_icon = gtk.image_new_from_pixbuf(button_icon_pixbuf)
-		self.button.set_image(button_icon)
+		if self.applet_icon:
+			button_icon_pixbuf = self.icon_helper.get_icon_pixbuf(self.applet_icon, self._get_best_icon_size_for_panel(), 'start-here')
+			button_icon = gtk.image_new_from_pixbuf(button_icon_pixbuf)
+			self.button.set_image(button_icon)
+		else:
+			self.button.set_image(None)
 
 		clean_imagemenuitem = gtk.ImageMenuItem()
 		is_horizontal = (self.applet.get_orient() in (gnomeapplet.ORIENT_UP, gnomeapplet.ORIENT_DOWN))
 
-		if self.applet_label:
+		if self.applet_label and self.applet_icon:
 			toggle_spacing = clean_imagemenuitem.style_get_property('toggle-spacing')
 		else:
 			toggle_spacing = 0
