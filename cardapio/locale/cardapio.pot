@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-05-28 18:44-0400\n"
+"POT-Creation-Date: 2011-06-26 21:38+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -105,7 +105,7 @@ msgstr ""
 #: src/plugins/google.py:85 src/plugins/google_localized.py:89
 #: src/plugins/tracker.py:72 src/plugins/tracker_fts.py:71
 #: src/plugins/yahoo.py:171 src/plugins/you_tube.py:158
-#: src/plugins/zeitgeist_categorized.py:95 src/plugins/zeitgeist_simple.py:94
+#: src/plugins/zeitgeist_categorized.py:98 src/plugins/zeitgeist_simple.py:94
 #: src/plugins/zeitgeist_smart.py:106
 msgid "Show additional results"
 msgstr ""
@@ -215,15 +215,15 @@ msgstr ""
 msgid "_About %(distro_name)s"
 msgstr ""
 
-#: src/OptionsWindow.py:187
+#: src/OptionsWindow.py:201
 msgid "Recording..."
 msgstr ""
 
-#: src/OptionsWindow.py:192 src/ui/options.ui:167
+#: src/OptionsWindow.py:206 src/ui/options.ui:166
 msgid "Grab new shortcut"
 msgstr ""
 
-#: src/OptionsWindow.py:299
+#: src/OptionsWindow.py:366
 #, python-format
 msgid ""
 "<b>Plugin:</b> %(name)s %(version)s\n"
@@ -231,7 +231,7 @@ msgid ""
 "<b>Description:</b> %(description)s"
 msgstr ""
 
-#: src/OptionsWindow.py:305
+#: src/OptionsWindow.py:372
 msgid "This is a community-supported plugin"
 msgstr ""
 
@@ -704,7 +704,7 @@ msgstr ""
 msgid "All other files"
 msgstr ""
 
-#: src/plugins/zeitgeist_categorized.py:96 src/plugins/zeitgeist_simple.py:95
+#: src/plugins/zeitgeist_categorized.py:99 src/plugins/zeitgeist_simple.py:95
 #: src/plugins/zeitgeist_smart.py:107
 msgid "Show additional search results in Sezen"
 msgstr ""
@@ -899,27 +899,27 @@ msgstr ""
 msgid "_Run"
 msgstr ""
 
-#: src/ui/options.ui:25
+#: src/ui/options.ui:8
 msgid "Cardapio Properties"
 msgstr ""
 
-#: src/ui/options.ui:75
+#: src/ui/options.ui:65
 msgid "Show session buttons in bottom pane"
 msgstr ""
 
-#: src/ui/options.ui:89
+#: src/ui/options.ui:80
 msgid "Reduce the size of Cardapio's main window"
 msgstr ""
 
-#: src/ui/options.ui:110
+#: src/ui/options.ui:103
 msgid "<b>Appearance</b>"
 msgstr ""
 
-#: src/ui/options.ui:143
+#: src/ui/options.ui:141
 msgid "Shortcut key:"
 msgstr ""
 
-#: src/ui/options.ui:151
+#: src/ui/options.ui:149
 msgid "Keep search results when Cardapio is hidden"
 msgstr ""
 
@@ -927,35 +927,51 @@ msgstr ""
 msgid "Open categories when cursor hovers them"
 msgstr ""
 
-#: src/ui/options.ui:227
+#: src/ui/options.ui:233
 msgid "<b>Behavior</b>"
 msgstr ""
 
-#: src/ui/options.ui:244
+#: src/ui/options.ui:252
 msgid "General"
 msgstr ""
 
-#: src/ui/options.ui:268
-msgid "Label:"
+#: src/ui/options.ui:279
+msgid "Label"
 msgstr ""
 
-#: src/ui/options.ui:292
-msgid "Icon:"
+#: src/ui/options.ui:311
+msgid "Icon"
 msgstr ""
 
-#: src/ui/options.ui:317
+#: src/ui/options.ui:324
+msgid "Default image"
+msgstr ""
+
+#: src/ui/options.ui:342
 msgid "Open menu when cursor hovers the applet"
 msgstr ""
 
-#: src/ui/options.ui:343
+#: src/ui/options.ui:360
+msgid "No icon"
+msgstr ""
+
+#: src/ui/options.ui:443
+msgid "Icon name"
+msgstr ""
+
+#: src/ui/options.ui:500
+msgid "File name"
+msgstr ""
+
+#: src/ui/options.ui:544
 msgid "Applet"
 msgstr ""
 
-#: src/ui/options.ui:375
+#: src/ui/options.ui:577
 msgid "Drag to reorder plugins"
 msgstr ""
 
-#: src/ui/options.ui:482
+#: src/ui/options.ui:687
 msgid "Plugins"
 msgstr ""
 
