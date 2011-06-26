@@ -160,7 +160,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.get_widget('MarginBottom').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_SIDE))
 		self.get_widget('MarginBottomLeft').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_LEFT_CORNER))
 		self.get_widget('MarginBottomRight').window.set_cursor(gtk.gdk.Cursor(gtk.gdk.BOTTOM_RIGHT_CORNER))
-		self.main_window.window.set_cursor(gtk.gdk.Cursor(gtk.gdk.ARROW))
+		self.main_window.window.set_cursor(None)
 
 		try:
 			self.main_window.set_property('has-resize-grip', False)
