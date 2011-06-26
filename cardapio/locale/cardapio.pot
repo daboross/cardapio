@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-06-26 21:38+0200\n"
+"POT-Creation-Date: 2011-06-26 23:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -936,42 +936,38 @@ msgid "General"
 msgstr ""
 
 #: src/ui/options.ui:279
-msgid "Label"
+msgid "Label:"
 msgstr ""
 
-#: src/ui/options.ui:311
-msgid "Icon"
+#: src/ui/options.ui:305
+msgid "Use icon from file:"
 msgstr ""
 
-#: src/ui/options.ui:324
-msgid "Default image"
+#: src/ui/options.ui:339
+msgid "Use named icon:"
 msgstr ""
 
-#: src/ui/options.ui:342
+#: src/ui/options.ui:379
+msgid "Use no icon"
+msgstr ""
+
+#: src/ui/options.ui:403
 msgid "Open menu when cursor hovers the applet"
 msgstr ""
 
-#: src/ui/options.ui:360
-msgid "No icon"
+#: src/ui/options.ui:427
+msgid "Use default icon"
 msgstr ""
 
-#: src/ui/options.ui:443
-msgid "Icon name"
-msgstr ""
-
-#: src/ui/options.ui:500
-msgid "File name"
-msgstr ""
-
-#: src/ui/options.ui:544
+#: src/ui/options.ui:457
 msgid "Applet"
 msgstr ""
 
-#: src/ui/options.ui:577
+#: src/ui/options.ui:490
 msgid "Drag to reorder plugins"
 msgstr ""
 
-#: src/ui/options.ui:687
+#: src/ui/options.ui:600
 msgid "Plugins"
 msgstr ""
 
