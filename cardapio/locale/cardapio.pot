@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-06-26 23:54+0200\n"
+"POT-Creation-Date: 2011-06-27 10:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -96,11 +96,11 @@ msgstr ""
 msgid "Show all categories"
 msgstr ""
 
-#: src/Cardapio.py:1287
+#: src/Cardapio.py:1288
 msgid "Filesystem Root"
 msgstr ""
 
-#: src/Cardapio.py:1311 src/plugins/amazon.py:278 src/plugins/bing.py:151
+#: src/Cardapio.py:1312 src/plugins/amazon.py:278 src/plugins/bing.py:151
 #: src/plugins/duckduck.py:74 src/plugins/ebay.py:245 src/plugins/ebay.py:261
 #: src/plugins/google.py:85 src/plugins/google_localized.py:89
 #: src/plugins/tracker.py:72 src/plugins/tracker_fts.py:71
@@ -110,103 +110,103 @@ msgstr ""
 msgid "Show additional results"
 msgstr ""
 
-#: src/Cardapio.py:1311
+#: src/Cardapio.py:1312
 msgid "Show additional search results in a file browser"
 msgstr ""
 
-#: src/Cardapio.py:2034 src/Cardapio.py:2398
+#: src/Cardapio.py:2035 src/Cardapio.py:2399
 msgid "Uncategorized"
 msgstr ""
 
-#: src/Cardapio.py:2034
+#: src/Cardapio.py:2035
 msgid "Other configuration tools"
 msgstr ""
 
-#: src/Cardapio.py:2085
+#: src/Cardapio.py:2086
 msgid "Network"
 msgstr ""
 
-#: src/Cardapio.py:2085
+#: src/Cardapio.py:2086
 msgid "Browse the contents of the network"
 msgstr ""
 
-#: src/Cardapio.py:2091
+#: src/Cardapio.py:2092
 msgid "Connect to Server"
 msgstr ""
 
-#: src/Cardapio.py:2091
+#: src/Cardapio.py:2092
 msgid "Connect to a remote computer or shared disk"
 msgstr ""
 
-#: src/Cardapio.py:2093
+#: src/Cardapio.py:2094
 msgid "Trash"
 msgstr ""
 
-#: src/Cardapio.py:2093
+#: src/Cardapio.py:2094
 msgid "Open the trash"
 msgstr ""
 
-#: src/Cardapio.py:2107
+#: src/Cardapio.py:2108
 msgid "Home"
 msgstr ""
 
-#: src/Cardapio.py:2107
+#: src/Cardapio.py:2108
 msgid "Open your personal folder"
 msgstr ""
 
-#: src/Cardapio.py:2123
+#: src/Cardapio.py:2124
 msgid "Desktop"
 msgstr ""
 
-#: src/Cardapio.py:2278
+#: src/Cardapio.py:2279
 msgid "Lock Screen"
 msgstr ""
 
-#: src/Cardapio.py:2279
+#: src/Cardapio.py:2280
 msgid "Protect your computer from unauthorized use"
 msgstr ""
 
-#: src/Cardapio.py:2285
+#: src/Cardapio.py:2286
 msgid "Log Out..."
 msgstr ""
 
-#: src/Cardapio.py:2286
+#: src/Cardapio.py:2287
 msgid "Log out of this session to log in as a different user"
 msgstr ""
 
-#: src/Cardapio.py:2292
+#: src/Cardapio.py:2293
 msgid "Shut Down..."
 msgstr ""
 
-#: src/Cardapio.py:2293
+#: src/Cardapio.py:2294
 msgid "Shut down the system"
 msgstr ""
 
-#: src/Cardapio.py:2378
+#: src/Cardapio.py:2379
 msgid "Folder Contents"
 msgstr ""
 
-#: src/Cardapio.py:2378
+#: src/Cardapio.py:2379
 msgid "Look inside folders"
 msgstr ""
 
-#: src/Cardapio.py:2386
+#: src/Cardapio.py:2387
 msgid "Side Pane"
 msgstr ""
 
-#: src/Cardapio.py:2386
+#: src/Cardapio.py:2387
 msgid "Items pinned to the side pane"
 msgstr ""
 
-#: src/Cardapio.py:2398
+#: src/Cardapio.py:2399
 msgid "Items that are not under any menu category"
 msgstr ""
 
-#: src/Cardapio.py:2399
+#: src/Cardapio.py:2400
 msgid "Session"
 msgstr ""
 
-#: src/Cardapio.py:2400
+#: src/Cardapio.py:2401
 msgid "System"
 msgstr ""
 
@@ -215,15 +215,15 @@ msgstr ""
 msgid "_About %(distro_name)s"
 msgstr ""
 
-#: src/OptionsWindow.py:201
+#: src/OptionsWindow.py:200
 msgid "Recording..."
 msgstr ""
 
-#: src/OptionsWindow.py:206 src/ui/options.ui:166
+#: src/OptionsWindow.py:205 src/ui/options.ui:166
 msgid "Grab new shortcut"
 msgstr ""
 
-#: src/OptionsWindow.py:366
+#: src/OptionsWindow.py:356
 #, python-format
 msgid ""
 "<b>Plugin:</b> %(name)s %(version)s\n"
@@ -231,7 +231,7 @@ msgid ""
 "<b>Description:</b> %(description)s"
 msgstr ""
 
-#: src/OptionsWindow.py:372
+#: src/OptionsWindow.py:362
 msgid "This is a community-supported plugin"
 msgstr ""
 
@@ -947,27 +947,31 @@ msgstr ""
 msgid "Use named icon:"
 msgstr ""
 
-#: src/ui/options.ui:379
+#: src/ui/options.ui:359
 msgid "Use no icon"
 msgstr ""
 
-#: src/ui/options.ui:403
+#: src/ui/options.ui:383
 msgid "Open menu when cursor hovers the applet"
 msgstr ""
 
-#: src/ui/options.ui:427
+#: src/ui/options.ui:407
 msgid "Use default icon"
 msgstr ""
 
-#: src/ui/options.ui:457
+#: src/ui/options.ui:453
+msgid "View icon-naming specification on the web"
+msgstr ""
+
+#: src/ui/options.ui:492
 msgid "Applet"
 msgstr ""
 
-#: src/ui/options.ui:490
+#: src/ui/options.ui:525
 msgid "Drag to reorder plugins"
 msgstr ""
 
-#: src/ui/options.ui:600
+#: src/ui/options.ui:635
 msgid "Plugins"
 msgstr ""
 
