@@ -905,6 +905,7 @@ class Cardapio(dbus.service.Object):
 		user's settings.
 		"""
 
+		self.hide()
 		self.options_window.show()
 
 

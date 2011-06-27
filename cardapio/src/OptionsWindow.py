@@ -22,7 +22,6 @@ import sys
 
 try:
 	import os
-	import urllib2
 	import gtk
 	from CardapioAppletInterface import PANEL_TYPE_DOCKY, PANEL_TYPE_AWN 
 
@@ -292,16 +291,8 @@ class OptionsWindow:
 		self.cardapio.settings['mini mode']                = self.get_widget('OptionMiniMode').get_active() 
 
 		if self.icon_button_file.get_active():
-
-			icon_name = self.icon_button_file_chooser.get_uri()
-
-			if not icon_name: icon_name = self.ICON_MISSING
-			else:
-				dummy, possible_path = urllib2.splittype(icon_name)
-
-				if os.path.exists(possible_path): icon_name = possible_path
-				else: icon_name = self.ICON_MISSING
-
+			icon_name = self.icon_button_file_chooser.get_filename()
+			if not icon_name or not os.path.exists(icon_name): icon_name = self.ICON_MISSING
 			self.cardapio.settings['applet icon'] = icon_name
 
 		elif self.icon_button_name.get_active():
@@ -325,7 +316,6 @@ class OptionsWindow:
 		"""
 
 		icon_string = self.cardapio.settings['applet icon']
-		dummy, possible_path = urllib2.splittype(icon_string)
 
 		self.icon_button_none.set_active(False)
 		self.icon_button_default.set_active(False)
@@ -338,9 +328,9 @@ class OptionsWindow:
 		elif icon_string == self.ICON_DEFAULT:
 			self.icon_button_default.set_active(True)
 
-		elif os.path.exists(possible_path):
+		elif os.path.exists(icon_string):
 			self.icon_button_file.set_active(True)
-			self.icon_button_file_chooser.set_uri(icon_string)
+			self.icon_button_file_chooser.set_filename(icon_string)
 
 		else:
 			self.icon_button_name.set_active(True)
