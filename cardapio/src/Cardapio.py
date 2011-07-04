@@ -29,6 +29,7 @@ try:
 	from CardapioPluginInterface import CardapioPluginInterface
 	from CardapioAppletInterface import *
 	from CardapioViewInterface import *
+	import Constants
 
 	import gc
 	import os
@@ -125,10 +126,7 @@ class Cardapio(dbus.service.Object):
 
 	LOG_FILE_MAX_SIZE                 = 1000000 # bytes
 
-	bus_name_str = 'org.varal.Cardapio'
-	bus_obj_str  = '/org/varal/Cardapio'
-
-	version = '0.9.182'
+	version = '0.9.183'
 
 	core_plugins = [
 			'applications',
@@ -147,10 +145,6 @@ class Cardapio(dbus.service.Object):
 
 	required_plugins = ['pinned']
 	builtin_plugins = ['applications', 'places', 'pinned']
-
-	DONT_SHOW       = 0
-	SHOW_CENTERED   = 1
-	SHOW_NEAR_MOUSE = 2
 
 	REMOTE_PROTOCOLS = ['ftp', 'sftp', 'smb']
 
@@ -226,8 +220,8 @@ class Cardapio(dbus.service.Object):
 
 		self.reset_search()
 
-		if   show == Cardapio.SHOW_NEAR_MOUSE: self.show_hide_near_mouse()
-		elif show == Cardapio.SHOW_CENTERED  : self.show()
+		if   show == Constants.SHOW_NEAR_MOUSE: self.show_hide_near_mouse()
+		elif show == Constants.SHOW_CENTERED  : self.show()
 
 
 	# This method is called from the View API
@@ -311,7 +305,7 @@ class Cardapio(dbus.service.Object):
 
 		try: 
 			self.bus = dbus.SessionBus()
-			dbus.service.Object.__init__(self, self.bus, Cardapio.bus_obj_str)
+			dbus.service.Object.__init__(self, self.bus, Constants.bus_obj_str)
 
 		except Exception, exception:
 			logging.warn('Could not open dbus. Uncaught exception.')
@@ -898,7 +892,7 @@ class Cardapio(dbus.service.Object):
 
 
 	# This method is called from the View API
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
+	@dbus.service.method(dbus_interface = Constants.bus_name_str, in_signature = None, out_signature = None)
 	def open_options_dialog(self):
 		"""
 		Show the Options Dialog and populate its widgets with values from the
@@ -1849,7 +1843,7 @@ class Cardapio(dbus.service.Object):
 		self.view.toggle_mini_mode_ui()
 
 
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
+	@dbus.service.method(dbus_interface = Constants.bus_name_str, in_signature = None, out_signature = None)
 	def show_hide(self):
 		"""
 		Toggles Cardapio's visibility and places the window near the applet or,
@@ -1864,7 +1858,7 @@ class Cardapio(dbus.service.Object):
 		return self.show_hide_near_point()
 
 
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = None, out_signature = None)
+	@dbus.service.method(dbus_interface = Constants.bus_name_str, in_signature = None, out_signature = None)
 	def show_hide_near_mouse(self):
 		"""
 		Toggles Cardapio's visibility and places the window near the mouse.
@@ -1879,7 +1873,7 @@ class Cardapio(dbus.service.Object):
 		return self.show_hide_near_point(mouse_x, mouse_y)
 
 
-	@dbus.service.method(dbus_interface = bus_name_str, in_signature = 'iibb', out_signature = None)
+	@dbus.service.method(dbus_interface = Constants.bus_name_str, in_signature = 'iibb', out_signature = None)
 	def show_hide_near_point(self, x = None, y = None, force_anchor_right = False, force_anchor_bottom = False):
 		"""
 		Toggles Cardapio's visibility and places the window at the given (x,y)

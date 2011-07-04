@@ -20,13 +20,17 @@
 # the function fatal_error(), which is used in the "except"
 from misc import fatal_error
 import sys
+import time
+starttime = time.time()
 
 try:
-	from Cardapio import Cardapio
-
-	import gtk
+	print 1, time.time() - starttime
+	import Constants
+	print 2, time.time() - starttime
 	import dbus
+	print 3, time.time() - starttime
 	from dbus.mainloop.glib import DBusGMainLoop
+	print 4, time.time() - starttime
 
 except Exception, exception:
 	fatal_error('Fatal error loading Cardapio', exception)
@@ -35,13 +39,15 @@ except Exception, exception:
 # main
 DBusGMainLoop(set_as_default = True)
 bus = dbus.SessionBus()
-bus_request_name = bus.request_name(Cardapio.bus_name_str)
+bus_request_name = bus.request_name(Constants.bus_name_str)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
 def start_cardapio(show):
 
+	from Cardapio import Cardapio
+	import gtk
 	Cardapio(show = show)
 	gtk.gdk.threads_enter()
 	gtk.main()
@@ -52,6 +58,7 @@ def cardapio_run_in_window():
 
 	import os
 	import gnomeapplet
+	import gtk
 	from gnomepanel.CardapioGnomeAppletFactory import CardapioGnomeAppletFactory
 
 	# make sure Cardapio shows even if using Ubuntu's AppMenu
@@ -74,16 +81,16 @@ def cardapio_run_standalone_but_hidden():
 
 	# if there's no other instance, start hidden Cardapio
 	if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
-		start_cardapio(show = Cardapio.DONT_SHOW)
+		start_cardapio(show = Constants.DONT_SHOW)
 
 
 def cardapio_show(centered = False):
 
 	if centered:
-		position = Cardapio.SHOW_CENTERED
+		position = Constants.SHOW_CENTERED
 		dbus_method_name = 'show_hide'
 	else:
-		position = Cardapio.SHOW_NEAR_MOUSE
+		position = Constants.SHOW_NEAR_MOUSE
 		dbus_method_name = 'show_hide_near_mouse'
 
 	# if there's no other instance - start Cardapio
@@ -92,7 +99,7 @@ def cardapio_show(centered = False):
 
 	# if there is - "show / hide" it
 	else:
-		dbus_method = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method(dbus_method_name)
+		dbus_method = bus.get_object(Constants.bus_name_str, Constants.bus_obj_str).get_dbus_method(dbus_method_name)
 		dbus_method()
 
 
@@ -105,7 +112,7 @@ def cardapio_open_options_dialog():
 
 	# if there is, show its options dialog
 	dbus_method_name = 'open_options_dialog'
-	dbus_method = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method(dbus_method_name)
+	dbus_method = bus.get_object(Constants.bus_name_str, Constants.bus_obj_str).get_dbus_method(dbus_method_name)
 	dbus_method()
 
 
@@ -113,7 +120,7 @@ def cardapio_show_near_docky():
 
 	# if there's no other instance - start hidden Cardapio
 	if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
-		start_cardapio(show = Cardapio.DONT_SHOW)
+		start_cardapio(show = Constants.DONT_SHOW)
 
 	else:
 		from docky.DockySettingsHelper import DockySettingsHelper, MainDockError
@@ -125,7 +132,7 @@ def cardapio_show_near_docky():
 			x, y, force_anchor_right, force_anchor_bottom = settings_helper.get_best_position(dock_num)
 
 			dbus_method_name = 'show_hide_near_point'
-			dbus_method = bus.get_object(Cardapio.bus_name_str, Cardapio.bus_obj_str).get_dbus_method(dbus_method_name)
+			dbus_method = bus.get_object(Constants.bus_name_str, Constants.bus_obj_str).get_dbus_method(dbus_method_name)
 			dbus_method(x, y, force_anchor_right, force_anchor_bottom)
 
 		except MainDockError, exception:
