@@ -20,17 +20,11 @@
 # the function fatal_error(), which is used in the "except"
 from misc import fatal_error
 import sys
-import time
-starttime = time.time()
 
 try:
-	print 1, time.time() - starttime
 	import Constants
-	print 2, time.time() - starttime
 	import dbus
-	print 3, time.time() - starttime
 	from dbus.mainloop.glib import DBusGMainLoop
-	print 4, time.time() - starttime
 
 except Exception, exception:
 	fatal_error('Fatal error loading Cardapio', exception)
