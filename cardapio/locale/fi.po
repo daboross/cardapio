@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-03-24 22:37+0100\n"
-"PO-Revision-Date: 2011-03-17 12:49+0000\n"
+"POT-Creation-Date: 2011-06-27 10:05+0200\n"
+"PO-Revision-Date: 2011-06-28 10:25+0000\n"
 "Last-Translator: Jiri Grönroos <Unknown>\n"
 "Language-Team: Finnish <fi@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
-"X-Generator: Launchpad (build 12981)\n"
+"X-Launchpad-Export-Date: 2011-07-02 10:16+0000\n"
+"X-Generator: Launchpad (build 13333)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "\"%(file_name)s\" on suoritettava tekstitiedosto."
@@ -149,6 +149,12 @@ msgstr ""
 msgid "Drag to reorder plugins"
 msgstr "Vedä järjestääksesi liitännäiset uudelleen"
 
+msgid "DuckDuckGo"
+msgstr "DuckDuckGo"
+
+msgid "DuckDuckGo Results"
+msgstr "DuckDuckGo-tulokset"
+
 msgid "Edit Menus"
 msgstr "Muokkaa valikkoja"
 
@@ -182,9 +188,6 @@ msgstr "Tänään käyttämäsi tiedostot"
 msgid "Filesystem Root"
 msgstr "Tiedostojärjestelmän juuri"
 
-msgid "Firefox Bookmarks"
-msgstr "Firefox-kirjanmerkit"
-
 msgid ""
 "Firefox bookmark:\n"
 "%s"
@@ -211,9 +214,6 @@ msgstr "Yleiset"
 msgid "Get help with %(distro_name)s"
 msgstr "Apua jakelun %(distro_name)s käyttöön"
 
-msgid "Go To \"%s\""
-msgstr "Siirry sivulle \"%s\""
-
 msgid "Go To \"%s\" in Chromium"
 msgstr "Siirry sivulle \"%s\" käyttäen Chromiumia"
 
@@ -237,9 +237,6 @@ msgstr "Ohjeet ja tuki"
 
 msgid "Home"
 msgstr "Koti"
-
-msgid "Icon:"
-msgstr "Kuvake:"
 
 msgid "Install this package without opening the Software Center"
 msgstr "Asenna tämä paketti avaamatta sovellusvalikoimaa"
@@ -357,6 +354,9 @@ msgstr "Suorita haku käyttäen Microsoftin Bing-hakua"
 msgid "Perform a search using Yahoo"
 msgstr "Suorita haku käyttäen Yahoota"
 
+msgid "Perform quick DuckDuckGo searches"
+msgstr "Suorita nopeita DuckDuckGo-hakuja"
+
 msgid ""
 "Perform quick Google searches <b>limited to</b> the system's default language"
 msgstr "Suorita Google-haku käyttäen järjestelmän <b>oletuskieltä</b>"
@@ -436,6 +436,9 @@ msgstr "Bingin palauttamat tulokset"
 msgid "Results found using Yahoo"
 msgstr "Yahoon palauttamat tulokset"
 
+msgid "Results found with DuckDuckGo"
+msgstr "DuckDuckGo:n löytämät tulokset"
+
 msgid "Results found with Google"
 msgstr "Google-tulokset"
 
@@ -467,9 +470,6 @@ msgid "Search <b>inside</b> local files and folders indexed with Tracker"
 msgstr ""
 "Etsi Trackerin indeksoimien kansioiden ja tiedostojen <b>tekstisisällöstä</"
 "b>."
-
-msgid "Search for Firefox Bookmarks"
-msgstr "Etsi Firefox-kirjanmerkkejä"
 
 msgid "Search for Tomboy notes"
 msgstr "Etsi Tomboy-muistiinpanoista"
@@ -631,8 +631,23 @@ msgstr "Luokittelemattomat"
 msgid "Update now"
 msgstr "Päivitä nyt"
 
+msgid "Use default icon"
+msgstr "Käytä oletuskuvaketta"
+
+msgid "Use icon from file:"
+msgstr "Käytä kuvaketta tiedostosta:"
+
+msgid "Use named icon:"
+msgstr "Käytä nimettyä kuvaketta:"
+
+msgid "Use no icon"
+msgstr "Älä käytä kuvaketta"
+
 msgid "View"
 msgstr "Näkymä"
+
+msgid "View icon-naming specification on the web"
+msgstr "Näytä kuvakenimeämisen määrittely verkossa"
 
 msgid "Virtual Machines"
 msgstr "Virtuaalikoneet"
@@ -645,9 +660,6 @@ msgstr "Www-kirjanmerkit"
 
 msgid "Web Results"
 msgstr "Www-tulokset"
-
-msgid "Web bookmarks in Firefox"
-msgstr "Firefoxin web-kirjanmerkit"
 
 msgid "Wikipedia"
 msgstr "Wikipedia"

@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-03-24 22:37+0100\n"
-"PO-Revision-Date: 2011-03-03 19:13+0000\n"
+"POT-Creation-Date: 2011-06-27 10:05+0200\n"
+"PO-Revision-Date: 2011-05-16 11:46+0000\n"
 "Last-Translator: Svetoslav Stefanov <svetlisashkov@yahoo.com>\n"
 "Language-Team: Bulgarian <bg@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
-"X-Generator: Launchpad (build 12981)\n"
+"X-Launchpad-Export-Date: 2011-07-02 10:16+0000\n"
+"X-Generator: Launchpad (build 13333)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "\"%(file_name)s\" е изпълним текстов файл."
@@ -48,6 +48,12 @@ msgstr "Достъп до документи и папки"
 
 msgid "All"
 msgstr "Всички"
+
+msgid "All other files"
+msgstr "Всички останали файлове"
+
+msgid "All time"
+msgstr "През цялото време"
 
 msgid "Amazon"
 msgstr "Amazon"
@@ -165,11 +171,17 @@ msgstr "Търсене на файлове"
 msgid "Files that you have used recently"
 msgstr "Наскоро изполвани файлове"
 
+msgid "Files you used this month"
+msgstr "Файлове, които сте използвали този месец"
+
+msgid "Files you used this week"
+msgstr "Файлове, които сте използвали тази седмица"
+
+msgid "Files you used today"
+msgstr "Файлове, които сте използвали днес"
+
 msgid "Filesystem Root"
 msgstr "Главна файлова система"
-
-msgid "Firefox Bookmarks"
-msgstr "Отметки на Firefox"
 
 msgid ""
 "Firefox bookmark:\n"
@@ -193,9 +205,6 @@ msgstr "Общи"
 
 msgid "Get help with %(distro_name)s"
 msgstr "Получаване на помощ за %(distro_name)s"
-
-msgid "Go To \"%s\""
-msgstr "Отиване до \"%s\""
 
 msgid "Go To \"%s\" in Chromium"
 msgstr "Отиване до \"%s\" в Chromium"
@@ -221,9 +230,6 @@ msgstr "Помощ и поддръжка"
 msgid "Home"
 msgstr "Домашна папка"
 
-msgid "Icon:"
-msgstr "Икона:"
-
 msgid "Install this package without opening the Software Center"
 msgstr "Инсталира този пакет без да се отваря Софтуерния център"
 
@@ -241,6 +247,9 @@ msgstr "Запазване на резултатите от търсене, пр
 
 msgid "Label:"
 msgstr "Етикет:"
+
+msgid "Launch in _Background"
+msgstr "Пускане на _заден фон"
 
 msgid "Launch this item"
 msgstr "Стартиране на този елемент"
@@ -436,9 +445,6 @@ msgstr "Търсене"
 msgid "Search <b>inside</b> local files and folders indexed with Tracker"
 msgstr "Търсене <b>вътре в</b> локални файлове и папки, индексирани с Tracker"
 
-msgid "Search for Firefox Bookmarks"
-msgstr "Търсене на отметки на Firefox"
-
 msgid "Search for Tomboy notes"
 msgstr "Търсене за бележки на Tomboy"
 
@@ -556,6 +562,15 @@ msgstr "Това е приставка, поддържана от общостт
 msgid "This menu will be updated momentarily."
 msgstr "Това меню ще бъде обновено моментално."
 
+msgid "This month"
+msgstr "Този месец"
+
+msgid "This week"
+msgstr "Тази седмица"
+
+msgid "Today"
+msgstr "Днес"
+
 msgid "Tomboy"
 msgstr "Tomboy"
 
@@ -588,9 +603,6 @@ msgstr "Уеб отметки"
 
 msgid "Web Results"
 msgstr "Уеб резулати"
-
-msgid "Web bookmarks in Firefox"
-msgstr "Уеб отметки във Firefox"
 
 msgid "Wikipedia"
 msgstr "Уикипедия"

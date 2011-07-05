@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-03-24 22:37+0100\n"
-"PO-Revision-Date: 2011-03-23 22:58+0000\n"
+"POT-Creation-Date: 2011-06-27 10:05+0200\n"
+"PO-Revision-Date: 2011-06-27 09:04+0000\n"
 "Last-Translator: Thiago Teixeira <Unknown>\n"
 "Language-Team: Brazilian Portuguese <pt_BR@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
-"X-Generator: Launchpad (build 12981)\n"
+"X-Launchpad-Export-Date: 2011-07-02 10:16+0000\n"
+"X-Generator: Launchpad (build 13333)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "\"%(file_name)s\" é um arquivo de texto executável."
@@ -149,6 +149,12 @@ msgstr "Você quer executar \"%(file_name)s\", ou exibir seu conteúdo?"
 msgid "Drag to reorder plugins"
 msgstr "Arraste com o mouse para reordenar"
 
+msgid "DuckDuckGo"
+msgstr "GDuckDuckGo"
+
+msgid "DuckDuckGo Results"
+msgstr "Resultados do DuckDuckGo"
+
 msgid "Edit Menus"
 msgstr "Editar Menus"
 
@@ -182,9 +188,6 @@ msgstr "Arquivos usados hoje"
 msgid "Filesystem Root"
 msgstr "Raiz do Sistema de Arquivos"
 
-msgid "Firefox Bookmarks"
-msgstr "Favoritos do Firefox"
-
 msgid ""
 "Firefox bookmark:\n"
 "%s"
@@ -211,9 +214,6 @@ msgstr "Geral"
 msgid "Get help with %(distro_name)s"
 msgstr "Obter ajuda sobre %(distro_name)s"
 
-msgid "Go To \"%s\""
-msgstr "Abrir \"%s\""
-
 msgid "Go To \"%s\" in Chromium"
 msgstr "Abrir \"%s\" com o Chromium"
 
@@ -237,9 +237,6 @@ msgstr "Ajuda e suporte"
 
 msgid "Home"
 msgstr "Pasta pessoal"
-
-msgid "Icon:"
-msgstr "Ícone:"
 
 msgid "Install this package without opening the Software Center"
 msgstr "Instalar esse programa sem abrir a Central de Programas"
@@ -356,12 +353,16 @@ msgstr "Procurar por páginas da web com o Microsoft Bing"
 msgid "Perform a search using Yahoo"
 msgstr "Procurar por páginas da web com o Yahoo"
 
+msgid "Perform quick DuckDuckGo searches"
+msgstr "Procurar por páginas da web usando o DuckDuckGo"
+
 msgid ""
 "Perform quick Google searches <b>limited to</b> the system's default language"
-msgstr "Procurar por páginas de web <b>no idioma local</b>"
+msgstr "Procurar por páginas de web <b>no idioma local</b>, usando o Google"
 
 msgid "Perform quick Google searches in <b>all</b> languages"
-msgstr "Procurar por páginas da web em <b>qualquer</b> idioma"
+msgstr ""
+"Procurar por páginas da web em <b>todos</b> os idiomas, usando o Google"
 
 msgid "Pidgin"
 msgstr "Pidgin"
@@ -435,6 +436,9 @@ msgstr "Resultados"
 msgid "Results found using Yahoo"
 msgstr "Resultados encontrados através do Yahoo"
 
+msgid "Results found with DuckDuckGo"
+msgstr "Resultados provenientes do DuckDuckGo"
+
 msgid "Results found with Google"
 msgstr "Resultados do Google"
 
@@ -465,9 +469,6 @@ msgstr "Buscar"
 msgid "Search <b>inside</b> local files and folders indexed with Tracker"
 msgstr ""
 "Procure <b>o conteúdo</b> de arquivos e pastas locais indexadas pelo Tracker"
-
-msgid "Search for Firefox Bookmarks"
-msgstr "Procurar suas páginas marcadas como favoritas no Firefox"
 
 msgid "Search for Tomboy notes"
 msgstr "Procure por lembretes e notas do Tomboy"
@@ -626,8 +627,23 @@ msgstr "Não Categorizado"
 msgid "Update now"
 msgstr "Atualizar agora"
 
+msgid "Use default icon"
+msgstr "Usar ícone padrão"
+
+msgid "Use icon from file:"
+msgstr "Usar arquivo como ícone:"
+
+msgid "Use named icon:"
+msgstr "Usar ícone nomeado:"
+
+msgid "Use no icon"
+msgstr "Não mostrar ícone algum"
+
 msgid "View"
 msgstr "Exibir"
+
+msgid "View icon-naming specification on the web"
+msgstr "Ver especificação para nomeação de ícones na web"
 
 msgid "Virtual Machines"
 msgstr "Máquinas Virtuais"
@@ -640,9 +656,6 @@ msgstr "Marcadores da Web"
 
 msgid "Web Results"
 msgstr "Resultados da Web"
-
-msgid "Web bookmarks in Firefox"
-msgstr "Páginas favoritas no Firefox"
 
 msgid "Wikipedia"
 msgstr "Wikipédia"

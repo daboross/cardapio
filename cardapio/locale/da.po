@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-03-24 22:37+0100\n"
+"POT-Creation-Date: 2011-06-27 10:05+0200\n"
 "PO-Revision-Date: 2011-04-01 18:51+0000\n"
 "Last-Translator: Kenneth Terkelsen <Unknown>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
-"X-Generator: Launchpad (build 12981)\n"
+"X-Launchpad-Export-Date: 2011-07-02 10:16+0000\n"
+"X-Generator: Launchpad (build 13333)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "\"%(file_name)s\" er en eksekverbar tekst fil."
@@ -182,9 +182,6 @@ msgstr "Filer brugt i dag"
 msgid "Filesystem Root"
 msgstr "Roden af filsystemet"
 
-msgid "Firefox Bookmarks"
-msgstr "Firefox Bogmærker"
-
 msgid ""
 "Firefox bookmark:\n"
 "%s"
@@ -211,9 +208,6 @@ msgstr "Generelt"
 msgid "Get help with %(distro_name)s"
 msgstr "Få hjælp til %(distro_name)s"
 
-msgid "Go To \"%s\""
-msgstr "Gå til \"%s\""
-
 msgid "Go To \"%s\" in Chromium"
 msgstr "Gå til \"%s\" i Chromium"
 
@@ -237,9 +231,6 @@ msgstr "Hjælp og support"
 
 msgid "Home"
 msgstr "Hjem"
-
-msgid "Icon:"
-msgstr "Ikon:"
 
 msgid "Install this package without opening the Software Center"
 msgstr "Installer denne pakke uden at åbne Software Centeret"
@@ -460,9 +451,6 @@ msgstr "Søg"
 msgid "Search <b>inside</b> local files and folders indexed with Tracker"
 msgstr "Søg <b>inden i</b> lokale filer og mapper indekseret med Tracker"
 
-msgid "Search for Firefox Bookmarks"
-msgstr "Søg efter Firefox Bogmærker"
-
 msgid "Search for Tomboy notes"
 msgstr "Søg efter Tomboy noter"
 
@@ -622,9 +610,6 @@ msgstr "Web Bogmærker"
 
 msgid "Web Results"
 msgstr "Web Resultater"
-
-msgid "Web bookmarks in Firefox"
-msgstr "Bogmærker i Firefox"
 
 msgid "Wikipedia"
 msgstr "Wikipedia"

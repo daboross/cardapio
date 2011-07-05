@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-03-24 22:37+0100\n"
+"POT-Creation-Date: 2011-06-27 10:05+0200\n"
 "PO-Revision-Date: 2011-01-14 20:34+0000\n"
 "Last-Translator: Vaidas Nargėlas <Unknown>\n"
 "Language-Team: Lithuanian <lt@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
-"X-Generator: Launchpad (build 12981)\n"
+"X-Launchpad-Export-Date: 2011-07-02 10:16+0000\n"
+"X-Generator: Launchpad (build 13333)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "\"%(file_name)s\" yra vykdomasis teksto failas."
@@ -143,9 +143,6 @@ msgstr "Jūsų vėliausiai naudoti dokumentai"
 msgid "Filesystem Root"
 msgstr "Failų sistema"
 
-msgid "Firefox Bookmarks"
-msgstr "Firefox žymelės"
-
 msgid ""
 "Firefox bookmark:\n"
 "%s"
@@ -161,9 +158,6 @@ msgstr "Bendra"
 
 msgid "Get help with %(distro_name)s"
 msgstr "Gauti papildomą %(distro_name)s pagalbą ir palaikymą"
-
-msgid "Go To \"%s\""
-msgstr "Atverti svetainę \"%s\""
 
 msgid "Go To \"%s\" in Chromium"
 msgstr "Atverti svetainę \"%s\" Chromium naršyklėje"
@@ -188,9 +182,6 @@ msgstr "Pagalba ir palaikymas"
 
 msgid "Home"
 msgstr "Asmeninis aplankas"
-
-msgid "Icon:"
-msgstr "Piktograma:"
 
 msgid "Install this package without opening the Software Center"
 msgstr "Įdiegti šį paketą neatveriant Programinės įrangos centro"
@@ -390,9 +381,6 @@ msgstr "Saugiai pašalinti šį kaupiklį"
 msgid "Search"
 msgstr "Ieškoti"
 
-msgid "Search for Firefox Bookmarks"
-msgstr "Ieškoti Firefox žymelių"
-
 msgid "Search for Tomboy notes"
 msgstr "Ieškoti Tomboy užrašų"
 
@@ -522,9 +510,6 @@ msgstr "Žiniatinklio žymelės"
 
 msgid "Web Results"
 msgstr "Žiniatinklio rezultatai"
-
-msgid "Web bookmarks in Firefox"
-msgstr "Interneto žymelės Firefox naršyklėje"
 
 msgid "Wikipedia"
 msgstr "Vikipedija"

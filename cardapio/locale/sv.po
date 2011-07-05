@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-03-24 22:37+0100\n"
+"POT-Creation-Date: 2011-06-27 10:05+0200\n"
 "PO-Revision-Date: 2010-10-29 11:17+0000\n"
 "Last-Translator: David Bengtsson <Unknown>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
-"X-Generator: Launchpad (build 12981)\n"
+"X-Launchpad-Export-Date: 2011-07-02 10:16+0000\n"
+"X-Generator: Launchpad (build 13333)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "\"%(file_name)s\" är en körbar textfil."
@@ -123,9 +123,6 @@ msgstr "Filer som du använt nyligen"
 msgid "Filesystem Root"
 msgstr "Rotfilsystemet"
 
-msgid "Firefox Bookmarks"
-msgstr "Firefox-bokmärken"
-
 msgid "Folder Contents"
 msgstr "Mappinnehåll"
 
@@ -144,9 +141,6 @@ msgstr "Allmänt"
 
 msgid "Get help with %(distro_name)s"
 msgstr "Få hjälp med %(distro_name)s"
-
-msgid "Go To \"%s\""
-msgstr "Gå till \"%s\""
 
 msgid "Google"
 msgstr "Google"
@@ -351,9 +345,6 @@ msgstr "Sök"
 msgid "Search <b>inside</b> local files and folders indexed with Tracker"
 msgstr "Sök <b>inuti</b> lokala filer och mappar som idexerats med Tracker"
 
-msgid "Search for Firefox Bookmarks"
-msgstr "Sök efter Firefox-bokmärken"
-
 msgid "Search for Tomboy notes"
 msgstr "Sök efter Tomboy-anteckningar"
 
@@ -486,9 +477,6 @@ msgstr "VirtualBox"
 
 msgid "Web Results"
 msgstr "Webbresultat"
-
-msgid "Web bookmarks in Firefox"
-msgstr "Webbokmärken i Firefox"
 
 msgid "Wikipedia"
 msgstr "Wikipedia"

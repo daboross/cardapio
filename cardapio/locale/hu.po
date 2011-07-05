@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-03-24 22:37+0100\n"
+"POT-Creation-Date: 2011-06-27 10:05+0200\n"
 "PO-Revision-Date: 2011-04-20 14:25+0000\n"
 "Last-Translator: Robert Roth <evfool@gmail.com>\n"
 "Language-Team: Hungarian <hu@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
-"X-Generator: Launchpad (build 12981)\n"
+"X-Launchpad-Export-Date: 2011-07-02 10:16+0000\n"
+"X-Generator: Launchpad (build 13333)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "„%(file_name)s” egy végrehajtható szöveges fájl"
@@ -153,9 +153,6 @@ msgstr "Fájlok, melyeket az utóbbi időben használt"
 msgid "Filesystem Root"
 msgstr "Gyökérfájlrendszer"
 
-msgid "Firefox Bookmarks"
-msgstr "Firefox könyvjelzők"
-
 msgid ""
 "Firefox bookmark:\n"
 "%s"
@@ -182,9 +179,6 @@ msgstr "Általános"
 msgid "Get help with %(distro_name)s"
 msgstr "Segítség a(z) %(distro_name)shoz"
 
-msgid "Go To \"%s\""
-msgstr "\"%s\" megnyitása"
-
 msgid "Go To \"%s\" in Chromium"
 msgstr "\"%s\" megnyitása Chromiummal"
 
@@ -208,9 +202,6 @@ msgstr "Súgó és támogatás"
 
 msgid "Home"
 msgstr "Saját mappa"
-
-msgid "Icon:"
-msgstr "Ikon:"
 
 msgid "Install this package without opening the Software Center"
 msgstr "Csomag telepítése a Szoftverközpont megnyitása nélkül"
@@ -422,9 +413,6 @@ msgid "Search <b>inside</b> local files and folders indexed with Tracker"
 msgstr ""
 "Keresés a Tracker által indexelt helyi fájlok és mappák <b>tartalmában</b>"
 
-msgid "Search for Firefox Bookmarks"
-msgstr "Firefox könyvjelzők keresése"
-
 msgid "Search for Tomboy notes"
 msgstr "Keresés a Tomboy jegyzetek között"
 
@@ -575,9 +563,6 @@ msgstr "Könyvjelzők"
 
 msgid "Web Results"
 msgstr "Webes találatok"
-
-msgid "Web bookmarks in Firefox"
-msgstr "Könyvjelzők a Firefoxban"
 
 msgid "Wikipedia"
 msgstr "Wikipédia"

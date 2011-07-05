@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-03-24 22:37+0100\n"
-"PO-Revision-Date: 2011-05-08 00:17+0000\n"
-"Last-Translator: Romanenko Lesha <Unknown>\n"
+"POT-Creation-Date: 2011-06-27 10:05+0200\n"
+"PO-Revision-Date: 2011-06-11 22:53+0000\n"
+"Last-Translator: Alexey Ivanov <alexey.ivanes@gmail.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-05-10 20:28+0000\n"
-"X-Generator: Launchpad (build 12981)\n"
+"X-Launchpad-Export-Date: 2011-07-02 10:16+0000\n"
+"X-Generator: Launchpad (build 13333)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "\"%(file_name)s\" является исполняемым текстовым файлом."
@@ -151,6 +151,12 @@ msgstr ""
 msgid "Drag to reorder plugins"
 msgstr "Перетащите, чтобы перестроить плагины"
 
+msgid "DuckDuckGo"
+msgstr "DuckDuckGo"
+
+msgid "DuckDuckGo Results"
+msgstr "Релузбтаты DuckDuckGo"
+
 msgid "Edit Menus"
 msgstr "Редактировать меню"
 
@@ -184,9 +190,6 @@ msgstr "Файлы, с которыми вы работали сегодня"
 msgid "Filesystem Root"
 msgstr "Корень файловой системы"
 
-msgid "Firefox Bookmarks"
-msgstr "Закладки Firefox"
-
 msgid ""
 "Firefox bookmark:\n"
 "%s"
@@ -213,9 +216,6 @@ msgstr "Общие"
 msgid "Get help with %(distro_name)s"
 msgstr "Получение помощи в %(distro_name)s"
 
-msgid "Go To \"%s\""
-msgstr "Перейти к \"%s\""
-
 msgid "Go To \"%s\" in Chromium"
 msgstr "Перейти к \"%s\" в Chromium"
 
@@ -240,9 +240,6 @@ msgstr "Справка и поддержка"
 msgid "Home"
 msgstr "Домашняя папка"
 
-msgid "Icon:"
-msgstr "Значок:"
-
 msgid "Install this package without opening the Software Center"
 msgstr "Установить этот пакет без открытия в Центре приложений"
 
@@ -260,6 +257,9 @@ msgstr "Сохранить результаты поиска при сворач
 
 msgid "Label:"
 msgstr "Метка:"
+
+msgid "Launch in _Background"
+msgstr "Запустить в _фоновом режие"
 
 msgid "Launch this item"
 msgstr "Запустить этот объект"
@@ -354,6 +354,9 @@ msgstr "Выполнить поиск, используя Microsoft Bing"
 msgid "Perform a search using Yahoo"
 msgstr "Выполнить поиск с помощью Yahoo"
 
+msgid "Perform quick DuckDuckGo searches"
+msgstr "Выполнить быстрый поиск DuckDuckGo"
+
 msgid ""
 "Perform quick Google searches <b>limited to</b> the system's default language"
 msgstr ""
@@ -432,6 +435,9 @@ msgstr "Результаты, найденные с помощью Bing"
 msgid "Results found using Yahoo"
 msgstr "Результаты, полученные с помощью Yahoo"
 
+msgid "Results found with DuckDuckGo"
+msgstr "Результаты поиска с DuckDuckGo"
+
 msgid "Results found with Google"
 msgstr "Результаты, найденные Google"
 
@@ -461,9 +467,6 @@ msgstr "Поиск"
 
 msgid "Search <b>inside</b> local files and folders indexed with Tracker"
 msgstr "Найти <b>в</b> локальных файлах и папках, индексированных Трекером"
-
-msgid "Search for Firefox Bookmarks"
-msgstr "Искать закладки Firefox"
 
 msgid "Search for Tomboy notes"
 msgstr "Искать заметки Tomboy"
@@ -624,9 +627,6 @@ msgstr "Веб-закладки"
 
 msgid "Web Results"
 msgstr "Результаты поиска в сети"
-
-msgid "Web bookmarks in Firefox"
-msgstr "Веб-закладки в Firefox"
 
 msgid "Wikipedia"
 msgstr "Википедия"
