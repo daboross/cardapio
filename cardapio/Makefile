@@ -33,6 +33,8 @@ install: install_docky_helper
 	cp -f src/cardapio-gnome-panel-applet $(PREFIX)/lib/cardapio/
 	cp -f src/Cardapio.py $(PREFIX)/lib/cardapio/
 	cp -f src/Cardapio.pyc $(PREFIX)/lib/cardapio/
+	cp -f src/Constants.py $(PREFIX)/lib/cardapio/
+	cp -f src/Constants.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/CardapioGtkView.py $(PREFIX)/lib/cardapio/
 	cp -f src/CardapioGtkView.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/CardapioViewInterface.py $(PREFIX)/lib/cardapio/
