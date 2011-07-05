@@ -126,7 +126,7 @@ class Cardapio(dbus.service.Object):
 
 	LOG_FILE_MAX_SIZE                 = 1000000 # bytes
 
-	version = '0.9.183'
+	version = '0.9.184'
 
 	core_plugins = [
 			'applications',
