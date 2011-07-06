@@ -987,7 +987,8 @@ This should take a few seconds</property>
       <object class="GtkImageMenuItem" id="OpenInBackgroundMenuItem">
         <property name="label" translatable="yes">Launch in _Background</property>
         <property name="visible">True</property>
-        <property name="tooltip_text" translatable="yes">Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-Click)</property>
+		<property name="tooltip_text" translatable="yes">Launch this item but do not hide Cardapio
+(same as Middle-Click or Ctrl-Click)</property>
         <property name="use_underline">True</property>
         <property name="image">image7</property>
         <property name="use_stock">False</property>
@@ -998,7 +999,8 @@ This should take a few seconds</property>
       <object class="GtkImageMenuItem" id="PeekInsideMenuItem">
         <property name="label" translatable="yes">Peek _Inside Folder</property>
         <property name="visible">True</property>
-        <property name="tooltip_text" translatable="yes">Show contents of this folder within Cardapio</property>
+		<property name="tooltip_text" translatable="yes">Show contents of this folder within Cardapio
+(same as Shift-Click)</property>
         <property name="use_underline">True</property>
         <property name="image">image12</property>
         <property name="use_stock">False</property>

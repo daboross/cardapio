@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-05 11:34+0200\n"
+"POT-Creation-Date: 2011-07-06 22:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -114,99 +114,99 @@ msgstr ""
 msgid "Show additional search results in a file browser"
 msgstr ""
 
-#: src/Cardapio.py:2029 src/Cardapio.py:2393
+#: src/Cardapio.py:2028 src/Cardapio.py:2392
 msgid "Uncategorized"
 msgstr ""
 
-#: src/Cardapio.py:2029
+#: src/Cardapio.py:2028
 msgid "Other configuration tools"
 msgstr ""
 
-#: src/Cardapio.py:2080
+#: src/Cardapio.py:2079
 msgid "Network"
 msgstr ""
 
-#: src/Cardapio.py:2080
+#: src/Cardapio.py:2079
 msgid "Browse the contents of the network"
 msgstr ""
 
-#: src/Cardapio.py:2086
+#: src/Cardapio.py:2085
 msgid "Connect to Server"
 msgstr ""
 
-#: src/Cardapio.py:2086
+#: src/Cardapio.py:2085
 msgid "Connect to a remote computer or shared disk"
 msgstr ""
 
-#: src/Cardapio.py:2088
+#: src/Cardapio.py:2087
 msgid "Trash"
 msgstr ""
 
-#: src/Cardapio.py:2088
+#: src/Cardapio.py:2087
 msgid "Open the trash"
 msgstr ""
 
-#: src/Cardapio.py:2102
+#: src/Cardapio.py:2101
 msgid "Home"
 msgstr ""
 
-#: src/Cardapio.py:2102
+#: src/Cardapio.py:2101
 msgid "Open your personal folder"
 msgstr ""
 
-#: src/Cardapio.py:2118
+#: src/Cardapio.py:2117
 msgid "Desktop"
 msgstr ""
 
-#: src/Cardapio.py:2273
+#: src/Cardapio.py:2272
 msgid "Lock Screen"
 msgstr ""
 
-#: src/Cardapio.py:2274
+#: src/Cardapio.py:2273
 msgid "Protect your computer from unauthorized use"
 msgstr ""
 
-#: src/Cardapio.py:2280
+#: src/Cardapio.py:2279
 msgid "Log Out..."
 msgstr ""
 
-#: src/Cardapio.py:2281
+#: src/Cardapio.py:2280
 msgid "Log out of this session to log in as a different user"
 msgstr ""
 
-#: src/Cardapio.py:2287
+#: src/Cardapio.py:2286
 msgid "Shut Down..."
 msgstr ""
 
-#: src/Cardapio.py:2288
+#: src/Cardapio.py:2287
 msgid "Shut down the system"
 msgstr ""
 
-#: src/Cardapio.py:2373
+#: src/Cardapio.py:2372
 msgid "Folder Contents"
 msgstr ""
 
-#: src/Cardapio.py:2373
+#: src/Cardapio.py:2372
 msgid "Look inside folders"
 msgstr ""
 
-#: src/Cardapio.py:2381
+#: src/Cardapio.py:2380
 msgid "Side Pane"
 msgstr ""
 
-#: src/Cardapio.py:2381
+#: src/Cardapio.py:2380
 msgid "Items pinned to the side pane"
 msgstr ""
 
-#: src/Cardapio.py:2393
+#: src/Cardapio.py:2392
 msgid "Items that are not under any menu category"
 msgstr ""
 
-#: src/Cardapio.py:2394
+#: src/Cardapio.py:2393
 msgid "Session"
 msgstr ""
 
-#: src/Cardapio.py:2395
+#: src/Cardapio.py:2394
 msgid "System"
 msgstr ""
 
@@ -823,79 +823,81 @@ msgstr ""
 
 #: src/ui/cardapio.ui:990
 msgid ""
-"Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-"
-"Click)"
+"Launch this item but do not hide Cardapio\n"
+"(same as Middle-Click or Ctrl-Click)"
 msgstr ""
 
-#: src/ui/cardapio.ui:999
+#: src/ui/cardapio.ui:1000
 msgid "Peek _Inside Folder"
 msgstr ""
 
-#: src/ui/cardapio.ui:1001
-msgid "Show contents of this folder within Cardapio"
-msgstr ""
-
-#: src/ui/cardapio.ui:1010
-msgid "Open Parent _Folder"
+#: src/ui/cardapio.ui:1002
+msgid ""
+"Show contents of this folder within Cardapio\n"
+"(same as Shift-Click)"
 msgstr ""
 
 #: src/ui/cardapio.ui:1012
+msgid "Open Parent _Folder"
+msgstr ""
+
+#: src/ui/cardapio.ui:1014
 msgid "Open this item's parent folder in the file browser"
 msgstr ""
 
-#: src/ui/cardapio.ui:1021
+#: src/ui/cardapio.ui:1023
 msgid "_Unmount"
 msgstr ""
 
-#: src/ui/cardapio.ui:1023
+#: src/ui/cardapio.ui:1025
 msgid "Safely eject this mount"
 msgstr ""
 
-#: src/ui/cardapio.ui:1037
+#: src/ui/cardapio.ui:1039
 msgid "_Pin This Item"
 msgstr ""
 
-#: src/ui/cardapio.ui:1039
+#: src/ui/cardapio.ui:1041
 msgid "Place this item into the \"Pinned Items\" list"
 msgstr ""
 
-#: src/ui/cardapio.ui:1048
+#: src/ui/cardapio.ui:1050
 msgid "_Unpin This Item"
 msgstr ""
 
-#: src/ui/cardapio.ui:1050
+#: src/ui/cardapio.ui:1052
 msgid "Remove this item from the \"Pinned Items\" list"
 msgstr ""
 
-#: src/ui/cardapio.ui:1059
+#: src/ui/cardapio.ui:1061
 msgid "_Add to Side Pane"
 msgstr ""
 
-#: src/ui/cardapio.ui:1061
+#: src/ui/cardapio.ui:1063
 msgid "Place this item in the side pane"
 msgstr ""
 
-#: src/ui/cardapio.ui:1070
+#: src/ui/cardapio.ui:1072
 msgid "_Remove from Side Pane"
 msgstr ""
 
-#: src/ui/cardapio.ui:1072
+#: src/ui/cardapio.ui:1074
 msgid "Remove this item from the side pane"
 msgstr ""
 
-#: src/ui/cardapio.ui:1151 src/ui/cardapio.ui:1166
+#: src/ui/cardapio.ui:1153 src/ui/cardapio.ui:1168
 msgid "translators: just enter any text here"
 msgstr ""
 
-#: src/ui/cardapio.ui:1191
+#: src/ui/cardapio.ui:1193
 msgid "Run in _Terminal"
 msgstr ""
 
-#: src/ui/cardapio.ui:1205
+#: src/ui/cardapio.ui:1207
 msgid "_Display"
 msgstr ""
 
-#: src/ui/cardapio.ui:1235
+#: src/ui/cardapio.ui:1237
 msgid "_Run"
 msgstr ""
 

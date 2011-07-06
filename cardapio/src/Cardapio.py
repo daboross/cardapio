@@ -2636,8 +2636,7 @@ class Cardapio(dbus.service.Object):
 		Handle the "open parent folder" context-menu action
 		"""
 
-		parent_folder, dummy = os.path.split(clicked_app_info['command'])
-		self.launch_xdg(parent_folder)
+		self.open_parent_folder(clicked_app_info)
 
 
 	# This method is called from the View API
@@ -2833,6 +2832,9 @@ class Cardapio(dbus.service.Object):
 			self.peek_inside_folder(app_info)
 			self.view.place_text_cursor_at_end()
 
+		elif self.app_is_valid_folder_or_file(app_info) > 0:
+			self.open_parent_folder(app_info)
+
 		else:
 			self.launch_app(app_info, hide)
 
@@ -2860,6 +2862,14 @@ class Cardapio(dbus.service.Object):
 			text = self.current_query
 			if hide: self.hide()
 			command(text)
+
+
+	def open_parent_folder(self, app_info):
+		"""
+		Opens the parent folder of a given file/folder
+		"""
+		parent_folder, dummy = os.path.split(app_info['command'])
+		self.launch_xdg(parent_folder)
 
 
 	def peek_inside_folder(self, app_info):
