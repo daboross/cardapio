@@ -593,8 +593,9 @@ class CardapioGtkView(CardapioViewInterface):
 		not middle-clicks and right-clicks.
 		"""
 
-		ctrl_is_pressed = (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
-		self.cardapio.handle_app_clicked(widget.app_info, 1, ctrl_is_pressed)
+		#ctrl_is_pressed = (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
+		#self.cardapio.handle_app_clicked(widget.app_info, 1, ctrl_is_pressed)
+		pass
 
 
 	# TODO MVC this out of Cardapio
@@ -604,10 +605,23 @@ class CardapioGtkView(CardapioViewInterface):
 		show context menu depending on the button pressed.
 		"""
 
-		if event.type != gtk.gdk.BUTTON_PRESS: return
-		if event.button == 1: return # avoid left-click activating the button twice
-		self.clicked_app_info = widget.app_info
-		self.cardapio.handle_app_clicked(widget.app_info, event.button, False)
+		if event.type == gtk.gdk._2BUTTON_PRESS:
+
+			self.cardapio.handle_peek_inside_pressed(widget.app_info)
+
+		elif event.type == gtk.gdk.BUTTON_PRESS:
+
+			# avoid left-click activating the button twice, since
+			# single-left-click is already handled in the
+			# on_app_button_clicked() method
+			#if event.button == 1: return 
+
+			ctrl_is_pressed  = (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
+			shift_is_pressed = (gtk.get_current_event().state & gtk.gdk.SHIFT_MASK == gtk.gdk.SHIFT_MASK)
+
+			self.clicked_app_info = widget.app_info
+			#self.cardapio.handle_app_clicked(widget.app_info, event.button, False)
+			self.cardapio.handle_app_clicked(widget.app_info, event.button, ctrl_is_pressed, shift_is_pressed)
 
 
 	def on_view_mode_toggled(self, widget):
@@ -876,7 +890,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 	def on_search_entry_activate(self, widget):
 
-		self.cardapio.handle_search_entry_activate()
+		self.cardapio.handle_search_entry_activate(self.get_ctrl_key_state(), self.get_shift_key_state())
 		# TODO: make this run also when the search entry is activated WHILE the
 		# ctrl key is pressed
 
@@ -1042,6 +1056,9 @@ class CardapioGtkView(CardapioViewInterface):
 
 		elif event.keyval == gtk.gdk.keyval_from_name('Escape'):
 			self.cardapio.handle_search_entry_escape_pressed()
+
+		elif event.keyval == gtk.gdk.keyval_from_name('Return'):
+			self.cardapio.handle_search_entry_activate(self.get_ctrl_key_state(), self.get_shift_key_state())
 
 		elif self.handle_if_key_combo(event): 
 			# this case is handled inherently by the handle_* function above
@@ -1738,6 +1755,13 @@ class CardapioGtkView(CardapioViewInterface):
 		return (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
 
 
+	def get_shift_key_state(self):
+		"""
+		Returns True if the SHIFT key is pressed, and False otherwise.
+		"""
+		return (gtk.get_current_event().state & gtk.gdk.SHIFT_MASK == gtk.gdk.SHIFT_MASK)
+
+
 	# This method is required by the View API
 	def run_in_ui_thread(self, function, *args, **kwargs):
 		"""
@@ -1918,5 +1942,13 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 		screen, dummy, dummy, dummy = self.display.get_pointer()
 		return screen.get_number()
+
+
+	# This method is required by the View API
+	def place_text_cursor_at_end(self):
+		"""
+		Places the text cursor at the end of the text entry
+		"""
+		self.search_entry.set_position(-1)
 
 

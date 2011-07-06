@@ -52,6 +52,7 @@ install: install_docky_helper
 	cp -f src/SettingsHelper.py $(PREFIX)/lib/cardapio/
 	cp -f src/SettingsHelper.pyc $(PREFIX)/lib/cardapio/
 	cp -f res/cardapio.desktop $(PREFIX)/lib/cardapio/
+	cp -f res/cardapioDocky.desktop $(PREFIX)/lib/cardapio/
 	
 	mkdir -p $(PREFIX)/lib/cardapio/ui
 	cp -f src/ui/cardapio.ui $(PREFIX)/lib/cardapio/ui/
@@ -66,6 +67,9 @@ install: install_docky_helper
 	cp -f src/docky/DockySettingsHelper* $(PREFIX)/lib/cardapio/docky/
 	cp -f src/docky/__init__* $(PREFIX)/lib/cardapio/docky/
 	
+	mkdir -p $(PREFIX)/share/applications
+	cp -f res/cardapio.desktop $(PREFIX)/share/applications/
+
 	mkdir -p $(PREFIX)/share/pixmaps
 	cp -f res/cardapio*.xcf $(PREFIX)/share/pixmaps/
 	cp -f res/cardapio*.png $(PREFIX)/share/pixmaps/
@@ -100,6 +104,7 @@ uninstall: uninstall_docky_helper
 	rm -rf $(PREFIX)/bin/cardapio
 	rm -rf $(PREFIX)/bin/cardapio-gnome-panel-applet 
 	rm -rf $(PREFIX)/share/pixmaps/cardapio*
+	rm -rf $(PREFIX)/share/applications/cardapio.desktop
 	rm -f $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
 	find $(PREFIX)/share/locale -name '*cardapio.*' -delete
 	

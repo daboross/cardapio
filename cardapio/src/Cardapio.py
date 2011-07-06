@@ -1652,7 +1652,7 @@ class Cardapio(dbus.service.Object):
 
 
 	# This method is called from the View API
-	def handle_search_entry_activate(self):
+	def handle_search_entry_activate(self, ctrl_is_pressed, shift_is_pressed):
 		"""
 		Handler for when the user presses Enter on the search entry
 		"""
@@ -1667,8 +1667,7 @@ class Cardapio(dbus.service.Object):
 		# the model should know the top app already!
 
 		if app_info is not None:
-			ctrl_is_pressed = self.view.get_ctrl_key_state()
-			self.handle_app_clicked(app_info, 1, ctrl_is_pressed)
+			self.handle_app_clicked(app_info, 1, ctrl_is_pressed, shift_is_pressed)
 
 		if not self.settings['keep search results']:
 			self.reset_search_timer = glib.timeout_add(self.settings['keep results duration'], self.reset_search_timer_fired)
@@ -2800,19 +2799,19 @@ class Cardapio(dbus.service.Object):
 
 
 	# This method is called from the View API
-	def handle_app_clicked(self, app_info, button, ctrl_is_pressed):
+	def handle_app_clicked(self, app_info, button, ctrl_is_pressed, shift_is_pressed):
 		"""
 		Handles the on-click event for buttons on the app list
 		"""
 
 		if button == 1:
-			# I'm not sure this is a good idea:
-			#self.peek_or_launch_app(app_info, hide = not ctrl_is_pressed)
 
-			# So i'm going back to this, for now:
-			self.launch_app(app_info, hide = not ctrl_is_pressed)
+			if (shift_is_pressed):
+				self.peek_or_launch_app(app_info, hide = not ctrl_is_pressed)
 
-			# I have more thinking to do about this...
+			else:
+				self.launch_app(app_info, hide = not ctrl_is_pressed)
+
 
 		elif button == 2:
 			self.launch_app(app_info, hide = False)
@@ -2832,6 +2831,7 @@ class Cardapio(dbus.service.Object):
 
 		if self.app_is_valid_folder_or_file(app_info) == 1:
 			self.peek_inside_folder(app_info)
+			self.view.place_text_cursor_at_end()
 
 		else:
 			self.launch_app(app_info, hide)

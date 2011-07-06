@@ -634,3 +634,10 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
+	def place_text_cursor_at_end(self):
+		"""
+		Places the text cursor at the end of the text entry
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+

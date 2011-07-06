@@ -29,7 +29,7 @@ class DockySettingsHelper:
 	docky_iface_gconf_root = docky_gconf_root + '/Interface/DockPreferences/'
 
 	# name of Cardapio's launcher
-	cardapio_desktop = 'cardapio.desktop'
+	cardapio_desktop = 'cardapioDocky.desktop'
 
 	gconf_client = gconf.client_get_default()
 
