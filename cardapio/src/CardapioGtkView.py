@@ -60,7 +60,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.auto_toggled_sidebar_button   = False # used to stop the on_toggle handler at times
 		self.auto_toggled_view_mode_button = False # used to stop the on_toggle handler at times
 		self.previously_focused_widget     = None
-		self.clicked_app_info              = None
+		self.clicked_app_button            = None
 		self.display                       = gtk.gdk.display_get_default()
 		self.screen                        = self.display.get_default_screen()
 		self.root_window                   = gtk.gdk.get_default_root_window()
@@ -516,14 +516,14 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
-	def fill_plugin_context_menu(self, clicked_app_info_context_menu):
+	def fill_plugin_context_menu(self, clicked_app_button_info_context_menu):
 		"""
 		Add plugin-related actions to the context menu
 		"""
 
 		i = 0
 
-		for item_info in clicked_app_info_context_menu:
+		for item_info in clicked_app_button_info_context_menu:
 
 			menu_item = gtk.ImageMenuItem(item_info['name'], True)
 			menu_item.set_tooltip_text(item_info['tooltip'])
@@ -540,6 +540,15 @@ class CardapioGtkView(CardapioViewInterface):
 
 			menu_item.show_all()
 			self.app_context_menu.append(menu_item)
+
+
+	def on_context_menu_selection_done(self, widget):
+		"""
+		Listener for when an app's context menu is closed
+		"""
+
+		widget = self.clicked_app_button
+		self.toggle_app_button(widget, False)
 
 
 	# This method is required by the View API
@@ -585,6 +594,15 @@ class CardapioGtkView(CardapioViewInterface):
 		self.app_context_menu.popup(None, None, None, 3, time)
 
 
+	def toggle_app_button(self, widget, state):
+		"""
+		Toggles/untoggles a given app button
+		"""
+		widget.handler_block_by_func(self.on_app_button_clicked)
+		widget.set_active(state)
+		widget.handler_unblock_by_func(self.on_app_button_clicked)
+
+
 	# TODO MVC this out of Cardapio
 	def on_app_button_clicked(self, widget):
 		"""
@@ -593,9 +611,11 @@ class CardapioGtkView(CardapioViewInterface):
 		when you press Enter), but not middle-clicks and right-clicks.
 		"""
 
-		ctrl_is_pressed = (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
-		shift_is_pressed = (gtk.get_current_event().state & gtk.gdk.SHIFT_MASK == gtk.gdk.SHIFT_MASK)
+		ctrl_is_pressed = self.get_ctrl_key_state()
+		shift_is_pressed = self.get_shift_key_state()
 		self.cardapio.handle_app_clicked(widget.app_info, 1, ctrl_is_pressed, shift_is_pressed)
+
+		self.toggle_app_button(widget, False)
 
 
 	# TODO MVC this out of Cardapio
@@ -609,7 +629,14 @@ class CardapioGtkView(CardapioViewInterface):
 		# is already handled in the on_app_button_clicked() method
 		if event.button == 1: return 
 
-		self.clicked_app_info = widget.app_info
+		# toggle app buttons that are right-clicked
+		if event.button == 3:
+			self.toggle_app_button(widget, True)
+
+		else:
+			self.toggle_app_button(widget, False)
+
+		self.clicked_app_button = widget
 		self.cardapio.handle_app_clicked(widget.app_info, event.button, False, False)
 
 
@@ -885,9 +912,10 @@ class CardapioGtkView(CardapioViewInterface):
 
 	def on_search_entry_activate(self, widget):
 
-		self.cardapio.handle_search_entry_activate(self.get_ctrl_key_state(), self.get_shift_key_state())
-		# TODO: make this run also when the search entry is activated WHILE the
-		# ctrl key is pressed
+		pass
+		#ctrl_is_pressed = self.get_ctrl_key_state()
+		#shift_is_pressed = self.get_shift_key_state()
+		#self.cardapio.handle_search_entry_activate(ctrl_is_pressed, shift_is_pressed)
 
 
 	# This method is required by the View API
@@ -920,7 +948,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 			for child in section.get_children()[0].get_children()[0].get_children():
 				if not child.get_visible(): continue
-				if type(child) != gtk.Button: continue
+				if type(child) != gtk.ToggleButton: continue
 
 				n = n - 1
 				if n == 0: return child
@@ -958,7 +986,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 		widget = self.previously_focused_widget
 
-		if (type(widget) is gtk.Button and 'app_info' in dir(widget)):
+		if (type(widget) is gtk.ToggleButton and 'app_info' in dir(widget)):
 			return widget.app_info
 
 		return None
@@ -1053,7 +1081,9 @@ class CardapioGtkView(CardapioViewInterface):
 			self.cardapio.handle_search_entry_escape_pressed()
 
 		elif event.keyval == gtk.gdk.keyval_from_name('Return'):
-			self.cardapio.handle_search_entry_activate(self.get_ctrl_key_state(), self.get_shift_key_state())
+			ctrl_is_pressed = self.get_ctrl_key_state()
+			shift_is_pressed = self.get_shift_key_state()
+			self.cardapio.handle_search_entry_activate(ctrl_is_pressed, shift_is_pressed)
 
 		elif self.handle_if_key_combo(event): 
 			# this case is handled inherently by the handle_* function above
@@ -1079,47 +1109,47 @@ class CardapioGtkView(CardapioViewInterface):
 
 	def on_pin_this_app_clicked(self, widget):
 
-		self.cardapio.handle_pin_this_app_clicked(self.clicked_app_info)
+		self.cardapio.handle_pin_this_app_clicked(self.clicked_app_button.app_info)
 
 
 	def on_unpin_this_app_clicked(self, widget):
 
-		self.cardapio.handle_unpin_this_app_clicked(self.clicked_app_info)
+		self.cardapio.handle_unpin_this_app_clicked(self.clicked_app_button.app_info)
 
 
 	def on_add_to_side_pane_clicked(self, widget):
 
-		self.cardapio.handle_add_to_side_pane_clicked(self.clicked_app_info)
+		self.cardapio.handle_add_to_side_pane_clicked(self.clicked_app_button.app_info)
 
 
 	def on_remove_from_side_pane_clicked(self, widget):
 
-		self.cardapio.handle_remove_from_side_pane_clicked(self.clicked_app_info)
+		self.cardapio.handle_remove_from_side_pane_clicked(self.clicked_app_button.app_info)
 
 
 	def on_open_parent_folder_pressed(self, widget):
 
-		self.cardapio.handle_open_parent_folder_pressed(self.clicked_app_info)
+		self.cardapio.handle_open_parent_folder_pressed(self.clicked_app_button.app_info)
 
 
 	def on_launch_in_background_pressed(self, widget):
 
-		self.cardapio.handle_launch_in_background_pressed(self.clicked_app_info)
+		self.cardapio.handle_launch_in_background_pressed(self.clicked_app_button.app_info)
 
 
 	def on_peek_inside_pressed(self, widget):
 
-		self.cardapio.handle_peek_inside_pressed(self.clicked_app_info)
+		self.cardapio.handle_peek_inside_pressed(self.clicked_app_button.app_info)
 
 
 	def on_eject_pressed(self, widget):
 
-		self.cardapio.handle_eject_pressed(self.clicked_app_info)
+		self.cardapio.handle_eject_pressed(self.clicked_app_button.app_info)
 
 
 	def on_open_app_pressed(self, widget):
 
-		self.cardapio.handle_launch_app_pressed(self.clicked_app_info)
+		self.cardapio.handle_launch_app_pressed(self.clicked_app_button.app_info)
 
 
 	def on_app_button_focused(self, widget, event):
@@ -1251,11 +1281,11 @@ class CardapioGtkView(CardapioViewInterface):
 		self.unblock_focus_out_event()
 
 
-	def get_clicked_app_info(self):
+	def get_clicked_app_button_info(self):
 		"""
 		Returns
 		"""
-		return self.clicked_app_info
+		return self.clicked_app_button.app_info
 
 
 	def add_button(self, button_str, icon_name, pane_or_section, tooltip, button_type):
@@ -1268,13 +1298,7 @@ class CardapioGtkView(CardapioViewInterface):
 		modified).
 		"""
 
-		if button_type != self.CATEGORY_BUTTON:
-			# TODO: make app buttons be togglebuttons too, so we can fake select
-			# them when the context menu is showing
-			button = gtk.Button() 
-		else:
-			button = gtk.ToggleButton()
-
+		button = gtk.ToggleButton()
 		label = gtk.Label(button_str)
 
 		if button_type == self.APP_BUTTON:
