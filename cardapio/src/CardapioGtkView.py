@@ -1390,6 +1390,14 @@ class CardapioGtkView(CardapioViewInterface):
 
 
 	# This method is required by the View API
+	def hide_button(self, button):
+		"""
+		Hides a button
+		"""
+		button.hide()
+
+
+	# This method is required by the View API
 	def setup_button_drag_and_drop(self, button, is_desktop_file):
 		"""
 		Sets up the event handlers for drag-and-drop

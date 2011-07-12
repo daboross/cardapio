@@ -1112,7 +1112,6 @@ class Cardapio(dbus.service.Object):
 
 		if alt:
 			if type(key) == int and 1 <= key <= 9:
-				print 'alt combo with ' + str(key)
 
 				app_info = self.view.get_nth_visible_app(key)
 
@@ -1283,11 +1282,9 @@ class Cardapio(dbus.service.Object):
 		else: parent_name = os.path.basename(path)
 		self.view.set_subfolder_section_title(parent_name)
 
-		count = 0
-		limit = self.settings['long search results limit']
 		base_text = base_text.lower()
 		ignore_hidden = True
-		
+
 		if base_text:
 			# show hidden files if user query is something like 'hi/there/.dude'
 			if base_text[0] == '.': 
@@ -1297,14 +1294,42 @@ class Cardapio(dbus.service.Object):
 		else:
 			matches = os.listdir(path)
 
+		try: 
+			self.file_looper = self.file_looper_generator(matches, path, ignore_hidden)
+			self.file_looper.next()
+
+			self.view.show_section(self.view.SUBFOLDERS_SECTION)
+			self.mark_section_has_entries_and_show_category_button(self.view.SUBFOLDERS_SECTION)
+			self.no_results_to_show = False
+
+		except:
+			self.no_results_to_show = True
+
+		return True
+
+
+	def file_looper_generator(self, matches, path, ignore_hidden):
+		"""
+		Creates a generator object that adds an app button for each file/folder
+		found in 'matches', and yields when the maximum number of results has been
+		shown. This is useful for paging the results.
+		"""
+
+		count = 0
+		limit = self.settings['long search results limit']
+		load_more_button = None
+		
 		for filename in sorted(matches, key = str.lower):
 
 			# ignore hidden files
 			if filename[0] == '.' and ignore_hidden: continue
 
 			if count >= limit: 
-				self.add_app_button(_('Show additional results'), 'system-file-manager', self.view.SUBFOLDERS_SECTION, 'xdg', path, _('Show additional search results in a file browser'), None)
-				break
+				load_more_button = self.add_app_button(_('Load additional results'), 'add', self.view.SUBFOLDERS_SECTION, 'special', self.load_more_subfolder_results, _('Show additional search results'), None)
+				#self.add_app_button(_('Show additional results'), 'system-file-manager', self.view.SUBFOLDERS_SECTION, 'xdg', path, _('Show additional search results in a file browser'), None)
+				count = 0
+				yield count
+				self.view.hide_button(load_more_button)
 
 			count += 1
 
@@ -1315,15 +1340,18 @@ class Cardapio(dbus.service.Object):
 			basename, dummy = os.path.splitext(filename)
 			self.add_app_button(filename, icon_name, self.view.SUBFOLDERS_SECTION, 'xdg', command, command, None)
 
-		if count:
-			self.view.show_section(self.view.SUBFOLDERS_SECTION)
-			self.mark_section_has_entries_and_show_category_button(self.view.SUBFOLDERS_SECTION)
-			self.no_results_to_show = False
+		yield count
 
-		else:
-			self.no_results_to_show = True
 
-		return True
+	def load_more_subfolder_results(self):
+		"""
+		Loads more results in the subfolder view
+		"""
+
+		try:
+			self.file_looper.next()	
+		except:
+			pass
 
 
 	def cancel_all_plugin_timers(self):
@@ -2676,7 +2704,7 @@ class Cardapio(dbus.service.Object):
 		self.view.hide_context_menu_option(self.view.PEEK_INSIDE_MENUITEM)
 		self.view.hide_context_menu_option(self.view.EJECT_MENUITEM)
 
-		if app_info['type'] == 'callback':
+		if app_info['type'] == 'callback' or app_info['type'] == 'special':
 			self.view.hide_context_menu_option(self.view.PIN_MENUITEM)
 			self.view.hide_context_menu_option(self.view.UNPIN_MENUITEM)
 			self.view.hide_context_menu_option(self.view.ADD_SIDE_PANE_MENUITEM)
@@ -2862,6 +2890,9 @@ class Cardapio(dbus.service.Object):
 			text = self.current_query
 			if hide: self.hide()
 			command(text)
+
+		elif command_type == 'special':
+			command()
 
 
 	def open_parent_folder(self, app_info):

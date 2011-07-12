@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-06-27 10:05+0200\n"
+"POT-Creation-Date: 2011-07-06 22:54+0200\n"
 "PO-Revision-Date: 2011-06-11 22:53+0000\n"
 "Last-Translator: Alexey Ivanov <alexey.ivanes@gmail.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-07-05 09:32+0000\n"
-"X-Generator: Launchpad (build 13333)\n"
+"X-Launchpad-Export-Date: 2011-07-08 18:28+0000\n"
+"X-Generator: Launchpad (build 13376)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "\"%(file_name)s\" является исполняемым текстовым файлом."
@@ -263,13 +263,6 @@ msgstr "Запустить в _фоновом режие"
 
 msgid "Launch this item"
 msgstr "Запустить этот объект"
-
-msgid ""
-"Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-"
-"Click)"
-msgstr ""
-"Запустить этот объект, но не сворачивать Cardapio (так же как при щелчке "
-"средней кнопкой или CTRL-щелчок)"
 
 msgid ""
 "Lets you choose from thousands of free applications available for Ubuntu"
@@ -545,9 +538,6 @@ msgstr "Просмотреть все результаты поиска в ве�
 
 msgid "Show all categories"
 msgstr "Показать все категории"
-
-msgid "Show contents of this folder within Cardapio"
-msgstr "Показать содержимое этой папки в Cardapio"
 
 msgid "Show session buttons in bottom pane"
 msgstr "Показывать кнопки управления сеансом внизу панели"

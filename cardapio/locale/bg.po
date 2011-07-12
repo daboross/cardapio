@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-06-27 10:05+0200\n"
+"POT-Creation-Date: 2011-07-06 22:54+0200\n"
 "PO-Revision-Date: 2011-05-16 11:46+0000\n"
 "Last-Translator: Svetoslav Stefanov <svetlisashkov@yahoo.com>\n"
 "Language-Team: Bulgarian <bg@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-07-05 09:32+0000\n"
-"X-Generator: Launchpad (build 13333)\n"
+"X-Launchpad-Export-Date: 2011-07-08 18:28+0000\n"
+"X-Generator: Launchpad (build 13376)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "\"%(file_name)s\" е изпълним текстов файл."
@@ -253,13 +253,6 @@ msgstr "Пускане на _заден фон"
 
 msgid "Launch this item"
 msgstr "Стартиране на този елемент"
-
-msgid ""
-"Launch this item but do not hide Cardapio (same as Middle-Click or CTRL-"
-"Click)"
-msgstr ""
-"Стартиране на този елемент без скриване на Cardapio (същото като цъкане със "
-"среден бутон или CTRL-Цъкане)"
 
 msgid ""
 "Lets you choose from thousands of free applications available for Ubuntu"
@@ -521,9 +514,6 @@ msgstr "Показва допълнителни резултати от търс
 
 msgid "Show all categories"
 msgstr "Показване на всички категории"
-
-msgid "Show contents of this folder within Cardapio"
-msgstr "Показване на съдържанието на тази папка в Cardapio"
 
 msgid "Show session buttons in bottom pane"
 msgstr "Показване на бутоните за сесия в долния панел"

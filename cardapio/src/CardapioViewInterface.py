@@ -390,6 +390,13 @@ class CardapioViewInterface:
 		raise NotImplementedError("You must implement this method!")
 
 
+	def hide_button(self, button):
+		"""
+		Hides a button
+		"""
+		raise NotImplementedError("You must implement this method!")
+
+
 	def setup_button_drag_and_drop(self, button, is_desktop_file):
 		"""
 		Sets up the event handlers for drag-and-drop

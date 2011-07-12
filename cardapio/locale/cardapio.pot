@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-06 22:54+0200\n"
+"POT-Creation-Date: 2011-07-12 20:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -96,117 +96,111 @@ msgstr ""
 msgid "Show all categories"
 msgstr ""
 
-#: src/Cardapio.py:1282
+#: src/Cardapio.py:1281
 msgid "Filesystem Root"
 msgstr ""
 
-#: src/Cardapio.py:1306 src/plugins/amazon.py:278 src/plugins/bing.py:151
-#: src/plugins/duckduck.py:74 src/plugins/ebay.py:245 src/plugins/ebay.py:261
-#: src/plugins/google.py:85 src/plugins/google_localized.py:89
-#: src/plugins/tracker.py:72 src/plugins/tracker_fts.py:71
-#: src/plugins/yahoo.py:171 src/plugins/you_tube.py:158
-#: src/plugins/zeitgeist_categorized.py:98 src/plugins/zeitgeist_simple.py:94
-#: src/plugins/zeitgeist_smart.py:106
-msgid "Show additional results"
+#: src/Cardapio.py:1328
+msgid "Load additional results"
 msgstr ""
 
-#: src/Cardapio.py:1306
-msgid "Show additional search results in a file browser"
+#: src/Cardapio.py:1328
+msgid "Show additional search results"
 msgstr ""
 
-#: src/Cardapio.py:2028 src/Cardapio.py:2392
+#: src/Cardapio.py:2056 src/Cardapio.py:2420
 msgid "Uncategorized"
 msgstr ""
 
-#: src/Cardapio.py:2028
+#: src/Cardapio.py:2056
 msgid "Other configuration tools"
 msgstr ""
 
-#: src/Cardapio.py:2079
+#: src/Cardapio.py:2107
 msgid "Network"
 msgstr ""
 
-#: src/Cardapio.py:2079
+#: src/Cardapio.py:2107
 msgid "Browse the contents of the network"
 msgstr ""
 
-#: src/Cardapio.py:2085
+#: src/Cardapio.py:2113
 msgid "Connect to Server"
 msgstr ""
 
-#: src/Cardapio.py:2085
+#: src/Cardapio.py:2113
 msgid "Connect to a remote computer or shared disk"
 msgstr ""
 
-#: src/Cardapio.py:2087
+#: src/Cardapio.py:2115
 msgid "Trash"
 msgstr ""
 
-#: src/Cardapio.py:2087
+#: src/Cardapio.py:2115
 msgid "Open the trash"
 msgstr ""
 
-#: src/Cardapio.py:2101
+#: src/Cardapio.py:2129
 msgid "Home"
 msgstr ""
 
-#: src/Cardapio.py:2101
+#: src/Cardapio.py:2129
 msgid "Open your personal folder"
 msgstr ""
 
-#: src/Cardapio.py:2117
+#: src/Cardapio.py:2145
 msgid "Desktop"
 msgstr ""
 
-#: src/Cardapio.py:2272
+#: src/Cardapio.py:2300
 msgid "Lock Screen"
 msgstr ""
 
-#: src/Cardapio.py:2273
+#: src/Cardapio.py:2301
 msgid "Protect your computer from unauthorized use"
 msgstr ""
 
-#: src/Cardapio.py:2279
+#: src/Cardapio.py:2307
 msgid "Log Out..."
 msgstr ""
 
-#: src/Cardapio.py:2280
+#: src/Cardapio.py:2308
 msgid "Log out of this session to log in as a different user"
 msgstr ""
 
-#: src/Cardapio.py:2286
+#: src/Cardapio.py:2314
 msgid "Shut Down..."
 msgstr ""
 
-#: src/Cardapio.py:2287
+#: src/Cardapio.py:2315
 msgid "Shut down the system"
 msgstr ""
 
-#: src/Cardapio.py:2372
+#: src/Cardapio.py:2400
 msgid "Folder Contents"
 msgstr ""
 
-#: src/Cardapio.py:2372
+#: src/Cardapio.py:2400
 msgid "Look inside folders"
 msgstr ""
 
-#: src/Cardapio.py:2380
+#: src/Cardapio.py:2408
 msgid "Side Pane"
 msgstr ""
 
-#: src/Cardapio.py:2380
+#: src/Cardapio.py:2408
 msgid "Items pinned to the side pane"
 msgstr ""
 
-#: src/Cardapio.py:2392
+#: src/Cardapio.py:2420
 msgid "Items that are not under any menu category"
 msgstr ""
 
-#: src/Cardapio.py:2393
+#: src/Cardapio.py:2421
 msgid "Session"
 msgstr ""
 
-#: src/Cardapio.py:2394
+#: src/Cardapio.py:2422
 msgid "System"
 msgstr ""
 
@@ -271,6 +265,16 @@ msgstr ""
 
 #: src/plugins/amazon.py:57
 msgid "Results found in Amazon"
+msgstr ""
+
+#: src/plugins/amazon.py:278 src/plugins/bing.py:151
+#: src/plugins/duckduck.py:74 src/plugins/ebay.py:245 src/plugins/ebay.py:261
+#: src/plugins/google.py:85 src/plugins/google_localized.py:89
+#: src/plugins/tracker.py:72 src/plugins/tracker_fts.py:71
+#: src/plugins/yahoo.py:171 src/plugins/you_tube.py:158
+#: src/plugins/zeitgeist_categorized.py:98 src/plugins/zeitgeist_simple.py:94
+#: src/plugins/zeitgeist_smart.py:106
+msgid "Show additional results"
 msgstr ""
 
 #: src/plugins/amazon.py:279 src/plugins/bing.py:152
@@ -743,7 +747,7 @@ msgstr ""
 msgid "_Edit Menus"
 msgstr ""
 
-#: src/gnomepanel/CardapioGnomeApplet.py:76 src/ui/cardapio.ui:946
+#: src/gnomepanel/CardapioGnomeApplet.py:76 src/ui/cardapio.ui:213
 msgid "_About Cardapio"
 msgstr ""
 
@@ -755,150 +759,150 @@ msgstr ""
 msgid "Access applications, folders, system settings, etc."
 msgstr ""
 
-#: src/ui/cardapio.ui:7 src/gnomepanel/cardapio.server.h:2
-msgid "Cardapio"
-msgstr ""
-
-#: src/ui/cardapio.ui:55
-msgid ""
-"Data has recently changed!\n"
-"This menu will be updated momentarily, so as not to interrupt your browsing."
-msgstr ""
-
-#: src/ui/cardapio.ui:57
-msgid "This menu will be updated momentarily."
-msgstr ""
-
-#: src/ui/cardapio.ui:67
-msgid "Update now"
-msgstr ""
-
-#: src/ui/cardapio.ui:138 src/ui/cardapio.ui:372
-msgid "Search"
-msgstr ""
-
-#: src/ui/cardapio.ui:213
-msgid "View"
-msgstr ""
-
-#: src/ui/cardapio.ui:289
-msgid "_Control Center"
-msgstr ""
-
-#: src/ui/cardapio.ui:829
+#: src/ui/cardapio.ui:12
 msgid "Cardapio Website"
 msgstr ""
 
-#: src/ui/cardapio.ui:830
+#: src/ui/cardapio.ui:13
 msgid ""
 "GNU General Public License v3\n"
 "http://www.gnu.org/licenses/gpl-3.0-standalone.html\t"
 msgstr ""
 
-#: src/ui/cardapio.ui:836
+#: src/ui/cardapio.ui:19
 msgid "See https://translations.launchpad.net/cardapio"
 msgstr ""
 
-#: src/ui/cardapio.ui:903
-msgid ""
-"<big>Rebuilding...</big>\n"
-"This should take a few seconds"
-msgstr ""
-
-#: src/ui/cardapio.ui:932
-msgid "Edit Menus"
-msgstr ""
-
-#: src/ui/cardapio.ui:977
+#: src/ui/cardapio.ui:55
 msgid "_Launch"
 msgstr ""
 
-#: src/ui/cardapio.ui:979
+#: src/ui/cardapio.ui:58
 msgid "Launch this item"
 msgstr ""
 
-#: src/ui/cardapio.ui:988
+#: src/ui/cardapio.ui:68
 msgid "Launch in _Background"
 msgstr ""
 
-#: src/ui/cardapio.ui:990
+#: src/ui/cardapio.ui:71
 msgid ""
 "Launch this item but do not hide Cardapio\n"
 "(same as Middle-Click or Ctrl-Click)"
 msgstr ""
 
-#: src/ui/cardapio.ui:1000
+#: src/ui/cardapio.ui:82
 msgid "Peek _Inside Folder"
 msgstr ""
 
-#: src/ui/cardapio.ui:1002
+#: src/ui/cardapio.ui:85
 msgid ""
 "Show contents of this folder within Cardapio\n"
 "(same as Shift-Click)"
 msgstr ""
 
-#: src/ui/cardapio.ui:1012
+#: src/ui/cardapio.ui:96
 msgid "Open Parent _Folder"
 msgstr ""
 
-#: src/ui/cardapio.ui:1014
+#: src/ui/cardapio.ui:99
 msgid "Open this item's parent folder in the file browser"
 msgstr ""
 
-#: src/ui/cardapio.ui:1023
+#: src/ui/cardapio.ui:109
 msgid "_Unmount"
 msgstr ""
 
-#: src/ui/cardapio.ui:1025
+#: src/ui/cardapio.ui:112
 msgid "Safely eject this mount"
 msgstr ""
 
-#: src/ui/cardapio.ui:1039
+#: src/ui/cardapio.ui:128
 msgid "_Pin This Item"
 msgstr ""
 
-#: src/ui/cardapio.ui:1041
+#: src/ui/cardapio.ui:131
 msgid "Place this item into the \"Pinned Items\" list"
 msgstr ""
 
-#: src/ui/cardapio.ui:1050
+#: src/ui/cardapio.ui:141
 msgid "_Unpin This Item"
 msgstr ""
 
-#: src/ui/cardapio.ui:1052
+#: src/ui/cardapio.ui:144
 msgid "Remove this item from the \"Pinned Items\" list"
 msgstr ""
 
-#: src/ui/cardapio.ui:1061
+#: src/ui/cardapio.ui:154
 msgid "_Add to Side Pane"
 msgstr ""
 
-#: src/ui/cardapio.ui:1063
+#: src/ui/cardapio.ui:157
 msgid "Place this item in the side pane"
 msgstr ""
 
-#: src/ui/cardapio.ui:1072
+#: src/ui/cardapio.ui:167
 msgid "_Remove from Side Pane"
 msgstr ""
 
-#: src/ui/cardapio.ui:1074
+#: src/ui/cardapio.ui:170
 msgid "Remove this item from the side pane"
 msgstr ""
 
-#: src/ui/cardapio.ui:1153 src/ui/cardapio.ui:1168
-msgid "translators: just enter any text here"
+#: src/ui/cardapio.ui:196
+msgid "Edit Menus"
 msgstr ""
 
-#: src/ui/cardapio.ui:1193
+#: src/ui/cardapio.ui:248 src/gnomepanel/cardapio.server.h:2
+msgid "Cardapio"
+msgstr ""
+
+#: src/ui/cardapio.ui:303
+msgid ""
+"Data has recently changed!\n"
+"This menu will be updated momentarily, so as not to interrupt your browsing."
+msgstr ""
+
+#: src/ui/cardapio.ui:305
+msgid "This menu will be updated momentarily."
+msgstr ""
+
+#: src/ui/cardapio.ui:317
+msgid "Update now"
+msgstr ""
+
+#: src/ui/cardapio.ui:398 src/ui/cardapio.ui:671
+msgid "Search"
+msgstr ""
+
+#: src/ui/cardapio.ui:486
+msgid "View"
+msgstr ""
+
+#: src/ui/cardapio.ui:577
+msgid "_Control Center"
+msgstr ""
+
+#: src/ui/cardapio.ui:1200
 msgid "Run in _Terminal"
 msgstr ""
 
-#: src/ui/cardapio.ui:1207
+#: src/ui/cardapio.ui:1215
 msgid "_Display"
 msgstr ""
 
-#: src/ui/cardapio.ui:1237
+#: src/ui/cardapio.ui:1247
 msgid "_Run"
+msgstr ""
+
+#: src/ui/cardapio.ui:1294 src/ui/cardapio.ui:1310
+msgid "translators: just enter any text here"
+msgstr ""
+
+#: src/ui/cardapio.ui:1389
+msgid ""
+"<big>Rebuilding...</big>\n"
+"This should take a few seconds"
 msgstr ""
 
 #: src/ui/options.ui:8
