@@ -1327,8 +1327,9 @@ class Cardapio(dbus.service.Object):
 			if count >= limit: 
 				load_more_button = self.add_app_button(_('Load additional results'), 'add', self.view.SUBFOLDERS_SECTION, 'special', self.load_more_subfolder_results, _('Show additional search results'), None)
 				#self.add_app_button(_('Show additional results'), 'system-file-manager', self.view.SUBFOLDERS_SECTION, 'xdg', path, _('Show additional search results in a file browser'), None)
-				count = 0
 				yield count
+				count = 0
+				limit *= 2
 				self.view.hide_button(load_more_button)
 
 			count += 1
