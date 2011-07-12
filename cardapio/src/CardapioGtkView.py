@@ -589,13 +589,13 @@ class CardapioGtkView(CardapioViewInterface):
 	def on_app_button_clicked(self, widget):
 		"""
 		Handle the on-click event for buttons on the app list. This includes
-		the "mouse click" event and the "clicked using keyboard" event, but
-		not middle-clicks and right-clicks.
+		the "mouse click" event and the "clicked using keyboard" event (for example,
+		when you press Enter), but not middle-clicks and right-clicks.
 		"""
 
-		#ctrl_is_pressed = (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
-		#self.cardapio.handle_app_clicked(widget.app_info, 1, ctrl_is_pressed)
-		pass
+		ctrl_is_pressed = (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
+		shift_is_pressed = (gtk.get_current_event().state & gtk.gdk.SHIFT_MASK == gtk.gdk.SHIFT_MASK)
+		self.cardapio.handle_app_clicked(widget.app_info, 1, ctrl_is_pressed, shift_is_pressed)
 
 
 	# TODO MVC this out of Cardapio
@@ -605,23 +605,12 @@ class CardapioGtkView(CardapioViewInterface):
 		show context menu depending on the button pressed.
 		"""
 
-		if event.type == gtk.gdk._2BUTTON_PRESS:
+		# avoid left-click activating the button twice, since single-left-click
+		# is already handled in the on_app_button_clicked() method
+		if event.button == 1: return 
 
-			self.cardapio.handle_peek_inside_pressed(widget.app_info)
-
-		elif event.type == gtk.gdk.BUTTON_PRESS:
-
-			# avoid left-click activating the button twice, since
-			# single-left-click is already handled in the
-			# on_app_button_clicked() method
-			#if event.button == 1: return 
-
-			ctrl_is_pressed  = (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
-			shift_is_pressed = (gtk.get_current_event().state & gtk.gdk.SHIFT_MASK == gtk.gdk.SHIFT_MASK)
-
-			self.clicked_app_info = widget.app_info
-			#self.cardapio.handle_app_clicked(widget.app_info, event.button, False)
-			self.cardapio.handle_app_clicked(widget.app_info, event.button, ctrl_is_pressed, shift_is_pressed)
+		self.clicked_app_info = widget.app_info
+		self.cardapio.handle_app_clicked(widget.app_info, event.button, False, False)
 
 
 	def on_view_mode_toggled(self, widget):
@@ -769,6 +758,12 @@ class CardapioGtkView(CardapioViewInterface):
 
 			if event.is_modifier: return
 			if self.handle_if_key_combo(event): return
+
+			# Catch it when the user pressed Shift-Enter and Ctrl-Enter when
+			# focused on a button
+			if event.keyval == gtk.gdk.keyval_from_name('Return'):
+				self.on_app_button_clicked(w)
+				return
 
 			self.main_window.set_focus(self.search_entry)
 			self.search_entry.set_position(len(self.search_entry.get_text()))
