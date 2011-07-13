@@ -1296,13 +1296,17 @@ class Cardapio(dbus.service.Object):
 
 		try: 
 			self.file_looper = self.file_looper_generator(matches, path, ignore_hidden)
-			self.file_looper.next()
+			count = self.file_looper.next()
 
+		except:
+			count = 0
+
+		if count > 0:
 			self.view.show_section(self.view.SUBFOLDERS_SECTION)
 			self.mark_section_has_entries_and_show_category_button(self.view.SUBFOLDERS_SECTION)
 			self.no_results_to_show = False
 
-		except:
+		else:
 			self.no_results_to_show = True
 
 		return True
@@ -1315,22 +1319,29 @@ class Cardapio(dbus.service.Object):
 		shown. This is useful for paging the results.
 		"""
 
-		count = 0
-		limit = self.settings['long search results limit']
-		load_more_button = None
+		count    = 0
+		page     = 1
+		pagesize = self.settings['long search results limit']
+		limit    = pagesize
 		
 		for filename in sorted(matches, key = str.lower):
 
 			# ignore hidden files
 			if filename[0] == '.' and ignore_hidden: continue
 
-			if count >= limit: 
+			if count > limit: 
+
+				# don't let user click more than 5 times on "load more results"
+				if page == 5:
+					self.add_app_button(_('Open this folder'), 'system-file-manager', self.view.SUBFOLDERS_SECTION, 'xdg', path, _('Show additional search results in a file browser'), None)
+					yield count
+
 				load_more_button = self.add_app_button(_('Load additional results'), 'add', self.view.SUBFOLDERS_SECTION, 'special', self.load_more_subfolder_results, _('Show additional search results'), None)
-				#self.add_app_button(_('Show additional results'), 'system-file-manager', self.view.SUBFOLDERS_SECTION, 'xdg', path, _('Show additional search results in a file browser'), None)
 				yield count
-				count = 0
-				limit *= 2
+
 				self.view.hide_button(load_more_button)
+				page += 1
+				limit = page * (pagesize * 2)
 
 			count += 1
 
