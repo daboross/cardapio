@@ -6,4 +6,4 @@ Type=Application
 Terminal=false
 Exec=cardapio docky-mode
 Name=Cardapio
-Icon=cardapio-256
+Icon=cardapio-dark256

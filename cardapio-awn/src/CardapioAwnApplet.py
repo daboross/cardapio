@@ -30,7 +30,7 @@ from awn.extras import awnlib, __version__
 class CardapioAwnApplet(CardapioAppletInterface):
 
 	panel_type = PANEL_TYPE_AWN
-	ICON = 'cardapio-256'
+	ICON = 'cardapio-dark256'
 
 	def __init__(self, applet):
 

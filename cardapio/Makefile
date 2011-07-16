@@ -71,7 +71,6 @@ install: install_docky_helper
 	cp -f res/cardapio.desktop $(PREFIX)/share/applications/
 
 	mkdir -p $(PREFIX)/share/pixmaps
-	cp -f res/cardapio*.xcf $(PREFIX)/share/pixmaps/
 	cp -f res/cardapio*.png $(PREFIX)/share/pixmaps/
 	cp -f res/cardapio*.svg $(PREFIX)/share/pixmaps/
 	

@@ -12,4 +12,4 @@ X-AWN-AppletCategory=Utility
 X-AWN-AppletExec=/usr/lib/cardapio/CardapioAwnWrapper.py
 
 Exec=awn-applet -p %k
-Icon=cardapio-256
+Icon=cardapio-dark256
