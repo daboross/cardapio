@@ -1,3 +1,33 @@
+cardapio (0.9.187-ubuntu1-natty1) natty; urgency=low
+
+   * New, updated Cardapio icon (see bug 654072)
+   * Added inline loading of additional subfolder results 
+   * Made app buttons toggle when right-clicked (fixing bug 656846)
+   * Fixed bug where pressing Enter when focused on an app button *was not* launching the focused app
+   * Fixed other bugs :)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 16 Jul 2011 23:01:00 +0100
+
+cardapio (0.9.187-ubuntu1-maverick1) maverick; urgency=low
+
+   * New, updated Cardapio icon (see bug 654072)
+   * Added inline loading of additional subfolder results 
+   * Made app buttons toggle when right-clicked (fixing bug 656846)
+   * Fixed bug where pressing Enter when focused on an app button *was not* launching the focused app
+   * Fixed other bugs :)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 16 Jul 2011 23:01:00 +0100
+
+cardapio (0.9.187-ubuntu1-lucid1) lucid; urgency=low
+
+   * New, updated Cardapio icon (see bug 654072)
+   * Added inline loading of additional subfolder results 
+   * Made app buttons toggle when right-clicked (fixing bug 656846)
+   * Fixed bug where pressing Enter when focused on an app button *was not* launching the focused app
+   * Fixed other bugs :)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 16 Jul 2011 23:01:00 +0100
+
 cardapio (0.9.186-ubuntu1-natty1) natty; urgency=low
 
    * Made shift-click / shift-enter mean: peek inside folder (if applied
