@@ -126,7 +126,7 @@ class Cardapio(dbus.service.Object):
 
 	LOG_FILE_MAX_SIZE                 = 1000000 # bytes
 
-	version = '0.9.186'
+	version = '0.9.187'
 
 	core_plugins = [
 			'applications',
@@ -174,25 +174,10 @@ class Cardapio(dbus.service.Object):
 
 		self.view             = CardapioGtkView(self)
 		self.options_window   = OptionsWindow(self)
+		self.applet           = panel_applet
 
 		self.reset_model()
-		self.visible                       = False
-		self.no_results_to_show            = False
-		self.opened_last_app_in_background = False
-		self.keybinding                    = None
-		self.reset_search_timer            = None
-		self.must_rebuild                  = False
-		self.rebuild_timer                 = None
-		self.search_timer_local            = None
-		self.search_timer_remote           = None
-		self.search_timeout_local          = None
-		self.search_timeout_remote         = None
-		self.in_system_menu_mode           = False
-		self.plugins_still_searching       = 0
-		self.bookmark_monitor              = None
-		self.volume_monitor                = None
-		self.last_visibility_toggle        = 0
-		self.applet                        = panel_applet
+		self.reset_members()
 
 		logging.info('Setting up DBus...')
 		self.setup_dbus()
@@ -728,6 +713,29 @@ class Cardapio(dbus.service.Object):
 
 		self.builtin_applications_plugin_active = False
 		self.builtin_places_plugin_active       = False
+
+
+	def reset_members(self):
+		"""
+		Resets Cardapio's member variables
+		"""
+
+		self.visible                       = False
+		self.no_results_to_show            = False
+		self.opened_last_app_in_background = False
+		self.keybinding                    = None
+		self.reset_search_timer            = None
+		self.must_rebuild                  = False
+		self.rebuild_timer                 = None
+		self.search_timer_local            = None
+		self.search_timer_remote           = None
+		self.search_timeout_local          = None
+		self.search_timeout_remote         = None
+		self.in_system_menu_mode           = False
+		self.plugins_still_searching       = 0
+		self.bookmark_monitor              = None
+		self.volume_monitor                = None
+		self.last_visibility_toggle        = 0
 
 
 	def load_settings(self):
@@ -3026,16 +3034,29 @@ class Cardapio(dbus.service.Object):
 		Run a command as a subprocess
 		"""
 
+		notify_id = None
+
 		try:
-			if self.applet.panel_type is not None: # TODO: Why is this check here? Makes no sense!
+			app_info  = gio.AppInfo(path)
+			context   = gtk.gdk.AppLaunchContext()
+			notify_id = context.get_startup_notify_id(app_info, [])
+
+ 			# FIXME: Why is this check here? Makes no sense!
+			if self.applet.panel_type is not None:
 				# allow launched apps to use Ubuntu's AppMenu
 				os.environ['UBUNTU_MENUPROXY'] = 'libappmenu.so'
 
-			subprocess.Popen(path, shell = True, cwd = self.home_folder_path)
+			os.environ['DESKTOP_STARTUP_ID'] = notify_id
+			app_info.launch(None, context)
+			#subprocess.Popen(path, shell = True, cwd = self.home_folder_path)
 
 		except Exception, exception:
 			logging.error('Could not launch %s' % path)
 			logging.error(exception)
+
+			if notify_id is not None: 
+				context.launch_failed(notify_id)
+
 			return False
 
 		if hide: self.hide()
