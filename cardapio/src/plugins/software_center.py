@@ -60,6 +60,10 @@ class CardapioPlugin(CardapioPluginInterface):
 			import gio
 			import platform
 
+			distro, ver, dummy = platform.linux_distribution()
+			self.is_maverick_or_newer = (distro == ('Ubuntu') and ver in ['10.10', '11.04', '11.10', '12.04'])
+			self.is_natty_or_newer = (distro == ('Ubuntu') and ver in ['11.04', '11.10', '12.04'])
+
 			software_center_path = '/usr/share/software-center'
 
 			if not os.path.exists(software_center_path):
@@ -67,9 +71,13 @@ class CardapioPlugin(CardapioPluginInterface):
 
 			sys.path.append(software_center_path)
 
-			from softwarecenter.enums import XAPIAN_VALUE_POPCON, XAPIAN_VALUE_ICON, XAPIAN_VALUE_SUMMARY 
+			from softwarecenter.enums import XAPIAN_VALUE_POPCON, XAPIAN_VALUE_ICON, XAPIAN_VALUE_SUMMARY
 			from softwarecenter.db.database import StoreDatabase
 			from softwarecenter.view.appview import AppViewFilter
+
+			if self.is_natty_or_newer:
+				from softwarecenter.db.application import Application
+				from softwarecenter.enums import PKG_STATE_UNINSTALLED
 
 		except Exception, exception:
 			self.c.write_to_log(self, 'Could not import certain modules', is_error = True)
@@ -86,8 +94,9 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.StoreDatabase        = StoreDatabase
 		self.AppViewFilter        = AppViewFilter
 
-		distro = platform.linux_distribution()
-		is_maverick = (distro == ('Ubuntu', '10.10', 'maverick'))
+		if self.is_natty_or_newer:
+			self.Application           = Application
+			self.PKG_STATE_UNINSTALLED = PKG_STATE_UNINSTALLED
 
 		self.cache = self.apt.Cache() # this line is really slow! around 0.28s on my computer!
 		db_path = '/var/cache/software-center/xapian'
@@ -99,13 +108,15 @@ class CardapioPlugin(CardapioPluginInterface):
 		self.db = StoreDatabase(db_path, self.cache)
 		self.db.open()
 		self.apps_filter = AppViewFilter(self.db, self.cache)
-		self.apps_filter.set_not_installed_only(True)
-		self.apps_filter.set_only_packages_without_applications(True)
 
-		self.action = None
+		if self.is_maverick_or_newer:
+			self.c.write_to_log(self, 'Detected Ubuntu 10.10 or higher')
 
-		if is_maverick:
-			self.c.write_to_log(self, 'Detected Ubuntu 10.10')
+			if self.is_natty_or_newer:
+				self.apps_filter.set_not_installed_only(True)
+			else:
+				self.apps_filter.set_only_packages_without_applications(True)
+
 			self.action = {
 				'name'         : _('Open Software Center'),
 				'tooltip'      : _('Search for more software in the Software Center'),
@@ -115,6 +126,8 @@ class CardapioPlugin(CardapioPluginInterface):
 				'context menu' : None,
 				}
 		else:
+			self.c.write_to_log(self, 'Detected Ubuntu older than 10.10')
+			self.apps_filter.set_only_packages_without_applications(True)
 			self.action = {
 				'name'         : _('Open Software Center'),
 				'tooltip'      : _('Search for more software in the Software Center'),
@@ -172,15 +185,24 @@ class CardapioPlugin(CardapioPluginInterface):
 
 		i = 0
 		for m in matches:
-			if not i < result_limit : break
+			if i >= result_limit: break
 			
-			doc = m[self.xapian.MSET_DOCUMENT]
-			pkgname = self.db.get_pkgname(doc)
-			summary = doc.get_value(self.XAPIAN_VALUE_SUMMARY)
+			if self.is_natty_or_newer:
+				doc = m.document
+				pkgname = self.db.get_pkgname(doc)
+				summary = doc.get_value(self.XAPIAN_VALUE_SUMMARY)
+				app = self.Application(self.db.get_appname(doc), self.db.get_pkgname(doc), popcon=self.db.get_popcon(doc))
+				uninstalled = (app.get_details(self.db).pkg_state == self.PKG_STATE_UNINSTALLED)
+
+			else:
+				doc = m[self.xapian.MSET_DOCUMENT]
+				pkgname = self.db.get_pkgname(doc)
+				summary = doc.get_value(self.XAPIAN_VALUE_SUMMARY)
+				uninstalled = self.apps_filter.filter(doc, pkgname)
 
 			name = doc.get_data()
 
-			if self.apps_filter.filter(doc, pkgname) and summary:
+			if uninstalled and summary:
 				icon_name = self.os.path.splitext(doc.get_value(self.XAPIAN_VALUE_ICON))[0]
 
 				tooltip = self.default_tooltip_str % name 
