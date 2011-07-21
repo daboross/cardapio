@@ -103,7 +103,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		# proceeding...
 
 		self.current_query = text
-		text = self.quote(text)
+		text = self.quote(str(text))
 
 		# The google search API only supports two sizes for the result list,
 		# that is: small (4 results) or large (8 results). So this plugin

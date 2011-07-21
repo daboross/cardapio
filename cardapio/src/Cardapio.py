@@ -1332,7 +1332,7 @@ class Cardapio(dbus.service.Object):
 		pagesize = self.settings['long search results limit']
 		limit    = pagesize
 		
-		for filename in sorted(matches, key = str.lower):
+		for filename in sorted(matches, key = unicode.lower):
 
 			# ignore hidden files
 			if filename[0] == '.' and ignore_hidden: continue
@@ -2791,11 +2791,12 @@ class Cardapio(dbus.service.Object):
 		dummy, extension = os.path.splitext(canonical_path)
 
 		# don't show it for network://, trash://, or .desktop files
+		# TODO: should we handle http://, etc?
 		if path_type not in ('computer', 'network', 'trash') and extension != '.desktop':
 
 			unescaped_path = self.unescape_url(canonical_path)
-			if os.path.isdir(unescaped_path): return 1
-			elif os.path.isfile(unescaped_path): return 2
+			if os.path.isdir(unescaped_path)    : return 1
+			elif os.path.isfile(unescaped_path) : return 2
 
 		return 0
 
@@ -3121,7 +3122,7 @@ class Cardapio(dbus.service.Object):
 		Clear all sorts of escaping from a URL, like %20 -> [space]
 		"""
 
-		return urllib2.unquote(str(text)) # NOTE: it is possible that with python3 we will have to change this line
+		return urllib2.unquote(unicode(text)) # NOTE: it is possible that with python3 we will have to change this line
 
 
 	def unescape_string(self, text):

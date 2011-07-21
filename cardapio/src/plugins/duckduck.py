@@ -94,7 +94,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		# proceeding...
 
 		self.current_query = text
-		text = self.quote(text)
+		text = self.quote(str(text))
 		
 		# Is there a way to get the result_limit in the init method
 		# so we don't have to assign it everytime search is called?

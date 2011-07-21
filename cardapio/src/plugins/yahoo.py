@@ -117,7 +117,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		current_args = self.api_base_args.copy()
 		current_args['count'] = result_limit
 
-		final_url = self.api_base_url.format(self.urllib.quote(text, ''), self.urllib.urlencode(current_args))
+		final_url = self.api_base_url.format(self.urllib.quote(str(text), ''), self.urllib.urlencode(current_args))
 
 		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
 

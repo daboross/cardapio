@@ -144,7 +144,7 @@ class CardapioPlugin(CardapioPluginInterface):
 				# of a URL so we need to encode the special characters; unfortunately,
 				# Python's 2.* urllib.quote throws an exception when it's given unicode
 				# argument - what now?
-				item_url = self.web_base_url.format(self.urllib.quote(item))
+				item_url = self.web_base_url.format(self.urllib.quote(str(item)))
 				items.append({
 					'name'         : item,
 					'tooltip'      : item_url,
