@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-07-06 22:54+0200\n"
-"PO-Revision-Date: 2011-04-01 18:51+0000\n"
-"Last-Translator: Kenneth Terkelsen <Unknown>\n"
+"POT-Creation-Date: 2011-07-12 20:52+0200\n"
+"PO-Revision-Date: 2011-07-09 22:32+0000\n"
+"Last-Translator: Simon <Unknown>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-07-08 18:28+0000\n"
-"X-Generator: Launchpad (build 13376)\n"
+"X-Launchpad-Export-Date: 2011-07-16 13:01+0000\n"
+"X-Generator: Launchpad (build 13405)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "\"%(file_name)s\" er en eksekverbar tekst fil."
@@ -149,6 +149,12 @@ msgstr "Vil du starte \"%(file_name)s\", eller vise dets indhold?"
 msgid "Drag to reorder plugins"
 msgstr "Træk for at reorganisere udviddelser"
 
+msgid "DuckDuckGo"
+msgstr "DuckDuckGo"
+
+msgid "DuckDuckGo Results"
+msgstr "DuckDuckGo resultater"
+
 msgid "Edit Menus"
 msgstr "Rediger Menuer"
 
@@ -250,6 +256,9 @@ msgstr "Behold søgeresultater når Cardapio er skjult"
 msgid "Label:"
 msgstr "Mærkat:"
 
+msgid "Launch in _Background"
+msgstr "Start i _baggrunden"
+
 msgid "Launch this item"
 msgstr "Start dette objekt"
 
@@ -310,7 +319,7 @@ msgid "Open menu when cursor hovers the applet"
 msgstr "Åben menuen når musen er over Cardapio applet'en"
 
 msgid "Open the trash"
-msgstr "Åben papirkurven"
+msgstr "Åbn papirkurven"
 
 msgid "Open this item's parent folder in the file browser"
 msgstr "Åben dette emnes beslægtede mappe i en filbrowser"
@@ -319,7 +328,7 @@ msgid "Open this note"
 msgstr "Åben denne note"
 
 msgid "Open your personal folder"
-msgstr "Åben din personlig mappe"
+msgstr "Åbn din personlige mappe"
 
 msgid "Other configuration tools"
 msgstr "Andre konfigureringsværktøjer"
@@ -335,6 +344,9 @@ msgstr "Foretag en søgning med Microsofts Bing"
 
 msgid "Perform a search using Yahoo"
 msgstr "Foretag en søgning med hjælp fra Yahoo"
+
+msgid "Perform quick DuckDuckGo searches"
+msgstr "Udfør hurtig DuckDuckGo søgninger"
 
 msgid ""
 "Perform quick Google searches <b>limited to</b> the system's default language"
@@ -381,6 +393,9 @@ msgstr "Seneste dokumenter (kategoriseret)"
 msgid "Recent documents (simple)"
 msgstr "Seneste dokumenter (simpel)"
 
+msgid "Recent documents (smart)"
+msgstr "Seneste dokumenter (smart)"
+
 msgid "Recording..."
 msgstr "Optager..."
 
@@ -413,6 +428,9 @@ msgstr "Resultater fundet ved hjælp af Bing"
 
 msgid "Results found using Yahoo"
 msgstr "Resultater fundet med hjælp fra Yahoo"
+
+msgid "Results found with DuckDuckGo"
+msgstr "Resultater fundet med DuckDuckGo"
 
 msgid "Results found with Google"
 msgstr "Resultater fundet ved hjælp af Google"
@@ -474,6 +492,20 @@ msgstr "Søg efter resultater hos Wikipedia"
 msgid "Search for results in YouTube"
 msgstr "Søg efter resultater hos YouTube"
 
+msgid ""
+"Search for your most recently used files in categorized fashion, but save "
+"space when no query is entered."
+msgstr ""
+"Søg efter dine seneste brugte filer i kategoriseret måde, men spar plads når "
+"ingen søgning er indtastet."
+
+msgid ""
+"Search for your most recently used files, divided into categories depending "
+"on <i>when</i> they were last accessed."
+msgstr ""
+"Søg efter dine seneste brugte filer, opdelt i kategorier afhængig af "
+"<i>hvornår</i> de sidst er tilgået."
+
 msgid "Search for your most recently used files."
 msgstr "Søg efter dine senest brugte filer."
 
@@ -510,9 +542,6 @@ msgstr "Vis ydreligere resultater"
 msgid "Show additional search results in Sezen"
 msgstr "Vis ydrerligere søgeresultater i Sezen"
 
-msgid "Show additional search results in a file browser"
-msgstr "Vis ydreligere søgeresultater i en filbrowser"
-
 msgid "Show additional search results in the Tracker search tool"
 msgstr "Vis ydreligere søgeresultater i Tracker søgeværktøjet"
 
@@ -521,6 +550,13 @@ msgstr "Vis ydreligere søgeresultater i din web browser"
 
 msgid "Show all categories"
 msgstr "Vis alle kategorier"
+
+msgid ""
+"Show contents of this folder within Cardapio\n"
+"(same as Shift-Click)"
+msgstr ""
+"Vis indholdet af denne mappe inden for Cardapio\n"
+"(samme som Shift-Klik)"
 
 msgid "Show session buttons in bottom pane"
 msgstr "Vis sessonsknapper i bundpanelet"
@@ -585,6 +621,18 @@ msgstr "Ukategoriseret"
 
 msgid "Update now"
 msgstr "Opdatér nu"
+
+msgid "Use default icon"
+msgstr "Brug standard ikon"
+
+msgid "Use icon from file:"
+msgstr "Brug ikon fra fil:"
+
+msgid "Use named icon:"
+msgstr "Brug navngivet ikon:"
+
+msgid "Use no icon"
+msgstr "Brug ingen ikon"
 
 msgid "View"
 msgstr "Vis"

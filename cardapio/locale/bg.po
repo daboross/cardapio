@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-07-06 22:54+0200\n"
-"PO-Revision-Date: 2011-05-16 11:46+0000\n"
+"POT-Creation-Date: 2011-07-12 20:52+0200\n"
+"PO-Revision-Date: 2011-07-15 06:00+0000\n"
 "Last-Translator: Svetoslav Stefanov <svetlisashkov@yahoo.com>\n"
 "Language-Team: Bulgarian <bg@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-07-08 18:28+0000\n"
-"X-Generator: Launchpad (build 13376)\n"
+"X-Launchpad-Export-Date: 2011-07-16 13:01+0000\n"
+"X-Generator: Launchpad (build 13405)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "\"%(file_name)s\" е изпълним текстов файл."
@@ -150,6 +150,12 @@ msgstr ""
 msgid "Drag to reorder plugins"
 msgstr "Влачете, за да пренаредите приставките"
 
+msgid "DuckDuckGo"
+msgstr "DuckDuckGo"
+
+msgid "DuckDuckGo Results"
+msgstr "Резултати от DuckDuckGo"
+
 msgid "Edit Menus"
 msgstr "Редактиране на менюта"
 
@@ -192,6 +198,9 @@ msgstr ""
 
 msgid "Folder Contents"
 msgstr "Съдържание на папка"
+
+msgid "Full-text file search"
+msgstr "Търсене в пълния текст на файла"
 
 msgid ""
 "GNU General Public License v3\n"
@@ -255,8 +264,18 @@ msgid "Launch this item"
 msgstr "Стартиране на този елемент"
 
 msgid ""
+"Launch this item but do not hide Cardapio\n"
+"(same as Middle-Click or Ctrl-Click)"
+msgstr ""
+"Пускане на този обект без скриване на Cardapio\n"
+"(същото като Среден бутон  Ctrl-Ляв бутон)"
+
+msgid ""
 "Lets you choose from thousands of free applications available for Ubuntu"
 msgstr "Можете да изберете от хиляди безплатни програми за Убунту"
+
+msgid "Load additional results"
+msgstr "Зареждане на допълнителни резултати"
 
 msgid "Local Results"
 msgstr "Локални резултати"
@@ -336,6 +355,9 @@ msgstr "Търсене с Bing на Microsoft"
 msgid "Perform a search using Yahoo"
 msgstr "Търсене с Yahoo"
 
+msgid "Perform quick DuckDuckGo searches"
+msgstr "Търсене с DuckDuckGo"
+
 msgid ""
 "Perform quick Google searches <b>limited to</b> the system's default language"
 msgstr ""
@@ -375,6 +397,15 @@ msgstr "Защита на компютъра от непозволен дост�
 msgid "Recent Documents"
 msgstr "Скорошни документи"
 
+msgid "Recent documents (categorized)"
+msgstr "Скорошни документи (категоризирани)"
+
+msgid "Recent documents (simple)"
+msgstr "Скорошни документи (просто)"
+
+msgid "Recent documents (smart)"
+msgstr "Скорошни документи (умно)"
+
 msgid "Recording..."
 msgstr "Запис..."
 
@@ -407,6 +438,9 @@ msgstr "Получени резултати от Bing"
 
 msgid "Results found using Yahoo"
 msgstr "Получени резултати от Yahoo"
+
+msgid "Results found with DuckDuckGo"
+msgstr "Намерени резултати с DuckDuckGo"
 
 msgid "Results found with Google"
 msgstr "Резултати, намерени с Google"
@@ -468,6 +502,16 @@ msgstr "Търсене за резултати в Уикипедия"
 msgid "Search for results in YouTube"
 msgstr "Търсене за резултати в YouTube"
 
+msgid ""
+"Search for your most recently used files, divided into categories depending "
+"on <i>when</i> they were last accessed."
+msgstr ""
+"Търсене за последно използваните файлове, разделени по категории според това "
+"<i>кога</i> за последен път са отваряни."
+
+msgid "Search for your most recently used files."
+msgstr "Търсене за последно отваряните файлове."
+
 msgid "Search local files and folders indexed with Tracker"
 msgstr "Търсене на локални файлове и папки, индексирани с Tracker"
 
@@ -498,11 +542,11 @@ msgstr "Показване на допълнителни бележки в Tombo
 msgid "Show additional results"
 msgstr "Показване на допълнителни резултати"
 
+msgid "Show additional search results"
+msgstr "Показване на допълнителни резултати от търсенето"
+
 msgid "Show additional search results in Sezen"
 msgstr "Показване на допълнителни резултати от търсенето в Sezen"
-
-msgid "Show additional search results in a file browser"
-msgstr "Допълнителни резултати от търсенето във файловия мениджър"
 
 msgid "Show additional search results in the Tracker search tool"
 msgstr ""
@@ -514,6 +558,13 @@ msgstr "Показва допълнителни резултати от търс
 
 msgid "Show all categories"
 msgstr "Показване на всички категории"
+
+msgid ""
+"Show contents of this folder within Cardapio\n"
+"(same as Shift-Click)"
+msgstr ""
+"Показване съдържанието на тази папка с Cardapio\n"
+"(същото като Shift-Ляв бутон)"
 
 msgid "Show session buttons in bottom pane"
 msgstr "Показване на бутоните за сесия в долния панел"
@@ -579,8 +630,23 @@ msgstr "Без категория"
 msgid "Update now"
 msgstr "Обновяване сега"
 
+msgid "Use default icon"
+msgstr "Използване на стандартната икона"
+
+msgid "Use icon from file:"
+msgstr "Използване на икона от файл:"
+
+msgid "Use named icon:"
+msgstr "Посочване на икона по име:"
+
+msgid "Use no icon"
+msgstr "Да не се използва икона"
+
 msgid "View"
 msgstr "Изглед"
+
+msgid "View icon-naming specification on the web"
+msgstr "Преглед на спецификациите за именуване на икони в уеб"
 
 msgid "Virtual Machines"
 msgstr "Виртуални машини"
