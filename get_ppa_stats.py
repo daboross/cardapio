@@ -7,7 +7,7 @@ PPA = "unstable"           # the PPA to get stats for. It's the second part of a
 dists = ['natty', 'maverick', 'lucid']
 archs = ['i386', 'amd64']
 
-url = r'https://api.edge.launchpad.net/devel/ubuntu/%s/%s'
+url = r'https://api.launchpad.net/devel/ubuntu/%s/%s'
 
 
 cachedir = "~/.launchpadlib/cache/"
