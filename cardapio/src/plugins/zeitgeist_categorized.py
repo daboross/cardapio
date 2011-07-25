@@ -88,6 +88,8 @@ class CardapioPlugin(CardapioPluginInterface):
 				self.c.write_to_log(self, 'Could not connect to Zeitgeist full-text-search', is_warning = True)
 				self.c.write_to_log(self, exception, is_warning = True)
 
+		bus.release_name('org.freedesktop.Tracker1')
+
 		self.have_sezen = which('sezen')
 
 		if not self.have_sezen:

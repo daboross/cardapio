@@ -65,6 +65,7 @@ class CardapioPlugin(CardapioPluginInterface):
 		else:
 			self.c.write_to_log(self, 'Could not connect to Tracker', is_error = True)
 			self.loaded = False
+			bus.release_name('org.freedesktop.Tracker1')
 			return 
 
 		self.action_command = r"tracker-search-tool '%s'"

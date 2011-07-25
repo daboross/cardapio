@@ -63,7 +63,9 @@ class CardapioPlugin(CardapioPluginInterface):
 			tracker_object = bus.get_object('org.freedesktop.Tracker1', '/org/freedesktop/Tracker1/Resources')
 			self.tracker = dbus.Interface(tracker_object, 'org.freedesktop.Tracker1.Resources')
 		else:
+			self.c.write_to_log(self, 'Could not connect to Tracker', is_error = True)
 			self.loaded = False
+			bus.release_name('org.freedesktop.Tracker1')
 			return
 
 		self.action_command = r'tracker-search-tool %s'
