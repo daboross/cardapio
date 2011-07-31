@@ -1260,7 +1260,7 @@ class Cardapio(dbus.service.Object):
 
 			# if typed root folder
 			if text == '' and selected_app_info is None: 
-				path        = '/'
+				path        = u'/'
 				base_text   = ''
 				self.subfolder_stack = [(text, path)]
 
@@ -1306,7 +1306,7 @@ class Cardapio(dbus.service.Object):
 			self.file_looper = self.file_looper_generator(matches, path, ignore_hidden)
 			count = self.file_looper.next()
 
-		except:
+		except Exception, e:
 			count = 0
 
 		if count > 0:
@@ -1331,6 +1331,7 @@ class Cardapio(dbus.service.Object):
 		page     = 1
 		pagesize = self.settings['long search results limit']
 		limit    = pagesize
+		path     = unicode(path) # just in case we missed it somewhere else
 		
 		for filename in sorted(matches, key = unicode.lower):
 
