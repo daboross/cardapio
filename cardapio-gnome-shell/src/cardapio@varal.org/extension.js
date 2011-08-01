@@ -7,7 +7,8 @@ const Shell = imports.gi.Shell;
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const Util = imports.misc.util;
-//const Lang = imports.lang;
+const Mainloop = imports.mainloop
+const Lang = imports.lang;
 
 const DBus = imports.dbus;
 
@@ -41,6 +42,12 @@ ApplicationsButton.prototype = {
 		PanelMenu.Button.prototype._init.call(this, 0.0);
 
 		DBus.session.start_service('org.varal.Cardapio')
+		this._cardapio = new Cardapio(DBus.session, 'org.varal.Cardapio', '/org/varal/Cardapio');
+
+		// Below is a hack to make sure the service started above gets 
+		// loaded before we run the set_default_window_positionRemote() 
+		// method. Ugly, argh!
+        Mainloop.timeout_add_seconds(1.0, Lang.bind(this, this._setDefaultWindowPosition));
 
 		this._icon = new St.Icon({ 
 			icon_name: 'start-here',
@@ -59,15 +66,19 @@ ApplicationsButton.prototype = {
 
 		// add immediately after hotspot
 		Main.panel._leftBox.insert_actor(this.actor, 1);
+	},
 
+	_setDefaultWindowPosition: function() {
 		x = this.actor.get_x();
 		y = this.actor.get_y();
-
-		this._cardapio = new Cardapio(DBus.session, 'org.varal.Cardapio', '/org/varal/Cardapio');
 		this._cardapio.set_default_window_positionRemote(x, y);
 	},
 
     _onButtonPress: function(actor, event) {
+
+		// just in case the user closed Cardapio in the 
+		// meantime using Alt-F4, we restart it here
+		DBus.session.start_service('org.varal.Cardapio')
 
 		visible = this._cardapio.is_visibleRemote();
 

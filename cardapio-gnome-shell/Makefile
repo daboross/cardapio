@@ -19,6 +19,6 @@ install:
 	cp -rf src/cardapio@varal.org $(PREFIX)/share/gnome-shell/extensions/
 
 uninstall:
-	rm -rf $(PREFIX)/share/gnome-shell/extensions
+	rm -rf $(PREFIX)/share/gnome-shell/extensions/cardapio@varal.org
 
 
