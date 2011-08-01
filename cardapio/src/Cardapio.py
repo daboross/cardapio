@@ -736,6 +736,7 @@ class Cardapio(dbus.service.Object):
 		self.bookmark_monitor              = None
 		self.volume_monitor                = None
 		self.last_visibility_toggle        = 0
+		self.default_window_position       = None
 
 
 	def load_settings(self):
@@ -1775,11 +1776,16 @@ class Cardapio(dbus.service.Object):
 		window_width, window_height = self.view.get_window_size()
 
 		if self.applet.panel_type != None:
+
 			orientation = self.applet.get_orientation()
 			x, y = self.applet.get_position()
 			w, h = self.applet.get_size()
 			if orientation == POS_LEFT: x += w
 			if orientation == POS_TOP : y += h
+
+		elif self.default_window_position is not None:
+
+			return self.default_window_position
 
 		else:
 
@@ -1872,6 +1878,17 @@ class Cardapio(dbus.service.Object):
 		# decide which search bar to show (top or bottom) depending
 		# on the y = 0 axis window invert
 		self.view.setup_search_entry(not anchor_bottom, not self.settings['mini mode'])
+
+
+	@dbus.service.method(dbus_interface = Constants.bus_name_str, in_signature = 'ii', out_signature = None)
+	def set_default_window_position(self, x, y):
+		"""
+		Sets Cardapio's position when it was initialized by itself (usually not 
+		in applet mode). If not set, Cardapio defaults to appearing in the center
+		of the screen.
+		"""
+
+		self.default_window_position = (x,y)
 
 
 	def save_dimensions(self):
@@ -3043,14 +3060,20 @@ class Cardapio(dbus.service.Object):
 			context   = gtk.gdk.AppLaunchContext()
 			notify_id = context.get_startup_notify_id(app_info, [])
 
- 			# FIXME: Why is this check here? Makes no sense!
 			if self.applet.panel_type is not None:
 				# allow launched apps to use Ubuntu's AppMenu
 				os.environ['UBUNTU_MENUPROXY'] = 'libappmenu.so'
 
 			os.environ['DESKTOP_STARTUP_ID'] = notify_id
-			app_info.launch(None, context)
-			#subprocess.Popen(path, shell = True, cwd = self.home_folder_path)
+
+			# FIXME
+			#
+			# This is the preferred GNOME way of doing things:
+			#app_info.launch(None, context)
+			# ...but how do we set the working directory?
+			#
+			# in the meantime, I'll just continue using this:
+			subprocess.Popen(path, shell = True, cwd = self.home_folder_path)
 
 		except Exception, exception:
 			logging.error('Could not launch %s' % path)
