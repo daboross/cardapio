@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=org.varal.Cardapio
+Exec=PREFIX/bin/cardapio hidden
+

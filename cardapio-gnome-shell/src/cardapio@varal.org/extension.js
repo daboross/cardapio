@@ -40,6 +40,8 @@ ApplicationsButton.prototype = {
 	_init: function() {
 		PanelMenu.Button.prototype._init.call(this, 0.0);
 
+		DBus.session.start_service('org.varal.Cardapio')
+
 		this._icon = new St.Icon({ 
 			icon_name: 'start-here',
 			icon_type: St.IconType.SYMBOLIC,
@@ -60,6 +62,7 @@ ApplicationsButton.prototype = {
 
 		x = this.actor.get_x();
 		y = this.actor.get_y();
+
 		this._cardapio = new Cardapio(DBus.session, 'org.varal.Cardapio', '/org/varal/Cardapio');
 		this._cardapio.set_default_window_positionRemote(x, y);
 	},
@@ -82,7 +85,6 @@ ApplicationsButton.prototype = {
 
 function main(extensionMeta) {
 
-	Util.trySpawnCommandLine('cardapio hidden');
 	new ApplicationsButton();
 }
 

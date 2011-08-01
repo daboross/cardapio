@@ -90,6 +90,9 @@ install: install_docky_helper
 		do test -f $$f/LC_MESSAGES/cardapio.mo && msgunfmt -o $$f.po $$f/LC_MESSAGES/cardapio.mo || true; \
 	done
 	intltool-merge -b locale src/gnomepanel/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
+	
+	mkdir -p /usr/share/dbus-1/services
+	sed s/PREFIX/$(PREFIX)/ res/cardapio.service > /usr/share/dbus-1/services/cardapio.service
 
 buildsrc:
 	debuild -S
@@ -105,6 +108,7 @@ uninstall: uninstall_docky_helper
 	rm -rf $(PREFIX)/share/pixmaps/cardapio*
 	rm -rf $(PREFIX)/share/applications/cardapio.desktop
 	rm -f $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
+	rm -f $(DESTDIR)/usr/share/dbus-1/services/cardapio.service
 	find $(PREFIX)/share/locale -name '*cardapio.*' -delete
 	
 	# remove old files which have been renamed or moved to another package
