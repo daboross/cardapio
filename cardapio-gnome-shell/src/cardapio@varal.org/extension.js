@@ -61,16 +61,32 @@ ApplicationsButton.prototype = {
 		this._box.add(this._icon);
 		this._box.add(this._label);
 
-		//this.actor.set_child(this._icon);
 		this.actor.set_child(this._box);
 
+		// add at the leftmost position
+		//this.container = Main.panel._leftBox;
+		//Main.panel._leftBox.insert_actor(this.actor, 0);
+
 		// add immediately after hotspot
+		this.container = Main.panel._leftBox;
 		Main.panel._leftBox.insert_actor(this.actor, 1);
+
+		// add to the left of the clock
+		//this.container = Main.panel._centerBox;
+		//Main.panel._centerBox.insert_actor(this.actor, 0);
+
+		// add to the right of the clock
+		//this.container = Main.panel._centerBox;
+		//Main.panel._centerBox.insert_actor(this.actor, -1);
+
+		// add at the right-most position
+		//this.container = Main.panel._rightBox;
+		//Main.panel._rightBox.insert_actor(this.actor, -1);
 	},
 
 	_setDefaultWindowPosition: function() {
-		x = this.actor.get_x();
-		y = this.actor.get_y();
+		x = this.actor.get_x() + this.container.get_x();
+		y = this.actor.get_y() + this.container.get_y();
 		this._cardapio.set_default_window_positionRemote(x, y);
 	},
 
@@ -87,8 +103,8 @@ ApplicationsButton.prototype = {
         else
             this.actor.remove_style_pseudo_class('active');
 
-		x = this.actor.get_x();
-		y = this.actor.get_y();
+		x = this.actor.get_x() + this.container.get_x();
+		y = this.actor.get_y() + this.container.get_y();
 		this._cardapio.show_hide_near_pointRemote(x, y, false, false);
     },
 };
