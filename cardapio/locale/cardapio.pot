@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-07-24 18:41+0200\n"
+"POT-Creation-Date: 2011-08-05 13:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -88,127 +88,127 @@ msgstr ""
 msgid "Your favorite items"
 msgstr ""
 
-#: src/Cardapio.py:782
+#: src/Cardapio.py:783
 msgid "All"
 msgstr ""
 
-#: src/Cardapio.py:782
+#: src/Cardapio.py:783
 msgid "Show all categories"
 msgstr ""
 
-#: src/Cardapio.py:1289
+#: src/Cardapio.py:1294
 msgid "Filesystem Root"
 msgstr ""
 
-#: src/Cardapio.py:1344
+#: src/Cardapio.py:1350
 msgid "Open this folder"
 msgstr ""
 
-#: src/Cardapio.py:1344
+#: src/Cardapio.py:1350
 msgid "Show additional search results in a file browser"
 msgstr ""
 
-#: src/Cardapio.py:1347
+#: src/Cardapio.py:1353
 msgid "Load additional results"
 msgstr ""
 
-#: src/Cardapio.py:1347
+#: src/Cardapio.py:1353
 msgid "Show additional search results"
 msgstr ""
 
-#: src/Cardapio.py:2076 src/Cardapio.py:2440
+#: src/Cardapio.py:2098 src/Cardapio.py:2460
 msgid "Uncategorized"
 msgstr ""
 
-#: src/Cardapio.py:2076
+#: src/Cardapio.py:2098
 msgid "Other configuration tools"
 msgstr ""
 
-#: src/Cardapio.py:2127
+#: src/Cardapio.py:2149
 msgid "Network"
 msgstr ""
 
-#: src/Cardapio.py:2127
+#: src/Cardapio.py:2149
 msgid "Browse the contents of the network"
 msgstr ""
 
-#: src/Cardapio.py:2133
+#: src/Cardapio.py:2155
 msgid "Connect to Server"
 msgstr ""
 
-#: src/Cardapio.py:2133
+#: src/Cardapio.py:2155
 msgid "Connect to a remote computer or shared disk"
 msgstr ""
 
-#: src/Cardapio.py:2135
+#: src/Cardapio.py:2157
 msgid "Trash"
 msgstr ""
 
-#: src/Cardapio.py:2135
+#: src/Cardapio.py:2157
 msgid "Open the trash"
 msgstr ""
 
-#: src/Cardapio.py:2149
+#: src/Cardapio.py:2171
 msgid "Home"
 msgstr ""
 
-#: src/Cardapio.py:2149
+#: src/Cardapio.py:2171
 msgid "Open your personal folder"
 msgstr ""
 
-#: src/Cardapio.py:2165
+#: src/Cardapio.py:2187
 msgid "Desktop"
 msgstr ""
 
-#: src/Cardapio.py:2320
+#: src/Cardapio.py:2340
 msgid "Lock Screen"
 msgstr ""
 
-#: src/Cardapio.py:2321
+#: src/Cardapio.py:2341
 msgid "Protect your computer from unauthorized use"
 msgstr ""
 
-#: src/Cardapio.py:2327
+#: src/Cardapio.py:2347
 msgid "Log Out..."
 msgstr ""
 
-#: src/Cardapio.py:2328
+#: src/Cardapio.py:2348
 msgid "Log out of this session to log in as a different user"
 msgstr ""
 
-#: src/Cardapio.py:2334
+#: src/Cardapio.py:2354
 msgid "Shut Down..."
 msgstr ""
 
-#: src/Cardapio.py:2335
+#: src/Cardapio.py:2355
 msgid "Shut down the system"
 msgstr ""
 
-#: src/Cardapio.py:2420
+#: src/Cardapio.py:2440
 msgid "Folder Contents"
 msgstr ""
 
-#: src/Cardapio.py:2420
+#: src/Cardapio.py:2440
 msgid "Look inside folders"
 msgstr ""
 
-#: src/Cardapio.py:2428
+#: src/Cardapio.py:2448
 msgid "Side Pane"
 msgstr ""
 
-#: src/Cardapio.py:2428
+#: src/Cardapio.py:2448
 msgid "Items pinned to the side pane"
 msgstr ""
 
-#: src/Cardapio.py:2440
+#: src/Cardapio.py:2460
 msgid "Items that are not under any menu category"
 msgstr ""
 
-#: src/Cardapio.py:2441
+#: src/Cardapio.py:2461
 msgid "Session"
 msgstr ""
 
-#: src/Cardapio.py:2442
+#: src/Cardapio.py:2462
 msgid "System"
 msgstr ""
 
@@ -278,10 +278,10 @@ msgstr ""
 #: src/plugins/amazon.py:278 src/plugins/bing.py:151
 #: src/plugins/duckduck.py:74 src/plugins/ebay.py:245 src/plugins/ebay.py:261
 #: src/plugins/google.py:85 src/plugins/google_localized.py:89
-#: src/plugins/tracker.py:72 src/plugins/tracker_fts.py:71
+#: src/plugins/tracker.py:73 src/plugins/tracker_fts.py:73
 #: src/plugins/yahoo.py:171 src/plugins/you_tube.py:158
-#: src/plugins/zeitgeist_categorized.py:98 src/plugins/zeitgeist_simple.py:94
-#: src/plugins/zeitgeist_smart.py:106
+#: src/plugins/zeitgeist_categorized.py:100 src/plugins/zeitgeist_simple.py:96
+#: src/plugins/zeitgeist_smart.py:108
 msgid "Show additional results"
 msgstr ""
 
@@ -523,7 +523,7 @@ msgstr ""
 msgid "Results found in your computer"
 msgstr ""
 
-#: src/plugins/tracker.py:73 src/plugins/tracker_fts.py:72
+#: src/plugins/tracker.py:74 src/plugins/tracker_fts.py:74
 msgid "Show additional search results in the Tracker search tool"
 msgstr ""
 
@@ -716,8 +716,8 @@ msgstr ""
 msgid "All other files"
 msgstr ""
 
-#: src/plugins/zeitgeist_categorized.py:99 src/plugins/zeitgeist_simple.py:95
-#: src/plugins/zeitgeist_smart.py:107
+#: src/plugins/zeitgeist_categorized.py:101 src/plugins/zeitgeist_simple.py:97
+#: src/plugins/zeitgeist_smart.py:109
 msgid "Show additional search results in Sezen"
 msgstr ""
 
