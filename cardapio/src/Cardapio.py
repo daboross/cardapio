@@ -1273,7 +1273,11 @@ class Cardapio(dbus.service.Object):
 					else: app_info = first_app_info
 
 					if app_info['type'] != 'xdg': return False
-					path = self.escape_quotes(self.unescape_url(app_info['command']))
+					path = app_info['command']
+					print type(path), path
+					path = self.unescape_url(path)
+					# removed this (was it ever necessary?)
+					#path = self.escape_quotes(path)
 
 					path_type, path = urllib2.splittype(path)
 					if path_type and path_type != 'file': return False
@@ -2276,9 +2280,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		folder_path = os.path.expanduser(folder_path.replace('$HOME', '~')).strip(' \n\r\t')
-
-		dummy, canonical_path = urllib2.splittype(folder_path)
-		canonical_path = self.unescape_url(canonical_path)
+		folder_path = self.unescape_url(folder_path)
 
 		icon_name = self.icon_helper.get_icon_name_from_path(folder_path)
 		if icon_name is None: icon_name = folder_icon
@@ -2539,7 +2541,7 @@ class Cardapio(dbus.service.Object):
 
 		# save some metadata for easy access
 		button.app_info = {
-			'name'         : self.unescape_url(button_str),
+			'name'         : button_str,
 			'tooltip'      : tooltip,
 			'icon name'    : icon_name,
 			'command'      : command,
@@ -3119,14 +3121,14 @@ class Cardapio(dbus.service.Object):
 		return True
 
 
-	def escape_quotes(self, text):
-		"""
-		Sanitize a string by escaping quotation marks
-		"""
-
-		text = text.replace("'", r"\'")
-		text = text.replace('"', r'\"')
-		return text
+	#def escape_quotes(self, text):
+	#	"""
+	#	Sanitize a string by escaping quotation marks
+	#	"""
+	#
+	#	text = text.replace("'", r"\'")
+	#	text = text.replace('"', r'\"')
+	#	return text
 
 
 	def escape_quotes_for_shell(self, text):
@@ -3146,7 +3148,9 @@ class Cardapio(dbus.service.Object):
 		Clear all sorts of escaping from a URL, like %20 -> [space]
 		"""
 
-		return urllib2.unquote(unicode(text)) # NOTE: it is possible that with python3 we will have to change this line
+		# Important: unicode(*) must be the outermost function here, or all
+		# sorts of unicode-related problems may appear!!!
+		return unicode(urllib2.unquote(text)) 
 
 
 	def unescape_string(self, text):
