@@ -1,4 +1,4 @@
-Source: cardapio-gnome-shell
+Source: cardapio-gnomeshell
 Section: gnome
 Priority: extra
 Maintainer: tvst <tvst@hotmail.com>
@@ -6,7 +6,7 @@ Build-Depends: debhelper (>= 7), cdbs (>= 0.4.49)
 Standards-Version: 3.8.3
 Homepage: https://launchpad.net/cardapio
 
-Package: cardapio-gnome-shell
+Package: cardapio-gnomeshell
 Architecture: any
 Depends: cardapio (>= 0.9.188)
 Description: Cardapio extension for Gnome Shell
