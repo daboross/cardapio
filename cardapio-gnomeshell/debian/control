@@ -8,7 +8,7 @@ Homepage: https://launchpad.net/cardapio
 
 Package: cardapio-gnomeshell
 Architecture: any
-Depends: cardapio (>= 0.9.188)
+Depends: cardapio (>= 0.9.188), gnome-shell
 Description: Cardapio extension for Gnome Shell
  Cardapio is a launcher that can work in two modes: as a panel applet 
  (in which case it is an alternative to Gnome's application menu 

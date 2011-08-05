@@ -1,6 +1,6 @@
-cardapio-gnomepanel (0.9.187-ubuntu2-XXXXX1) XXXXX; urgency=low
+cardapio-gnomepanel (0.9.189-ubuntu1-XXXXX1) XXXXX; urgency=low
 
-   * Bug fixes, new icon, etc :)
+   * Just synchronizing all packages
 
- -- Thiago Teixeira <tvst@hotmail.com>  Sat, 16 Jul 2011 23:00:00 +0100
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 5 Aug 2011 23:00:00 +0100
 
