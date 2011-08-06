@@ -36,29 +36,37 @@ class DesktopEnvironment:
 
 		# initialize everything to Gnome defaults, then change them to other DEs as needed
 		self.about_de            = 'gnome-about'
-		self.about_distro        = 'yelp ghelp:about-%s' % cardapio.distro_name.lower() # NOTE: i'm assuming this is the pattern for all distros...
+		self.about_distro        = 'yelp "ghelp:about-%s"' % cardapio.distro_name.lower() # NOTE: i'm assuming this is the pattern for all distros...
 		self.menu_editor         = 'alacarte'
-		self.file_open           = 'xdg-open'
+		self.file_open           = "xdg-open '%s'"
 		self.connect_to_server   = which('nautilus-connect-server')
 		self.lock_screen         = 'gnome-screensaver-command --lock'
 		self.save_session        = 'gnome-session-save --logout-dialog'
 		self.shutdown            = 'gnome-session-save --shutdown-dialog'
 		self.execute_in_terminal = None
 
-		# fix libexo bug where exo-open breaks xdg-open
-		if which('exo-open') is not None: 
-			self.file_open = 'exo-open'
+		if   self.environment == 'kde'         : pass
+		elif self.environment == 'xfce'        : pass
+		elif self.environment == 'lwde'        : pass
+		elif self.environment == 'gnome'       : self.init_gnome()
+		elif self.environment == 'gnome-shell' : self.init_gnome()
+
+
+	def init_gnome(self):
+		"""
+		Override some of the default variables for use in Gnome
+		"""
+
+		# When libexo is installed (use in some xfce apps) it breaks xdg-open
+		# for some reason. So we here substitute it with gnome-open.
+		self.file_open = "gnome-open '%s'"
 
 		try:
-			from gnome import execute_terminal_shell as gnome_execute_terminal_shell
-			self.execute_in_terminal = gnome_execute_terminal_shell
+			from gnome import execute_terminal_shell 
+			self.execute_in_terminal = execute_terminal_shell
 
 		except Exception, exception:
 			logging.warn('Warning: you will not be able to execute scripts in the terminal')
-
-		if   self.environment == 'kde'   : pass
-		elif self.environment == 'xfce'  : pass
-		elif self.environment == 'lwde'  : pass
 
 
 	def register_session_close_handler(self, handler):

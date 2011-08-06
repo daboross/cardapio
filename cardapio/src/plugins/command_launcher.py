@@ -100,15 +100,16 @@ class CardapioPlugin (CardapioPluginInterface):
 					'name'          : cmdargs,
 					'tooltip'       : 'Run \'%s\'' % cmdargs,
 					'icon name'     : cmd,
-					'type'          : 'raw',
+					'type'          : 'raw-no-notification',
 					'command'       : cmdargs,
 					'context menu'  : [
 						{
 						'name'      : self.in_a_terminal % cmdargs,
 						'tooltip'   : self.in_a_terminal_tooltip % cmdargs,
 						'icon name' : 'utilities-terminal',
-						'type'      : 'raw',
-						'command'   : 'gnome-terminal -x bash -c \"%s ; bash\"' % cmdargs
+						'type'      : 'raw-in-terminal',
+						#'command'   : 'gnome-terminal -x bash -c \"%s ; bash\"' % cmdargs
+						'command'   : cmdargs
 						},
 						{
 						'name'      : self.as_root % cmdargs,

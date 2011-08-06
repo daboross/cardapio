@@ -2879,6 +2879,12 @@ class Cardapio(dbus.service.Object):
 		elif command_type == 'raw':
 			self.launch_raw(command, hide)
 
+		elif command_type == 'raw-in-terminal':
+			self.launch_raw_in_terminal(command, hide)
+
+		elif command_type == 'raw-no-notification':
+			self.launch_raw(command, hide, skip_startup_notification = True)
+
 		elif command_type == 'xdg':
 			self.launch_xdg(command, hide)
 
@@ -2999,13 +3005,14 @@ class Cardapio(dbus.service.Object):
 					return
 
 		elif path_type in Cardapio.REMOTE_PROTOCOLS:
+			# TODO: move to DesktopEnvironment.py
 			special_handler = self.settings['handler for %s paths' % path_type]
 			return self.launch_raw(special_handler % path, hide)
 
-		return self.launch_raw("%s '%s'" % (self.de.file_open, path), hide)
+		return self.launch_raw(self.de.file_open % path, hide)
 
 
-	def launch_raw(self, path, hide = True):
+	def launch_raw(self, path, hide = True, skip_startup_notification = False):
 		"""
 		Run a command as a subprocess
 		"""
@@ -3013,15 +3020,17 @@ class Cardapio(dbus.service.Object):
 		notify_id = None
 
 		try:
-			app       = gio.AppInfo(path)
-			context   = gtk.gdk.AppLaunchContext()
-			notify_id = context.get_startup_notify_id(app, [])
+			if not skip_startup_notification:
+
+				app       = gio.AppInfo(path)
+				context   = gtk.gdk.AppLaunchContext()
+				notify_id = context.get_startup_notify_id(app, [])
+
+				os.environ['DESKTOP_STARTUP_ID'] = notify_id
 
 			if self.applet.panel_type is not None:
 				# allow launched apps to use Ubuntu's AppMenu
 				os.environ['UBUNTU_MENUPROXY'] = 'libappmenu.so'
-
-			os.environ['DESKTOP_STARTUP_ID'] = notify_id
 
 			# FIXME
 			#
