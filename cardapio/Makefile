@@ -35,6 +35,8 @@ install: install_docky_helper
 	cp -f src/Cardapio.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/Constants.py $(PREFIX)/lib/cardapio/
 	cp -f src/Constants.pyc $(PREFIX)/lib/cardapio/
+	cp -f src/DesktopEnvironment.py $(PREFIX)/lib/cardapio/
+	cp -f src/DesktopEnvironment.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/CardapioGtkView.py $(PREFIX)/lib/cardapio/
 	cp -f src/CardapioGtkView.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/CardapioViewInterface.py $(PREFIX)/lib/cardapio/
@@ -92,7 +94,7 @@ install: install_docky_helper
 	intltool-merge -b locale src/gnomepanel/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
 	
 	mkdir -p $(DESTDIR)/usr/share/dbus-1/services
-	sed s_PREFIX_$(PREFIX)_ res/cardapio.service > /usr/share/dbus-1/services/cardapio.service
+	sed s_PREFIX_$(PREFIX)_ res/cardapio.service > $(DESTDIR)/usr/share/dbus-1/services/cardapio.service
 
 buildsrc:
 	debuild -S

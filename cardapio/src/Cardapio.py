@@ -26,6 +26,7 @@ try:
 	from SettingsHelper import *
 	from CardapioGtkView import *
 	from OptionsWindow import *
+	from DesktopEnvironment import *
 	from CardapioPluginInterface import CardapioPluginInterface
 	from CardapioAppletInterface import *
 	from CardapioViewInterface import *
@@ -38,7 +39,8 @@ try:
 	import gio
 	import glib
 	import json
-	import gmenu
+	import gmenu # TODO: DE-independence 
+
 	import urllib2
 	import gettext
 	import logging
@@ -58,23 +60,6 @@ try:
 except Exception, exception:
 	fatal_error('Fatal error loading Cardapio', exception)
 	sys.exit(1)
-
-try:
-	from gnome import execute_terminal_shell as gnome_execute_terminal_shell
-
-except Exception, exception:
-	print('Warning: you will not be able to execute scripts in the terminal')
-	gnome_execute_terminal_shell = None
-
-try:
-	from gnome import program_init as gnome_program_init
-	from gnome.ui import master_client as gnome_ui_master_client
-
-except Exception, exception:
-	print('Warning: Cardapio will not be able to tell when the session is closed')
-	gnome_program_init     = None
-	gnome_ui_master_client = None
-
 
 if gtk.ver < (2, 14, 0):
 	fatal_error('Fatal error loading Cardapio', 'Error! Gtk version must be at least 2.14. You have version %s' % gtk.ver)
@@ -737,6 +722,7 @@ class Cardapio(dbus.service.Object):
 		self.volume_monitor                = None
 		self.last_visibility_toggle        = 0
 		self.default_window_position       = None
+		self.de                            = DesktopEnvironment(self)
 
 
 	def load_settings(self):
@@ -762,12 +748,7 @@ class Cardapio(dbus.service.Object):
 		(only handles Gnome for now)
 		"""
 
-		if gnome_program_init is not None:
-			# The function below prints a warning to the screen, saying that
-			# an assertion has failed. Apparently this is normal. Ignore it.
-			gnome_program_init('', self.version) 
-			client = gnome_ui_master_client()
-			client.connect('save-yourself', lambda x: self.save_and_quit())
+		pass
 			
 
 	def build_ui(self):
@@ -885,17 +866,11 @@ class Cardapio(dbus.service.Object):
 		or the "About Cardapio" dialog
 		"""
 
-		# TODO: DE-independence 
-		# figure out how to discover which DE is being used. If not Gnome,
-		# remove the "About Gnome" menu item and add "About $DE". Also, what should
-		# be called for the AboutDistro if not yelp? 
-
 		if verb == 'AboutGnome':
-			self.launch_raw('gnome-about')
+			self.launch_raw(self.de.about_de)
 
 		elif verb == 'AboutDistro':
-			self.launch_raw('yelp ghelp:about-%s' % Cardapio.distro_name.lower())
-			# NOTE: i'm assuming this is the pattern for all distros...
+			self.launch_raw(self.de.about_distro)
 
 		else: self.view.open_about_dialog()
 
@@ -1274,7 +1249,6 @@ class Cardapio(dbus.service.Object):
 
 					if app_info['type'] != 'xdg': return False
 					path = app_info['command']
-					print type(path), path
 					path = self.unescape_url(path)
 					# removed this (was it ever necessary?)
 					#path = self.escape_quotes(path)
@@ -2148,11 +2122,9 @@ class Cardapio(dbus.service.Object):
 
 		self.add_app_button(_('Network'), 'network', section, 'xdg', 'network://', _('Browse the contents of the network'), self.app_list)
 
-		# TODO: DE-independence
-
-		connect_to_server_app_path = which('nautilus-connect-server')
-		if connect_to_server_app_path is not None:
-			self.add_app_button(_('Connect to Server'), 'network-server', section, 'raw', connect_to_server_app_path, _('Connect to a remote computer or shared disk'), self.app_list)
+		self.de.connect_to_server
+		if self.de.connect_to_server is not None:
+			self.add_app_button(_('Connect to Server'), 'network-server', section, 'raw', self.de.connect_to_server, _('Connect to a remote computer or shared disk'), self.app_list)
 
 		self.add_app_button(_('Trash'), 'user-trash', section, 'xdg', 'trash:///', _('Open the trash'), self.app_list)
 
@@ -2333,28 +2305,26 @@ class Cardapio(dbus.service.Object):
 		Populate the Session list
 		"""
 
-		# TODO: DE-independence 
-
 		items = [
 			[
 				_('Lock Screen'),
 				_('Protect your computer from unauthorized use'),
 				'system-lock-screen',
-				'gnome-screensaver-command --lock',
+				self.de.lock_screen,
 				self.view.LEFT_SESSION_PANE,
 			],
 			[
 				_('Log Out...'),
 				_('Log out of this session to log in as a different user'),
 				'system-log-out',
-				'gnome-session-save --logout-dialog',
+				self.de.save_session,
 				self.view.RIGHT_SESSION_PANE,
 			],
 			[
 				_('Shut Down...'),
 				_('Shut down the system'),
 				'system-shutdown',
-				'gnome-session-save --shutdown-dialog',
+				self.de.shutdown,
 				self.view.RIGHT_SESSION_PANE,
 			],
 		]
@@ -2379,8 +2349,6 @@ class Cardapio(dbus.service.Object):
 		"""
 		Populate the Applications list by reading the Gnome menus
 		"""
-
-		# TODO: DE-independence 
 
 		self.load_menus()
 
@@ -2590,8 +2558,6 @@ class Cardapio(dbus.service.Object):
 		parent widget
 		"""
 
-		# TODO: DE-independence 
-
 		for node in tree.contents:
 
 			if isinstance(node, gmenu.Entry):
@@ -2609,8 +2575,7 @@ class Cardapio(dbus.service.Object):
 		Opens Gnome's menu editor.
 		"""
 
-		# TODO: DE-independence 
-		self.launch_raw('alacarte')
+		self.launch_raw(self.de.menu_editor)
 
 
 	def go_to_parent_folder(self):
@@ -3047,7 +3012,7 @@ class Cardapio(dbus.service.Object):
 			special_handler = self.settings['handler for %s paths' % path_type]
 			return self.launch_raw(special_handler % path, hide)
 
-		return self.launch_raw("xdg-open '%s'" % path, hide)
+		return self.launch_raw("%s '%s'" % (self.de.file_open, path), hide)
 
 
 	def launch_raw(self, path, hide = True):
@@ -3058,9 +3023,9 @@ class Cardapio(dbus.service.Object):
 		notify_id = None
 
 		try:
-			app_info  = gio.AppInfo(path)
+			app       = gio.AppInfo(path)
 			context   = gtk.gdk.AppLaunchContext()
-			notify_id = context.get_startup_notify_id(app_info, [])
+			notify_id = context.get_startup_notify_id(app, [])
 
 			if self.applet.panel_type is not None:
 				# allow launched apps to use Ubuntu's AppMenu
@@ -3071,7 +3036,7 @@ class Cardapio(dbus.service.Object):
 			# FIXME
 			#
 			# This is the preferred GNOME way of doing things:
-			#app_info.launch(None, context)
+			#app.launch(None, context)
 			# ...but how do we set the working directory?
 			#
 			# in the meantime, I'll just continue using this:
@@ -3097,8 +3062,7 @@ class Cardapio(dbus.service.Object):
 		Returns true if the libraries for launching in a terminal are installed
 		"""
 
-		# TODO: DE-independence 
-		return (gnome_execute_terminal_shell is not None)
+		return (self.de.execute_in_terminal is not None)
 
 
 	def launch_raw_in_terminal(self, path, hide = True):
@@ -3106,10 +3070,9 @@ class Cardapio(dbus.service.Object):
 		Run a command inside Gnome's default terminal
 		"""
 
-		# TODO: DE-independence 
 		try:
 			if self.can_launch_in_terminal():
-				gnome_execute_terminal_shell(self.home_folder_path, path)
+				self.de.execute_in_terminal(self.home_folder_path, path)
 
 		except Exception, exception:
 			logging.error('Could not launch %s' % path)
