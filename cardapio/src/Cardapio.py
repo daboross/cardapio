@@ -39,7 +39,7 @@ try:
 	import gio
 	import glib
 	import json
-	import gmenu # TODO: DE-independence 
+	import gmenu
 
 	import urllib2
 	import gettext
@@ -184,7 +184,7 @@ class Cardapio(dbus.service.Object):
 		self.build_ui()
 		logging.info('...done building UI!')
 
-		self.init_desktop_environment()
+		self.de.register_session_close_handler(self.save_and_quit)
 
 		logging.info('==> Done initializing Cardapio!')
 
@@ -740,16 +740,6 @@ class Cardapio(dbus.service.Object):
 			traceback.print_exc()
 			sys.exit(1)
 
-
-	# TODO MVC: Move to a new GnomeHelper.py file
-	def init_desktop_environment(self):
-		"""
-		Runs a few initializations related to the user's desktop environment
-		(only handles Gnome for now)
-		"""
-
-		pass
-			
 
 	def build_ui(self):
 		"""
