@@ -68,7 +68,9 @@ class CardapioGtkView(CardapioViewInterface):
 		self.root_window                   = gtk.gdk.get_default_root_window()
 
 
-	# This method is required by the View API
+	# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+	# Methods required by the View API
+
 	def setup_ui(self):
 		"""
 		Reads the GTK Builder interface file and sets up some UI details
@@ -170,47 +172,6 @@ class CardapioGtkView(CardapioViewInterface):
 			pass
 
 
-	def on_gtk_settings_changed(self, gobj, property_changed):
-		"""
-		Rebuild the Cardapio UI whenever the color scheme or gtk theme change
-		"""
-
-		if property_changed.name == 'gtk-color-scheme' or property_changed.name == 'gtk-theme-name':
-			self.read_gui_theme_info()
-			self.cardapio.handle_view_settings_changed()
-
-
-	def read_gui_theme_info(self):
-		"""
-		Reads some info from the GTK theme to better adapt to it 
-		"""
-
-		dummy_window = gtk.Window()
-		dummy_window.set_name('ApplicationPane')
-		dummy_window.realize()
-		app_style = dummy_window.get_style()
-		self.style_app_button_bg = app_style.base[gtk.STATE_NORMAL]
-		self.style_app_button_fg = app_style.text[gtk.STATE_NORMAL]
-		self.get_widget('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
-		self.get_widget('NavigationButtonsBackground').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
-
-		# TODO: I would love to assign some existing theme color on ReloadMessageBar,
-		# but I don't know which color I can use for this. Is there a named
-		# "message bar" color, that is used by Evince, for instance?
-		#
-		# self.get_widget('ReloadMessageBar').modify_bg(gtk.STATE_NORMAL, ??)
-		# self.get_widget('ReloadMessageBar').modify_fg(gtk.STATE_NORMAL, ??)
-
-
-	def on_mainwindow_destroy(self, *dummy):
-		"""
-		Handler for when the Cardapio window is destroyed
-		"""
-
-		self.cardapio.handle_window_destroyed()
-
-	
-	# This method is required by the View API
 	def quit(self):
 		"""
 		Do the last cleaning up you need to do --- this is the last thing that
@@ -219,7 +180,6 @@ class CardapioGtkView(CardapioViewInterface):
 		gtk.main_quit()
 
 
-	# This method is required by the View API
 	def set_sidebar_button_toggled(self, button, state):
 		"""
 		Toggle a sidebar button
@@ -230,7 +190,6 @@ class CardapioGtkView(CardapioViewInterface):
 			button.set_active(state)
 
 
-	# This method is required by the View API
 	def set_all_sections_sidebar_button_toggled(self, state, is_system_mode):
 		"""
 		Toggle the "All" sidebar button for either the main mode or
@@ -243,7 +202,6 @@ class CardapioGtkView(CardapioViewInterface):
 			self.set_sidebar_button_toggled(self.all_sections_sidebar_button, state)
 
 
-	# This method is required by the View API
 	def set_all_sections_sidebar_button_sensitive(self, state, is_system_mode):
 		"""
 		Makes the "All" button unclickable
@@ -255,255 +213,11 @@ class CardapioGtkView(CardapioViewInterface):
 			self.all_sections_sidebar_button.set_sensitive(state)
 
 
-	def on_all_sections_sidebar_button_clicked(self, widget):
-		"""
-		Handler for when the user clicks "All" in the sidebar
-		"""
-
-		if self.auto_toggled_sidebar_button:
-			self.auto_toggled_sidebar_button = False
-			return True
-
-		self.cardapio.handle_section_all_clicked()
-
-	
-	# This method is required by the View API
 	def show_section(self, section):
 		"""
 		Shows a given application section
 		"""
 		section.show()
-
-
-	# This method is required by the View API
-	def hide_section(self, section):
-		"""
-		Hides a given application section
-		"""
-		section.hide()
-
-
-	# This method is required by the View API
-	def hide_sections(self, sections):
-		"""
-		Hides the application sections listed in the array "sections"
-		"""
-		for section in sections: section.hide()
-
-
-	# This method is required by the View API
-	def clear_search_entry(self):
-		"""
-		Removes all text from the search entry.
-		"""
-		self.search_entry.set_text('')
-
-
-	# This method is required by the View API
-	def set_search_entry_text(self, text):
-		"""
-		Removes all text from the search entry.
-		"""
-		self.search_entry.set_text(text)
-
-
-	# This method is required by the View API
-	def get_search_entry_text(self):
-		"""
-		Gets the text that is currently displayed in the search entry, formatted
-		in UTF8.
-		"""
-
-		text = self.search_entry.get_text()
-		return unicode(text, 'utf-8')
-
-
-	# TODO MVC this out of Cardapio
-	def on_sidebar_button_clicked(self, widget, section):
-		"""
-		Handler for when the user chooses a category in the sidebar
-		"""
-
-		if self.auto_toggled_sidebar_button:
-			self.auto_toggled_sidebar_button = False
-			return True
-
-		return not self.cardapio.handle_section_clicked(section)
-
-
-	def on_sidebar_button_hovered(self, widget):
-		"""
-		Handler for when the user hovers over a category in the sidebar
-		"""
-
-		widget.set_active(True)
-
-
-	def on_mainwindow_button_pressed(self, widget, event):
-		"""
-		Show context menu when the right mouse button is clicked on the main
-		window
-		"""
-
-		# TODO NOW: consider case where cursor is inside the APPLET too!
-
-		if not self.is_cursor_inside_window(self.main_window):
-			# since we grab keyboard/pointer focus, we want to make sure Cardapio hides
-			# when the user clicks outside its window
-			self.hide_main_window()
-			return False
-
-		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
-			self.block_focus_out_event()
-			self.context_menu.popup(None, None, None, event.button, event.time)
-
-
-	def on_search_entry_button_pressed(self, widget, event):
-		"""
-		Handler for when the users clicks on the search entry. We use this to
-		stop window from hiding when context menu is shown.
-		"""
-
-		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
-			self.block_focus_out_event()
-			glib.timeout_add(self.FOCUS_BLOCK_INTERVAL, self.unblock_focus_out_event)
-
-
-	# This method is required by the View API
-	def show_message_window(self):
-		"""
-		Show the "Rebuilding..." message window
-		"""
-
-		main_window_width, main_window_height = self.main_window.get_size()
-		message_width, message_height = self.message_window.get_size()
-
-		offset_x = (main_window_width  - message_width) / 2
-		offset_y = (main_window_height - message_height) / 2
-
-		x, y = self.main_window.get_position()
-		self.message_window.move(x + offset_x, y + offset_y)
-
-		self.message_window.set_keep_above(True)
-		self.show_window_on_top(self.message_window)
-
-		# ensure window is rendered immediately
-		gtk.gdk.flush()
-		while gtk.events_pending():
-			gtk.main_iteration()
-
-
-	# This method is required by the View API
-	def hide_message_window(self):
-		"""
-		Hide the "Rebuilding..." message window
-		"""
-
-		self.message_window.hide()
-
-		# ensure window is hidden immediately
-		gtk.gdk.flush()
-		while gtk.events_pending():
-			gtk.main_iteration()
-
-
-	# This method is required by the View API
-	def show_main_window(self):
-		"""
-		Shows Cardapio's main window
-		"""
-
-		self.show_window_on_top(self.main_window)
-
-		# NOTE: I would love to use keyboard_grab rather than have to keep track
-		# of opened_last_app_in_background in Cardapio.py, especially because
-		# that approach breaks with some apps like Firefox. However, using
-		# keyboard_grab introduces tons of issues itself. For instance, it
-		# blocks mouse clicks outside of Cardapio from closing the Cardapio
-		# window. It also blocks the shortcut key from being used to close
-		# Cardapio. In sum, this whole situation is a mess. And it would be
-		# great if someone could help...
-
-		#gtk.gdk.keyboard_grab(self.main_window.window)
-		#gtk.gdk.pointer_grab(self.main_window.window, True, gtk.gdk.BUTTON_PRESS_MASK)
-
-
-	# This method is required by the View API
-	def hide_main_window(self):
-		"""
-		Hides Cardapio's main window
-		"""
-
-		# see the note in show_main_window()
-		#gtk.gdk.pointer_ungrab(0)
-		#gtk.gdk.keyboard_ungrab(0)
-
-		self.main_window.hide()
-
-
-	# This method is required by the View API
-	def open_about_dialog(self):
-		"""
-		Shows the "About" dialog
-		"""
-
-		self.about_dialog.show()
-
-
-	def on_about_cardapio_clicked(self, dummy):
-		self.open_about_dialog()
-
-
-	# This method is required by the View API
-	def show_executable_file_dialog(self, primary_text, secondary_text, hide_terminal_option):
-		"""
-		Opens a dialog similar to the one in Nautilus, that asks whether an
-		executable script should be launched or edited.
-		"""
-
-		primary_text = '<big><b>' + primary_text + '</b></big>'
-
-		self.get_widget('ExecutableDialogPrimaryText').set_markup(primary_text)
-		self.get_widget('ExecutableDialogSecondaryText').set_text(secondary_text)
-
-		if hide_terminal_option:
-			self.get_widget('ExecutableDialogRunInTerminal').hide()
-
-		self.executable_file_dialog.set_focus(self.get_widget('ExecutableDialogCancel'))
-
-		response = self.executable_file_dialog.run()
-		self.executable_file_dialog.hide()
-
-		return response
-
-
-	def show_window_on_top(self, window):
-		"""
-		Place the Cardapio window on top of all others
-		"""
-
-		window.stick()
-		window.set_screen(self.screen)
-		window.show_now()
-
-		# for compiz, this must take place twice!!
-		window.present_with_time(int(time()))
-		window.present_with_time(int(time()))
-
-		# for metacity, this is required!!
-		window.window.focus()
-
-
-	# This method is required by the View API
-	def block_focus_out_event(self):
-		"""
-		Blocks the focus-out event
-		"""
-
-		if not self.focus_out_blocked:
-			self.main_window.handler_block_by_func(self.on_mainwindow_focus_out)
-			self.main_window.handler_block_by_func(self.on_mainwindow_cursor_leave)
-			self.focus_out_blocked = True
 
 
 	def unblock_focus_out_event(self, *dummy):
@@ -517,7 +231,6 @@ class CardapioGtkView(CardapioViewInterface):
 			self.focus_out_blocked = False
 
 
-	# This method is required by the View API
 	def fill_plugin_context_menu(self, clicked_app_button_info_context_menu):
 		"""
 		Add plugin-related actions to the context menu
@@ -544,16 +257,6 @@ class CardapioGtkView(CardapioViewInterface):
 			self.app_context_menu.append(menu_item)
 
 
-	def on_context_menu_selection_done(self, widget):
-		"""
-		Listener for when an app's context menu is closed
-		"""
-
-		widget = self.clicked_app_button
-		self.toggle_app_button(widget, False)
-
-
-	# This method is required by the View API
 	def clear_plugin_context_menu(self):
 		"""
 		Remove all plugin-dependent actions from the context menu
@@ -564,7 +267,6 @@ class CardapioGtkView(CardapioViewInterface):
 				self.app_context_menu.remove(menu_item)
 
 
-	# This method is required by the View API
 	def show_context_menu_option(self, menu_item):
 		"""
 		Shows the context menu option specified by "menu_item". The "menu_item"
@@ -575,7 +277,6 @@ class CardapioGtkView(CardapioViewInterface):
 		menu_item.show()
 
 
-	# This method is required by the View API
 	def hide_context_menu_option(self, menu_item):
 		"""
 		Hides the context menu option specified by "menu_item". The "menu_item"
@@ -586,7 +287,6 @@ class CardapioGtkView(CardapioViewInterface):
 		menu_item.hide()
 
 
-	# This method is required by the View API
 	def popup_app_context_menu(self, app_info):
 		"""
 		Show context menu for app buttons
@@ -596,65 +296,6 @@ class CardapioGtkView(CardapioViewInterface):
 		self.app_context_menu.popup(None, None, None, 3, time)
 
 
-	def toggle_app_button(self, widget, state):
-		"""
-		Toggles/untoggles a given app button
-		"""
-		widget.handler_block_by_func(self.on_app_button_clicked)
-		widget.set_active(state)
-		widget.handler_unblock_by_func(self.on_app_button_clicked)
-
-
-	# TODO MVC this out of Cardapio
-	def on_app_button_clicked(self, widget):
-		"""
-		Handle the on-click event for buttons on the app list. This includes
-		the "mouse click" event and the "clicked using keyboard" event (for example,
-		when you press Enter), but not middle-clicks and right-clicks.
-		"""
-
-		ctrl_is_pressed = self.get_ctrl_key_state()
-		shift_is_pressed = self.get_shift_key_state()
-		self.cardapio.handle_app_clicked(widget.app_info, 1, ctrl_is_pressed, shift_is_pressed)
-
-		self.toggle_app_button(widget, False)
-
-
-	# TODO MVC this out of Cardapio
-	def on_app_button_button_pressed(self, widget, event):
-		"""
-		Respond to mouse click events onto app buttons. Either launch an app or
-		show context menu depending on the button pressed.
-		"""
-
-		# avoid left-click activating the button twice, since single-left-click
-		# is already handled in the on_app_button_clicked() method
-		if event.button == 1: return 
-
-		# toggle app buttons that are right-clicked
-		if event.button == 3:
-			self.toggle_app_button(widget, True)
-
-		else:
-			self.toggle_app_button(widget, False)
-
-		self.clicked_app_button = widget
-		self.cardapio.handle_app_clicked(widget.app_info, event.button, False, False)
-
-
-	def on_view_mode_toggled(self, widget):
-		"""
-		Handler for when the "system menu" button is toggled
-		"""
-
-		if self.auto_toggled_view_mode_button:
-			self.auto_toggled_view_mode_button = False
-			return True
-
-		self.cardapio.handle_view_mode_toggled(widget.get_active())
-
-
-	# This method is required by the View API
 	def set_view_mode_button_toggled(self, state):
 		"""
 		Toggle the "view mode" button, which switches between "app view" and
@@ -666,7 +307,6 @@ class CardapioGtkView(CardapioViewInterface):
 			self.view_mode_button.set_active(state)
 
 
-	# This method is required by the View API
 	def show_view_mode_button(self):
 		"""
 		Shows the "view mode" button, which switches between "app view" and
@@ -681,7 +321,6 @@ class CardapioGtkView(CardapioViewInterface):
 		self.get_widget('SideappViewport').show()
 
 
-	# This method is required by the View API
 	def hide_view_mode_button(self):
 		"""
 		Hides the "view mode" button, which switches between "app view" and
@@ -691,7 +330,6 @@ class CardapioGtkView(CardapioViewInterface):
 		self.view_mode_button.hide()
 
 
-	# This method is required by the View API
 	def set_main_splitter_position(self, position):
 		"""
 		Set the position of the "splitter" which separates the sidepane from the
@@ -701,7 +339,6 @@ class CardapioGtkView(CardapioViewInterface):
 		self.main_splitter.set_position(position)
 
 
-	# This method is required by the View API
 	def get_main_splitter_position(self):
 		"""
 		Get the position of the "splitter" which separates the sidepane from the
@@ -711,7 +348,6 @@ class CardapioGtkView(CardapioViewInterface):
 		return self.main_splitter.get_position()
 
 
-	# This method is required by the View API
 	def get_window_size(self):
 		"""
 		Get the width and height of the Cardapio window
@@ -720,7 +356,6 @@ class CardapioGtkView(CardapioViewInterface):
 		return list(self.main_window.get_size())
 
 
-	# This method is required by the View API
 	def get_window_position(self):
 		"""
 		Get the x,y coordinates of the top-left corner of the Cardapio window
@@ -728,7 +363,6 @@ class CardapioGtkView(CardapioViewInterface):
 		return self.main_window.get_position()
 
 
-	# This method is required by the View API
 	def apply_settings(self):
 		"""
 		Setup UI elements from the set of preferences that are accessible
@@ -765,71 +399,6 @@ class CardapioGtkView(CardapioViewInterface):
 		self.toggle_mini_mode_ui(update_window_size = False)
 
 
-	def on_dialog_close(self, dialog, response = None):
-		"""
-		Handler for when a dialog's X button is clicked. This is used for the
-		"About" and "Open in terminal?" dialogs for example.
-		"""
-
-		dialog.hide()
-		return True
-
-
-	def on_mainwindow_after_key_pressed(self, widget, event):
-		"""
-		Send all keypresses to the search entry, so the user can search
-		from anywhere without the need to focus the search entry first
-		"""
-
-		w = self.main_window.get_focus()
-
-		if w != self.search_entry and w == self.previously_focused_widget:
-
-			if event.is_modifier: return
-			if self.handle_if_key_combo(event): return
-
-			# Catch it when the user pressed Shift-Enter and Ctrl-Enter when
-			# focused on a button
-			if event.keyval == gtk.gdk.keyval_from_name('Return'):
-				self.on_app_button_clicked(w)
-				return
-
-			self.main_window.set_focus(self.search_entry)
-			self.search_entry.set_position(len(self.search_entry.get_text()))
-			
-			self.search_entry.emit('key-press-event', event)
-
-		else:
-			self.previously_focused_widget = None
-
-
-	def handle_if_key_combo(self, event):
-		"""
-		If the event describes a key combo (a regular key plus Alt or Ctrl),
-		this method tells the model to process the combo, and returns True.
-		Otherwise, returns False.
-		"""
-
-		if event.state & gtk.gdk.MOD1_MASK: 
-			if 48 <= event.keyval <= 57: 
-				self.cardapio.handle_special_key_pressed(key = event.keyval - 48, alt = True)
-				return True
-
-		return False
-
-
-	def on_mainwindow_key_pressed(self, widget, event):
-		"""
-		This is a trick to make sure the user isn't already typing at the
-		search entry when we redirect all keypresses to the search entry.
-		Because that would enter two of each key.
-		"""
-
-		if self.main_window.get_focus() != self.search_entry:
-			self.previously_focused_widget = self.main_window.get_focus()
-
-
-	# This method is required by the View API
 	def get_cursor_coordinates(self):
 		"""
 		Returns the x,y coordinates of the mouse cursor with respect
@@ -839,21 +408,6 @@ class CardapioGtkView(CardapioViewInterface):
 		return mouse_x, mouse_y
 
 
-	def is_cursor_inside_window(self, window):
-		"""
-		Returns True if the mouse cursor is inside the given window. False
-		otherwise.
-		"""
-
-		mouse_x, mouse_y = self.get_cursor_coordinates()
-
-		x0, y0 = window.get_position()
-		w, h = list(window.get_size())
-
-		return (x0 <= mouse_x <= x0+w and y0 <= mouse_y <= y0+h)
-
-
-	# This method is required by the View API
 	def get_monitor_dimensions(self, x, y):
 		"""
 		Returns the dimensions of the monitor that contains the point x,y.  It
@@ -866,7 +420,6 @@ class CardapioGtkView(CardapioViewInterface):
 		return monitor_dimensions
 
 
-	# This method is required by the View API
 	def get_screen_dimensions(self):
 		"""
 		Returns usable dimensions of the current desktop in a form of
@@ -892,6 +445,1204 @@ class CardapioGtkView(CardapioViewInterface):
 		return (screen_x, screen_y, screen_width, screen_height)
 
 
+	def is_window_visible(self):
+		"""
+		Returns True if the main window is visible
+		"""
+		return self.main_window.get_visible()
+
+
+	def is_search_entry_empty(self):
+		"""
+		Returns True if the search entry is empty.
+		"""
+
+		return (len(self.search_entry.get_text().strip()) == 0)
+
+
+	def focus_first_visible_app(self):
+		"""
+		Focuses the first visible button in the app pane.
+		"""
+
+		first_app_widget = self._get_nth_visible_app_widget(1)
+		if first_app_widget is not None:
+			self.main_window.set_focus(first_app_widget)
+
+
+	def get_nth_visible_app(self, n):
+		"""
+		Returns the app_info for the nth app in the right pane, if any.
+		"""
+		widget = self._get_nth_visible_app_widget(n)
+		if widget is None: return None
+		return widget.app_info
+
+
+	def get_selected_app(self):
+		"""
+		Returns the button for the selected app (that is, the one that has
+		keyboard focus) if any.
+		"""
+
+		widget = self.previously_focused_widget
+
+		if (type(widget) is gtk.ToggleButton and 'app_info' in dir(widget)):
+			return widget.app_info
+
+		return None
+
+
+	def place_text_cursor_at_end(self):
+		"""
+		Places the text cursor at the end of the search entry's text
+		"""
+
+		self.search_entry.set_position(-1)
+
+
+	def hide_no_results_text(self):
+		"""
+		Hide the "No results to show" text
+		"""
+
+		self.no_results_section.hide()
+
+
+	def scroll_to_top(self):
+		"""
+		Scroll to the top of the app pane
+		"""
+
+		self.scroll_adjustment.set_value(0)
+
+
+	def show_no_results_text(self, text = None):
+		"""
+		Show the "No results to show" text
+		"""
+
+		if text is None: text = self.cardapio.no_results_text
+
+		self.no_results_label.set_text(text)
+		self.no_results_section.show()
+
+
+	def show_navigation_buttons(self):
+		"""
+		Shows the row of navigation buttons on top of the main app pane.
+		"""
+		self.navigation_buttons_pane.show()
+		self.mainpane_separator.show()
+
+		# This is a hackish way to solve a bug, where adding a '/' to a folder
+		# from a Tracker result would not jump into it. We need to run this line
+		# somewhere before processing a subfolder, so we're doing it here.
+		self.previously_focused_widget = None
+
+
+	def hide_navigation_buttons(self):
+		"""
+		Shows the row of navigation buttons on top of the main app pane.
+		"""
+		self.navigation_buttons_pane.hide()
+		self.mainpane_separator.hide()
+
+
+	def add_app_button(self, button_str, icon_name, pane_or_section, tooltip):
+		"""
+		Adds a button to the app pane, and returns a handler to it
+		"""
+		return self._add_button(button_str, icon_name, pane_or_section, tooltip, self.APP_BUTTON)
+
+
+	def add_category_button(self, button_str, icon_name, pane_or_section, section, tooltip):
+		"""
+		Adds a toggle-button to the category pane, and returns a handler to it
+		"""
+
+		sidebar_button = self._add_button(button_str, icon_name, pane_or_section, tooltip, self.CATEGORY_BUTTON)
+		sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section)
+		return sidebar_button
+
+
+	def add_session_button(self, button_str, icon_name, pane_or_section, tooltip):
+		"""
+		Adds a button to the session pane, and returns a handler to it
+		"""
+		return self._add_button(button_str, icon_name, pane_or_section, tooltip, self.SESSION_BUTTON)
+
+
+	def add_sidepane_button(self, button_str, icon_name, pane_or_section, tooltip):
+		"""
+		Adds a button to the sidepane, and returns a handler to it
+		"""
+		return self._add_button(button_str, icon_name, pane_or_section, tooltip, self.SIDEPANE_BUTTON)
+
+
+	def hide_button(self, button):
+		"""
+		Hides a button
+		"""
+		button.hide()
+
+
+	def setup_button_drag_and_drop(self, button, is_desktop_file):
+		"""
+		Sets up the event handlers for drag-and-drop
+		"""
+
+		if is_desktop_file:
+			button.drag_source_set(
+					gtk.gdk.BUTTON1_MASK,
+					[('text/uri-list', 0, 0)],
+					gtk.gdk.ACTION_COPY)
+		else:
+			button.drag_source_set(
+					gtk.gdk.BUTTON1_MASK,
+					[('text/uri-list', 0, 0)],
+					gtk.gdk.ACTION_LINK)
+
+		button.connect('drag-begin', self.on_app_button_drag_begin)
+		button.connect('drag-data-get', self.on_app_button_data_get)
+		# TODO: drag and drop to reorganize pinned items
+
+
+	def get_section_from_button(self, button):
+		"""
+		Returns a unique handler describing the section that a given app button
+		belongs to
+		"""
+
+		# NOTE: IF THERE ARE CHANGES IN THE UI FILE, THIS MAY PRODUCE
+		# HARD-TO-FIND BUGS!!
+
+		return button.parent.parent.parent
+
+
+	def pre_build_ui(self):
+		"""
+		Prepares the UI before building any of the actual content-related widgets
+		"""
+
+		self._read_gui_theme_info()
+
+		# the ui is already built by ui file, so we just clear it here
+		self._remove_all_children(self.APPLICATION_PANE)
+		self._remove_all_children(self.RIGHT_SESSION_PANE)
+		self._remove_all_children(self.LEFT_SESSION_PANE)
+
+
+	def post_build_ui(self):
+		"""
+		Performs operations after building the actual content-related widgets
+		"""
+
+		# TODO: this is nitpicky, but we should do something here to preload the
+		# window, so that it doesn't flash a grey rectangle on the first time
+		# cardapio is shown
+		pass
+
+
+	def build_all_sections_sidebar_buttons(self, title, tooltip):
+		"""
+		Creates the "All sections" buttons for both the regular and system modes
+		"""
+
+		# "All" button for the regular menu
+		button = self._add_button(title, None, self.CATEGORY_PANE, tooltip, self.CATEGORY_BUTTON)
+		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
+		self.all_sections_sidebar_button = button
+		self.set_sidebar_button_toggled(button, True)
+		self.all_sections_sidebar_button.set_sensitive(False)
+
+		# "All" button for the system menu
+		button = self._add_button(title, None, self.SYSTEM_CATEGORY_PANE, tooltip, self.CATEGORY_BUTTON)
+		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
+		self.all_system_sections_sidebar_button = button
+		self.set_sidebar_button_toggled(button, True)
+		self.all_system_sections_sidebar_button.set_sensitive(False)
+
+
+	def build_no_results_section(self):
+		"""
+		Creates the section that will be used to display the "No results to show" text
+		"""
+
+		section, label = self.add_application_section('Dummy text')
+		self.no_results_section = section
+		self.no_results_label = label
+		self.hide_no_results_text()
+
+
+	def build_subfolders_section(self, title, tooltip):
+		"""
+		Creates the Folder Contents section to the app pane
+		"""
+
+		section, label = self.cardapio.add_section(title, 'system-file-manager', tooltip = tooltip, hidden_when_no_query = True)
+		self.SUBFOLDERS_SECTION = section
+		self.subfolders_label = label
+
+
+	def build_uncategorized_section(self, title, tooltip):
+		"""
+		Creates the Uncategorized section to the app pane
+		"""
+
+		section, dummy = self.cardapio.add_section(title, 'applications-other', tooltip = tooltip, hidden_when_no_query = True)
+		self.UNCATEGORIZED_SECTION = section
+
+
+	def build_session_section(self, title, tooltip):
+		"""
+		Creates the Session section to the app pane
+		"""
+
+		section, dummy = self.cardapio.add_section(title, 'session-properties', hidden_when_no_query = True)
+		self.SESSION_SECTION = section
+
+
+	def build_system_section(self, title, tooltip):
+		"""
+		Creates the System section to the app pane
+		"""
+
+		section, dummy = self.cardapio.add_section(title, 'applications-system', hidden_when_no_query = True)
+		self.SYSTEM_SECTION = section
+
+
+	def build_places_section(self, title, tooltip):
+		"""
+		Creates the Places section to the app pane
+		"""
+		
+		section, dummy = self.cardapio.add_section(title, 'folder', tooltip = tooltip, hidden_when_no_query = False)
+		self.PLACES_SECTION = section
+
+
+	def build_pinneditems_section(self, title, tooltip):
+		"""
+		Creates the Pinned Items section to the app pane
+		"""
+
+		section, dummy = self.cardapio.add_section(title, 'emblem-favorite', tooltip = tooltip, hidden_when_no_query = False)
+		self.FAVORITES_SECTION = section
+
+
+	def build_sidepane_section(self, title, tooltip):
+		"""
+		Creates the Side Pane section to the app pane
+		"""
+
+		section, dummy = self.cardapio.add_section(title, 'emblem-favorite', tooltip = tooltip, hidden_when_no_query = True)
+		self.SIDEPANE_SECTION = section
+
+
+	def remove_about_context_menu_items(self):
+		"""
+		Removes "About Gnome" and "About %distro" from Cardapio's context menu
+		"""
+
+		self.get_widget('AboutGnomeMenuItem').set_visible(False)
+		self.get_widget('AboutDistroMenuItem').set_visible(False)
+
+
+	def show_window_frame(self):
+		"""
+		Shows the window frame around Cardapio
+		"""
+		self.main_window.set_decorated(True)
+		self.main_window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
+		self.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
+
+
+	def hide_window_frame(self):
+		"""
+		Hides the window frame around Cardapio
+		"""
+		self.main_window.set_decorated(False)
+		self.main_window.set_deletable(True) 
+		self.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_IN)
+
+
+	def remove_all_buttons_from_section(self, section):
+		"""
+		Removes all buttons from a given section 
+		"""
+
+		container = self._get_button_container_from_section(section)
+		if container is None: return
+		for	child in container.get_children():
+			container.remove(child)
+		# TODO: for speed, remove/readd container from its parent instead of
+		# removing each child!
+
+
+	def remove_all_buttons_from_category_panes(self):
+		"""
+		Removes all buttons from both the regular and system category panes
+		(i.e. the category filter lists)
+		"""
+		
+		for	child in self.CATEGORY_PANE.get_children(): self.CATEGORY_PANE.remove(child)
+		for	child in self.SYSTEM_CATEGORY_PANE.get_children(): self.SYSTEM_CATEGORY_PANE.remove(child)
+
+
+	def toggle_mini_mode_ui(self, update_window_size = True):
+		"""
+		Collapses the sidebar into a row of small buttons (i.e. minimode)
+		"""
+
+		category_buttons = self.CATEGORY_PANE.get_children() +\
+				self.SYSTEM_CATEGORY_PANE.get_children() + self.SIDE_PANE.get_children()
+
+		if self.cardapio.settings['mini mode']:
+
+			for category_button in category_buttons:
+				category_button.child.child.get_children()[1].hide()
+
+			try:
+				self.session_button_locksys.child.child.get_children()[1].hide()
+				self.session_button_logout.child.child.get_children()[1].hide()
+			except:
+				pass
+
+			self.RIGHT_SESSION_PANE.set_homogeneous(False)
+
+			self.get_widget('ViewLabel').set_size_request(0, 0) # required! otherwise a weird margin appears
+			self.get_widget('ViewLabel').hide()
+			self.get_widget('ControlCenterLabel').hide()
+			self.get_widget('ControlCenterArrow').hide()
+			self.get_widget('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
+
+			padding = self.fullsize_mode_padding
+			self.get_widget('CategoryMargin').set_padding(0, padding[1], padding[2], padding[3])
+
+			self.get_widget('TopLeftSearchSlabMargin').hide()    # these are required, to make sure the splitter
+			self.get_widget('BottomLeftSearchSlabMargin').hide() # ...moves all the way to the left
+			sidepane_margin = self.get_widget('SidePaneMargin')
+			#self.set_main_splitter_position(0)
+
+			# hack to make sure the viewport resizes to the minisize correctly
+			self.get_widget('SideappViewport').hide()
+			self.get_widget('SideappViewport').show()
+			#self.LEFT_SESSION_PANE.hide()
+			#self.LEFT_SESSION_PANE.show()
+			#self.RIGHT_SESSION_PANE.hide()
+			#self.RIGHT_SESSION_PANE.show()
+
+			if update_window_size:
+				self.cardapio.settings['window size'][0] -= self.get_main_splitter_position()
+
+		else:
+
+			for category_button in category_buttons:
+				category_button.child.child.get_children()[1].show()
+
+			try:
+				self.session_button_locksys.child.child.get_children()[1].show()
+				self.session_button_logout.child.child.get_children()[1].show()
+			except:
+				pass
+
+			self.RIGHT_SESSION_PANE.set_homogeneous(True)
+
+			self.get_widget('ViewLabel').set_size_request(-1, -1)
+			self.get_widget('ViewLabel').show()
+			self.get_widget('ControlCenterLabel').show()
+			self.get_widget('ControlCenterArrow').show()
+			self.get_widget('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
+
+			self.get_widget('CategoryMargin').set_padding(*self.fullsize_mode_padding)
+			
+			self.set_main_splitter_position(self.cardapio.settings['splitter position'])
+
+			if update_window_size:
+				self.cardapio.settings['window size'][0] += self.get_main_splitter_position()
+
+
+	def setup_search_entry(self, place_at_top, place_at_left):
+		"""
+		Hides 3 of the 4 search entries and returns the visible entry.
+		"""
+
+		text = self.search_entry.get_text()
+
+		self.get_widget('TopLeftSearchSlabMargin').hide()
+		self.get_widget('BottomLeftSearchSlabMargin').hide()
+		self.get_widget('TopRightSearchSlabMargin').hide()
+		self.get_widget('BottomRightSearchSlabMargin').hide()
+
+		if place_at_top:
+			if place_at_left:
+				self.search_entry = self.get_widget('TopLeftSearchEntry')
+				self.get_widget('TopLeftSearchSlabMargin').show()
+			else:
+				self.search_entry = self.get_widget('TopRightSearchEntry')
+				self.get_widget('TopRightSearchSlabMargin').show()
+		else:
+			if place_at_left:
+				self.search_entry = self.get_widget('BottomLeftSearchEntry')
+				self.get_widget('BottomLeftSearchSlabMargin').show()
+			else:
+				self.search_entry = self.get_widget('BottomRightSearchEntry')
+				self.get_widget('BottomRightSearchSlabMargin').show()
+
+		self.search_entry.handler_block_by_func(self.on_search_entry_changed)
+		self.search_entry.set_text(text)
+		self.search_entry.handler_unblock_by_func(self.on_search_entry_changed)
+
+
+	def focus_search_entry(self):
+		"""
+		Focuses the search entry
+		"""
+
+		self.main_window.set_focus(self.search_entry)
+
+
+	def show_section_status_text(self, section, text):
+		"""
+		Shows some status text inside a section (for instance, this is called to
+		write the "loading..." text for slow plugins).
+		"""
+
+		self.remove_all_buttons_from_section(section)
+
+		label = gtk.Label(text)
+		label.set_alignment(0, 0.5)
+		label.set_sensitive(False)
+		label.show()
+
+		section_contents = section.get_children()[0].get_children()[0]
+		section_contents.pack_start(label, expand = False, fill = False)
+		section_contents.show()
+
+
+	def run_in_ui_thread(self, function, *args, **kwargs):
+		"""
+		Runs a function making sure that no other thread can write to the UI.
+		"""
+		gtk.gdk.threads_enter()
+		function(*args, **kwargs)
+		gtk.gdk.threads_leave()
+
+
+	def add_application_section(self, section_title):
+		"""
+		Adds a new section to the applications pane
+		"""
+
+		section_contents = gtk.VBox(homogeneous = True)
+
+		section_margin = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
+		section_margin.add(section_contents)
+		section_margin.set_padding(0, 0, 0, 0)
+
+		label = gtk.Label()
+		label.set_use_markup(True)
+		label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
+		label.set_padding(0, 4)
+		label.set_attributes(self.section_label_attributes)
+
+		if section_title is not None:
+			label.set_text(section_title)
+
+		section = gtk.Frame()
+		section.set_label_widget(label)
+		section.set_shadow_type(gtk.SHADOW_NONE)
+		section.add(section_margin)
+
+		section.show_all()
+
+		self.APPLICATION_PANE.pack_start(section, expand = False, fill = False)
+
+		return section, label
+
+
+	def show_pane(self, pane):
+		"""
+		Show the pane given by one of the *_PANE constants
+		"""
+		pane.show()
+
+
+	def hide_pane(self, pane):
+		"""
+		Hide the pane given by one of the *_PANE constants
+		"""
+		pane.hide()
+
+
+	def show_button(self, button):
+		"""
+		Show the given button 
+		"""
+		button.show()
+
+
+	def hide_button(self, button):
+		"""
+		Hide the given button
+		"""
+		button.hide()
+
+
+	def resize_main_window(self, width, height):
+		"""
+		Resizes the main Cardapio window
+		"""
+		self.main_window.resize(width, height)
+
+
+	def move_main_window(self, x, y, anchor_right, anchor_bottom):
+		"""
+		Moves the main Cardapio window, obeying the anchor_* booleans
+		"""
+
+		if anchor_right:
+			if anchor_bottom: self.main_window.set_gravity(gtk.gdk.GRAVITY_SOUTH_EAST)
+			else: self.main_window.set_gravity(gtk.gdk.GRAVITY_NORTH_EAST)
+
+		else:
+			if anchor_bottom: self.main_window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
+			else: self.main_window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
+
+		# There has been a regression in Ubuntu 11.04, so I'm making the hack permanent. Ugh.
+		#if gtk.ver[0] == 2 and gtk.ver[1] <= 21 and gtk.ver[2] < 5:
+		if True:
+			self._move_main_window_with_gravity_hack(x, y)
+		else:
+			self.main_window.move(x, y)
+
+
+	def set_subfolder_section_title(self, title):
+		"""
+		Sets the title of the subfolder section
+		"""
+		self.subfolders_label.set_text(title)
+
+
+	def show_rebuild_required_bar(self):
+		"""
+		Shows the "rebuild required" bar, which allows the user to click the
+		"reload" button, which rebuilds all of Cardapio's menus
+		"""
+		self.get_widget('ReloadMessageBar').show()
+
+
+	def hide_rebuild_required_bar(self):
+		"""
+		Hide the "rebuild required" bar.
+		"""
+		self.get_widget('ReloadMessageBar').hide()
+
+
+	def set_screen(self, screen_number):
+		"""
+		Sets the screen where the view will be shown (given as an integer)
+		"""
+		self.screen = self.display.get_screen(screen_number)
+		self.root_window = self.screen.get_root_window()
+
+
+	def get_screen_with_pointer(self):
+		"""
+		Returns the number of the screen that currently contains the mouse
+		pointer
+		"""
+		screen, dummy, dummy, dummy = self.display.get_pointer()
+		return screen.get_number()
+
+
+	def place_text_cursor_at_end(self):
+		"""
+		Places the text cursor at the end of the text entry
+		"""
+		self.search_entry.set_position(-1)
+
+
+	def hide_section(self, section):
+		"""
+		Hides a given application section
+		"""
+		section.hide()
+
+
+	def hide_sections(self, sections):
+		"""
+		Hides the application sections listed in the array "sections"
+		"""
+		for section in sections: section.hide()
+
+
+	def clear_search_entry(self):
+		"""
+		Removes all text from the search entry.
+		"""
+		self.search_entry.set_text('')
+
+
+	def set_search_entry_text(self, text):
+		"""
+		Removes all text from the search entry.
+		"""
+		self.search_entry.set_text(text)
+
+
+	def get_search_entry_text(self):
+		"""
+		Gets the text that is currently displayed in the search entry, formatted
+		in UTF8.
+		"""
+
+		text = self.search_entry.get_text()
+		return unicode(text, 'utf-8')
+
+
+	def show_message_window(self):
+		"""
+		Show the "Rebuilding..." message window
+		"""
+
+		main_window_width, main_window_height = self.main_window.get_size()
+		message_width, message_height = self.message_window.get_size()
+
+		offset_x = (main_window_width  - message_width) / 2
+		offset_y = (main_window_height - message_height) / 2
+
+		x, y = self.main_window.get_position()
+		self.message_window.move(x + offset_x, y + offset_y)
+
+		self.message_window.set_keep_above(True)
+		self._show_window_on_top(self.message_window)
+
+		# ensure window is rendered immediately
+		gtk.gdk.flush()
+		while gtk.events_pending():
+			gtk.main_iteration()
+
+
+	def hide_message_window(self):
+		"""
+		Hide the "Rebuilding..." message window
+		"""
+
+		self.message_window.hide()
+
+		# ensure window is hidden immediately
+		gtk.gdk.flush()
+		while gtk.events_pending():
+			gtk.main_iteration()
+
+
+	def show_main_window(self):
+		"""
+		Shows Cardapio's main window
+		"""
+
+		self._show_window_on_top(self.main_window)
+
+		# NOTE: I would love to use keyboard_grab rather than have to keep track
+		# of opened_last_app_in_background in Cardapio.py, especially because
+		# that approach breaks with some apps like Firefox. However, using
+		# keyboard_grab introduces tons of issues itself. For instance, it
+		# blocks mouse clicks outside of Cardapio from closing the Cardapio
+		# window. It also blocks the shortcut key from being used to close
+		# Cardapio. In sum, this whole situation is a mess. And it would be
+		# great if someone could help...
+
+		#gtk.gdk.keyboard_grab(self.main_window.window)
+		#gtk.gdk.pointer_grab(self.main_window.window, True, gtk.gdk.BUTTON_PRESS_MASK)
+
+
+	def hide_main_window(self):
+		"""
+		Hides Cardapio's main window
+		"""
+
+		# see the note in show_main_window()
+		#gtk.gdk.pointer_ungrab(0)
+		#gtk.gdk.keyboard_ungrab(0)
+
+		self.main_window.hide()
+
+
+	def open_about_dialog(self):
+		"""
+		Shows the "About" dialog
+		"""
+
+		self.about_dialog.show()
+
+
+	def show_executable_file_dialog(self, primary_text, secondary_text, hide_terminal_option):
+		"""
+		Opens a dialog similar to the one in Nautilus, that asks whether an
+		executable script should be launched or edited.
+		"""
+
+		primary_text = '<big><b>' + primary_text + '</b></big>'
+
+		self.get_widget('ExecutableDialogPrimaryText').set_markup(primary_text)
+		self.get_widget('ExecutableDialogSecondaryText').set_text(secondary_text)
+
+		if hide_terminal_option:
+			self.get_widget('ExecutableDialogRunInTerminal').hide()
+
+		self.executable_file_dialog.set_focus(self.get_widget('ExecutableDialogCancel'))
+
+		response = self.executable_file_dialog.run()
+		self.executable_file_dialog.hide()
+
+		return response
+
+
+	def block_focus_out_event(self):
+		"""
+		Blocks the focus-out event
+		"""
+
+		if not self.focus_out_blocked:
+			self.main_window.handler_block_by_func(self.on_mainwindow_focus_out)
+			self.main_window.handler_block_by_func(self.on_mainwindow_cursor_leave)
+			self.focus_out_blocked = True
+
+
+	# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+	# Private methods
+
+	def _read_gui_theme_info(self):
+		"""
+		Reads some info from the GTK theme to better adapt to it 
+		"""
+
+		dummy_window = gtk.Window()
+		dummy_window.set_name('ApplicationPane')
+		dummy_window.realize()
+		app_style = dummy_window.get_style()
+		self.style_app_button_bg = app_style.base[gtk.STATE_NORMAL]
+		self.style_app_button_fg = app_style.text[gtk.STATE_NORMAL]
+		self.get_widget('ScrolledViewport').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
+		self.get_widget('NavigationButtonsBackground').modify_bg(gtk.STATE_NORMAL, self.style_app_button_bg)
+
+		# TODO: I would love to assign some existing theme color on ReloadMessageBar,
+		# but I don't know which color I can use for this. Is there a named
+		# "message bar" color, that is used by Evince, for instance?
+		#
+		# self.get_widget('ReloadMessageBar').modify_bg(gtk.STATE_NORMAL, ??)
+		# self.get_widget('ReloadMessageBar').modify_fg(gtk.STATE_NORMAL, ??)
+
+
+	def _show_window_on_top(self, window):
+		"""
+		Place the Cardapio window on top of all others
+		"""
+
+		window.stick()
+		window.set_screen(self.screen)
+		window.show_now()
+
+		# for compiz, this must take place twice!!
+		window.present_with_time(int(time()))
+		window.present_with_time(int(time()))
+
+		# for metacity, this is required!!
+		window.window.focus()
+
+
+	def _toggle_app_button(self, widget, state):
+		"""
+		Toggles/untoggles a given app button
+		"""
+		widget.handler_block_by_func(self.on_app_button_clicked)
+		widget.set_active(state)
+		widget.handler_unblock_by_func(self.on_app_button_clicked)
+
+
+	def _handle_if_key_combo(self, event):
+		"""
+		If the event describes a key combo (a regular key plus Alt or Ctrl),
+		this method tells the model to process the combo, and returns True.
+		Otherwise, returns False.
+		"""
+
+		if event.state & gtk.gdk.MOD1_MASK: 
+			if 48 <= event.keyval <= 57: 
+				self.cardapio.handle_special_key_pressed(key = event.keyval - 48, alt = True)
+				return True
+
+		return False
+
+
+	def _is_cursor_inside_window(self, window):
+		"""
+		Returns True if the mouse cursor is inside the given window. False
+		otherwise.
+		"""
+
+		mouse_x, mouse_y = self.get_cursor_coordinates()
+
+		x0, y0 = window.get_position()
+		w, h = list(window.get_size())
+
+		return (x0 <= mouse_x <= x0+w and y0 <= mouse_y <= y0+h)
+
+
+	def _get_nth_visible_app_widget(self, n = 1):
+		"""
+		Returns the nth app in the right pane, if any.
+		"""
+
+		for section in self.APPLICATION_PANE.get_children():
+			if not section.get_visible(): continue
+
+			# NOTE: the following line depends on the UI file. If the file is
+			# changed, this may raise an exception:
+
+			for child in section.get_children()[0].get_children()[0].get_children():
+				if not child.get_visible(): continue
+				if type(child) != gtk.ToggleButton: continue
+
+				n = n - 1
+				if n == 0: return child
+
+		return None
+
+
+	def _add_button(self, button_str, icon_name, pane_or_section, tooltip, button_type):
+		# TODO MVC: break this into add_app_button, add_sidebar_button, etc., so
+		# it's easier to implement app buttons that are different from sidebar
+		# ones.
+		"""
+		Adds a button to a parent container and returns a handler to it, which
+		will be treated by the Controller as a constant (i.e. will never be
+		modified).
+		"""
+
+		button = gtk.ToggleButton()
+		label = gtk.Label(button_str)
+
+		if button_type == self.APP_BUTTON:
+			icon_size_pixels = self.cardapio.icon_helper.icon_size_app
+			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
+			button.connect('clicked', self.on_app_button_clicked)
+			button.connect('button-press-event', self.on_app_button_button_pressed)
+			button.connect('focus-in-event', self.on_app_button_focused)
+			parent_widget = self._get_button_container_from_section(pane_or_section)
+
+			# TODO: figure out how to set max width so that it is the best for
+			# the window and font sizes
+			#layout = label.get_layout()
+			#extents = layout.get_pixel_extents()
+			#label.set_ellipsize(ELLIPSIZE_END)
+			#label.set_max_width_chars(20)
+
+		else:
+			parent_widget = pane_or_section
+			icon_size_pixels = self.cardapio.icon_helper.icon_size_category
+
+			if button_type == self.SIDEPANE_BUTTON:
+				icon_size_pixels = self.cardapio.icon_helper.icon_size_category
+				button.connect('clicked', self.on_app_button_clicked)
+				button.connect('button-press-event', self.on_app_button_button_pressed)
+				button.connect('focus-in-event', self.on_app_button_focused)
+
+			elif button_type == self.SESSION_BUTTON:
+				icon_size_pixels = self.cardapio.icon_helper.icon_size_category
+				button.connect('clicked', self.on_app_button_clicked)
+
+		icon_pixbuf = self.cardapio.icon_helper.get_icon_pixbuf(icon_name, icon_size_pixels)
+		icon = gtk.image_new_from_pixbuf(icon_pixbuf)
+
+		hbox = gtk.HBox()
+		hbox.add(icon)
+		hbox.add(label)
+		hbox.set_spacing(5)
+		hbox.set_homogeneous(False)
+
+		align = gtk.Alignment(0, 0.5)
+		align.add(hbox)
+
+		if tooltip: button.set_tooltip_text(tooltip)
+
+		button.add(align)
+		button.set_relief(gtk.RELIEF_NONE)
+		button.set_use_underline(False)
+
+		button.show_all()
+		parent_widget.pack_start(button, expand = False, fill = False)
+
+		return button
+
+
+	def _get_button_container_from_section(self, section):
+		"""
+		Returns a SectionContents widget given a SectionSlab. (SectionContents
+		is the child of SectionMargin which is the child of SectionSlab. All app
+		buttons are contained inside a SectionContents widget. The only exception
+		is the SideappPane widget, which is its own button container)
+		"""
+
+		if section == self.SIDE_PANE: return section
+		try:
+			return section.get_children()[0].get_children()[0]
+		except:
+			return None
+
+
+	def _remove_all_children(self, container):
+		"""
+		Removes all children from a GTK container
+		"""
+		
+		for child in container: container.remove(child)
+
+
+	def _get_ctrl_key_state(self):
+		"""
+		Returns True if the CTRL key is pressed, and False otherwise.
+		"""
+		return (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
+
+
+	def _get_shift_key_state(self):
+		"""
+		Returns True if the SHIFT key is pressed, and False otherwise.
+		"""
+		return (gtk.get_current_event().state & gtk.gdk.SHIFT_MASK == gtk.gdk.SHIFT_MASK)
+
+
+	def _move_main_window_with_gravity_hack(self, x, y):
+		"""
+		For some reason, GTK 2.20.x in Ubuntu 10.04 (Lucid) does not 
+		respect the set_gravity command, so here we fix that.
+		"""
+
+		gravity = self.main_window.get_gravity()
+		width, height = self.main_window.get_size()
+
+		if gravity == gtk.gdk.GRAVITY_NORTH_WEST:
+			pass
+
+		elif gravity == gtk.gdk.GRAVITY_NORTH_EAST:
+			x -= width
+
+		elif gravity == gtk.gdk.GRAVITY_SOUTH_WEST:
+			y -= height
+
+		elif gravity == gtk.gdk.GRAVITY_SOUTH_EAST:
+			x -= width
+			y -= height
+
+		# NOTE: There are other gravity constants in GDK, but we do not implement
+		# them here because they're not used in Cardapio.
+
+		self.main_window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
+		self.main_window.move(x, y)
+
+
+	def _get_icon_pixbuf_from_app_info(self, app_info):
+		"""
+		Get the icon pixbuf for an app given its app_info dict
+		"""
+
+		return self.cardapio.icon_helper.get_icon_pixbuf(app_info['icon name'], self.cardapio.icon_helper.icon_size_app)
+
+
+	# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+	# Callbacks
+
+	def on_gtk_settings_changed(self, gobj, property_changed):
+		"""
+		Rebuild the Cardapio UI whenever the color scheme or gtk theme change
+		"""
+
+		if property_changed.name == 'gtk-color-scheme' or property_changed.name == 'gtk-theme-name':
+			self._read_gui_theme_info()
+			self.cardapio.handle_view_settings_changed()
+
+
+	def on_mainwindow_destroy(self, *dummy):
+		"""
+		Handler for when the Cardapio window is destroyed
+		"""
+
+		self.cardapio.handle_window_destroyed()
+
+	
+	def on_all_sections_sidebar_button_clicked(self, widget):
+		"""
+		Handler for when the user clicks "All" in the sidebar
+		"""
+
+		if self.auto_toggled_sidebar_button:
+			self.auto_toggled_sidebar_button = False
+			return True
+
+		self.cardapio.handle_section_all_clicked()
+
+	
+	def on_sidebar_button_clicked(self, widget, section):
+		"""
+		Handler for when the user chooses a category in the sidebar
+		"""
+
+		if self.auto_toggled_sidebar_button:
+			self.auto_toggled_sidebar_button = False
+			return True
+
+		return not self.cardapio.handle_section_clicked(section)
+
+
+	def on_sidebar_button_hovered(self, widget):
+		"""
+		Handler for when the user hovers over a category in the sidebar
+		"""
+
+		widget.set_active(True)
+
+
+	def on_mainwindow_button_pressed(self, widget, event):
+		"""
+		Show context menu when the right mouse button is clicked on the main
+		window
+		"""
+
+		# TODO NOW: consider case where cursor is inside the APPLET too!
+
+		if not self._is_cursor_inside_window(self.main_window):
+			# since we grab keyboard/pointer focus, we want to make sure Cardapio hides
+			# when the user clicks outside its window
+			self.hide_main_window()
+			return False
+
+		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
+			self.block_focus_out_event()
+			self.context_menu.popup(None, None, None, event.button, event.time)
+
+
+	def on_search_entry_button_pressed(self, widget, event):
+		"""
+		Handler for when the users clicks on the search entry. We use this to
+		stop window from hiding when context menu is shown.
+		"""
+
+		if event.type == gtk.gdk.BUTTON_PRESS and event.button == 3:
+			self.block_focus_out_event()
+			glib.timeout_add(self.FOCUS_BLOCK_INTERVAL, self.unblock_focus_out_event)
+
+
+	def on_about_cardapio_clicked(self, dummy):
+		self.open_about_dialog()
+
+
+	def on_context_menu_selection_done(self, widget):
+		"""
+		Listener for when an app's context menu is closed
+		"""
+
+		widget = self.clicked_app_button
+		self._toggle_app_button(widget, False)
+
+
+	def on_app_button_clicked(self, widget):
+		"""
+		Handle the on-click event for buttons on the app list. This includes
+		the "mouse click" event and the "clicked using keyboard" event (for example,
+		when you press Enter), but not middle-clicks and right-clicks.
+		"""
+
+		ctrl_is_pressed = self._get_ctrl_key_state()
+		shift_is_pressed = self._get_shift_key_state()
+		self.cardapio.handle_app_clicked(widget.app_info, 1, ctrl_is_pressed, shift_is_pressed)
+
+		self._toggle_app_button(widget, False)
+
+
+	def on_app_button_button_pressed(self, widget, event):
+		"""
+		Respond to mouse click events onto app buttons. Either launch an app or
+		show context menu depending on the button pressed.
+		"""
+
+		# avoid left-click activating the button twice, since single-left-click
+		# is already handled in the on_app_button_clicked() method
+		if event.button == 1: return 
+
+		# toggle app buttons that are right-clicked
+		if event.button == 3:
+			self._toggle_app_button(widget, True)
+
+		else:
+			self._toggle_app_button(widget, False)
+
+		self.clicked_app_button = widget
+		self.cardapio.handle_app_clicked(widget.app_info, event.button, False, False)
+
+
+	def on_view_mode_toggled(self, widget):
+		"""
+		Handler for when the "system menu" button is toggled
+		"""
+
+		if self.auto_toggled_view_mode_button:
+			self.auto_toggled_view_mode_button = False
+			return True
+
+		self.cardapio.handle_view_mode_toggled(widget.get_active())
+
+
+	def on_dialog_close(self, dialog, response = None):
+		"""
+		Handler for when a dialog's X button is clicked. This is used for the
+		"About" and "Open in terminal?" dialogs for example.
+		"""
+
+		dialog.hide()
+		return True
+
+
+	def on_mainwindow_after_key_pressed(self, widget, event):
+		"""
+		Send all keypresses to the search entry, so the user can search
+		from anywhere without the need to focus the search entry first
+		"""
+
+		w = self.main_window.get_focus()
+
+		if w != self.search_entry and w == self.previously_focused_widget:
+
+			if event.is_modifier: return
+			if self._handle_if_key_combo(event): return
+
+			# Catch it when the user pressed Shift-Enter and Ctrl-Enter when
+			# focused on a button
+			if event.keyval == gtk.gdk.keyval_from_name('Return'):
+				self.on_app_button_clicked(w)
+				return
+
+			self.main_window.set_focus(self.search_entry)
+			self.search_entry.set_position(len(self.search_entry.get_text()))
+			
+			self.search_entry.emit('key-press-event', event)
+
+		else:
+			self.previously_focused_widget = None
+
+
+	def on_mainwindow_key_pressed(self, widget, event):
+		"""
+		This is a trick to make sure the user isn't already typing at the
+		search entry when we redirect all keypresses to the search entry.
+		Because that would enter two of each key.
+		"""
+
+		if self.main_window.get_focus() != self.search_entry:
+			self.previously_focused_widget = self.main_window.get_focus()
+
+
 	def on_mainwindow_focus_out(self, widget, event):
 
 		self.cardapio.handle_mainwindow_focus_out()
@@ -915,125 +1666,12 @@ class CardapioGtkView(CardapioViewInterface):
 	def on_search_entry_activate(self, widget):
 
 		pass
-		#ctrl_is_pressed = self.get_ctrl_key_state()
-		#shift_is_pressed = self.get_shift_key_state()
+		#ctrl_is_pressed = self._get_ctrl_key_state()
+		#shift_is_pressed = self._get_shift_key_state()
 		#self.cardapio.handle_search_entry_activate(ctrl_is_pressed, shift_is_pressed)
 
 
-	# This method is required by the View API
-	def is_window_visible(self):
-		"""
-		Returns True if the main window is visible
-		"""
-		return self.main_window.get_visible()
-
-
-	# This method is required by the View API
-	def is_search_entry_empty(self):
-		"""
-		Returns True if the search entry is empty.
-		"""
-
-		return (len(self.search_entry.get_text().strip()) == 0)
-
-
-	def get_nth_visible_app_widget(self, n = 1):
-		"""
-		Returns the nth app in the right pane, if any.
-		"""
-
-		for section in self.APPLICATION_PANE.get_children():
-			if not section.get_visible(): continue
-
-			# NOTE: the following line depends on the UI file. If the file is
-			# changed, this may raise an exception:
-
-			for child in section.get_children()[0].get_children()[0].get_children():
-				if not child.get_visible(): continue
-				if type(child) != gtk.ToggleButton: continue
-
-				n = n - 1
-				if n == 0: return child
-
-		return None
-
-
-	# This method is required by the View API
-	def focus_first_visible_app(self):
-		"""
-		Focuses the first visible button in the app pane.
-		"""
-
-		first_app_widget = self.get_nth_visible_app_widget(1)
-		if first_app_widget is not None:
-			self.main_window.set_focus(first_app_widget)
-
-
-	# This method is required by the View API
-	def get_nth_visible_app(self, n):
-		"""
-		Returns the app_info for the nth app in the right pane, if any.
-		"""
-		widget = self.get_nth_visible_app_widget(n)
-		if widget is None: return None
-		return widget.app_info
-
-
-	# This method is required by the View API
-	def get_selected_app(self):
-		"""
-		Returns the button for the selected app (that is, the one that has
-		keyboard focus) if any.
-		"""
-
-		widget = self.previously_focused_widget
-
-		if (type(widget) is gtk.ToggleButton and 'app_info' in dir(widget)):
-			return widget.app_info
-
-		return None
-
-
-	# This method is required by the View API
-	def place_text_cursor_at_end(self):
-		"""
-		Places the text cursor at the end of the search entry's text
-		"""
-
-		self.search_entry.set_position(-1)
-
-
-	# This method is required by the View API
-	def hide_no_results_text(self):
-		"""
-		Hide the "No results to show" text
-		"""
-
-		self.no_results_section.hide()
-
-
-	# This method is required by the View API
-	def scroll_to_top(self):
-		"""
-		Scroll to the top of the app pane
-		"""
-
-		self.scroll_adjustment.set_value(0)
-
-
-	# This method is required by the View API
-	def show_no_results_text(self, text = None):
-		"""
-		Show the "No results to show" text
-		"""
-
-		if text is None: text = self.cardapio.no_results_text
-
-		self.no_results_label.set_text(text)
-		self.no_results_section.show()
-
-
-	def open_about_gnome_dialog(self, widget):
+	def on_about_gnome_clicked(self, widget):
 		"""
 		Opens the "About Gnome" dialog.
 		"""
@@ -1041,7 +1679,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.cardapio.handle_about_menu_item_clicked('AboutGnome')
 
 
-	def open_about_distro_dialog(self, widget):
+	def on_about_distro_clicked(self, widget):
 		"""
 		Opens the "About %distro%" dialog
 		"""
@@ -1049,7 +1687,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.cardapio.handle_about_menu_item_clicked('AboutDistro')
 
 
-	def open_options_dialog(self, *dummy):
+	def on_options_menu_item_clicked(self, *dummy):
 		"""
 		Opens Cardapio's options dialog	
 		"""
@@ -1057,7 +1695,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.cardapio.open_options_dialog()
 
 
-	def launch_edit_app(self, *dummy):
+	def on_edit_menu_item_clicked(self, *dummy):
 		"""
 		Open the menu editor app
 		"""
@@ -1083,11 +1721,11 @@ class CardapioGtkView(CardapioViewInterface):
 			self.cardapio.handle_search_entry_escape_pressed()
 
 		elif event.keyval == gtk.gdk.keyval_from_name('Return'):
-			ctrl_is_pressed = self.get_ctrl_key_state()
-			shift_is_pressed = self.get_shift_key_state()
+			ctrl_is_pressed = self._get_ctrl_key_state()
+			shift_is_pressed = self._get_shift_key_state()
 			self.cardapio.handle_search_entry_activate(ctrl_is_pressed, shift_is_pressed)
 
-		elif self.handle_if_key_combo(event): 
+		elif self._handle_if_key_combo(event): 
 			# this case is handled inherently by the handle_* function above
 			pass 
 
@@ -1197,30 +1835,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.cardapio.handle_back_button_clicked()
 
 
-	# This method is required by the View API
-	def show_navigation_buttons(self):
-		"""
-		Shows the row of navigation buttons on top of the main app pane.
-		"""
-		self.navigation_buttons_pane.show()
-		self.mainpane_separator.show()
-
-		# This is a hackish way to solve a bug, where adding a '/' to a folder
-		# from a Tracker result would not jump into it. We need to run this line
-		# somewhere before processing a subfolder, so we're doing it here.
-		self.previously_focused_widget = None
-
-
-	# This method is required by the View API
-	def hide_navigation_buttons(self):
-		"""
-		Shows the row of navigation buttons on top of the main app pane.
-		"""
-		self.navigation_buttons_pane.hide()
-		self.mainpane_separator.hide()
-
-
-	def start_resize(self, widget, event):
+	def on_resize_started(self, widget, event):
 		"""
 		This function is used to emulate the window manager's resize function
 		from Cardapio's borderless window.
@@ -1273,7 +1888,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.main_window.window.begin_resize_drag(edge, event.button, x, y, event.time)
 
 
-	def end_resize(self, *dummy):
+	def on_resize_ended(self, *dummy):
 		"""
 		This function is called when the user releases the mouse after resizing the
 		Cardapio window.
@@ -1283,709 +1898,7 @@ class CardapioGtkView(CardapioViewInterface):
 		self.unblock_focus_out_event()
 
 
-	def get_clicked_app_button_info(self):
-		"""
-		Returns
-		"""
-		return self.clicked_app_button.app_info
-
-
-	def add_button(self, button_str, icon_name, pane_or_section, tooltip, button_type):
-		# TODO MVC: break this into add_app_button, add_sidebar_button, etc., so
-		# it's easier to implement app buttons that are different from sidebar
-		# ones.
-		"""
-		Adds a button to a parent container and returns a handler to it, which
-		will be treated by the Controller as a constant (i.e. will never be
-		modified).
-		"""
-
-		button = gtk.ToggleButton()
-		label = gtk.Label(button_str)
-
-		if button_type == self.APP_BUTTON:
-			icon_size_pixels = self.cardapio.icon_helper.icon_size_app
-			label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
-			button.connect('clicked', self.on_app_button_clicked)
-			button.connect('button-press-event', self.on_app_button_button_pressed)
-			button.connect('focus-in-event', self.on_app_button_focused)
-			parent_widget = self.get_button_container_from_section(pane_or_section)
-
-			# TODO: figure out how to set max width so that it is the best for
-			# the window and font sizes
-			#layout = label.get_layout()
-			#extents = layout.get_pixel_extents()
-			#label.set_ellipsize(ELLIPSIZE_END)
-			#label.set_max_width_chars(20)
-
-		else:
-			parent_widget = pane_or_section
-			icon_size_pixels = self.cardapio.icon_helper.icon_size_category
-
-			if button_type == self.SIDEPANE_BUTTON:
-				icon_size_pixels = self.cardapio.icon_helper.icon_size_category
-				button.connect('clicked', self.on_app_button_clicked)
-				button.connect('button-press-event', self.on_app_button_button_pressed)
-				button.connect('focus-in-event', self.on_app_button_focused)
-
-			elif button_type == self.SESSION_BUTTON:
-				icon_size_pixels = self.cardapio.icon_helper.icon_size_category
-				button.connect('clicked', self.on_app_button_clicked)
-
-		icon_pixbuf = self.cardapio.icon_helper.get_icon_pixbuf(icon_name, icon_size_pixels)
-		icon = gtk.image_new_from_pixbuf(icon_pixbuf)
-
-		hbox = gtk.HBox()
-		hbox.add(icon)
-		hbox.add(label)
-		hbox.set_spacing(5)
-		hbox.set_homogeneous(False)
-
-		align = gtk.Alignment(0, 0.5)
-		align.add(hbox)
-
-		if tooltip: button.set_tooltip_text(tooltip)
-
-		button.add(align)
-		button.set_relief(gtk.RELIEF_NONE)
-		button.set_use_underline(False)
-
-		button.show_all()
-		parent_widget.pack_start(button, expand = False, fill = False)
-
-		return button
-
-
-	# This method is required by the View API
-	def add_app_button(self, button_str, icon_name, pane_or_section, tooltip):
-		"""
-		Adds a button to the app pane, and returns a handler to it
-		"""
-		return self.add_button(button_str, icon_name, pane_or_section, tooltip, self.APP_BUTTON)
-
-
-	# This method is required by the View API
-	def add_category_button(self, button_str, icon_name, pane_or_section, section, tooltip):
-		"""
-		Adds a toggle-button to the category pane, and returns a handler to it
-		"""
-
-		sidebar_button = self.add_button(button_str, icon_name, pane_or_section, tooltip, self.CATEGORY_BUTTON)
-		sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section)
-		return sidebar_button
-
-
-	# This method is required by the View API
-	def add_session_button(self, button_str, icon_name, pane_or_section, tooltip):
-		"""
-		Adds a button to the session pane, and returns a handler to it
-		"""
-		return self.add_button(button_str, icon_name, pane_or_section, tooltip, self.SESSION_BUTTON)
-
-
-	# This method is required by the View API
-	def add_sidepane_button(self, button_str, icon_name, pane_or_section, tooltip):
-		"""
-		Adds a button to the sidepane, and returns a handler to it
-		"""
-		return self.add_button(button_str, icon_name, pane_or_section, tooltip, self.SIDEPANE_BUTTON)
-
-
-	# This method is required by the View API
-	def hide_button(self, button):
-		"""
-		Hides a button
-		"""
-		button.hide()
-
-
-	# This method is required by the View API
-	def setup_button_drag_and_drop(self, button, is_desktop_file):
-		"""
-		Sets up the event handlers for drag-and-drop
-		"""
-
-		if is_desktop_file:
-			button.drag_source_set(
-					gtk.gdk.BUTTON1_MASK,
-					[('text/uri-list', 0, 0)],
-					gtk.gdk.ACTION_COPY)
-		else:
-			button.drag_source_set(
-					gtk.gdk.BUTTON1_MASK,
-					[('text/uri-list', 0, 0)],
-					gtk.gdk.ACTION_LINK)
-
-		button.connect('drag-begin', self.on_app_button_drag_begin)
-		button.connect('drag-data-get', self.on_app_button_data_get)
-		# TODO: drag and drop to reorganize pinned items
-
-
-	# This method is required by the View API
-	def get_section_from_button(self, button):
-		"""
-		Returns a unique handler describing the section that a given app button
-		belongs to
-		"""
-
-		# NOTE: IF THERE ARE CHANGES IN THE UI FILE, THIS MAY PRODUCE
-		# HARD-TO-FIND BUGS!!
-
-		return button.parent.parent.parent
-
-
-	# This method is required by the View API
-	def pre_build_ui(self):
-		"""
-		Prepares the UI before building any of the actual content-related widgets
-		"""
-
-		self.read_gui_theme_info()
-
-		# the ui is already built by ui file, so we just clear it here
-		self.remove_all_children(self.APPLICATION_PANE)
-		self.remove_all_children(self.RIGHT_SESSION_PANE)
-		self.remove_all_children(self.LEFT_SESSION_PANE)
-
-
-	# This method is required by the View API
-	def post_build_ui(self):
-		"""
-		Performs operations after building the actual content-related widgets
-		"""
-
-		# TODO: this is nitpicky, but we should do something here to preload the
-		# window, so that it doesn't flash a grey rectangle on the first time
-		# cardapio is shown
-		pass
-
-
-	# This method is required by the View API
-	def build_all_sections_sidebar_buttons(self, title, tooltip):
-		"""
-		Creates the "All sections" buttons for both the regular and system modes
-		"""
-
-		# "All" button for the regular menu
-		button = self.add_button(title, None, self.CATEGORY_PANE, tooltip, self.CATEGORY_BUTTON)
-		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
-		self.all_sections_sidebar_button = button
-		self.set_sidebar_button_toggled(button, True)
-		self.all_sections_sidebar_button.set_sensitive(False)
-
-		# "All" button for the system menu
-		button = self.add_button(title, None, self.SYSTEM_CATEGORY_PANE, tooltip, self.CATEGORY_BUTTON)
-		button.connect('clicked', self.on_all_sections_sidebar_button_clicked)
-		self.all_system_sections_sidebar_button = button
-		self.set_sidebar_button_toggled(button, True)
-		self.all_system_sections_sidebar_button.set_sensitive(False)
-
-
-	# This method is required by the View API
-	def build_no_results_section(self):
-		"""
-		Creates the section that will be used to display the "No results to show" text
-		"""
-
-		section, label = self.add_application_section('Dummy text')
-		self.no_results_section = section
-		self.no_results_label = label
-		self.hide_no_results_text()
-
-
-	# This method is required by the View API
-	def build_subfolders_section(self, title, tooltip):
-		"""
-		Creates the Folder Contents section to the app pane
-		"""
-
-		section, label = self.cardapio.add_section(title, 'system-file-manager', tooltip = tooltip, hidden_when_no_query = True)
-		self.SUBFOLDERS_SECTION = section
-		self.subfolders_label = label
-
-
-	# This method is required by the View API
-	def build_uncategorized_section(self, title, tooltip):
-		"""
-		Creates the Uncategorized section to the app pane
-		"""
-
-		section, dummy = self.cardapio.add_section(title, 'applications-other', tooltip = tooltip, hidden_when_no_query = True)
-		self.UNCATEGORIZED_SECTION = section
-
-
-	# This method is required by the View API
-	def build_session_section(self, title, tooltip):
-		"""
-		Creates the Session section to the app pane
-		"""
-
-		section, dummy = self.cardapio.add_section(title, 'session-properties', hidden_when_no_query = True)
-		self.SESSION_SECTION = section
-
-
-	# This method is required by the View API
-	def build_system_section(self, title, tooltip):
-		"""
-		Creates the System section to the app pane
-		"""
-
-		section, dummy = self.cardapio.add_section(title, 'applications-system', hidden_when_no_query = True)
-		self.SYSTEM_SECTION = section
-
-
-	# This method is required by the View API
-	def build_places_section(self, title, tooltip):
-		"""
-		Creates the Places section to the app pane
-		"""
-		
-		section, dummy = self.cardapio.add_section(title, 'folder', tooltip = tooltip, hidden_when_no_query = False)
-		self.PLACES_SECTION = section
-
-
-	# This method is required by the View API
-	def build_pinneditems_section(self, title, tooltip):
-		"""
-		Creates the Pinned Items section to the app pane
-		"""
-
-		section, dummy = self.cardapio.add_section(title, 'emblem-favorite', tooltip = tooltip, hidden_when_no_query = False)
-		self.FAVORITES_SECTION = section
-
-
-	# This method is required by the View API
-	def build_sidepane_section(self, title, tooltip):
-		"""
-		Creates the Side Pane section to the app pane
-		"""
-
-		section, dummy = self.cardapio.add_section(title, 'emblem-favorite', tooltip = tooltip, hidden_when_no_query = True)
-		self.SIDEPANE_SECTION = section
-
-
-	# This method is required by the View API
-	def remove_about_context_menu_items(self):
-		"""
-		Removes "About Gnome" and "About %distro" from Cardapio's context menu
-		"""
-
-		self.get_widget('AboutGnomeMenuItem').set_visible(False)
-		self.get_widget('AboutDistroMenuItem').set_visible(False)
-
-
-	# This method is required by the View API
-	def show_window_frame(self):
-		"""
-		Shows the window frame around Cardapio
-		"""
-		self.main_window.set_decorated(True)
-		self.main_window.set_deletable(False) # remove "close" button from window frame (doesn't work with Compiz!)
-		self.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
-
-
-	# This method is required by the View API
-	def hide_window_frame(self):
-		"""
-		Hides the window frame around Cardapio
-		"""
-		self.main_window.set_decorated(False)
-		self.main_window.set_deletable(True) 
-		self.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_IN)
-
-
-	# This method is required by the View API
-	def remove_all_buttons_from_section(self, section):
-		"""
-		Removes all buttons from a given section 
-		"""
-
-		container = self.get_button_container_from_section(section)
-		if container is None: return
-		for	child in container.get_children():
-			container.remove(child)
-		# TODO: for speed, remove/readd container from its parent instead of
-		# removing each child!
-
-
-	def get_button_container_from_section(self, section):
-		"""
-		Returns a SectionContents widget given a SectionSlab. (SectionContents
-		is the child of SectionMargin which is the child of SectionSlab. All app
-		buttons are contained inside a SectionContents widget. The only exception
-		is the SideappPane widget, which is its own button container)
-		"""
-
-		if section == self.SIDE_PANE: return section
-		try:
-			return section.get_children()[0].get_children()[0]
-		except:
-			return None
-
-
-	# This method is required by the View API
-	def remove_all_buttons_from_category_panes(self):
-		"""
-		Removes all buttons from both the regular and system category panes
-		(i.e. the category filter lists)
-		"""
-		
-		for	child in self.CATEGORY_PANE.get_children(): self.CATEGORY_PANE.remove(child)
-		for	child in self.SYSTEM_CATEGORY_PANE.get_children(): self.SYSTEM_CATEGORY_PANE.remove(child)
-
-
-	# This method is required by the View API
-	def toggle_mini_mode_ui(self, update_window_size = True):
-		"""
-		Collapses the sidebar into a row of small buttons (i.e. minimode)
-		"""
-
-		category_buttons = self.CATEGORY_PANE.get_children() +\
-				self.SYSTEM_CATEGORY_PANE.get_children() + self.SIDE_PANE.get_children()
-
-		if self.cardapio.settings['mini mode']:
-
-			for category_button in category_buttons:
-				category_button.child.child.get_children()[1].hide()
-
-			try:
-				self.session_button_locksys.child.child.get_children()[1].hide()
-				self.session_button_logout.child.child.get_children()[1].hide()
-			except:
-				pass
-
-			self.RIGHT_SESSION_PANE.set_homogeneous(False)
-
-			self.get_widget('ViewLabel').set_size_request(0, 0) # required! otherwise a weird margin appears
-			self.get_widget('ViewLabel').hide()
-			self.get_widget('ControlCenterLabel').hide()
-			self.get_widget('ControlCenterArrow').hide()
-			self.get_widget('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_NEVER)
-
-			padding = self.fullsize_mode_padding
-			self.get_widget('CategoryMargin').set_padding(0, padding[1], padding[2], padding[3])
-
-			self.get_widget('TopLeftSearchSlabMargin').hide()    # these are required, to make sure the splitter
-			self.get_widget('BottomLeftSearchSlabMargin').hide() # ...moves all the way to the left
-			sidepane_margin = self.get_widget('SidePaneMargin')
-			#self.set_main_splitter_position(0)
-
-			# hack to make sure the viewport resizes to the minisize correctly
-			self.get_widget('SideappViewport').hide()
-			self.get_widget('SideappViewport').show()
-			#self.LEFT_SESSION_PANE.hide()
-			#self.LEFT_SESSION_PANE.show()
-			#self.RIGHT_SESSION_PANE.hide()
-			#self.RIGHT_SESSION_PANE.show()
-
-			if update_window_size:
-				self.cardapio.settings['window size'][0] -= self.get_main_splitter_position()
-
-		else:
-
-			for category_button in category_buttons:
-				category_button.child.child.get_children()[1].show()
-
-			try:
-				self.session_button_locksys.child.child.get_children()[1].show()
-				self.session_button_logout.child.child.get_children()[1].show()
-			except:
-				pass
-
-			self.RIGHT_SESSION_PANE.set_homogeneous(True)
-
-			self.get_widget('ViewLabel').set_size_request(-1, -1)
-			self.get_widget('ViewLabel').show()
-			self.get_widget('ControlCenterLabel').show()
-			self.get_widget('ControlCenterArrow').show()
-			self.get_widget('CategoryScrolledWindow').set_policy(gtk.POLICY_NEVER, gtk.POLICY_AUTOMATIC)
-
-			self.get_widget('CategoryMargin').set_padding(*self.fullsize_mode_padding)
-			
-			self.set_main_splitter_position(self.cardapio.settings['splitter position'])
-
-			if update_window_size:
-				self.cardapio.settings['window size'][0] += self.get_main_splitter_position()
-
-
-	# This method is required by the View API
-	def setup_search_entry(self, place_at_top, place_at_left):
-		"""
-		Hides 3 of the 4 search entries and returns the visible entry.
-		"""
-
-		text = self.search_entry.get_text()
-
-		self.get_widget('TopLeftSearchSlabMargin').hide()
-		self.get_widget('BottomLeftSearchSlabMargin').hide()
-		self.get_widget('TopRightSearchSlabMargin').hide()
-		self.get_widget('BottomRightSearchSlabMargin').hide()
-
-		if place_at_top:
-			if place_at_left:
-				self.search_entry = self.get_widget('TopLeftSearchEntry')
-				self.get_widget('TopLeftSearchSlabMargin').show()
-			else:
-				self.search_entry = self.get_widget('TopRightSearchEntry')
-				self.get_widget('TopRightSearchSlabMargin').show()
-		else:
-			if place_at_left:
-				self.search_entry = self.get_widget('BottomLeftSearchEntry')
-				self.get_widget('BottomLeftSearchSlabMargin').show()
-			else:
-				self.search_entry = self.get_widget('BottomRightSearchEntry')
-				self.get_widget('BottomRightSearchSlabMargin').show()
-
-		self.search_entry.handler_block_by_func(self.on_search_entry_changed)
-		self.search_entry.set_text(text)
-		self.search_entry.handler_unblock_by_func(self.on_search_entry_changed)
-
-
-	def remove_all_children(self, container):
-		"""
-		Removes all children from a GTK container
-		"""
-		
-		for child in container: container.remove(child)
-
-
-	# This method is required by the View API
-	def focus_search_entry(self):
-		"""
-		Focuses the search entry
-		"""
-
-		self.main_window.set_focus(self.search_entry)
-
-
-	# This method is required by the View API
-	def show_section_status_text(self, section, text):
-		"""
-		Shows some status text inside a section (for instance, this is called to
-		write the "loading..." text for slow plugins).
-		"""
-
-		self.remove_all_buttons_from_section(section)
-
-		label = gtk.Label(text)
-		label.set_alignment(0, 0.5)
-		label.set_sensitive(False)
-		label.show()
-
-		section_contents = section.get_children()[0].get_children()[0]
-		section_contents.pack_start(label, expand = False, fill = False)
-		section_contents.show()
-
-
-	def get_ctrl_key_state(self):
-		"""
-		Returns True if the CTRL key is pressed, and False otherwise.
-		"""
-		return (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
-
-
-	def get_shift_key_state(self):
-		"""
-		Returns True if the SHIFT key is pressed, and False otherwise.
-		"""
-		return (gtk.get_current_event().state & gtk.gdk.SHIFT_MASK == gtk.gdk.SHIFT_MASK)
-
-
-	# This method is required by the View API
-	def run_in_ui_thread(self, function, *args, **kwargs):
-		"""
-		Runs a function making sure that no other thread can write to the UI.
-		"""
-		gtk.gdk.threads_enter()
-		function(*args, **kwargs)
-		gtk.gdk.threads_leave()
-
-
-	# This method is required by the View API
-	def add_application_section(self, section_title):
-		"""
-		Adds a new section to the applications pane
-		"""
-
-		section_contents = gtk.VBox(homogeneous = True)
-
-		section_margin = gtk.Alignment(0.5, 0.5, 1.0, 1.0)
-		section_margin.add(section_contents)
-		section_margin.set_padding(0, 0, 0, 0)
-
-		label = gtk.Label()
-		label.set_use_markup(True)
-		label.modify_fg(gtk.STATE_NORMAL, self.style_app_button_fg)
-		label.set_padding(0, 4)
-		label.set_attributes(self.section_label_attributes)
-
-		if section_title is not None:
-			label.set_text(section_title)
-
-		section = gtk.Frame()
-		section.set_label_widget(label)
-		section.set_shadow_type(gtk.SHADOW_NONE)
-		section.add(section_margin)
-
-		section.show_all()
-
-		self.APPLICATION_PANE.pack_start(section, expand = False, fill = False)
-
-		return section, label
-
-
-	# This method is required by the View API
-	def show_pane(self, pane):
-		"""
-		Show the pane given by one of the *_PANE constants
-		"""
-		pane.show()
-
-
-	# This method is required by the View API
-	def hide_pane(self, pane):
-		"""
-		Hide the pane given by one of the *_PANE constants
-		"""
-		pane.hide()
-
-
-	# This method is required by the View API
-	def show_button(self, button):
-		"""
-		Show the given button 
-		"""
-		button.show()
-
-
-	# This method is required by the View API
-	def hide_button(self, button):
-		"""
-		Hide the given button
-		"""
-		button.hide()
-
-
-	# This method is required by the View API
-	def resize_main_window(self, width, height):
-		"""
-		Resizes the main Cardapio window
-		"""
-		self.main_window.resize(width, height)
-
-
-	# This method is required by the View API
-	def move_main_window(self, x, y, anchor_right, anchor_bottom):
-		"""
-		Moves the main Cardapio window, obeying the anchor_* booleans
-		"""
-
-		if anchor_right:
-			if anchor_bottom: self.main_window.set_gravity(gtk.gdk.GRAVITY_SOUTH_EAST)
-			else: self.main_window.set_gravity(gtk.gdk.GRAVITY_NORTH_EAST)
-
-		else:
-			if anchor_bottom: self.main_window.set_gravity(gtk.gdk.GRAVITY_SOUTH_WEST)
-			else: self.main_window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
-
-		# There has been a regression in Ubuntu 11.04, so I'm making the hack permanent. Ugh.
-		#if gtk.ver[0] == 2 and gtk.ver[1] <= 21 and gtk.ver[2] < 5:
-		if True:
-			self._move_main_window_with_gravity_hack(x, y)
-		else:
-			self.main_window.move(x, y)
-
-
-	def _move_main_window_with_gravity_hack(self, x, y):
-		"""
-		For some reason, GTK 2.20.x in Ubuntu 10.04 (Lucid) does not 
-		respect the set_gravity command, so here we fix that.
-		"""
-
-		gravity = self.main_window.get_gravity()
-		width, height = self.main_window.get_size()
-
-		if gravity == gtk.gdk.GRAVITY_NORTH_WEST:
-			pass
-
-		elif gravity == gtk.gdk.GRAVITY_NORTH_EAST:
-			x -= width
-
-		elif gravity == gtk.gdk.GRAVITY_SOUTH_WEST:
-			y -= height
-
-		elif gravity == gtk.gdk.GRAVITY_SOUTH_EAST:
-			x -= width
-			y -= height
-
-		# NOTE: There are other gravity constants in GDK, but we do not implement
-		# them here because they're not used in Cardapio.
-
-		self.main_window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
-		self.main_window.move(x, y)
-
-
-	# This method is required by the View API
-	def set_subfolder_section_title(self, title):
-		"""
-		Sets the title of the subfolder section
-		"""
-		self.subfolders_label.set_text(title)
-
-
 	def on_reload_button_clicked(self, widget):
 		self.cardapio.handle_reload_clicked()
-
-
-	# This method is required by the View API
-	def show_rebuild_required_bar(self):
-		"""
-		Shows the "rebuild required" bar, which allows the user to click the
-		"reload" button, which rebuilds all of Cardapio's menus
-		"""
-		self.get_widget('ReloadMessageBar').show()
-
-
-	# This method is required by the View API
-	def hide_rebuild_required_bar(self):
-		"""
-		Hide the "rebuild required" bar.
-		"""
-		self.get_widget('ReloadMessageBar').hide()
-
-
-	# This method is required by the View API
-	def set_screen(self, screen_number):
-		"""
-		Sets the screen where the view will be shown (given as an integer)
-		"""
-		self.screen = self.display.get_screen(screen_number)
-		self.root_window = self.screen.get_root_window()
-
-
-	# This method is required by the View API
-	def get_screen_with_pointer(self):
-		"""
-		Returns the number of the screen that currently contains the mouse
-		pointer
-		"""
-		screen, dummy, dummy, dummy = self.display.get_pointer()
-		return screen.get_number()
-
-
-	# This method is required by the View API
-	def place_text_cursor_at_end(self):
-		"""
-		Places the text cursor at the end of the text entry
-		"""
-		self.search_entry.set_position(-1)
-
-
-	def _get_icon_pixbuf_from_app_info(self, app_info):
-		"""
-		Get the icon pixbuf for an app given its app_info dict
-		"""
-
-		return self.cardapio.icon_helper.get_icon_pixbuf(app_info['icon name'], self.cardapio.icon_helper.icon_size_app)
 
 

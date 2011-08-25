@@ -188,7 +188,7 @@ http://www.gnu.org/licenses/gpl-3.0-standalone.html	</property>
         <property name="use_action_appearance">False</property>
         <property name="use_underline">True</property>
         <property name="use_stock">True</property>
-        <signal name="activate" handler="open_options_dialog" swapped="no"/>
+        <signal name="activate" handler="on_options_menu_item_clicked" swapped="no"/>
       </object>
     </child>
     <child>
@@ -199,7 +199,7 @@ http://www.gnu.org/licenses/gpl-3.0-standalone.html	</property>
         <property name="use_action_appearance">False</property>
         <property name="image">image2</property>
         <property name="use_stock">False</property>
-        <signal name="activate" handler="launch_edit_app" swapped="no"/>
+        <signal name="activate" handler="on_edit_menu_item_clicked" swapped="no"/>
       </object>
     </child>
     <child>
@@ -228,7 +228,7 @@ http://www.gnu.org/licenses/gpl-3.0-standalone.html	</property>
         <property name="use_action_appearance">False</property>
         <property name="use_underline">True</property>
         <property name="use_stock">True</property>
-        <signal name="activate" handler="open_about_gnome_dialog" swapped="no"/>
+        <signal name="activate" handler="on_about_gnome_clicked" swapped="no"/>
       </object>
     </child>
     <child>
@@ -238,7 +238,7 @@ http://www.gnu.org/licenses/gpl-3.0-standalone.html	</property>
         <property name="use_action_appearance">False</property>
         <property name="use_underline">True</property>
         <property name="use_stock">True</property>
-        <signal name="activate" handler="open_about_distro_dialog" swapped="no"/>
+        <signal name="activate" handler="on_about_distro_clicked" swapped="no"/>
       </object>
     </child>
   </object>
@@ -257,7 +257,7 @@ http://www.gnu.org/licenses/gpl-3.0-standalone.html	</property>
     <property name="mnemonics_visible">False</property>
     <signal name="key-press-event" handler="on_mainwindow_after_key_pressed" after="yes" swapped="no"/>
     <signal name="key-press-event" handler="on_mainwindow_key_pressed" swapped="no"/>
-    <signal name="configure-event" handler="end_resize" swapped="no"/>
+    <signal name="configure-event" handler="on_resize_ended" swapped="no"/>
     <signal name="leave-notify-event" handler="on_mainwindow_cursor_leave" swapped="no"/>
     <signal name="destroy" handler="on_mainwindow_destroy" swapped="no"/>
     <signal name="button-press-event" handler="on_mainwindow_button_pressed" swapped="no"/>
@@ -1028,8 +1028,8 @@ This menu will be updated momentarily, so as not to interrupt your browsing.</pr
                 <property name="height_request">4</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <signal name="button-press-event" handler="start_resize" swapped="no"/>
-                <signal name="button-release-event" handler="end_resize" swapped="no"/>
+                <signal name="button-press-event" handler="on_resize_started" swapped="no"/>
+                <signal name="button-release-event" handler="on_resize_ended" swapped="no"/>
                 <child>
                   <placeholder/>
                 </child>
@@ -1045,8 +1045,8 @@ This menu will be updated momentarily, so as not to interrupt your browsing.</pr
                 <property name="height_request">4</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <signal name="button-press-event" handler="start_resize" swapped="no"/>
-                <signal name="button-release-event" handler="end_resize" swapped="no"/>
+                <signal name="button-press-event" handler="on_resize_started" swapped="no"/>
+                <signal name="button-release-event" handler="on_resize_ended" swapped="no"/>
                 <child>
                   <placeholder/>
                 </child>
@@ -1064,8 +1064,8 @@ This menu will be updated momentarily, so as not to interrupt your browsing.</pr
                 <property name="width_request">4</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <signal name="button-press-event" handler="start_resize" swapped="no"/>
-                <signal name="button-release-event" handler="end_resize" swapped="no"/>
+                <signal name="button-press-event" handler="on_resize_started" swapped="no"/>
+                <signal name="button-release-event" handler="on_resize_ended" swapped="no"/>
                 <child>
                   <placeholder/>
                 </child>
@@ -1081,8 +1081,8 @@ This menu will be updated momentarily, so as not to interrupt your browsing.</pr
                 <property name="width_request">4</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <signal name="button-press-event" handler="start_resize" swapped="no"/>
-                <signal name="button-release-event" handler="end_resize" swapped="no"/>
+                <signal name="button-press-event" handler="on_resize_started" swapped="no"/>
+                <signal name="button-release-event" handler="on_resize_ended" swapped="no"/>
                 <child>
                   <placeholder/>
                 </child>
@@ -1101,8 +1101,8 @@ This menu will be updated momentarily, so as not to interrupt your browsing.</pr
                 <property name="height_request">4</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <signal name="button-press-event" handler="start_resize" swapped="no"/>
-                <signal name="button-release-event" handler="end_resize" swapped="no"/>
+                <signal name="button-press-event" handler="on_resize_started" swapped="no"/>
+                <signal name="button-release-event" handler="on_resize_ended" swapped="no"/>
                 <child>
                   <placeholder/>
                 </child>
@@ -1120,8 +1120,8 @@ This menu will be updated momentarily, so as not to interrupt your browsing.</pr
                 <property name="height_request">4</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <signal name="button-press-event" handler="start_resize" swapped="no"/>
-                <signal name="button-release-event" handler="end_resize" swapped="no"/>
+                <signal name="button-press-event" handler="on_resize_started" swapped="no"/>
+                <signal name="button-release-event" handler="on_resize_ended" swapped="no"/>
                 <child>
                   <placeholder/>
                 </child>
@@ -1141,8 +1141,8 @@ This menu will be updated momentarily, so as not to interrupt your browsing.</pr
                 <property name="height_request">4</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <signal name="button-press-event" handler="start_resize" swapped="no"/>
-                <signal name="button-release-event" handler="end_resize" swapped="no"/>
+                <signal name="button-press-event" handler="on_resize_started" swapped="no"/>
+                <signal name="button-release-event" handler="on_resize_ended" swapped="no"/>
                 <child>
                   <placeholder/>
                 </child>
@@ -1160,8 +1160,8 @@ This menu will be updated momentarily, so as not to interrupt your browsing.</pr
                 <property name="height_request">4</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <signal name="button-press-event" handler="start_resize" swapped="no"/>
-                <signal name="button-release-event" handler="end_resize" swapped="no"/>
+                <signal name="button-press-event" handler="on_resize_started" swapped="no"/>
+                <signal name="button-release-event" handler="on_resize_ended" swapped="no"/>
                 <child>
                   <placeholder/>
                 </child>
