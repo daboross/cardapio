@@ -21,6 +21,8 @@ from misc import *
 import sys
 
 try:
+	import Constants
+
 	import os
 	import gtk
 	from CardapioAppletInterface import PANEL_TYPE_DOCKY, PANEL_TYPE_AWN 
@@ -53,7 +55,7 @@ class OptionsWindow:
 		options_ui_filepath = os.path.join(self.cardapio.cardapio_path, 'ui', 'options.ui')
 
 		builder = gtk.Builder()
-		builder.set_translation_domain(self.cardapio.APP)
+		builder.set_translation_domain(Constants.APP)
 		builder.add_from_file(options_ui_filepath)
 		builder.connect_signals(self)
 
@@ -72,11 +74,11 @@ class OptionsWindow:
 		self.drag_allowed_cursor = gtk.gdk.Cursor(gtk.gdk.FLEUR)
 		#self.busy_cursor = gtk.gdk.Cursor(gtk.gdk.WATCH)
 
-		self.prepare_panel_related_options()
-		self.read_gtk_theme_info()
+		self._prepare_panel_related_options()
+		self._read_gtk_theme_info()
 
 
-	def read_gtk_theme_info(self):
+	def _read_gtk_theme_info(self):
 		"""
 		Reads some info from the GTK theme to better adapt to it 
 		"""
@@ -85,7 +87,7 @@ class OptionsWindow:
 		self.scrollbar_width = scrollbar.style_get_property('slider-width')
 
 
-	def prepare_panel_related_options(self):
+	def _prepare_panel_related_options(self):
 		"""
 		Show or hide widgets in the options window depending on whether they
 		are supported by the current panel (if any)
@@ -128,22 +130,22 @@ class OptionsWindow:
 
 		self.is_change_handler_blocked = True
 
-		self.set_widget_from_option('OptionKeybinding', 'keybinding')
-		self.set_widget_from_option('OptionAppletLabel', 'applet label')
-		#self.set_widget_from_option('OptionAppletIcon', 'applet icon')
-		self.set_widget_from_option('OptionSessionButtons', 'show session buttons')
-		self.set_widget_from_option('OptionKeepResults', 'keep search results')
-		self.set_widget_from_option('OptionOpenOnHover', 'open on hover')
-		self.set_widget_from_option('OptionOpenCategoriesOnHover', 'open categories on hover')
-		self.set_widget_from_option('OptionMiniMode', 'mini mode')
+		self._set_widget_from_option('OptionKeybinding', 'keybinding')
+		self._set_widget_from_option('OptionAppletLabel', 'applet label')
+		#self._set_widget_from_option('OptionAppletIcon', 'applet icon')
+		self._set_widget_from_option('OptionSessionButtons', 'show session buttons')
+		self._set_widget_from_option('OptionKeepResults', 'keep search results')
+		self._set_widget_from_option('OptionOpenOnHover', 'open on hover')
+		self._set_widget_from_option('OptionOpenCategoriesOnHover', 'open categories on hover')
+		self._set_widget_from_option('OptionMiniMode', 'mini mode')
 
-		self.set_icon_widgets()
+		self._set_icon_widgets()
 
 		icon_size = gtk.icon_size_lookup(4)[0] # 4 because it's that same as in the UI file
 
 		self.plugin_tree_model.clear()
 
-		for plugin_tuple in self.cardapio.plugin_iterator():
+		for plugin_tuple in self._plugin_iterator():
 
 			basename, plugin_class, is_active, is_core, is_required = plugin_tuple
 
@@ -170,7 +172,34 @@ class OptionsWindow:
 		return True
 
 
-	def set_widget_from_option(self, widget_str, option_str):
+	def _plugin_iterator(self):
+		"""
+		Iterates first through all active plugins in their user-specified order,
+		then through all inactive plugins alphabetically.
+		"""
+
+		plugin_list = []
+		plugin_list += [basename for basename in self.cardapio.settings['active plugins']]
+
+		inactive_plugins = [
+				(self.cardapio.get_plugin_class(basename).name.lower(), basename) 
+				for basename in self.cardapio.plugin_database if basename not in plugin_list]
+		inactive_plugins = [plugin_tuple[1] for plugin_tuple in sorted(inactive_plugins)]
+		plugin_list += inactive_plugins
+
+		for basename in plugin_list:
+
+			try: plugin_class = self.cardapio.get_plugin_class(basename)
+			except: continue
+
+			is_active   = (basename in self.cardapio.settings['active plugins'])
+			is_core     = (basename in Constants.CORE_PLUGINS)
+			is_required = (basename in Constants.REQUIRED_PLUGINS)
+
+			yield (basename, plugin_class, is_active, is_core, is_required)
+
+
+	def _set_widget_from_option(self, widget_str, option_str):
 		"""
 		Set the value of the widget named 'widget_str' to 'option_str'
 		"""
@@ -309,7 +338,7 @@ class OptionsWindow:
 		self.cardapio.apply_settings()
 
 
-	def set_icon_widgets(self):
+	def _set_icon_widgets(self):
 		"""
 		Sets the value of icon-related widgets in the options window according
 		to the user options.

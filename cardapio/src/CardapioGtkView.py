@@ -21,8 +21,10 @@ from misc import *
 import sys
 
 try:
+	import Constants
 	from CardapioViewInterface import *
 	from IconHelper import *
+
 	import os
 	import gtk
 	import glib
@@ -75,7 +77,7 @@ class CardapioGtkView(CardapioViewInterface):
 		main_ui_filepath = os.path.join(self.cardapio.cardapio_path, 'ui', 'cardapio.ui')
 
 		builder = gtk.Builder()
-		builder.set_translation_domain(self.cardapio.APP)
+		builder.set_translation_domain(Constants.APP)
 		builder.add_from_file(main_ui_filepath)
 		builder.connect_signals(self)
 
@@ -175,7 +177,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 		if property_changed.name == 'gtk-color-scheme' or property_changed.name == 'gtk-theme-name':
 			self.read_gui_theme_info()
-			self.cardapio.schedule_rebuild()
+			self.cardapio.handle_view_settings_changed()
 
 
 	def read_gui_theme_info(self):
@@ -205,7 +207,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Handler for when the Cardapio window is destroyed
 		"""
 
-		self.cardapio.save_and_quit()
+		self.cardapio.handle_window_destroyed()
 
 	
 	# This method is required by the View API
@@ -649,7 +651,7 @@ class CardapioGtkView(CardapioViewInterface):
 			self.auto_toggled_view_mode_button = False
 			return True
 
-		self.cardapio.switch_modes(show_system_menus = widget.get_active())
+		self.cardapio.handle_view_mode_toggled(widget.get_active())
 
 
 	# This method is required by the View API
@@ -1036,7 +1038,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Opens the "About Gnome" dialog.
 		"""
 
-		self.cardapio.open_about_dialog('AboutGnome')
+		self.cardapio.handle_about_menu_item_clicked('AboutGnome')
 
 
 	def open_about_distro_dialog(self, widget):
@@ -1044,7 +1046,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Opens the "About %distro%" dialog
 		"""
 
-		self.cardapio.open_about_dialog('AboutDistro')
+		self.cardapio.handle_about_menu_item_clicked('AboutDistro')
 
 
 	def open_options_dialog(self, *dummy):
@@ -1060,7 +1062,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Open the menu editor app
 		"""
 
-		self.cardapio.launch_edit_app()
+		self.cardapio.handle_editor_menu_item_clicked()
 
 		
 	def on_search_entry_changed(self, *dummy):
@@ -1174,7 +1176,7 @@ class CardapioGtkView(CardapioViewInterface):
 		mouse cursor.
 		"""
 		
-		icon_pixbuf = self.cardapio.get_icon_pixbuf_from_app_info(button.app_info)
+		icon_pixbuf = self._get_icon_pixbuf_from_app_info(button.app_info)
 		button.drag_source_set_icon_pixbuf(icon_pixbuf)
 
 
@@ -1277,7 +1279,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Cardapio window.
 		"""
 
-		self.cardapio.end_resize()
+		self.cardapio.handle_resize_done()
 		self.unblock_focus_out_event()
 
 
@@ -1977,5 +1979,13 @@ class CardapioGtkView(CardapioViewInterface):
 		Places the text cursor at the end of the text entry
 		"""
 		self.search_entry.set_position(-1)
+
+
+	def _get_icon_pixbuf_from_app_info(self, app_info):
+		"""
+		Get the icon pixbuf for an app given its app_info dict
+		"""
+
+		return self.cardapio.icon_helper.get_icon_pixbuf(app_info['icon name'], self.cardapio.icon_helper.icon_size_app)
 
 

@@ -33,7 +33,7 @@ except Exception, exception:
 # main
 DBusGMainLoop(set_as_default = True)
 bus = dbus.SessionBus()
-bus_request_name = bus.request_name(Constants.bus_name_str)
+bus_request_name = bus.request_name(Constants.BUS_NAME_STR)
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -93,7 +93,7 @@ def cardapio_show(centered = False):
 
 	# if there is - "show / hide" it
 	else:
-		dbus_method = bus.get_object(Constants.bus_name_str, Constants.bus_obj_str).get_dbus_method(dbus_method_name)
+		dbus_method = bus.get_object(Constants.BUS_NAME_STR, Constants.BUS_OBJ_STR).get_dbus_method(dbus_method_name)
 		dbus_method()
 
 
@@ -106,7 +106,7 @@ def cardapio_open_options_dialog():
 
 	# if there is, show its options dialog
 	dbus_method_name = 'open_options_dialog'
-	dbus_method = bus.get_object(Constants.bus_name_str, Constants.bus_obj_str).get_dbus_method(dbus_method_name)
+	dbus_method = bus.get_object(Constants.BUS_NAME_STR, Constants.BUS_OBJ_STR).get_dbus_method(dbus_method_name)
 	dbus_method()
 
 
@@ -126,7 +126,7 @@ def cardapio_show_near_docky():
 			x, y, force_anchor_right, force_anchor_bottom = settings_helper.get_best_position(dock_num)
 
 			dbus_method_name = 'show_hide_near_point'
-			dbus_method = bus.get_object(Constants.bus_name_str, Constants.bus_obj_str).get_dbus_method(dbus_method_name)
+			dbus_method = bus.get_object(Constants.BUS_NAME_STR, Constants.BUS_OBJ_STR).get_dbus_method(dbus_method_name)
 			dbus_method(x, y, force_anchor_right, force_anchor_bottom)
 
 		except MainDockError, exception:

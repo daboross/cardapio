@@ -66,6 +66,7 @@ if gtk.ver < (2, 14, 0):
 	sys.exit(1)
 
 
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 # Set up translations
 
 # try path like /usr/share/locale
@@ -80,26 +81,25 @@ if not os.path.exists(prefix_path):
 	prefix_path = [os.path.sep] + prefix_path + ['locale']
 	prefix_path = os.path.join(*prefix_path)
 
-DIR = prefix_path
-APP = 'cardapio'
-
 setlocale(LC_ALL, '')
-gettext.bindtextdomain(APP, DIR)
+gettext.bindtextdomain(Constants.APP, prefix_path)
 
 if hasattr(gettext, 'bind_textdomain_codeset'):
-    gettext.bind_textdomain_codeset(APP, 'UTF-8')
+    gettext.bind_textdomain_codeset(Constants.APP, 'UTF-8')
 
-gettext.textdomain(APP)
+gettext.textdomain(Constants.APP)
 _ = gettext.gettext
 
 
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 # Hack for making translations work with ui files
 
 import gtk.glade
-gtk.glade.bindtextdomain(APP, DIR)
-gtk.glade.textdomain(APP)
+gtk.glade.bindtextdomain(Constants.APP, prefix_path)
+gtk.glade.textdomain(Constants.APP)
 
 
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 # Main Cardapio class
 
 class Cardapio(dbus.service.Object):
@@ -113,46 +113,32 @@ class Cardapio(dbus.service.Object):
 
 	version = '0.9.189'
 
-	core_plugins = [
-			'applications',
-			'command_launcher',
-			'google',
-			'google_localized',
-			'pinned',
-			'places',
-			'software_center',
-			'tracker',
-			'tracker_fts',
-			'zeitgeist_smart',
-			'zeitgeist_categorized',
-			'zeitgeist_simple',
-			]
-
-	required_plugins = ['pinned']
-	builtin_plugins = ['applications', 'places', 'pinned']
-
 	REMOTE_PROTOCOLS = ['ftp', 'sftp', 'smb']
 
+
 	class SafeCardapioProxy:
+		"""
+		Used to pass to the plugins an object containing a subset of Cardapio's
+		members
+		"""
 		pass
+
 
 	def __init__(self, show = False, panel_applet = None, debug = False):
 		"""
-		Creates a instance of Cardapio.
+		Creates an instance of Cardapio.
 		"""
 
-		self.create_xdg_folders()  # must happen before logging is setup
-		self.setup_log_file(debug)
+		self._create_xdg_folders()  # must happen before logging is setup
+		self._setup_log_file(debug)
 
 		logging.info('----------------- Cardapio launched -----------------')
 		logging.info('Cardapio version: %s' % Cardapio.version)
 		logging.info('Distribution: %s' % platform.platform())
 
 		logging.info('Loading settings...')
-		self.load_settings()
+		self._load_settings()
 		logging.info('...done loading settings!')
-
-		self.APP = APP
 
 		self.cardapio_path    = cardapio_path
 		self.home_folder_path = os.path.abspath(os.path.expanduser('~'))
@@ -161,47 +147,46 @@ class Cardapio(dbus.service.Object):
 		self.options_window   = OptionsWindow(self)
 		self.applet           = panel_applet
 
-		self.reset_model()
-		self.reset_members()
+		self._reset_model()
+		self._reset_members()
 
 		logging.info('Setting up DBus...')
-		self.setup_dbus()
+		self._setup_dbus()
 		logging.info('...done setting up DBus!')
 
 		logging.info('Setting up UI...')
-		self.setup_ui() # must be the first ui-related method to be called
+		self._setup_ui() # must be the first ui-related method to be called
 		logging.info('...done setting up UI!')
 
 		logging.info('Setting up panel applet (if any)...')
-		self.setup_applet()
+		self._setup_applet()
 		logging.info('...done setting up panel applet!')
 			
 		logging.info('Setting up Plugins...')
-		self.setup_plugins()
+		self._setup_plugins()
 		logging.info('...done setting up Plugins!')
 
 		logging.info('Building UI...')
-		self.build_ui()
+		self._build_ui()
 		logging.info('...done building UI!')
 
 		self.de.register_session_close_handler(self.save_and_quit)
 
 		logging.info('==> Done initializing Cardapio!')
 
-		self.reset_search()
+		self._reset_search()
 
 		if   show == Constants.SHOW_NEAR_MOUSE: self.show_hide_near_mouse()
-		elif show == Constants.SHOW_CENTERED  : self.show()
+		elif show == Constants.SHOW_CENTERED  : self._show()
 
 
-	# This method is called from the View API
 	def save_and_quit(self):
 		"""
 		Saves the current state and quits
 		"""
 
 		self.save()
-		self.quit()
+		self._quit()
 
 
 	def save(self):
@@ -215,7 +200,7 @@ class Cardapio(dbus.service.Object):
 			logging.error('Error while saving settings: %s' % exception)
 
 
-	def quit(self):
+	def _quit(self):
 		"""
 		Quits without saving the current state.
 		"""
@@ -225,7 +210,7 @@ class Cardapio(dbus.service.Object):
 		sys.exit()
 
 
-	def setup_log_file(self, debug):
+	def _setup_log_file(self, debug):
 		"""
 		Opens the log file, clears it if it's too large, and prepares the logging module
 		"""
@@ -249,7 +234,7 @@ class Cardapio(dbus.service.Object):
 		logging.basicConfig(filename = logging_filename, level = logging_level, format = logging_format)
 
 
-	def load_menus(self):
+	def _load_menus(self):
 		"""
 		Loads the XDG application menus into memory
 		"""
@@ -262,11 +247,11 @@ class Cardapio(dbus.service.Object):
 			logging.warn('Could not find Control Center menu file. Deactivating Control Center button.')
 
 		self.app_tree = gmenu.lookup_tree('applications.menu')
-		self.app_tree.add_monitor(self.on_menu_data_changed)
-		self.sys_tree.add_monitor(self.on_menu_data_changed)
+		self.app_tree.add_monitor(self._on_menu_data_changed)
+		self.sys_tree.add_monitor(self._on_menu_data_changed)
 
 
-	def setup_dbus(self):
+	def _setup_dbus(self):
 		"""
 		Sets up the session bus
 		"""
@@ -275,14 +260,14 @@ class Cardapio(dbus.service.Object):
 
 		try: 
 			self.bus = dbus.SessionBus()
-			dbus.service.Object.__init__(self, self.bus, Constants.bus_obj_str)
+			dbus.service.Object.__init__(self, self.bus, Constants.BUS_OBJ_STR)
 
 		except Exception, exception:
 			logging.warn('Could not open dbus. Uncaught exception.')
 			logging.warn(exception)
 
 
-	def setup_ui(self):
+	def _setup_ui(self):
 		"""
 		Calls the UI backend's "setup_ui" function
 		"""
@@ -296,13 +281,13 @@ class Cardapio(dbus.service.Object):
 		self.executable_file_dialog_caption = _('"%(file_name)s" is an executable text file.')
 
 		self.icon_helper = IconHelper()
-		self.icon_helper.register_icon_theme_listener(self.on_icon_theme_changed)
+		self.icon_helper.register_icon_theme_listener(self._on_icon_theme_changed)
 
 		self.view.setup_ui()
 		self.options_window.setup_ui()
 
 
-	def setup_applet(self):
+	def _setup_applet(self):
 		"""
 		Prepares Cardapio's applet in any of the compatible panels.
 		"""
@@ -321,7 +306,7 @@ class Cardapio(dbus.service.Object):
 		self.applet.setup(self)
 
 
-	def load_plugin_class(self, basename):
+	def _load_plugin_class(self, basename):
 		"""
 		Returns the CardapioPlugin class from the plugin at basename.py.
 		If it fails, it returns a string decribing the error.
@@ -345,7 +330,7 @@ class Cardapio(dbus.service.Object):
 		return plugin_class
 
 
-	def build_plugin_database(self):
+	def _build_plugin_database(self):
 		"""
 		Searches the plugins/ folder for .py files not starting with underscore.
 		Creates the dict self.plugin_database indexed by the plugin filename's base name.
@@ -402,7 +387,7 @@ class Cardapio(dbus.service.Object):
 				for file_ in files:
 					if len(file_) > 3 and file_[-3:] == '.py' and file_[0] != '_' and file_[0] != '.':
 						basename = file_[:-3]
-						plugin_class = self.load_plugin_class(basename)
+						plugin_class = self._load_plugin_class(basename)
 
 						if type(plugin_class) is str: 
 							logging.error('[%s] %s' % (basename, plugin_class))
@@ -417,7 +402,7 @@ class Cardapio(dbus.service.Object):
 		# freed when the garbage collector releases the inactive plugins
 
 	
-	def activate_plugins_from_settings(self):
+	def _activate_plugins_from_settings(self):
 		"""
 		Initializes plugins in the database if the user's settings say so.
 		"""
@@ -441,10 +426,10 @@ class Cardapio(dbus.service.Object):
 
 		for basename in self.settings['active plugins']:
 
-			if basename in self.builtin_plugins: continue
+			if basename in Constants.BUILTIN_PLUGINS: continue
 
 			basename = str(basename)
-			plugin_class = self.load_plugin_class(basename)
+			plugin_class = self._load_plugin_class(basename)
 
 			if type(plugin_class) is str:
 				logging.error('[%s] %s' % (basename, plugin_class))
@@ -467,7 +452,7 @@ class Cardapio(dbus.service.Object):
 					break
 
 				if not plugin.loaded:
-					self.plugin_write_to_log(plugin, 'Plugin did not load properly')
+					self._plugin_write_to_log(plugin, 'Plugin did not load properly')
 					self.settings['active plugins'].remove(basename)
 					error = True
 					break
@@ -525,7 +510,7 @@ class Cardapio(dbus.service.Object):
 		gc.collect()
 
 
-	def plugin_write_to_log(self, plugin, text, is_debug = False, is_warning = False, is_error = False):
+	def _plugin_write_to_log(self, plugin, text, is_debug = False, is_warning = False, is_error = False):
 		"""
 		Writes 'text' to the log file, prefixing it with [plugin name]. Different
 		levels of messages can be used by setting one of is_debug, is_warning, is_error:
@@ -559,43 +544,7 @@ class Cardapio(dbus.service.Object):
 		write('[%s] %s'  % (plugin.name, text))
 
 
-	# This method is called from the View API
-	def handle_section_all_clicked(self):
-		"""
-		This method is activated when the user presses the "All" section button.
-		It unselects the currently-selected section if any, otherwise it clears
-		the search entry.
-		"""
-
-		if self.selected_section is None:
-			self.view.clear_search_entry()
-			self.view.set_all_sections_sidebar_button_sensitive(False, self.in_system_menu_mode)
-			return 
-
-		self.untoggle_and_show_all_sections()
-
-
-	# This method is called from the View API
-	def handle_section_clicked(self, section):
-		"""
-		This method is activated when the user presses a section button (except
-		for the "All" button). It causes that section to be displayed in case
-		the it wasn't already visible, or hides it otherwise. Returns a boolean
-		indicating whether the section button should be drawn toggled or not.
-		"""
-
-		# if already toggled, untoggle
-		if self.selected_section == section:
-			self.selected_section = None # necessary!
-			self.untoggle_and_show_all_sections()
-			return False
-
-		# otherwise toggle
-		self.toggle_and_show_section(section)
-		return True
-
-
-	def create_xdg_folders(self):
+	def _create_xdg_folders(self):
 		"""
 		Creates Cardapio's config and cache folders (usually at ~/.config/Cardapio and
 		~/.cache/Cardapio)
@@ -608,7 +557,7 @@ class Cardapio(dbus.service.Object):
 
 		elif not os.path.isdir(self.config_folder_path):
 			fatal_error('Error creating config folder!', 'Cannot create folder "%s" because a file with that name already exists!' % self.config_folder_path)
-			self.quit()
+			self._quit()
 
 		self.cache_folder_path = os.path.join(DesktopEntry.xdg_cache_home, 'Cardapio')
 
@@ -617,37 +566,37 @@ class Cardapio(dbus.service.Object):
 
 		elif not os.path.isdir(self.cache_folder_path):
 			fatal_error('Error creating cache folder!', 'Cannot create folder "%s" because a file with that name already exists!' % self.cache_folder_path)
-			self.quit()
+			self._quit()
 
 
-	def setup_plugins(self):
+	def _setup_plugins(self):
 		"""
 		Reads all plugins from the plugin folders and activates the ones that
 		have been specified in the settings file.
 		"""
 
 		self.safe_cardapio_proxy = Cardapio.SafeCardapioProxy()
-		self.safe_cardapio_proxy.write_to_log              = self.plugin_write_to_log
-		self.safe_cardapio_proxy.handle_search_result      = self.plugin_handle_search_result
-		self.safe_cardapio_proxy.handle_search_error       = self.plugin_handle_search_error
-		self.safe_cardapio_proxy.ask_for_reload_permission = self.plugin_ask_for_reload_permission
+		self.safe_cardapio_proxy.write_to_log              = self._plugin_write_to_log
+		self.safe_cardapio_proxy.handle_search_result      = self._plugin_handle_search_result
+		self.safe_cardapio_proxy.handle_search_error       = self._plugin_handle_search_error
+		self.safe_cardapio_proxy.ask_for_reload_permission = self._plugin_ask_for_reload_permission
 
-		self.build_plugin_database()
-		self.activate_plugins_from_settings() # investigate memory usage here
+		self._build_plugin_database()
+		self._activate_plugins_from_settings() # investigate memory usage here
 
 
-	def set_keybinding(self):
+	def _set_keybinding(self):
 		"""
 		Sets Cardapio's keybinding to the value chosen by the user
 		"""
 
-		self.unset_keybinding()
+		self._unset_keybinding()
 
 		self.keybinding = self.settings['keybinding']
 		keybinder.bind(self.keybinding, self.show_hide)
 
 
-	def unset_keybinding(self):
+	def _unset_keybinding(self):
 		"""
 		Sets Cardapio's keybinding to nothing 
 		"""
@@ -663,7 +612,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		# set up keybinding
-		self.set_keybinding()
+		self._set_keybinding()
 
 		# set up applet
 		if self.applet.panel_type is not None:
@@ -678,10 +627,10 @@ class Cardapio(dbus.service.Object):
 		Setup plugin-related UI elements according to the user preferences
 		"""
 
-		self.schedule_rebuild(reactivate_plugins = True)
+		self._schedule_rebuild(reactivate_plugins = True)
 
 
-	def reset_model(self, reset_all = True):
+	def _reset_model(self, reset_all = True):
 		"""
 		Resets the data structures that contain all data related to Cardapio's
 		main operation mode
@@ -700,7 +649,7 @@ class Cardapio(dbus.service.Object):
 		self.builtin_places_plugin_active       = False
 
 
-	def reset_members(self):
+	def _reset_members(self):
 		"""
 		Resets Cardapio's member variables
 		"""
@@ -722,15 +671,19 @@ class Cardapio(dbus.service.Object):
 		self.volume_monitor                = None
 		self.last_visibility_toggle        = 0
 		self.default_window_position       = None
+
+		# These may be used by the View or OptionsWindow classes
 		self.de                            = DesktopEnvironment(self)
+		self.icon_helper                   = None
 
 
-	def load_settings(self):
+	def _load_settings(self):
 		"""
 		Loads the user's settings using a SettingsHelper
 		"""
 
 		try:
+			# This object may be used by the View or OptionsWindow classes
 			self.settings = SettingsHelper(self.config_folder_path)
 
 		except Exception, ex:
@@ -741,7 +694,7 @@ class Cardapio(dbus.service.Object):
 			sys.exit(1)
 
 
-	def build_ui(self):
+	def _build_ui(self):
 		"""
 		Read the contents of all menus and plugins and build the UI
 		elements that support them.
@@ -749,34 +702,33 @@ class Cardapio(dbus.service.Object):
 
 		self.view.pre_build_ui()
 
-		self.clear_all_panes()
+		self._clear_all_panes()
 		self.view.hide_view_mode_button()
 		self.view.build_all_sections_sidebar_buttons(_('All'), _('Show all categories'))
 
-		self.build_special_sections()
-		self.build_reorderable_sections()
+		self._build_special_sections()
+		self._build_reorderable_sections()
 
 		if self.builtin_places_plugin_active:
-			self.fill_places_list()
+			self._fill_places_list()
 
 		if self.builtin_applications_plugin_active:
-			self.fill_session_list()
-			self.fill_system_list()
-			self.fill_uncategorized_list()
+			self._fill_session_list()
+			self._fill_system_list()
+			self._fill_uncategorized_list()
 
 			if self.have_control_center:
 				self.view.show_view_mode_button()
 
-		self.fill_favorites_list(self.view.FAVORITES_SECTION, 'pinned items')
-		self.fill_favorites_list(self.view.SIDEPANE_SECTION, 'side pane items')
+		self._fill_favorites_list(self.view.FAVORITES_SECTION, 'pinned items')
+		self._fill_favorites_list(self.view.SIDEPANE_SECTION, 'side pane items')
 
 		self.apply_settings()
 		self.view.post_build_ui()
 		self.view.hide_message_window()
 
 
-	# This method is called from the View API
-	def rebuild_ui(self, show_message = False):
+	def _rebuild_ui(self, show_message = False):
 		"""
 		Rebuild the UI after a timer (this is called when the menu data changes,
 		for example)
@@ -796,7 +748,7 @@ class Cardapio(dbus.service.Object):
 			self.rebuild_timer = None
 
 		# don't interrupt the user if a rebuild was requested while the window was shown
-		# (instead, the rebuild will happen when self.hide() is called)
+		# (instead, the rebuild will happen when self._hide() is called)
 		if (not show_message) and self.view.is_window_visible(): 
 			logging.info('Rebuild postponed: Cardapio is visible!')
 			self.must_rebuild = True
@@ -810,9 +762,9 @@ class Cardapio(dbus.service.Object):
 		if show_message:
 			self.view.show_message_window()
 
-		self.reset_model()
-		if self.must_activate_plugins: self.activate_plugins_from_settings()
-		self.build_ui()
+		self._reset_model()
+		if self.must_activate_plugins: self._activate_plugins_from_settings()
+		self._build_ui()
 
 		gc.collect()
 
@@ -826,8 +778,8 @@ class Cardapio(dbus.service.Object):
 				plugin.on_reload_permission_granted()
 				# (leak solved!)
 
-		#self.reset_search_query()
-		self.reset_search()
+		#self._reset_search_query()
+		self._reset_search()
 		self.view.focus_search_entry()
 
 		return False
@@ -836,76 +788,30 @@ class Cardapio(dbus.service.Object):
 		# the rebuild_timer above. But it's better to be safe then sorry...)
 
 
-	def clear_all_panes(self):
+	def _clear_all_panes(self):
 		"""
 		Clears all the different sections of the UI (panes)
 		"""
 
-		self.remove_all_buttons_from_section(self.view.APPLICATION_PANE)
-		self.remove_all_buttons_from_section(self.view.SIDE_PANE)
-		self.remove_all_buttons_from_section(self.view.LEFT_SESSION_PANE)
-		self.remove_all_buttons_from_section(self.view.RIGHT_SESSION_PANE)
+		self._remove_all_buttons_from_section(self.view.APPLICATION_PANE)
+		self._remove_all_buttons_from_section(self.view.SIDE_PANE)
+		self._remove_all_buttons_from_section(self.view.LEFT_SESSION_PANE)
+		self._remove_all_buttons_from_section(self.view.RIGHT_SESSION_PANE)
 
 		self.view.remove_all_buttons_from_category_panes()
 
 
-	# This method is used by both the View API and the Applet API
-	def open_about_dialog(self, verb):
-		"""
-		Opens either the "About Gnome" dialog, or the "About Ubuntu" dialog,
-		or the "About Cardapio" dialog
-		"""
-
-		if verb == 'AboutGnome':
-			self.launch_raw(self.de.about_de)
-
-		elif verb == 'AboutDistro':
-			self.launch_raw(self.de.about_distro)
-
-		else: self.view.open_about_dialog()
-
-
-	# This method is called from the View API
-	@dbus.service.method(dbus_interface = Constants.bus_name_str, in_signature = None, out_signature = None)
+	@dbus.service.method(dbus_interface = Constants.BUS_NAME_STR, in_signature = None, out_signature = None)
 	def open_options_dialog(self):
 		"""
 		Show the Options Dialog and populate its widgets with values from the
 		user's settings.
 		"""
 
-		self.hide()
+		self._hide()
 		self.options_window.show()
 
 
-	# This method is called from OptionsWindow
-	def plugin_iterator(self):
-		"""
-		Iterates first through all active plugins in their user-specified order,
-		then through all inactive plugins alphabetically.
-		"""
-
-		plugin_list = []
-		plugin_list += [basename for basename in self.settings['active plugins']]
-
-		inactive_plugins = [
-				(self.plugin_database[basename]['class'].name.lower(), basename) 
-				for basename in self.plugin_database if basename not in plugin_list]
-		inactive_plugins = [plugin_tuple[1] for plugin_tuple in sorted(inactive_plugins)]
-		plugin_list += inactive_plugins
-
-		for basename in plugin_list:
-
-			try: plugin_class = self.plugin_database[basename]['class']
-			except: continue
-
-			is_active   = (basename in self.settings['active plugins'])
-			is_core     = (basename in self.core_plugins)
-			is_required = (basename in self.required_plugins)
-
-			yield (basename, plugin_class, is_active, is_core, is_required)
-
-
-	# This method is called from OptionsWindow
 	def get_plugin_class(self, plugin_basename):
 		"""
 		Given the plugin filename (without the .py) this method returns the
@@ -916,98 +822,23 @@ class Cardapio(dbus.service.Object):
 		return self.plugin_database[plugin_basename]['class']
 
 
-	# This method is called from the View API
-	def end_resize(self):
-		"""
-		This function is called when the user releases the mouse after resizing the
-		Cardapio window.
-		"""
-
-		self.save_dimensions()
-
-
-	# This method is called from the View API
-	def handle_mainwindow_focus_out(self):
-		"""
-		Make Cardapio disappear when it loses focus
-		"""
-
-		self.save_dimensions()
-
-		# Make sure clicking the applet button doesn't cause a focus-out event.
-		# Otherwise, the click signal can actually happen *after* the focus-out,
-		# which causes the window to be re-shown rather than disappearing.  So
-		# by ignoring this focus-out we actually make sure that Cardapio will be
-		# hidden after all. Silly.
-		mouse_x, mouse_y = self.view.get_cursor_coordinates()
-		if self.applet.has_mouse_cursor(mouse_x, mouse_y): return
-
-		# If the last app was opened in the background, make sure Cardapio
-		# doesn't hide when the app gets focused
-
-		if self.opened_last_app_in_background:
-
-			self.opened_last_app_in_background = False
-			self.show_main_window_on_best_screen()
-			return
-
-		self.hide()
-
-
-	# This method is called from the View API
-	def handle_mainwindow_cursor_leave(self):
-		"""
-		Handler for when the cursor leaves the Cardapio window.
-		If using 'open on hover', this hides the Cardapio window after a delay.
-		"""
-		if self.applet.panel_type is None: return
-
-		# TODO - Delete this line on Feb 28th
-		#if self.settings['open on hover'] and not self.view.focus_out_blocked:
-		if self.settings['open on hover']:
-			glib.timeout_add(self.settings['autohide delay'], self.hide_if_mouse_away)
-
-
-	# This method is called from the View API
-	def handle_user_closing_mainwindow(self):
-		"""
-		What happens when the user presses Alt-F4? If in panel mode,
-		nothing. If in launcher mode, this terminates Cardapio.
-		"""
-
-		if self.applet.panel_type is not None:
-			# keep window alive if in panel mode
-			return True
-
-		self.save_and_quit()
-
-
-	def on_menu_data_changed(self, tree):
+	def _on_menu_data_changed(self, tree):
 		"""
 		Rebuild the Cardapio UI whenever the menu data changes
 		"""
 
-		self.schedule_rebuild()
+		self._schedule_rebuild()
 
 	
-	def on_icon_theme_changed(self, *dummy):
+	def _on_icon_theme_changed(self, *dummy):
 		"""
 		Rebuild the Cardapio UI whenever the icon theme changes
 		"""
 
-		self.schedule_rebuild()
+		self._schedule_rebuild()
 
 
-	# This method is called from the View API 
-	def handle_reload_clicked(self):
-		"""
-		Rebuilds the Cardapio UI immediately. Should *never* be called from a plugin!
-		"""
-		self.rebuild_ui(show_message = True)
-
-	
-	# This method is called from the View API 
-	def schedule_rebuild(self, reactivate_plugins = False):
+	def _schedule_rebuild(self, reactivate_plugins = False):
 		"""
 		Rebuilds the Cardapio UI after a timer
 		"""
@@ -1027,11 +858,10 @@ class Cardapio(dbus.service.Object):
 			rebuild_delay = self.settings['keep results duration']
 
 		self.view.show_rebuild_required_bar()
-		self.rebuild_timer = glib.timeout_add(rebuild_delay, self.rebuild_ui)
+		self.rebuild_timer = glib.timeout_add(rebuild_delay, self._rebuild_ui)
 
 
-	# This method is called from the View API
-	def switch_modes(self, show_system_menus, toggle_mode_button = False):
+	def _switch_modes(self, show_system_menus, toggle_mode_button = False):
 		"""
 		Switches between "all menus" and "system menus" mode
 		"""
@@ -1040,8 +870,8 @@ class Cardapio(dbus.service.Object):
 
 		if toggle_mode_button: self.view.set_view_mode_button_toggled(show_system_menus)
 
-		self.untoggle_and_show_all_sections()
-		self.process_query(ignore_if_unchanged = False)
+		self._untoggle_and_show_all_sections()
+		self._process_query(ignore_if_unchanged = False)
 
 		if show_system_menus:
 			self.view.hide_pane(self.view.CATEGORY_PANE)
@@ -1052,20 +882,7 @@ class Cardapio(dbus.service.Object):
 			self.view.show_pane(self.view.CATEGORY_PANE)
 
 
-	# This method is called from the View API
-	def handle_search_entry_icon_pressed(self):
-		"""
-		Handler for when the "clear" icon of the search entry is pressed
-		"""
-
-		if self.view.is_search_entry_empty():
-			self.untoggle_and_show_all_sections()
-
-		else:
-			self.reset_search_query_and_selected_section()
-
-
-	def parse_keyword_query(self, text):
+	def _parse_keyword_query(self, text):
 		"""
 		Returns the (keyword, text) pair of a keyword search of type 
 		"?keyword text1 text2 ...", where text = "text1 text2 ..."
@@ -1078,31 +895,7 @@ class Cardapio(dbus.service.Object):
 		return keyword[1:], text
 
 
-	# This method is called from the View API
-	def handle_special_key_pressed(self, key, alt = False, ctrl = False):
-		"""
-		Handler for when an Alt/Ctrl combo is pressed and Cardapio is active.
-		"""
-
-		if alt:
-			if type(key) == int and 1 <= key <= 9:
-
-				app_info = self.view.get_nth_visible_app(key)
-
-				if app_info is not None:
-					self.launch_app(app_info, ctrl == False)
-
-
-	# This method is called from the View API
-	def handle_search_entry_changed(self):
-		"""
-		Handler for when the user types something in the search entry
-		"""
-
-		self.process_query(ignore_if_unchanged = True)
-
-	
-	def process_query(self, ignore_if_unchanged):
+	def _process_query(self, ignore_if_unchanged):
 		"""
 		Processes user query (i.e. the text in the search entry)
 		"""
@@ -1138,36 +931,36 @@ class Cardapio(dbus.service.Object):
 			self.subfolder_stack = []
 			self.view.hide_navigation_buttons()
 
-		self.disappear_with_all_sections_and_category_buttons()
+		self._disappear_with_all_sections_and_category_buttons()
 		handled = False
 
 		# if showing the control center menu
 		if self.in_system_menu_mode:
-			handled = self.search_menus(text, self.sys_list)
+			handled = self._search_menus(text, self.sys_list)
 
 		# if doing a subfolder search
 		elif in_subfolder_search_mode:
-			handled = self.search_subfolders(text, first_app_info, selected_app_info)
+			handled = self._search_subfolders(text, first_app_info, selected_app_info)
 
 		# if doing a keyword search
 		elif text and text[0] == '?':
-			handled = self.search_with_plugin_keyword(text)
+			handled = self._search_with_plugin_keyword(text)
 
 		# if none of these have "handled" the query, then just run a regular
 		# search. This includes the regular menus, the system menus, and all
 		# active plugins
 		if not handled:
 			self.view.hide_navigation_buttons()
-			self.search_menus(text, self.app_list)
-			self.schedule_search_with_all_plugins(text)
+			self._search_menus(text, self.app_list)
+			self._schedule_search_with_all_plugins(text)
 
-		if len(text) == 0: self.disappear_with_all_transitory_sections()
+		if len(text) == 0: self._disappear_with_all_transitory_sections()
 		else: self.view.set_all_sections_sidebar_button_sensitive(True, self.in_system_menu_mode)
 
-		self.consider_showing_no_results_text()
+		self._consider_showing_no_results_text()
 
 
-	def search_menus(self, text, app_list):
+	def _search_menus(self, text, app_list):
 		"""
 		Start a menu search
 		"""
@@ -1184,18 +977,18 @@ class Cardapio(dbus.service.Object):
 				self.view.hide_button(app['button'])
 			else:
 				self.view.show_button(app['button'])
-				self.mark_section_has_entries_and_show_category_button(app['section'])
+				self._mark_section_has_entries_and_show_category_button(app['section'])
 				self.no_results_to_show = False
 
 		if self.selected_section is None:
-			self.untoggle_and_show_all_sections()
+			self._untoggle_and_show_all_sections()
 
 		self.view.show_pane(self.view.APPLICATION_PANE) # restore APPLICATION_PANE
 		
 		return True
 
 
-	def search_subfolders(self, text, first_app_info, selected_app_info):
+	def _search_subfolders(self, text, first_app_info, selected_app_info):
 		"""
 		Lets you browse your filesystem through Cardapio by typing slash "/" after
 		a search query to "push into" a folder. 
@@ -1207,7 +1000,7 @@ class Cardapio(dbus.service.Object):
 		path          = None
 
 		self.view.hide_section(self.view.SUBFOLDERS_SECTION) # for added performance
-		self.remove_all_buttons_from_section(self.view.SUBFOLDERS_SECTION)
+		self._remove_all_buttons_from_section(self.view.SUBFOLDERS_SECTION)
 
 		if not search_inside:
 			if not self.subfolder_stack: return False
@@ -1239,7 +1032,7 @@ class Cardapio(dbus.service.Object):
 
 					if app_info['type'] != 'xdg': return False
 					path = app_info['command']
-					path = self.unescape_url(path)
+					path = self._unescape_url(path)
 					# removed this (was it ever necessary?)
 					#path = self.escape_quotes(path)
 
@@ -1272,7 +1065,7 @@ class Cardapio(dbus.service.Object):
 			matches = os.listdir(path)
 
 		try: 
-			self.file_looper = self.file_looper_generator(matches, path, ignore_hidden)
+			self.file_looper = self._file_looper_generator(matches, path, ignore_hidden)
 			count = self.file_looper.next()
 
 		except Exception, e:
@@ -1280,7 +1073,7 @@ class Cardapio(dbus.service.Object):
 
 		if count > 0:
 			self.view.show_section(self.view.SUBFOLDERS_SECTION)
-			self.mark_section_has_entries_and_show_category_button(self.view.SUBFOLDERS_SECTION)
+			self._mark_section_has_entries_and_show_category_button(self.view.SUBFOLDERS_SECTION)
 			self.no_results_to_show = False
 
 		else:
@@ -1289,7 +1082,7 @@ class Cardapio(dbus.service.Object):
 		return True
 
 
-	def file_looper_generator(self, matches, path, ignore_hidden):
+	def _file_looper_generator(self, matches, path, ignore_hidden):
 		"""
 		Creates a generator object that adds an app button for each file/folder
 		found in 'matches', and yields when the maximum number of results has been
@@ -1311,10 +1104,10 @@ class Cardapio(dbus.service.Object):
 
 				# don't let user click more than 5 times on "load more results"
 				if page == 5:
-					self.add_app_button(_('Open this folder'), 'system-file-manager', self.view.SUBFOLDERS_SECTION, 'xdg', path, _('Show additional search results in a file browser'), None)
+					self._add_app_button(_('Open this folder'), 'system-file-manager', self.view.SUBFOLDERS_SECTION, 'xdg', path, _('Show additional search results in a file browser'), None)
 					yield count
 
-				load_more_button = self.add_app_button(_('Load additional results'), 'add', self.view.SUBFOLDERS_SECTION, 'special', self.load_more_subfolder_results, _('Show additional search results'), None)
+				load_more_button = self._add_app_button(_('Load additional results'), 'add', self.view.SUBFOLDERS_SECTION, 'special', self._load_more_subfolder_results, _('Show additional search results'), None)
 				yield count
 
 				self.view.hide_button(load_more_button)
@@ -1328,12 +1121,12 @@ class Cardapio(dbus.service.Object):
 			if icon_name is None: icon_name = 'folder'
 
 			basename, dummy = os.path.splitext(filename)
-			self.add_app_button(filename, icon_name, self.view.SUBFOLDERS_SECTION, 'xdg', command, command, None)
+			self._add_app_button(filename, icon_name, self.view.SUBFOLDERS_SECTION, 'xdg', command, command, None)
 
 		yield count
 
 
-	def load_more_subfolder_results(self):
+	def _load_more_subfolder_results(self):
 		"""
 		Loads more results in the subfolder view
 		"""
@@ -1344,7 +1137,7 @@ class Cardapio(dbus.service.Object):
 			pass
 
 
-	def cancel_all_plugin_timers(self):
+	def _cancel_all_plugin_timers(self):
 		"""
 		Cancels both the "search start"-type timers and the "search timeout"-type ones
 		"""
@@ -1362,7 +1155,7 @@ class Cardapio(dbus.service.Object):
 			glib.source_remove(self.search_timeout_remote)
 
 
-	def search_with_plugin_keyword(self, text):
+	def _search_with_plugin_keyword(self, text):
 		"""
 		Search using the plugin that matches the keyword (specified as the first
 		word in a query beginning with a question mark). This method always
@@ -1370,7 +1163,7 @@ class Cardapio(dbus.service.Object):
 		types. 
 		"""
 
-		keywordtext = self.parse_keyword_query(text)
+		keywordtext = self._parse_keyword_query(text)
 		if not keywordtext: return True
 
 		keyword, text = keywordtext
@@ -1387,58 +1180,58 @@ class Cardapio(dbus.service.Object):
 
 		plugin = self.keyword_to_plugin_mapping[keyword][0] # TODO TODO
 
-		self.cancel_all_plugins()
-		self.cancel_all_plugin_timers()
+		self._cancel_all_plugins()
+		self._cancel_all_plugin_timers()
 
-		self.schedule_search_with_specific_plugin(text, plugin.search_delay_type, plugin)
+		self._schedule_search_with_specific_plugin(text, plugin.search_delay_type, plugin)
 
 		return True
 
 
-	def reset_search(self):
+	def _reset_search(self):
 		"""
 		Sets Cardapio's search to its default empty state
 		"""
-		self.schedule_search_with_all_plugins('')
+		self._schedule_search_with_all_plugins('')
 
 
-	def schedule_search_with_all_plugins(self, text):
+	def _schedule_search_with_all_plugins(self, text):
 		"""
 		Cleans up plugins and timers, and creates new timers to search with all
 		plugins
 		"""
 
-		self.cancel_all_plugins()
-		self.cancel_all_plugin_timers()
+		self._cancel_all_plugins()
+		self._cancel_all_plugin_timers()
 
-		self.schedule_search_with_specific_plugin(text, None)
-		self.schedule_search_with_specific_plugin(text, 'local')
-		self.schedule_search_with_specific_plugin(text, 'remote')
+		self._schedule_search_with_specific_plugin(text, None)
+		self._schedule_search_with_specific_plugin(text, 'local')
+		self._schedule_search_with_specific_plugin(text, 'remote')
 
 
-	def schedule_search_with_specific_plugin(self, text, delay_type = None, specific_plugin = None):
+	def _schedule_search_with_specific_plugin(self, text, delay_type = None, specific_plugin = None):
 		"""
 		Sets up timers to start searching with the plugins specified by the
 		delay_type and possibly by "specific_plugin"
 		"""
 
 		if delay_type is None:
-			self.search_with_specific_plugin(text, None, specific_plugin)
+			self._search_with_specific_plugin(text, None, specific_plugin)
 
 		elif delay_type == 'local':
 			timer_delay = self.settings['local search update delay']
 			timeout     = self.settings['local search timeout']
-			self.search_timer_local   = glib.timeout_add(timer_delay, self.search_with_specific_plugin, text, delay_type, specific_plugin)
-			self.search_timeout_local = glib.timeout_add(timeout, self.show_all_plugin_timeout_text, delay_type)
+			self.search_timer_local   = glib.timeout_add(timer_delay, self._search_with_specific_plugin, text, delay_type, specific_plugin)
+			self.search_timeout_local = glib.timeout_add(timeout, self._show_all_plugin_timeout_text, delay_type)
 		
 		else:
 			timer_delay = self.settings['remote search update delay']
 			timeout     = self.settings['remote search timeout']
-			self.search_timer_remote   = glib.timeout_add(timer_delay, self.search_with_specific_plugin, text, delay_type, specific_plugin)
-			self.search_timeout_remote = glib.timeout_add(timeout, self.show_all_plugin_timeout_text, delay_type)
+			self.search_timer_remote   = glib.timeout_add(timer_delay, self._search_with_specific_plugin, text, delay_type, specific_plugin)
+			self.search_timeout_remote = glib.timeout_add(timeout, self._show_all_plugin_timeout_text, delay_type)
 
 
-	def search_with_specific_plugin(self, text, delay_type, specific_plugin = None):
+	def _search_with_specific_plugin(self, text, delay_type, specific_plugin = None):
 		"""
 		Start a plugin-based search
 		"""
@@ -1459,11 +1252,11 @@ class Cardapio(dbus.service.Object):
 			plugin.__is_running = True
 
 			try:
-				self.show_plugin_loading_text(plugin)
+				self._show_plugin_loading_text(plugin)
 				plugin.search(text, self.settings['long search results limit'])
 
 			except Exception, exception:
-				self.plugin_write_to_log(plugin, 'Plugin search query failed to execute', is_error = True)
+				self._plugin_write_to_log(plugin, 'Plugin search query failed to execute', is_error = True)
 				logging.error(exception)
 
 			return False # Required!
@@ -1485,18 +1278,18 @@ class Cardapio(dbus.service.Object):
 			plugin.__is_running = True
 
 			try:
-				self.show_plugin_loading_text(plugin)
+				self._show_plugin_loading_text(plugin)
 				plugin.search(text, number_of_results)
 
 			except Exception, exception:
-				self.plugin_write_to_log(plugin, 'Plugin search query failed to execute', is_error = True)
+				self._plugin_write_to_log(plugin, 'Plugin search query failed to execute', is_error = True)
 				logging.error(exception)
 
 		return False
 		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
-	def show_plugin_loading_text(self, plugin):
+	def _show_plugin_loading_text(self, plugin):
 		"""
 		Write "Searching..." under the plugin section title
 		"""
@@ -1510,7 +1303,7 @@ class Cardapio(dbus.service.Object):
 		self.plugins_still_searching += 1
 
 
-	def show_all_plugin_timeout_text(self, delay_type):
+	def _show_all_plugin_timeout_text(self, delay_type):
 		"""
 		Write "Plugin timed out..." under the plugin section title
 		"""
@@ -1524,7 +1317,7 @@ class Cardapio(dbus.service.Object):
 				plugin.cancel()
 
 			except Exception, exception:
-				self.plugin_write_to_log(plugin, 'Plugin failed to cancel query', is_error = True)
+				self._plugin_write_to_log(plugin, 'Plugin failed to cancel query', is_error = True)
 				logging.error(exception)
 
 			self.view.show_section_status_text(plugin.section, self.plugin_timeout_text)
@@ -1532,25 +1325,25 @@ class Cardapio(dbus.service.Object):
 
 			self.plugins_still_searching -= 1
 
-		self.consider_showing_no_results_text()
+		self._consider_showing_no_results_text()
 
 		return False
 		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
-	def plugin_handle_search_error(self, plugin, text):
+	def _plugin_handle_search_error(self, plugin, text):
 		"""
 		Handler for when a plugin returns an error
 		"""
 
 		plugin.__is_running = False
-		self.plugin_write_to_log(plugin, text, is_error = True)
+		self._plugin_write_to_log(plugin, text, is_error = True)
 
 		# must be outside the lock!
-		self.plugin_handle_search_result(plugin, [], '')
+		self._plugin_handle_search_result(plugin, [], '')
 
 
-	def plugin_handle_search_result(self, plugin, results, original_query):
+	def _plugin_handle_search_result(self, plugin, results, original_query):
 		"""
 		Handler for when a plugin returns some search results. This handler may be
 		running on a different thread from the rest of the Cardapio application, since
@@ -1558,11 +1351,11 @@ class Cardapio(dbus.service.Object):
 		sent to be executed in the UI thread (if any).
 		"""
 
-		self.view.run_in_ui_thread(self.plugin_handle_search_result_synchronized, plugin, results, original_query)
+		self.view.run_in_ui_thread(self._plugin_handle_search_result_synchronized, plugin, results, original_query)
 
 
 	# TODO MVC
-	def plugin_handle_search_result_synchronized(self, plugin, results, original_query):
+	def _plugin_handle_search_result_synchronized(self, plugin, results, original_query):
 		"""
 		Handler for when a plugin returns some search results. This one is
 		actually synchronized with the UI thread.
@@ -1609,7 +1402,7 @@ class Cardapio(dbus.service.Object):
 			if icon_name is None:
 				icon_name = fallback_icon
 
-			button = self.add_app_button(result['name'], icon_name, plugin.section, result['type'], result['command'], result['tooltip'], None)
+			button = self._add_app_button(result['name'], icon_name, plugin.section, result['type'], result['command'], result['tooltip'], None)
 			button.app_info['context menu'] = result['context menu']
 
 
@@ -1621,36 +1414,36 @@ class Cardapio(dbus.service.Object):
 			section_contents = plugin.section.get_children()[0].get_children()[0]
 			section_contents.show()
 
-			self.mark_section_has_entries_and_show_category_button(plugin.section)
+			self._mark_section_has_entries_and_show_category_button(plugin.section)
 
 			if (self.selected_section is None) or (self.selected_section == plugin.section):
 				self.view.show_section(plugin.section)
 				self.view.hide_no_results_text()
 
 			else:
-				self.consider_showing_no_results_text()
+				self._consider_showing_no_results_text()
 
 		else:
 
-			self.mark_section_empty_and_hide_category_button(plugin.section)
+			self._mark_section_empty_and_hide_category_button(plugin.section)
 
 			if (self.selected_section is None) or (self.selected_section == plugin.section):
 				self.view.hide_section(plugin.section)
 
-			self.consider_showing_no_results_text()
+			self._consider_showing_no_results_text()
 
 
-	def plugin_ask_for_reload_permission(self, plugin):
+	def _plugin_ask_for_reload_permission(self, plugin):
 		"""
 		Handler for when a plugin asks Cardapio whether it can reload its
 		database
 		"""
 
 		# TODO: do this in a smarter way
-		self.schedule_rebuild()
+		self._schedule_rebuild()
 
 
-	def cancel_all_plugins(self):
+	def _cancel_all_plugins(self):
 		"""
 		Tell all plugins to stop a possibly-time-consuming search
 		"""
@@ -1665,70 +1458,11 @@ class Cardapio(dbus.service.Object):
 				plugin.cancel()
 
 			except Exception, exception:
-				self.plugin_write_to_log(plugin, 'Plugin failed to cancel query', is_error = True)
+				self._plugin_write_to_log(plugin, 'Plugin failed to cancel query', is_error = True)
 				logging.error(exception)
 
 
-	# This method is called from the View API
-	def handle_search_entry_activate(self, ctrl_is_pressed, shift_is_pressed):
-		"""
-		Handler for when the user presses Enter on the search entry
-		"""
-
-		if self.view.is_search_entry_empty():
-			# TODO: why is this needed? I don't see its effects...
-			self.disappear_with_all_transitory_sections() 
-			return
-
-		app_info = self.view.get_nth_visible_app(1)
-		# TODO MVC: there should be no need for get_first_visible_app. Instead,
-		# the model should know the top app already!
-
-		if app_info is not None:
-			self.handle_app_clicked(app_info, 1, ctrl_is_pressed, shift_is_pressed)
-
-		if not self.settings['keep search results']:
-			self.reset_search_timer = glib.timeout_add(self.settings['keep results duration'], self.reset_search_timer_fired)
-
-
-	# This method is called from the View API
-	def handle_search_entry_tab_pressed(self):
-		"""
-		Handler for when the tab is pressed while the search entry is focused.
-		This moves the focus into the app pane.
-		"""
-		self.view.focus_first_visible_app()
-
-
-	# This method is called from the View API
-	def handle_search_entry_escape_pressed(self):
-		"""
-		Handle what should happen when Escape is pressed while the search entry
-		is focused.
-		"""
-
-		self.cancel_all_plugins()
-
-		text = self.view.get_search_entry_text()
-		slash_pos = text.rfind('/')
-
-		if self.subfolder_stack and slash_pos != -1:
-			self.go_to_parent_folder()
-
-		elif not self.view.is_search_entry_empty():
-			self.reset_search_query()
-
-		elif self.selected_section is not None:
-			self.untoggle_and_show_all_sections()
-
-		elif self.in_system_menu_mode:
-			self.switch_modes(show_system_menus = False, toggle_mode_button = True)
-
-		else:
-			self.hide()
-
-
-	def choose_coordinates_for_window(self):
+	def _choose_coordinates_for_window(self):
 		"""
 		Returns the appropriate coordinates for the given window. The
 		coordinates are determined according to the following algorithm:
@@ -1769,7 +1503,7 @@ class Cardapio(dbus.service.Object):
 		return x, y
 
 
-	def get_coordinates_inside_screen(self, x, y, force_anchor_right = False, force_anchor_bottom = False):
+	def _get_coordinates_inside_screen(self, x, y, force_anchor_right = False, force_anchor_bottom = False):
 		"""
 		If the window won't fit on the usable screen, given its size and
 		proposed coordinates, the method will rotate it over its x, y, or x=y
@@ -1823,7 +1557,7 @@ class Cardapio(dbus.service.Object):
 		return x, y, anchor_right, anchor_bottom
 
 
-	def restore_dimensions(self, x = None, y = None, force_anchor_right = False, force_anchor_bottom = False):
+	def _restore_dimensions(self, x = None, y = None, force_anchor_right = False, force_anchor_bottom = False):
 		"""
 		Resize Cardapio according to the user preferences
 		"""
@@ -1832,9 +1566,9 @@ class Cardapio(dbus.service.Object):
 			self.view.resize_main_window(*self.settings['window size'])
 
 		if x is None or y is None:
-			x, y = self.choose_coordinates_for_window()
+			x, y = self._choose_coordinates_for_window()
 
-		x, y, anchor_right, anchor_bottom = self.get_coordinates_inside_screen(x, y, force_anchor_right, force_anchor_bottom)
+		x, y, anchor_right, anchor_bottom = self._get_coordinates_inside_screen(x, y, force_anchor_right, force_anchor_bottom)
 		self.view.move_main_window(x, y, anchor_right, anchor_bottom)
 
 		if self.settings['mini mode']:
@@ -1848,7 +1582,7 @@ class Cardapio(dbus.service.Object):
 		self.view.setup_search_entry(not anchor_bottom, not self.settings['mini mode'])
 
 
-	@dbus.service.method(dbus_interface = Constants.bus_name_str, in_signature = 'ii', out_signature = None)
+	@dbus.service.method(dbus_interface = Constants.BUS_NAME_STR, in_signature = 'ii', out_signature = None)
 	def set_default_window_position(self, x, y):
 		"""
 		Sets Cardapio's position when it was initialized by itself (usually not 
@@ -1859,7 +1593,7 @@ class Cardapio(dbus.service.Object):
 		self.default_window_position = (x,y)
 
 
-	def save_dimensions(self):
+	def _save_dimensions(self):
 		"""
 		Save Cardapio's size into the user preferences
 		"""
@@ -1869,14 +1603,7 @@ class Cardapio(dbus.service.Object):
 			self.settings['splitter position'] = self.view.get_main_splitter_position()
 
 
-	def toggle_mini_mode_ui(self):
-		"""
-		Collapses the sidebar into a row of small buttons (i.e. minimode)
-		"""
-		self.view.toggle_mini_mode_ui()
-
-
-	@dbus.service.method(dbus_interface = Constants.bus_name_str, in_signature = None, out_signature = None)
+	@dbus.service.method(dbus_interface = Constants.BUS_NAME_STR, in_signature = None, out_signature = None)
 	def show_hide(self):
 		"""
 		Toggles Cardapio's visibility and places the window near the applet or,
@@ -1891,7 +1618,7 @@ class Cardapio(dbus.service.Object):
 		return self.show_hide_near_point()
 
 
-	@dbus.service.method(dbus_interface = Constants.bus_name_str, in_signature = None, out_signature = None)
+	@dbus.service.method(dbus_interface = Constants.BUS_NAME_STR, in_signature = None, out_signature = None)
 	def show_hide_near_mouse(self):
 		"""
 		Toggles Cardapio's visibility and places the window near the mouse.
@@ -1906,7 +1633,7 @@ class Cardapio(dbus.service.Object):
 		return self.show_hide_near_point(mouse_x, mouse_y)
 
 
-	@dbus.service.method(dbus_interface = Constants.bus_name_str, in_signature = 'iibb', out_signature = None)
+	@dbus.service.method(dbus_interface = Constants.BUS_NAME_STR, in_signature = 'iibb', out_signature = None)
 	def show_hide_near_point(self, x = None, y = None, force_anchor_right = False, force_anchor_bottom = False):
 		"""
 		Toggles Cardapio's visibility and places the window at the given (x,y)
@@ -1923,18 +1650,18 @@ class Cardapio(dbus.service.Object):
 			return
 
 		if self.visible: 
-			self.hide()
+			self._hide()
 		else: 
 			if x is not None: x = int(x)
 			if y is not None: y = int(y)
 			if x < 0: x = None
 			if y < 0: y = None
-			self.show(x, y, force_anchor_right, force_anchor_bottom)
+			self._show(x, y, force_anchor_right, force_anchor_bottom)
 
 		return True
 	
 
-	def show(self, x = None, y = None, force_anchor_right = False, force_anchor_bottom = False):
+	def _show(self, x = None, y = None, force_anchor_right = False, force_anchor_bottom = False):
 		"""
 		Shows the Cardapio window.
 
@@ -1948,15 +1675,15 @@ class Cardapio(dbus.service.Object):
 
 		# reset to regular mode if 'keep search results' is off
 		elif not self.settings['keep search results']:
-			self.switch_modes(show_system_menus = False, toggle_mode_button = True)
+			self._switch_modes(show_system_menus = False, toggle_mode_button = True)
 
 		self.applet.draw_toggled_state(True)
 		#self.applet.disable_autohide(True)
 
-		self.restore_dimensions(x, y, force_anchor_right = False, force_anchor_bottom = False)
+		self._restore_dimensions(x, y, force_anchor_right = False, force_anchor_bottom = False)
 
 		self.view.focus_search_entry()
-		self.show_main_window_on_best_screen()
+		self._show_main_window_on_best_screen()
 
  		self.view.scroll_to_top()
 
@@ -1966,7 +1693,7 @@ class Cardapio(dbus.service.Object):
 		self.opened_last_app_in_background = False
 
 
-	def show_main_window_on_best_screen(self):
+	def _show_main_window_on_best_screen(self):
 		"""
 		Shows the Cardapio window on the best screen: if there is an applet,
 		shows Cardapio on the screen where the applet is drawn. Otherwise, show
@@ -1980,7 +1707,7 @@ class Cardapio(dbus.service.Object):
 		self.view.show_main_window()
 
 
-	def hide(self):
+	def _hide(self):
 		"""
 		Hides the Cardapio window.
 		"""
@@ -1999,18 +1726,18 @@ class Cardapio(dbus.service.Object):
 			# remembering current search text in all entries
 			self.view.set_search_entry_text(self.current_query)
 		else:
-			self.reset_search_timer = glib.timeout_add(self.settings['keep results duration'], self.reset_search_timer_fired)
+			self.reset_search_timer = glib.timeout_add(self.settings['keep results duration'], self._reset_search_timer_fired)
 
-		self.cancel_all_plugins()
+		self._cancel_all_plugins()
 
 		logging.info('(RSS = %s)' % get_memory_usage())
 
-		if self.must_rebuild: self.schedule_rebuild()
+		if self.must_rebuild: self._schedule_rebuild()
 
 		return False # used for when hide() is called from a timer
 
 
-	def hide_if_mouse_away(self):
+	def _hide_if_mouse_away(self):
 		"""
 		Hide the window if the cursor is neither on top of it nor on top of the
 		panel applet
@@ -2030,10 +1757,10 @@ class Cardapio(dbus.service.Object):
 
 		if self.applet.has_mouse_cursor(mouse_x, mouse_y): return
 
-		self.hide()
+		self._hide()
 
 
-	def remove_section_from_app_list(self, section):
+	def _remove_section_from_app_list(self, section):
 		"""
 		Remove from the app list all apps that belong in a given section.
 		"""
@@ -2046,7 +1773,7 @@ class Cardapio(dbus.service.Object):
 			else: i += 1
 
 
-	def fill_system_list(self):
+	def _fill_system_list(self):
 		"""
 		Populate the System section
 		"""
@@ -2060,29 +1787,29 @@ class Cardapio(dbus.service.Object):
 		self.view.hide_pane(self.view.SYSTEM_CATEGORY_PANE)
 
 		section, dummy = self.add_section(_('Uncategorized'), 'applications-other', tooltip = _('Other configuration tools'), hidden_when_no_query = False, system_menu = True)
-		self.add_tree_to_app_list(self.sys_tree.root, section, self.sys_list, recursive = False)
+		self._add_tree_to_app_list(self.sys_tree.root, section, self.sys_list, recursive = False)
 
-		self.add_tree_to_app_list(self.sys_tree.root, self.view.SYSTEM_SECTION, self.app_list)
+		self._add_tree_to_app_list(self.sys_tree.root, self.view.SYSTEM_SECTION, self.app_list)
 
 
-	def fill_uncategorized_list(self):
+	def _fill_uncategorized_list(self):
 		"""
 		Populate the Uncategorized section
 		"""
 
-		self.add_tree_to_app_list(self.app_tree.root, self.view.UNCATEGORIZED_SECTION, self.app_list, recursive = False)
+		self._add_tree_to_app_list(self.app_tree.root, self.view.UNCATEGORIZED_SECTION, self.app_list, recursive = False)
 
 
-	def fill_places_list(self):
+	def _fill_places_list(self):
 		"""
 		Populate the places list
 		"""
 
-		self.fill_bookmarked_places_list()
-		self.fill_system_places_list()
+		self._fill_bookmarked_places_list()
+		self._fill_system_places_list()
 
 
-	def fill_system_places_list(self):
+	def _fill_system_places_list(self):
 		"""
 		Populate the "system places", which include Computer, the list of
 		connected drives, and so on.
@@ -2107,33 +1834,34 @@ class Cardapio(dbus.service.Object):
 			try    : command = str(volume.get_mount().get_root().get_uri())
 			except : command = ''
 
-			self.add_app_button(name, icon_name, section, 'xdg', command, command, self.app_list)
+			self._add_app_button(name, icon_name, section, 'xdg', command, command, self.app_list)
 			self.volumes[command] = volume
 
-		self.add_app_button(_('Network'), 'network', section, 'xdg', 'network://', _('Browse the contents of the network'), self.app_list)
+		self._add_app_button(_('Network'), 'network', section, 'xdg', 'network://', _('Browse the contents of the network'), self.app_list)
 
 		self.de.connect_to_server
 		if self.de.connect_to_server is not None:
-			self.add_app_button(_('Connect to Server'), 'network-server', section, 'raw', self.de.connect_to_server, _('Connect to a remote computer or shared disk'), self.app_list)
+			self._add_app_button(_('Connect to Server'), 'network-server', section, 'raw', self.de.connect_to_server, _('Connect to a remote computer or shared disk'), self.app_list)
 
-		self.add_app_button(_('Trash'), 'user-trash', section, 'xdg', 'trash:///', _('Open the trash'), self.app_list)
+		self._add_app_button(_('Trash'), 'user-trash', section, 'xdg', 'trash:///', _('Open the trash'), self.app_list)
 
 		if not volume_monitor_already_existed:
-			self.volume_monitor.connect('mount-added', self.on_volume_monitor_changed)
-			self.volume_monitor.connect('mount-removed', self.on_volume_monitor_changed)
+			self.volume_monitor.connect('mount-added', self._on_volume_monitor_changed)
+			self.volume_monitor.connect('mount-removed', self._on_volume_monitor_changed)
 
 
-	def fill_bookmarked_places_list(self):
+	def _fill_bookmarked_places_list(self):
 		"""
 		Populate the "bookmarked places", which include Home and your personal bookmarks.
 		"""
 
 		section = self.view.PLACES_SECTION
 
-		self.add_app_button(_('Home'), 'user-home', section, 'xdg', self.home_folder_path, _('Open your personal folder'), self.app_list)
+		self._add_app_button(_('Home'), 'user-home', section, 'xdg', self.home_folder_path, _('Open your personal folder'), self.app_list)
 
 		xdg_folders_file_path = os.path.join(DesktopEntry.xdg_config_home, 'user-dirs.dirs')
 		xdg_folders_file = file(xdg_folders_file_path, 'r')
+		# TODO: xdg_folders_file = codecs.open(xdg_folders_file_path, mode='r', encoding='utf-8')
 
 		# find desktop path and add desktop button
 		for line in xdg_folders_file.readlines():
@@ -2146,65 +1874,66 @@ class Cardapio(dbus.service.Object):
 				# do *not* need to add the desktop button.
 				if os.path.abspath(path) == self.home_folder_path: break
 
-				self.add_place(_('Desktop'), path, 'user-desktop')
+				self._add_place(_('Desktop'), path, 'user-desktop')
 				break
 
 		xdg_folders_file.close()
 
 		bookmark_file_path = os.path.join(self.home_folder_path, '.gtk-bookmarks')
 		bookmark_file = file(bookmark_file_path, 'r')
+		# TODO: xdg_folders_file = codecs.open(bookmark_file_path, mode='r', encoding='utf-8')
 
 		for line in bookmark_file.readlines():
 			if line.strip(' \n\r\t'):
 
-				name, path = self.get_place_name_and_path(line)
+				name, path = self._get_place_name_and_path(line)
 				path_type, dummy = urllib2.splittype(path)
 
 				gio_path_obj = gio.File(path)
 				if not gio_path_obj.query_exists() and path_type not in Cardapio.REMOTE_PROTOCOLS: continue
 
-				self.add_place(name, path, 'folder')
+				self._add_place(name, path, 'folder')
 
 		bookmark_file.close()
 
 		if self.bookmark_monitor is None:
 			self.bookmark_monitor = gio.File(bookmark_file_path).monitor_file() # keep a reference to avoid getting it garbage-collected
-			self.bookmark_monitor.connect('changed', self.on_bookmark_monitor_changed)
+			self.bookmark_monitor.connect('changed', self._on_bookmark_monitor_changed)
 
 
-	def on_bookmark_monitor_changed(self, monitor, file, other_file, event):
+	def _on_bookmark_monitor_changed(self, monitor, file, other_file, event):
 		"""
 		Handler for when the user adds/removes a bookmarked folder using
 		Nautilus or some other program
 		"""
 
 	 	# hoping this helps with bug 662249, in case there is some strange threading problem happening (although there are no explicit threads in this program)	
-		self.bookmark_monitor.handler_block_by_func(self.on_bookmark_monitor_changed)
+		self.bookmark_monitor.handler_block_by_func(self._on_bookmark_monitor_changed)
 
 		if event == gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
-			self.remove_all_buttons_from_section(self.view.PLACES_SECTION)
-			self.fill_places_list()
+			self._remove_all_buttons_from_section(self.view.PLACES_SECTION)
+			self._fill_places_list()
 
 		# same here
-		self.bookmark_monitor.handler_unblock_by_func(self.on_bookmark_monitor_changed) 
+		self.bookmark_monitor.handler_unblock_by_func(self._on_bookmark_monitor_changed) 
 
 
-	def on_volume_monitor_changed(self, monitor, drive):
+	def _on_volume_monitor_changed(self, monitor, drive):
 		"""
 		Handler for when volumes are mounted or ejected
 		"""
 
 	 	# hoping this helps with bug 662249, in case there is some strange threading problem happening (although there are no explicit threads in this program)	
-		self.volume_monitor.handler_block_by_func(self.on_volume_monitor_changed)
+		self.volume_monitor.handler_block_by_func(self._on_volume_monitor_changed)
 
-		self.remove_all_buttons_from_section(self.view.PLACES_SECTION)
-		self.fill_places_list()
+		self._remove_all_buttons_from_section(self.view.PLACES_SECTION)
+		self._fill_places_list()
 
 		# same here
-		self.volume_monitor.handler_unblock_by_func(self.on_volume_monitor_changed) 
+		self.volume_monitor.handler_unblock_by_func(self._on_volume_monitor_changed) 
 
 
-	def get_folder_name_and_path(self, folder_path):
+	def _get_folder_name_and_path(self, folder_path):
 		"""
 		Returns a folder's name and path from its full filename
 		"""
@@ -2221,7 +1950,7 @@ class Cardapio(dbus.service.Object):
 		return name, path
 
 
-	def get_place_name_and_path(self, folder_path):
+	def _get_place_name_and_path(self, folder_path):
 		"""
 		Return the name and path of a bookmarked folder given a line from the
 		gtk-bookmarks file
@@ -2233,23 +1962,23 @@ class Cardapio(dbus.service.Object):
 			path = res[0]
 			return name, path
 
-		return self.get_folder_name_and_path(folder_path)
+		return self._get_folder_name_and_path(folder_path)
 
 
-	def add_place(self, folder_name, folder_path, folder_icon):
+	def _add_place(self, folder_name, folder_path, folder_icon):
 		"""
 		Add a folder to the Places list in Cardapio
 		"""
 
 		folder_path = os.path.expanduser(folder_path.replace('$HOME', '~')).strip(' \n\r\t')
-		folder_path = self.unescape_url(folder_path)
+		folder_path = self._unescape_url(folder_path)
 
 		icon_name = self.icon_helper.get_icon_name_from_path(folder_path)
 		if icon_name is None: icon_name = folder_icon
-		self.add_app_button(folder_name, icon_name, self.view.PLACES_SECTION, 'xdg', folder_path, folder_path, self.app_list)
+		self._add_app_button(folder_name, icon_name, self.view.PLACES_SECTION, 'xdg', folder_path, folder_path, self.app_list)
 
 
-	def fill_favorites_list(self, section, list_name):
+	def _fill_favorites_list(self, section, list_name):
 		"""
 		Populate either the Pinned Items or Side Pane list
 		"""
@@ -2267,30 +1996,30 @@ class Cardapio(dbus.service.Object):
 			if 'context menu' not in app:
 				app['context menu'] = None
 
-			app_button = self.add_app_button(app['name'], app['icon name'], section, app['type'], app['command'], app['tooltip'], self.app_list)
+			app_button = self._add_app_button(app['name'], app['icon name'], section, app['type'], app['command'], app['tooltip'], self.app_list)
 
 			self.view.show_button(app_button)
-			self.mark_section_has_entries_and_show_category_button(section)
+			self._mark_section_has_entries_and_show_category_button(section)
 			self.no_results_to_show = False
 			no_results = False
 
 			if section == self.view.SIDEPANE_SECTION:
-				button_str, tooltip = self.sanitize_button_info(app['name'], app['tooltip'])
+				button_str, tooltip = self._sanitize_button_info(app['name'], app['tooltip'])
 				sidepane_button = self.view.add_sidepane_button(button_str, app['icon name'], self.view.SIDE_PANE, tooltip)
 				sidepane_button.app_info = app_button.app_info
 
 		if no_results or (section is self.view.SIDEPANE_SECTION):
-			self.disappear_with_section_and_category_button(section)
+			self._disappear_with_section_and_category_button(section)
 
 		elif (self.selected_section is not None) and (self.selected_section != section):
 			self.view.hide_section(section)
 
 		else:
-			self.mark_section_has_entries_and_show_category_button(section)
+			self._mark_section_has_entries_and_show_category_button(section)
 			self.view.show_section(section)
 
 
-	def fill_session_list(self):
+	def _fill_session_list(self):
 		"""
 		Populate the Session list
 		"""
@@ -2321,9 +2050,9 @@ class Cardapio(dbus.service.Object):
 
 		for item in items:
 
-			app_button = self.add_app_button(item[0], item[2], self.view.SESSION_SECTION, 'raw', item[3], item[1], self.app_list)
+			app_button = self._add_app_button(item[0], item[2], self.view.SESSION_SECTION, 'raw', item[3], item[1], self.app_list)
 
-			button_str, tooltip = self.sanitize_button_info(item[0], item[1])
+			button_str, tooltip = self._sanitize_button_info(item[0], item[1])
 			session_button = self.view.add_session_button(button_str, item[2], item[4], tooltip)
 
 			session_button.app_info = app_button.app_info
@@ -2335,18 +2064,20 @@ class Cardapio(dbus.service.Object):
 		self.view.session_button_shutdown = items[2][5]
 
 
-	def build_applications_list(self):
+	def _build_applications_list(self):
 		"""
 		Populate the Applications list by reading the Gnome menus
 		"""
 
-		self.load_menus()
+		self._load_menus()
 
 		for node in self.app_tree.root.contents:
 			if isinstance(node, gmenu.Directory):
 				self.add_section(node.name, node.icon, node.get_comment(), node = node, hidden_when_no_query = False)
 
 
+	# TODO MVC
+	# This method is called from the View API
 	def add_section(self, title_str, icon_name = None, tooltip = '', hidden_when_no_query = False, node = None, system_menu = False):
 		"""
 		Add to the app pane a new section (i.e. a container holding a title
@@ -2366,11 +2097,11 @@ class Cardapio(dbus.service.Object):
 
 		if node is not None:
 			# add all apps in this category to application pane
-			self.add_tree_to_app_list(node, section, app_list)
+			self._add_tree_to_app_list(node, section, app_list)
 			# TODO: fix small leak in the call above
 
 		# add category to category pane
-		title_str, tooltip = self.sanitize_button_info(title_str, tooltip)
+		title_str, tooltip = self._sanitize_button_info(title_str, tooltip)
 		category_button = self.view.add_category_button(title_str, icon_name, category_pane, section, tooltip)
 
 		if hidden_when_no_query:
@@ -2387,7 +2118,7 @@ class Cardapio(dbus.service.Object):
 		return section, label
 
 
-	def build_special_sections(self):
+	def _build_special_sections(self):
 		"""
 		Builds sections that have special functions in the system, such as the
 		one that contains the "no results to show" text and the one containing
@@ -2398,7 +2129,7 @@ class Cardapio(dbus.service.Object):
 		self.view.build_subfolders_section(_('Folder Contents'), _('Look inside folders'))
 
 
-	def build_reorderable_sections(self):
+	def _build_reorderable_sections(self):
 		"""
 		Add all the reorderable sections to the app pane
 		"""
@@ -2414,7 +2145,7 @@ class Cardapio(dbus.service.Object):
 			plugin_class = self.plugin_database[basename]['class']
 
 			if basename == 'applications':
-				self.build_applications_list() 
+				self._build_applications_list() 
 				self.view.build_uncategorized_section(_('Uncategorized'), _('Items that are not under any menu category'))
 				self.view.build_session_section(_('Session'), None)
 				self.view.build_system_section(_('System'), None)
@@ -2442,7 +2173,7 @@ class Cardapio(dbus.service.Object):
 					plugin.section, dummy = self.add_section(plugin.category_name, plugin.category_icon, plugin.category_tooltip, hidden_when_no_query = plugin.hide_from_sidebar)
 
 
-	def remove_all_buttons_from_section(self, section):
+	def _remove_all_buttons_from_section(self, section):
 		"""
 		Removes all buttons from a given section
 		"""
@@ -2455,7 +2186,7 @@ class Cardapio(dbus.service.Object):
 			self.view.remove_all_buttons_from_section(section)
 
 
-	def reset_search_query(self):
+	def _reset_search_query(self):
 		"""
 		Clears search entry.
 		"""
@@ -2465,28 +2196,28 @@ class Cardapio(dbus.service.Object):
 		self.subfolder_stack = []
 
 
-	def reset_search_timer_fired(self):
+	def _reset_search_timer_fired(self):
 		"""
 		Clears search entry and unselects the selected section button (if any)
 		"""
 
 		if not self.view.is_window_visible():
-			self.reset_search_query_and_selected_section()
+			self._reset_search_query_and_selected_section()
 
 		return False
 		# Required! makes this a "one-shot" timer, rather than "periodic"
 
 
-	def reset_search_query_and_selected_section(self):
+	def _reset_search_query_and_selected_section(self):
 		"""
 		Clears search entry and unselects the selected section button (if any)
 		"""
 
-		self.reset_search_query()
-		self.untoggle_and_show_all_sections()
+		self._reset_search_query()
+		self._untoggle_and_show_all_sections()
 
 
-	def add_app_button(self, button_str, icon_name, section, command_type, command, tooltip, app_list):
+	def _add_app_button(self, button_str, icon_name, section, command_type, command, tooltip, app_list):
 		"""
 		Adds a new button to the app pane
 		"""
@@ -2494,7 +2225,7 @@ class Cardapio(dbus.service.Object):
 		if type(button_str) is str:
 			button_str = unicode(button_str, 'utf-8')
 
-		button_str, tooltip = self.sanitize_button_info(button_str, tooltip)
+		button_str, tooltip = self._sanitize_button_info(button_str, tooltip)
 		button = self.view.add_app_button(button_str, icon_name, section, tooltip)
 
 		# save some metadata for easy access
@@ -2532,17 +2263,17 @@ class Cardapio(dbus.service.Object):
 		return button
 
 
-	def sanitize_button_info(self, button_str, tooltip):
+	def _sanitize_button_info(self, button_str, tooltip):
 		"""
 		Clean up the strings that have to do with a button: its label and its tooltip
 		"""
 
-		button_str = self.unescape_url(button_str)
-		if tooltip: tooltip = self.unescape_url(tooltip)
+		button_str = self._unescape_url(button_str)
+		if tooltip: tooltip = self._unescape_url(tooltip)
 		return button_str, tooltip
 
 
-	def add_tree_to_app_list(self, tree, section, app_list, recursive = True):
+	def _add_tree_to_app_list(self, tree, section, app_list, recursive = True):
 		"""
 		Adds all the apps in a subtree of Gnome's menu as buttons in a given
 		parent widget
@@ -2552,23 +2283,14 @@ class Cardapio(dbus.service.Object):
 
 			if isinstance(node, gmenu.Entry):
 
-				self.add_app_button(node.name, node.icon, section, 'app', node.desktop_file_path, node.get_comment(), app_list)
+				self._add_app_button(node.name, node.icon, section, 'app', node.desktop_file_path, node.get_comment(), app_list)
 
 			elif isinstance(node, gmenu.Directory) and recursive:
 
-				self.add_tree_to_app_list(node, section, app_list)
+				self._add_tree_to_app_list(node, section, app_list)
 
 
-	# This method is called from the View API
-	def launch_edit_app(self):
-		"""
-		Opens Gnome's menu editor.
-		"""
-
-		self.launch_raw(self.de.menu_editor)
-
-
-	def go_to_parent_folder(self):
+	def _go_to_parent_folder(self):
 		"""
 		Goes to the parent of the folder specified by the string in the search
 		entry.
@@ -2583,114 +2305,7 @@ class Cardapio(dbus.service.Object):
 		self.view.place_text_cursor_at_end()
 
 
-	# This method is called from the View API
-	def handle_back_button_clicked(self):
-		"""
-		Handle the back-button's click action
-		"""
-		self.go_to_parent_folder()
-
-
-	# This method is called from the View API
-	def handle_pin_this_app_clicked(self, clicked_app_info):
-		"""
-		Handle the pinning action
-		"""
-
-		self.remove_section_from_app_list(self.view.FAVORITES_SECTION)
-		self.remove_all_buttons_from_section(self.view.FAVORITES_SECTION)
-		self.settings['pinned items'].append(clicked_app_info)
-		self.fill_favorites_list(self.view.FAVORITES_SECTION, 'pinned items')
-
-
-	# This method is called from the View API
-	def handle_unpin_this_app_clicked(self, clicked_app_info):
-		"""
-		Handle the unpinning action
-		"""
-
-		self.remove_section_from_app_list(self.view.FAVORITES_SECTION)
-		self.remove_all_buttons_from_section(self.view.FAVORITES_SECTION)
-		self.settings['pinned items'].remove(clicked_app_info)
-		self.fill_favorites_list(self.view.FAVORITES_SECTION, 'pinned items')
-
-
-	# This method is called from the View API
-	def handle_add_to_side_pane_clicked(self, clicked_app_info):
-		"""
-		Handle the "add to sidepane" action
-		"""
-
-		self.remove_section_from_app_list(self.view.SIDEPANE_SECTION)
-		self.remove_all_buttons_from_section(self.view.SIDEPANE_SECTION)
- 		self.remove_all_buttons_from_section(self.view.SIDE_PANE)
-		self.settings['side pane items'].append(clicked_app_info)
-		self.fill_favorites_list(self.view.SIDEPANE_SECTION, 'side pane items')
-		self.view.SIDE_PANE.queue_resize() # required! or sidepane's allocation will be x,y,width,0 when first item is added
-		self.view.get_widget('SideappSubdivider').queue_resize() # required! or sidepane will obscure the mode switcher button
-
-
-	# This method is called from the View API
-	def handle_remove_from_side_pane_clicked(self, clicked_app_info):
-		"""
-		Handle the "remove from sidepane" action
-		"""
-
-		self.remove_section_from_app_list(self.view.SIDEPANE_SECTION)
-		self.remove_all_buttons_from_section(self.view.SIDEPANE_SECTION)
- 		self.remove_all_buttons_from_section(self.view.SIDE_PANE)
-		self.settings['side pane items'].remove(clicked_app_info)
-		self.fill_favorites_list(self.view.SIDEPANE_SECTION, 'side pane items')
-		self.view.get_widget('SideappSubdivider').queue_resize() # required! or an extra space will show up where but button used to be
-
-
-	# This method is called from the View API
-	def handle_launch_app_pressed(self, clicked_app_info):
-		"""
-		Handle the "launch" context-menu action
-		"""
-
-		self.launch_app(clicked_app_info, True)
-
-
-	# This method is called from the View API
-	def handle_open_parent_folder_pressed(self, clicked_app_info):
-		"""
-		Handle the "open parent folder" context-menu action
-		"""
-
-		self.open_parent_folder(clicked_app_info)
-
-
-	# This method is called from the View API
-	def handle_launch_in_background_pressed(self, clicked_app_info):
-		"""
-		Handle the "launch in background" context-menu action
-		"""
-
-		self.launch_app(clicked_app_info, hide = False)
-
-
-	# This method is called from the View API
-	def handle_peek_inside_pressed(self, clicked_app_info):
-		"""
-		Handle the "peek inside folder" context-menu action
-		"""
-
-		self.peek_inside_folder(clicked_app_info)
-
-
-	# This method is called from the View API
-	def handle_eject_pressed(self, clicked_app_info):
-		"""
-		Handle the "eject" context-menu action
-		"""
-
-		volume = self.volumes[clicked_app_info['command']]
-		volume.eject(return_true)
-
-
-	def setup_app_context_menu(self, app_info):
+	def _setup_app_context_menu(self, app_info):
 		"""
 		Show or hide different context menu options depending on the widget
 		"""
@@ -2738,7 +2353,7 @@ class Cardapio(dbus.service.Object):
 			self.view.show_context_menu_option(self.view.ADD_SIDE_PANE_MENUITEM)
 			self.view.hide_context_menu_option(self.view.REMOVE_SIDE_PANE_MENUITEM)
 
-		folder_or_file = self.app_is_valid_folder_or_file(app_info)
+		folder_or_file = self._app_is_valid_folder_or_file(app_info)
 		if folder_or_file == 1:
 			self.view.show_context_menu_option(self.view.PEEK_INSIDE_MENUITEM)
 		if folder_or_file > 0:
@@ -2753,7 +2368,7 @@ class Cardapio(dbus.service.Object):
 		self.setup_plugin_context_menu(app_info)
 
 
-	def app_is_valid_folder_or_file(self, app_info):
+	def _app_is_valid_folder_or_file(self, app_info):
 		"""
 		Returns 1 if the given app_info points to a local folder that exists, 
 		2 if a file, and 0 if neither.
@@ -2769,14 +2384,14 @@ class Cardapio(dbus.service.Object):
 		# TODO: should we handle http://, etc?
 		if path_type not in ('computer', 'network', 'trash') and extension != '.desktop':
 
-			unescaped_path = self.unescape_url(canonical_path)
+			unescaped_path = self._unescape_url(canonical_path)
 			if os.path.isdir(unescaped_path)    : return 1
 			elif os.path.isfile(unescaped_path) : return 2
 
 		return 0
 
 
-	# This method is called from the View API
+	# TODO MVC
 	def setup_plugin_context_menu(self, app_info):
 		"""
 		Sets up context menu items as requested by individual plugins
@@ -2788,82 +2403,24 @@ class Cardapio(dbus.service.Object):
 		self.view.fill_plugin_context_menu(app_info['context menu'])
 
 
-	def get_icon_pixbuf_from_app_info(self, app_info):
-		"""
-		Get the icon pixbuf for an app given its app_info dict
-		"""
-
-		return self.icon_helper.get_icon_pixbuf(app_info['icon name'], self.icon_helper.icon_size_app)
-
-
-	def get_app_uri_for_drag_and_drop(self, app_info):
-		"""
-		Prepare the data that will be sent to the other application when an app is
-		dragged from Cardapio.
-		"""
-
-		command = app_info['command']
-		command_type = app_info['type']
-
-		if command_type == 'app':
-			command = 'file://' + command
-
-		elif command_type == 'xdg':
-
-			path_type, dummy = urllib2.splittype(command)
-			if path_type is None: command = 'file://' + command
-
-			# TODO: figure out how to handle drag-and-drop for 'computer://' and
-			# 'trash://' (it seems that nautilus has the same problems...)
-
-		# TODO: handle command_type == 'raw' by creating a new desktop file and link?
-
-		return command
-
-
-	# This method is called from the View API
-	def handle_app_clicked(self, app_info, button, ctrl_is_pressed, shift_is_pressed):
-		"""
-		Handles the on-click event for buttons on the app list
-		"""
-
-		if button == 1:
-
-			if (shift_is_pressed):
-				self.peek_or_launch_app(app_info, hide = not ctrl_is_pressed)
-
-			else:
-				self.launch_app(app_info, hide = not ctrl_is_pressed)
-
-
-		elif button == 2:
-			self.launch_app(app_info, hide = False)
-			#self.view.block_focus_out_event()
-
-		elif button == 3:
-			self.setup_app_context_menu(app_info)
-			self.view.block_focus_out_event()
-			self.view.popup_app_context_menu(app_info)
-
-
-	def peek_or_launch_app(self, app_info, hide):
+	def _peek_or_launch_app(self, app_info, hide):
 		"""
 		Either peek inside a folder (if the app_info describes a local folder)
 		or launch the item in the app_info
 		"""
 
-		if self.app_is_valid_folder_or_file(app_info) == 1:
-			self.peek_inside_folder(app_info)
+		if self._app_is_valid_folder_or_file(app_info) == 1:
+			self._peek_inside_folder(app_info)
 			self.view.place_text_cursor_at_end()
 
-		elif self.app_is_valid_folder_or_file(app_info) > 0:
-			self.open_parent_folder(app_info)
+		elif self._app_is_valid_folder_or_file(app_info) > 0:
+			self._open_parent_folder(app_info)
 
 		else:
-			self.launch_app(app_info, hide)
+			self._launch_app(app_info, hide)
 
 
-	def launch_app(self, app_info, hide):
+	def _launch_app(self, app_info, hide):
 		"""
 		Execute app_info['command'], for any app_info['type']
 		"""
@@ -2874,38 +2431,38 @@ class Cardapio(dbus.service.Object):
 		self.opened_last_app_in_background = not hide
 
 		if command_type == 'app':
-			self.launch_desktop(command, hide)
+			self._launch_desktop(command, hide)
 
 		elif command_type == 'raw':
-			self.launch_raw(command, hide)
+			self._launch_raw(command, hide)
 
 		elif command_type == 'raw-in-terminal':
-			self.launch_raw_in_terminal(command, hide)
+			self._launch_raw_in_terminal(command, hide)
 
 		elif command_type == 'raw-no-notification':
-			self.launch_raw(command, hide, skip_startup_notification = True)
+			self._launch_raw(command, hide, skip_startup_notification = True)
 
 		elif command_type == 'xdg':
-			self.launch_xdg(command, hide)
+			self._launch_xdg(command, hide)
 
 		elif command_type == 'callback':
 			text = self.current_query
-			if hide: self.hide()
+			if hide: self._hide()
 			command(text)
 
 		elif command_type == 'special':
 			command()
 
 
-	def open_parent_folder(self, app_info):
+	def _open_parent_folder(self, app_info):
 		"""
 		Opens the parent folder of a given file/folder
 		"""
 		parent_folder, dummy = os.path.split(app_info['command'])
-		self.launch_xdg(parent_folder)
+		self._launch_xdg(parent_folder)
 
 
-	def peek_inside_folder(self, app_info):
+	def _peek_inside_folder(self, app_info):
 		"""
 		Shows within Cardapio the folder that given app_info points to
 		"""
@@ -2913,7 +2470,7 @@ class Cardapio(dbus.service.Object):
 		dummy, path = urllib2.splittype(app_info['command'])
 		if os.path.isfile(path): path, dummy = os.path.split(path)
 
-		path = self.unescape_url(path)
+		path = self._unescape_url(path)
 		name = app_info['name']
 
 		if self.subfolder_stack:
@@ -2926,7 +2483,7 @@ class Cardapio(dbus.service.Object):
 		self.view.set_search_entry_text(entry_text + '/')
 
 
-	def launch_desktop(self, command, hide = True):
+	def _launch_desktop(self, command, hide = True):
 		"""
 		Launch applications represented by .desktop files
 		"""
@@ -2934,7 +2491,7 @@ class Cardapio(dbus.service.Object):
 		if os.path.exists(command):
 
 			path = DesktopEntry.DesktopEntry(command).getExec()
-			path = self.unescape_string(path)
+			path = self._unescape_string(path)
 
 			# Strip parts of the path that contain %<a-Z>
 
@@ -2947,20 +2504,20 @@ class Cardapio(dbus.service.Object):
 			path = ' '.join(path_parts)
 			
 			if DesktopEntry.DesktopEntry(command).getTerminal():
-				return self.launch_raw_in_terminal(path, hide)
+				return self._launch_raw_in_terminal(path, hide)
 			else:
-				return self.launch_raw(path, hide)
+				return self._launch_raw(path, hide)
 
 		else:
 			logging.warn('Tried launching an app that does not exist: %s' % desktop_path)
 
 
-	def launch_xdg(self, path, hide = True):
+	def _launch_xdg(self, path, hide = True):
 		"""
 		Open a url, file or folder
 		"""
 
-		path = self.escape_quotes_for_shell(self.unescape_url(path))
+		path = self._escape_quotes_for_shell(self._unescape_url(path))
 		path_type, dummy = urllib2.splittype(path)
 
 		# if the file is executable, ask what to do
@@ -2970,7 +2527,7 @@ class Cardapio(dbus.service.Object):
 
 			# treat '.desktop' files differently
 			if extension == '.desktop':
-				self.launch_desktop(path, hide)
+				self._launch_desktop(path, hide)
 				return
 
 			gio_file_info = gio.File(path).query_info('standard::content-type')
@@ -2990,7 +2547,7 @@ class Cardapio(dbus.service.Object):
 
 				# if "Run in Terminal"
 				if response == 1:
-					return self.launch_raw_in_terminal(path, hide)
+					return self._launch_raw_in_terminal(path, hide)
 
 				# if "Display"
 				elif response == 2:
@@ -2998,7 +2555,7 @@ class Cardapio(dbus.service.Object):
 
 				# if "Run"
 				elif response == 3:
-					return self.launch_raw(path, hide)
+					return self._launch_raw(path, hide)
 
 				# if "Cancel"
 				else:
@@ -3007,12 +2564,12 @@ class Cardapio(dbus.service.Object):
 		elif path_type in Cardapio.REMOTE_PROTOCOLS:
 			# TODO: move to DesktopEnvironment.py
 			special_handler = self.settings['handler for %s paths' % path_type]
-			return self.launch_raw(special_handler % path, hide)
+			return self._launch_raw(special_handler % path, hide)
 
-		return self.launch_raw(self.de.file_open % path, hide)
+		return self._launch_raw(self.de.file_open % path, hide)
 
 
-	def launch_raw(self, path, hide = True, skip_startup_notification = False):
+	def _launch_raw(self, path, hide = True, skip_startup_notification = False):
 		"""
 		Run a command as a subprocess
 		"""
@@ -3050,12 +2607,11 @@ class Cardapio(dbus.service.Object):
 
 			return False
 
-		if hide: self.hide()
+		if hide: self._hide()
 
 		return True
 
 
-	# This method is called from the View API
 	def can_launch_in_terminal(self):
 		"""
 		Returns true if the libraries for launching in a terminal are installed
@@ -3064,7 +2620,7 @@ class Cardapio(dbus.service.Object):
 		return (self.de.execute_in_terminal is not None)
 
 
-	def launch_raw_in_terminal(self, path, hide = True):
+	def _launch_raw_in_terminal(self, path, hide = True):
 		"""
 		Run a command inside Gnome's default terminal
 		"""
@@ -3078,22 +2634,12 @@ class Cardapio(dbus.service.Object):
 			logging.error(exception)
 			return False
 
-		if hide: self.hide()
+		if hide: self._hide()
 
 		return True
 
 
-	#def escape_quotes(self, text):
-	#	"""
-	#	Sanitize a string by escaping quotation marks
-	#	"""
-	#
-	#	text = text.replace("'", r"\'")
-	#	text = text.replace('"', r'\"')
-	#	return text
-
-
-	def escape_quotes_for_shell(self, text):
+	def _escape_quotes_for_shell(self, text):
 		"""
 		Sanitize a string by escaping quotation marks, but treat single quotes
 		differently since they cannot be escaped by the shell when in already
@@ -3105,7 +2651,7 @@ class Cardapio(dbus.service.Object):
 		return text
 
 
-	def unescape_url(self, text):
+	def _unescape_url(self, text):
 		"""
 		Clear all sorts of escaping from a URL, like %20 -> [space]
 		"""
@@ -3115,7 +2661,7 @@ class Cardapio(dbus.service.Object):
 		return unicode(urllib2.unquote(text)) 
 
 
-	def unescape_string(self, text):
+	def _unescape_string(self, text):
 		"""
 		Clear all sorts of escaping from a string, like slash slash -> slash
 		"""
@@ -3123,7 +2669,7 @@ class Cardapio(dbus.service.Object):
 		return text.decode('string-escape')
 
 
-	def untoggle_and_show_all_sections(self):
+	def _untoggle_and_show_all_sections(self):
 		"""
 		Show all sections that currently have search results, and untoggle all
 		category buttons
@@ -3152,7 +2698,7 @@ class Cardapio(dbus.service.Object):
 			self.view.set_all_sections_sidebar_button_sensitive(False, self.in_system_menu_mode)
 
 
-	def toggle_and_show_section(self, section):
+	def _toggle_and_show_section(self, section):
 		"""
 		Show a given section, make sure its button is toggled, and that
 		no other buttons are toggled
@@ -3173,11 +2719,11 @@ class Cardapio(dbus.service.Object):
 		self.view.set_all_sections_sidebar_button_sensitive(True, False)
 
 		self.selected_section = section
-		self.consider_showing_no_results_text()
+		self._consider_showing_no_results_text()
  		self.view.scroll_to_top()
 
 
-	def consider_showing_no_results_text(self):
+	def _consider_showing_no_results_text(self):
 		"""
 		Decide whether the "No results" text should be shown (and, if so, show it)
 		"""
@@ -3201,53 +2747,53 @@ class Cardapio(dbus.service.Object):
 			self.view.show_no_results_text(self.no_results_in_category_text % {'category_name': self.section_list[self.selected_section]['name']})
 
 
-	def disappear_with_all_transitory_sections(self):
+	def _disappear_with_all_transitory_sections(self):
 		"""
 		Hides all sections that should not appear in the sidebar when
 		there is no text in the search entry
 		"""
 
-		self.disappear_with_section_and_category_button(self.view.SUBFOLDERS_SECTION)
-		self.disappear_with_section_and_category_button(self.view.SIDEPANE_SECTION)
+		self._disappear_with_section_and_category_button(self.view.SUBFOLDERS_SECTION)
+		self._disappear_with_section_and_category_button(self.view.SIDEPANE_SECTION)
 
 		if self.builtin_applications_plugin_active:
-			self.disappear_with_section_and_category_button(self.view.SESSION_SECTION)
-			self.disappear_with_section_and_category_button(self.view.SYSTEM_SECTION)
-			self.disappear_with_section_and_category_button(self.view.UNCATEGORIZED_SECTION)
+			self._disappear_with_section_and_category_button(self.view.SESSION_SECTION)
+			self._disappear_with_section_and_category_button(self.view.SYSTEM_SECTION)
+			self._disappear_with_section_and_category_button(self.view.UNCATEGORIZED_SECTION)
 
-		self.disappear_with_all_transitory_plugin_sections()
+		self._disappear_with_all_transitory_plugin_sections()
 
 
-	def disappear_with_section_and_category_button(self, section):
+	def _disappear_with_section_and_category_button(self, section):
 		"""
 		Mark a section as empty, hide it, and hide its category button
 		"""
 
-		self.mark_section_empty_and_hide_category_button(section)
+		self._mark_section_empty_and_hide_category_button(section)
 		self.view.hide_section(section)
 
 
-	def disappear_with_all_sections_and_category_buttons(self):
+	def _disappear_with_all_sections_and_category_buttons(self):
 		"""
 		Hide all sections, including plugins and non-plugins
 		"""
 
 		for section in self.section_list:
-			self.mark_section_empty_and_hide_category_button(section)
+			self._mark_section_empty_and_hide_category_button(section)
 			self.view.hide_section(section)
 
 
-	def disappear_with_all_transitory_plugin_sections(self):
+	def _disappear_with_all_transitory_plugin_sections(self):
 		"""
 		Hide the section for all plugins that are marked as transitory
 		"""
 
 		for plugin in self.active_plugin_instances:
 			if plugin.hide_from_sidebar:
-				self.disappear_with_section_and_category_button(plugin.section)
+				self._disappear_with_section_and_category_button(plugin.section)
 
 
-	def mark_section_empty_and_hide_category_button(self, section):
+	def _mark_section_empty_and_hide_category_button(self, section):
 		"""
 		Mark a section as empty (no search results) and hide its sidebar button
 		"""
@@ -3257,7 +2803,7 @@ class Cardapio(dbus.service.Object):
 		self.view.hide_button(self.section_list[section]['category button'])
 
 
-	def mark_section_has_entries_and_show_category_button(self, section):
+	def _mark_section_has_entries_and_show_category_button(self, section):
 		"""
 		Mark a section as having entries and show its sidebar button
 		"""
@@ -3270,6 +2816,405 @@ class Cardapio(dbus.service.Object):
 		self.view.show_button(self.section_list[section]['category button'])
 
 	
+	# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+	# Callbacks used in the View module	
+
+	def handle_section_all_clicked(self):
+		"""
+		This method is activated when the user presses the "All" section button.
+		It unselects the currently-selected section if any, otherwise it clears
+		the search entry.
+		"""
+
+		if self.selected_section is None:
+			self.view.clear_search_entry()
+			self.view.set_all_sections_sidebar_button_sensitive(False, self.in_system_menu_mode)
+			return 
+
+		self._untoggle_and_show_all_sections()
+
+
+	def handle_section_clicked(self, section):
+		"""
+		This method is activated when the user presses a section button (except
+		for the "All" button). It causes that section to be displayed in case
+		the it wasn't already visible, or hides it otherwise. Returns a boolean
+		indicating whether the section button should be drawn toggled or not.
+		"""
+
+		# if already toggled, untoggle
+		if self.selected_section == section:
+			self.selected_section = None # necessary!
+			self._untoggle_and_show_all_sections()
+			return False
+
+		# otherwise toggle
+		self._toggle_and_show_section(section)
+		return True
+
+
+	def handle_about_menu_item_clicked(self, verb):
+		"""
+		Opens either the "About Gnome" dialog, or the "About Ubuntu" dialog,
+		or the "About Cardapio" dialog
+		"""
+
+		if verb == 'AboutGnome':
+			self._launch_raw(self.de.about_de)
+
+		elif verb == 'AboutDistro':
+			self._launch_raw(self.de.about_distro)
+
+		else: self.view.open_about_dialog()
+
+
+	def handle_resize_done(self):
+		"""
+		This function is called when the user releases the mouse after resizing the
+		Cardapio window.
+		"""
+
+		self._save_dimensions()
+
+
+	def handle_mainwindow_focus_out(self):
+		"""
+		Make Cardapio disappear when it loses focus
+		"""
+
+		self._save_dimensions()
+
+		# Make sure clicking the applet button doesn't cause a focus-out event.
+		# Otherwise, the click signal can actually happen *after* the focus-out,
+		# which causes the window to be re-shown rather than disappearing.  So
+		# by ignoring this focus-out we actually make sure that Cardapio will be
+		# hidden after all. Silly.
+		mouse_x, mouse_y = self.view.get_cursor_coordinates()
+		if self.applet.has_mouse_cursor(mouse_x, mouse_y): return
+
+		# If the last app was opened in the background, make sure Cardapio
+		# doesn't hide when the app gets focused
+
+		if self.opened_last_app_in_background:
+
+			self.opened_last_app_in_background = False
+			self._show_main_window_on_best_screen()
+			return
+
+		self._hide()
+
+
+	def handle_mainwindow_cursor_leave(self):
+		"""
+		Handler for when the cursor leaves the Cardapio window.
+		If using 'open on hover', this hides the Cardapio window after a delay.
+		"""
+		if self.applet.panel_type is None: return
+
+		# TODO - Delete this line on Feb 28th
+		#if self.settings['open on hover'] and not self.view.focus_out_blocked:
+		if self.settings['open on hover']:
+			glib.timeout_add(self.settings['autohide delay'], self._hide_if_mouse_away)
+
+
+	def handle_user_closing_mainwindow(self):
+		"""
+		What happens when the user presses Alt-F4? If in panel mode,
+		nothing. If in launcher mode, this terminates Cardapio.
+		"""
+
+		if self.applet.panel_type is not None:
+			# keep window alive if in panel mode
+			return True
+
+		self.save_and_quit()
+
+
+	def handle_window_destroyed(self):
+		"""
+		Handler for when the Cardapio window is closed
+		"""
+
+		self.save_and_quit()
+
+
+	def handle_reload_clicked(self):
+		"""
+		Rebuilds the Cardapio UI immediately. Should *never* be called from a plugin!
+		"""
+		self._rebuild_ui(show_message = True)
+
+
+	def handle_view_settings_changed(self):
+		"""
+		Rebuilds the UI after the View reports its settings has changed (for instance, 
+		when the icon theme changes)
+		"""
+
+		self._schedule_rebuild()
+
+	
+	def handle_search_entry_icon_pressed(self):
+		"""
+		Handler for when the "clear" icon of the search entry is pressed
+		"""
+
+		if self.view.is_search_entry_empty():
+			self._untoggle_and_show_all_sections()
+
+		else:
+			self._reset_search_query_and_selected_section()
+
+
+	def handle_special_key_pressed(self, key, alt = False, ctrl = False):
+		"""
+		Handler for when an Alt/Ctrl combo is pressed and Cardapio is active.
+		"""
+
+		if alt:
+			if type(key) == int and 1 <= key <= 9:
+
+				app_info = self.view.get_nth_visible_app(key)
+
+				if app_info is not None:
+					self._launch_app(app_info, ctrl == False)
+
+
+	def handle_search_entry_changed(self):
+		"""
+		Handler for when the user types something in the search entry
+		"""
+
+		self._process_query(ignore_if_unchanged = True)
+
+	
+	def handle_search_entry_activate(self, ctrl_is_pressed, shift_is_pressed):
+		"""
+		Handler for when the user presses Enter on the search entry
+		"""
+
+		if self.view.is_search_entry_empty():
+			# TODO: why is this needed? I don't see its effects...
+			self._disappear_with_all_transitory_sections() 
+			return
+
+		app_info = self.view.get_nth_visible_app(1)
+		# TODO MVC: there should be no need for get_first_visible_app. Instead,
+		# the model should know the top app already!
+
+		if app_info is not None:
+			self.handle_app_clicked(app_info, 1, ctrl_is_pressed, shift_is_pressed)
+
+		if not self.settings['keep search results']:
+			self.reset_search_timer = glib.timeout_add(self.settings['keep results duration'], self._reset_search_timer_fired)
+
+
+	def handle_search_entry_tab_pressed(self):
+		"""
+		Handler for when the tab is pressed while the search entry is focused.
+		This moves the focus into the app pane.
+		"""
+		self.view.focus_first_visible_app()
+
+
+	def handle_search_entry_escape_pressed(self):
+		"""
+		Handle what should happen when Escape is pressed while the search entry
+		is focused.
+		"""
+
+		self._cancel_all_plugins()
+
+		text = self.view.get_search_entry_text()
+		slash_pos = text.rfind('/')
+
+		if self.subfolder_stack and slash_pos != -1:
+			self._go_to_parent_folder()
+
+		elif not self.view.is_search_entry_empty():
+			self._reset_search_query()
+
+		elif self.selected_section is not None:
+			self._untoggle_and_show_all_sections()
+
+		elif self.in_system_menu_mode:
+			self._switch_modes(show_system_menus = False, toggle_mode_button = True)
+
+		else:
+			self._hide()
+
+
+	def handle_editor_menu_item_clicked(self):
+		"""
+		Opens Gnome's menu editor.
+		"""
+
+		self._launch_raw(self.de.menu_editor)
+
+
+	def handle_back_button_clicked(self):
+		"""
+		Handle the back-button's click action
+		"""
+		self._go_to_parent_folder()
+
+
+	def handle_pin_this_app_clicked(self, clicked_app_info):
+		"""
+		Handle the pinning action
+		"""
+
+		self._remove_section_from_app_list(self.view.FAVORITES_SECTION)
+		self._remove_all_buttons_from_section(self.view.FAVORITES_SECTION)
+		self.settings['pinned items'].append(clicked_app_info)
+		self._fill_favorites_list(self.view.FAVORITES_SECTION, 'pinned items')
+
+
+	def handle_unpin_this_app_clicked(self, clicked_app_info):
+		"""
+		Handle the unpinning action
+		"""
+
+		self._remove_section_from_app_list(self.view.FAVORITES_SECTION)
+		self._remove_all_buttons_from_section(self.view.FAVORITES_SECTION)
+		self.settings['pinned items'].remove(clicked_app_info)
+		self._fill_favorites_list(self.view.FAVORITES_SECTION, 'pinned items')
+
+
+	def handle_add_to_side_pane_clicked(self, clicked_app_info):
+		"""
+		Handle the "add to sidepane" action
+		"""
+
+		self._remove_section_from_app_list(self.view.SIDEPANE_SECTION)
+		self._remove_all_buttons_from_section(self.view.SIDEPANE_SECTION)
+ 		self._remove_all_buttons_from_section(self.view.SIDE_PANE)
+		self.settings['side pane items'].append(clicked_app_info)
+		self._fill_favorites_list(self.view.SIDEPANE_SECTION, 'side pane items')
+		self.view.SIDE_PANE.queue_resize() # required! or sidepane's allocation will be x,y,width,0 when first item is added
+		self.view.get_widget('SideappSubdivider').queue_resize() # required! or sidepane will obscure the mode switcher button
+
+
+	def handle_remove_from_side_pane_clicked(self, clicked_app_info):
+		"""
+		Handle the "remove from sidepane" action
+		"""
+
+		self._remove_section_from_app_list(self.view.SIDEPANE_SECTION)
+		self._remove_all_buttons_from_section(self.view.SIDEPANE_SECTION)
+ 		self._remove_all_buttons_from_section(self.view.SIDE_PANE)
+		self.settings['side pane items'].remove(clicked_app_info)
+		self._fill_favorites_list(self.view.SIDEPANE_SECTION, 'side pane items')
+		self.view.get_widget('SideappSubdivider').queue_resize() # required! or an extra space will show up where but button used to be
+
+
+	def handle_launch_app_pressed(self, clicked_app_info):
+		"""
+		Handle the "launch" context-menu action
+		"""
+
+		self._launch_app(clicked_app_info, True)
+
+
+	def handle__open_parent_folder_pressed(self, clicked_app_info):
+		"""
+		Handle the "open parent folder" context-menu action
+		"""
+
+		self._open_parent_folder(clicked_app_info)
+
+
+	def handle_launch_in_background_pressed(self, clicked_app_info):
+		"""
+		Handle the "launch in background" context-menu action
+		"""
+
+		self._launch_app(clicked_app_info, hide = False)
+
+
+	def handle_peek_inside_pressed(self, clicked_app_info):
+		"""
+		Handle the "peek inside folder" context-menu action
+		"""
+
+		self._peek_inside_folder(clicked_app_info)
+
+
+	def handle_eject_pressed(self, clicked_app_info):
+		"""
+		Handle the "eject" context-menu action
+		"""
+
+		volume = self.volumes[clicked_app_info['command']]
+		volume.eject(return_true)
+
+
+	def handle_app_clicked(self, app_info, button, ctrl_is_pressed, shift_is_pressed):
+		"""
+		Handles the on-click event for buttons on the app list
+		"""
+
+		if button == 1:
+
+			if (shift_is_pressed):
+				self._peek_or_launch_app(app_info, hide = not ctrl_is_pressed)
+
+			else:
+				self._launch_app(app_info, hide = not ctrl_is_pressed)
+
+
+		elif button == 2:
+			self._launch_app(app_info, hide = False)
+			#self.view.block_focus_out_event()
+
+		elif button == 3:
+			self._setup_app_context_menu(app_info)
+			self.view.block_focus_out_event()
+			self.view.popup_app_context_menu(app_info)
+
+
+	def handle_view_mode_toggled(self, show_system_menus):
+		"""
+		Handler for when the user toggles between the Control Center and regular views
+		"""
+
+		self._switch_modes(show_system_menus)
+
+
+	def get_app_uri_for_drag_and_drop(self, app_info):
+		"""
+		Prepare the data that will be sent to the other application when an app is
+		dragged from Cardapio.
+		"""
+
+		command = app_info['command']
+		command_type = app_info['type']
+
+		if command_type == 'app':
+			command = 'file://' + command
+
+		elif command_type == 'xdg':
+
+			path_type, dummy = urllib2.splittype(command)
+			if path_type is None: command = 'file://' + command
+
+			# TODO: figure out how to handle drag-and-drop for 'computer://' and
+			# 'trash://' (it seems that nautilus has the same problems...)
+
+		# TODO: handle command_type == 'raw' by creating a new desktop file and link?
+
+		return command
+
+
+	# This method is called from OptionsWindow
+	def toggle_mini_mode_ui(self):
+		"""
+		Collapses the sidebar into a row of small buttons (i.e. minimode)
+		"""
+		self.view.toggle_mini_mode_ui()
+
+
+# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 import __builtin__
 __builtin__._ = _
 __builtin__.CardapioPluginInterface = CardapioPluginInterface

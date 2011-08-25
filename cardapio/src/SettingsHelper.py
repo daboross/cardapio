@@ -19,6 +19,7 @@ from misc import *
 
 try:
 	import Cardapio
+	import Constants
 
 	import os
 	import gtk
@@ -123,7 +124,7 @@ class SettingsHelper:
 			self.settings['active plugins'][i] = 'web_bookmarks'
 
 		# make sure required plugins are in the plugin list
-		for required_plugin in Cardapio.Cardapio.required_plugins:
+		for required_plugin in Constants.REQUIRED_PLUGINS:
 			if required_plugin not in self.settings['active plugins']:
 				self.settings['active plugins'] = [required_plugin] + self.settings['active plugins']
 
