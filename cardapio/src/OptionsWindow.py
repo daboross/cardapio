@@ -433,7 +433,7 @@ class OptionsWindow:
 		iter_ = self.plugin_tree_model.get_iter(path)
 		basename = self.plugin_tree_model.get_value(iter_, 0)
 
-		if basename in self.cardapio.required_plugins: return
+		if basename in Constants.REQUIRED_PLUGINS: return
 
 		self.plugin_tree_model.set_value(iter_, 3, not cell.get_active())
 		self.apply_plugins_from_option_window()
