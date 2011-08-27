@@ -42,9 +42,10 @@ class OptionsWindow:
 	ICON_DEFAULT = 'start-here'
 	ICON_MISSING = 'image-missing'
 
-	def __init__(self, cardapio):
+	def __init__(self, cardapio, applet_type):
 
 		self.cardapio = cardapio
+		self.applet_type = applet_type
 
 
 	def setup_ui(self):
@@ -93,11 +94,11 @@ class OptionsWindow:
 		are supported by the current panel (if any)
 		"""
 
-		if self.cardapio.applet is None \
-				or self.cardapio.applet.panel_type == PANEL_TYPE_DOCKY:
+		if self.applet_type is None \
+				or self.applet_type == PANEL_TYPE_DOCKY:
 			self.get_widget('AppletOptionPane').hide()
 
-		elif self.cardapio.applet.panel_type is PANEL_TYPE_AWN:
+		elif self.applet_type is PANEL_TYPE_AWN:
 			self.get_widget('LabelAppletLabel').hide()
 			self.get_widget('OptionAppletLabel').hide()
 			self.get_widget('OptionIconNone').hide()
@@ -184,6 +185,7 @@ class OptionsWindow:
 		inactive_plugins = [
 				(self.cardapio.get_plugin_class(basename).name.lower(), basename) 
 				for basename in self.cardapio.plugin_database if basename not in plugin_list]
+
 		inactive_plugins = [plugin_tuple[1] for plugin_tuple in sorted(inactive_plugins)]
 		plugin_list += inactive_plugins
 
