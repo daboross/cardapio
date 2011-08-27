@@ -273,13 +273,13 @@ class Cardapio(dbus.service.Object):
 		Calls the UI backend's "setup_ui" function
 		"""
 
-		self._no_results_text             = _('No results to show')
-		self._no_results_in_category_text = _('No results to show in "%(category_name)s"')
-		self._plugin_loading_text         = _('Searching...')
-		self._plugin_timeout_text         = _('Search timed out')
+		self.no_results_text             = _('No results to show')
+		self.no_results_in_category_text = _('No results to show in "%(category_name)s"')
+		self.plugin_loading_text         = _('Searching...')
+		self.plugin_timeout_text         = _('Search timed out')
 
-		self._executable_file_dialog_text    = _('Do you want to run "%(file_name)s", or display its contents?')
-		self._executable_file_dialog_caption = _('"%(file_name)s" is an executable text file.')
+		self.executable_file_dialog_text    = _('Do you want to run "%(file_name)s", or display its contents?')
+		self.executable_file_dialog_caption = _('"%(file_name)s" is an executable text file.')
 
 		self.icon_helper = IconHelper()
 		self.icon_helper.register_icon_theme_listener(self._on_icon_theme_changed)
@@ -1071,9 +1071,13 @@ class Cardapio(dbus.service.Object):
 			if base_text[0] == '.': 
 				ignore_hidden = False
 				base_text = base_text[1:]
-			matches = [f for f in os.listdir(path) if f.lower().find(base_text) != -1]
+
+			costs_and_words = [(f.lower().find(base_text), f) for f in os.listdir(path)]
+			costs_and_words = sorted(costs_and_words) # sort by cost
+			matches = [cw[1] for cw in costs_and_words if cw[0] >= 0]
 		else:
 			matches = os.listdir(path)
+			matches = sorted(matches, key = unicode.lower)
 
 		try: 
 			self._file_looper = self._file_looper_generator(matches, path, ignore_hidden)
@@ -1105,8 +1109,9 @@ class Cardapio(dbus.service.Object):
 		pagesize = self.settings['long search results limit']
 		limit    = pagesize
 		path     = unicode(path) # just in case we missed it somewhere else
-		
-		for filename in sorted(matches, key = unicode.lower):
+
+		for filename in matches:
+		#for filename in sorted(matches, key = unicode.lower):
 
 			# ignore hidden files
 			if filename[0] == '.' and ignore_hidden: continue
@@ -1305,7 +1310,7 @@ class Cardapio(dbus.service.Object):
 		Write "Searching..." under the plugin section title
 		"""
 
-		self._view.show_section_status_text(plugin.section, self._plugin_loading_text)
+		self._view.show_section_status_text(plugin.section, self.plugin_loading_text)
 
 		if self._selected_section is None or plugin.section == self._selected_section:
 			self._view.show_section(plugin.section)
@@ -1331,7 +1336,7 @@ class Cardapio(dbus.service.Object):
 				self._plugin_write_to_log(plugin, 'Plugin failed to cancel query', is_error = True)
 				logging.error(exception)
 
-			self._view.show_section_status_text(plugin.section, self._plugin_timeout_text)
+			self._view.show_section_status_text(plugin.section, self.plugin_timeout_text)
 			self._view.show_section(plugin.section)
 
 			self._plugins_still_searching -= 1
@@ -2548,8 +2553,8 @@ class Cardapio(dbus.service.Object):
 
 				arg_dict = {'file_name': os.path.basename(path)}
 
-				primary_text = self._executable_file_dialog_text % arg_dict
-				secondary_text = self._executable_file_dialog_caption % arg_dict
+				primary_text = self.executable_file_dialog_text % arg_dict
+				secondary_text = self.executable_file_dialog_caption % arg_dict
 				hide_terminal_option = not self.can_launch_in_terminal()
 
 				# show "Run in Terminal", "Display", "Cancel", "Run"
@@ -2754,7 +2759,7 @@ class Cardapio(dbus.service.Object):
 
 		else:
 			self._view.hide_section(self._selected_section)
-			self._view.show_no_results_text(self._no_results_in_category_text % {'category_name': self._section_list[self._selected_section]['name']})
+			self._view.show_no_results_text(self.no_results_in_category_text % {'category_name': self._section_list[self._selected_section]['name']})
 
 
 	def _disappear_with_all_transitory_sections(self):
