@@ -235,7 +235,7 @@ class Cardapio(dbus.service.Object):
 		logging.basicConfig(filename = logging_filename, level = logging_level, format = logging_format)
 
 
-	def _load_menus(self):
+	def _load_application_menus(self):
 		"""
 		Loads the XDG application menus into memory
 		"""
@@ -331,15 +331,13 @@ class Cardapio(dbus.service.Object):
 		return plugin_class
 
 
-	def _buildplugin_database(self):
+	def _build_plugin_database(self):
 		"""
 		Searches the plugins/ folder for .py files not starting with underscore.
-		Creates the dict self.plugin_database indexed by the plugin filename's base name.
+		Creates the dict self._plugin_database indexed by the plugin filename's base name.
 		"""
 
-		# TODO: make this private, by making OptionsWindow not use it
-		self.plugin_database = {}
-		# maybe I should move all "*plugin*()" methods into a PluginHelper.py ?
+		self._plugin_database = {}
 
 		plugin_class = CardapioPluginInterface(None)
 		plugin_class.name              = _('Application menu')
@@ -350,7 +348,7 @@ class Cardapio(dbus.service.Object):
 		plugin_class.category_name     = None
 		plugin_class.category_tooltip  = None
 		plugin_class.category_icon     = 'applications-other'
-		self.plugin_database['applications'] = {'class' : plugin_class, 'instances' : []}
+		self._plugin_database['applications'] = {'class' : plugin_class, 'instances' : []}
 
 		plugin_class = CardapioPluginInterface(None)
 		plugin_class.name              = _('Places menu')
@@ -361,7 +359,7 @@ class Cardapio(dbus.service.Object):
 		plugin_class.category_name     = _('Places')
 		plugin_class.category_tooltip  = _('Access documents and folders')
 		plugin_class.category_icon     = 'folder'
-		self.plugin_database['places'] = {'class' : plugin_class, 'instances' : []}
+		self._plugin_database['places'] = {'class' : plugin_class, 'instances' : []}
 
 		plugin_class = CardapioPluginInterface(None)
 		plugin_class.name              = _('Pinned items')
@@ -372,7 +370,7 @@ class Cardapio(dbus.service.Object):
 		plugin_class.category_name     = _('Pinned items')
 		plugin_class.category_tooltip  = _('Your favorite items')
 		plugin_class.category_icon     = 'emblem-favorite'
-		self.plugin_database['pinned'] = {'class' : plugin_class, 'instances' : []}
+		self._plugin_database['pinned'] = {'class' : plugin_class, 'instances' : []}
 
 		plugin_dirs = [
 			os.path.join(DesktopEntry.xdg_config_home, 'Cardapio', 'plugins'),
@@ -396,7 +394,7 @@ class Cardapio(dbus.service.Object):
 							logging.error('[%s] %s' % (basename, plugin_class))
 							continue
 
-						self.plugin_database[basename] = {
+						self._plugin_database[basename] = {
 							'class'     : plugin_class,
 							'instances' : [],
 							}
@@ -414,11 +412,11 @@ class Cardapio(dbus.service.Object):
 
 		# remove existing plugins
 
-		for basename in self.plugin_database:
-			plugins = self.plugin_database[basename]['instances']
+		for basename in self._plugin_database:
+			plugins = self._plugin_database[basename]['instances']
 			for plugin in plugins:
 				if plugin is not None: plugin.__del__()
-			self.plugin_database[basename]['instances'] = []
+			self._plugin_database[basename]['instances'] = []
 
 		self._active_plugin_instances  = []
 		self._keyword_to_plugin_mapping = {}
@@ -498,10 +496,10 @@ class Cardapio(dbus.service.Object):
 					plugin.search_delay_type = plugin.search_delay_type.partition(' search update delay')[0]
 
 				if category == 0: 
-					self.plugin_database[basename]['instances'] = []
+					self._plugin_database[basename]['instances'] = []
 					self._keyword_to_plugin_mapping[keyword]     = []
 
-				self.plugin_database[basename]['instances'].append(plugin)
+				self._plugin_database[basename]['instances'].append(plugin)
 				self._keyword_to_plugin_mapping[keyword].append(plugin)
 				self._active_plugin_instances.append(plugin)
 
@@ -584,7 +582,7 @@ class Cardapio(dbus.service.Object):
 		self.safe_cardapio_proxy.handle_search_error       = self._plugin_handle_search_error
 		self.safe_cardapio_proxy.ask_for_reload_permission = self._plugin_ask_for_reload_permission
 
-		self._buildplugin_database()
+		self._build_plugin_database()
 		self._activate_plugins_from_settings() # investigate memory usage here
 
 
@@ -822,7 +820,17 @@ class Cardapio(dbus.service.Object):
 		its full name, version, author, and so on.
 		"""
 
-		return self.plugin_database[plugin_basename]['class']
+		return self._plugin_database[plugin_basename]['class']
+
+
+	def get_inactive_plugins(self):
+		"""
+		Returns the basenames of all plugins in the plugin_database that are not
+		present in settings['active plugins'] (i.e. have not been selected by the user
+		to be activated in Cardapio)
+		"""
+
+		return [basename for basename in self._plugin_database if basename not in self.settings['active plugins']]
 
 
 	def _on_menu_data_changed(self, tree):
@@ -2072,7 +2080,7 @@ class Cardapio(dbus.service.Object):
 		Populate the Applications list by reading the Gnome menus
 		"""
 
-		self._load_menus()
+		self._load_application_menus()
 
 		for node in self._app_tree.root.contents:
 			if isinstance(node, gmenu.Directory):
@@ -2141,11 +2149,11 @@ class Cardapio(dbus.service.Object):
 
 		for basename in self.settings['active plugins']:
 
-			if basename not in self.plugin_database:
+			if basename not in self._plugin_database:
 				self.settings['active plugins'].remove(basename)
 				continue
 
-			plugin_class = self.plugin_database[basename]['class']
+			plugin_class = self._plugin_database[basename]['class']
 
 			if basename == 'applications':
 				self._build_applications_list() 
@@ -2162,11 +2170,10 @@ class Cardapio(dbus.service.Object):
 				self._view.build_pinneditems_section(plugin_class.category_name, plugin_class.category_tooltip)
 
 			else:
-
 				for category in xrange(plugin_class.category_count):
 
 					try:
-						plugin = self.plugin_database[basename]['instances'][category]
+						plugin = self._plugin_database[basename]['instances'][category]
 					except Exception, exception:
 						logging.error('[%s] No such category in this plugin!' % basename)
 						logging.error(exception)

@@ -181,7 +181,7 @@ class CardapioAwnApplet(CardapioAppletInterface):
 
 
 	def _open_about_dialog(self, widget):
-		self.cardapio.open_about_dialog()
+		self.cardapio.handle_about_menu_item_clicked(widget)
 
 
 	def _on_applet_destroy(self, *args):

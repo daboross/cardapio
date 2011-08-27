@@ -180,13 +180,13 @@ class OptionsWindow:
 		"""
 
 		plugin_list = []
-		plugin_list += [basename for basename in self.cardapio.settings['active plugins']]
+		plugin_list += self.cardapio.settings['active plugins']
 
 		inactive_plugins = [
 				(self.cardapio.get_plugin_class(basename).name.lower(), basename) 
-				for basename in self.cardapio.plugin_database if basename not in plugin_list]
+				for basename in self.cardapio.get_inactive_plugins()]
 
-		inactive_plugins = [plugin_tuple[1] for plugin_tuple in sorted(inactive_plugins)]
+		inactive_plugins = [name_and_basename[1] for name_and_basename in sorted(inactive_plugins)]
 		plugin_list += inactive_plugins
 
 		for basename in plugin_list:

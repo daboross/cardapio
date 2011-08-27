@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-07-24 18:41+0200\n"
-"PO-Revision-Date: 2011-07-06 19:25+0000\n"
-"Last-Translator: simon <Unknown>\n"
+"POT-Creation-Date: 2011-08-06 20:38+0200\n"
+"PO-Revision-Date: 2011-08-08 09:47+0000\n"
+"Last-Translator: Alejandro Pérez <Unknown>\n"
 "Language-Team: Spanish <es@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-08-05 10:41+0000\n"
-"X-Generator: Launchpad (build 13613)\n"
+"X-Launchpad-Export-Date: 2011-08-24 21:44+0000\n"
+"X-Generator: Launchpad (build 13727)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "«%(file_name)s» es un archivo de texto ejecutable."
@@ -49,6 +49,12 @@ msgstr "Acceda a documentos y carpetas"
 
 msgid "All"
 msgstr "Todos"
+
+msgid "All other files"
+msgstr "Todos los demás archivos"
+
+msgid "All time"
+msgstr "Siempre"
 
 msgid "Amazon"
 msgstr "Amazon"
@@ -143,6 +149,12 @@ msgstr "¿Quiere ejecutar \"%(file_name)s\", o mostrar sus contenidos?"
 
 msgid "Drag to reorder plugins"
 msgstr "Arrastrar para reordenar complementos"
+
+msgid "DuckDuckGo"
+msgstr "DuckDuckGo"
+
+msgid "DuckDuckGo Results"
+msgstr "Resultados en DuckDuckGo"
 
 msgid "Edit Menus"
 msgstr "Editar Menús"
@@ -245,13 +257,26 @@ msgstr "Mantener los resultados de búsqueda cuando Cardapio esté oculto"
 msgid "Label:"
 msgstr "Etiqueta:"
 
+msgid "Launch in _Background"
+msgstr "Iniciar en Segundo plano"
+
 msgid "Launch this item"
 msgstr "Arrancar este objeto"
+
+msgid ""
+"Launch this item but do not hide Cardapio\n"
+"(same as Middle-Click or Ctrl-Click)"
+msgstr ""
+"Lanzar este elemento pero no ocultar Cardapio\n"
+"(lo mismo que Click central o Ctrl-Click)"
 
 msgid ""
 "Lets you choose from thousands of free applications available for Ubuntu"
 msgstr ""
 "Le permite elegir entre miles de aplicaciones libres disponibles para Ubuntu"
+
+msgid "Load additional results"
+msgstr "Cargar resultados adicionales"
 
 msgid "Local Results"
 msgstr "Resultados locales"
@@ -307,6 +332,9 @@ msgstr "Abrir el menú cuando el cursor se encuentre sobre el complemento"
 msgid "Open the trash"
 msgstr "Abrir la papelera"
 
+msgid "Open this folder"
+msgstr "Abrir esta carpeta"
+
 msgid "Open this item's parent folder in the file browser"
 msgstr "Abrir la carpeta contenedora de este elemento en el navegador"
 
@@ -330,6 +358,9 @@ msgstr "Realizar una búsqueda usando Microsoft Bing"
 
 msgid "Perform a search using Yahoo"
 msgstr "Realizar una búsqueda usando Yahoo"
+
+msgid "Perform quick DuckDuckGo searches"
+msgstr "Realiza búsquedas rápidas en DuckDuckGo"
 
 msgid ""
 "Perform quick Google searches <b>limited to</b> the system's default language"
@@ -370,6 +401,15 @@ msgstr "Proteja su equipo del uso no autorizado"
 msgid "Recent Documents"
 msgstr "Documentos recientes"
 
+msgid "Recent documents (categorized)"
+msgstr "Documentos recientes (por categoría)"
+
+msgid "Recent documents (simple)"
+msgstr "Documentos recientes (sencillo)"
+
+msgid "Recent documents (smart)"
+msgstr "Documentos recientes (inteligente)"
+
 msgid "Recording..."
 msgstr "Grabando..."
 
@@ -402,6 +442,9 @@ msgstr "Resultados encontrados usando Bing"
 
 msgid "Results found using Yahoo"
 msgstr "Resultados encontrados usando Yahoo"
+
+msgid "Results found with DuckDuckGo"
+msgstr "Resultados encontrados con DuckDuckGo"
 
 msgid "Results found with Google"
 msgstr "Resultados encontrados con Google"
@@ -464,6 +507,13 @@ msgstr "Buscar resultados en wikipedia"
 msgid "Search for results in YouTube"
 msgstr "Resultados encontrados usando YouTube"
 
+msgid ""
+"Search for your most recently used files, divided into categories depending "
+"on <i>when</i> they were last accessed."
+msgstr ""
+"Busque archivos recientemente utilizados, divididos en categorías "
+"dependiendo de <i>cuando</i> fueron accedidos por última vez."
+
 msgid "Search for your most recently used files."
 msgstr "Buscar los archivos utilizados más recientes"
 
@@ -497,6 +547,9 @@ msgstr "Mostrar notas adicionales en Tomboy"
 msgid "Show additional results"
 msgstr "Mostrar resultados adicionales"
 
+msgid "Show additional search results"
+msgstr "Mostrar resultados de búsqueda adicionales"
+
 msgid "Show additional search results in Sezen"
 msgstr "Muestra resultados de búsqueda adicionales en Sezen"
 
@@ -511,6 +564,13 @@ msgstr "Mostrar resultados adicionales en su navegador web"
 
 msgid "Show all categories"
 msgstr "Mostrar todas las categorías"
+
+msgid ""
+"Show contents of this folder within Cardapio\n"
+"(same as Shift-Click)"
+msgstr ""
+"Mostrar contenidos de la carpeta con Cardapio\n"
+"(lo mismo que Shift-Click)"
 
 msgid "Show session buttons in bottom pane"
 msgstr "Mostrar botones de Sesión en el panel"
@@ -581,6 +641,9 @@ msgstr "Usar el icono predeterminado"
 
 msgid "Use icon from file:"
 msgstr "Usar icono desde un archivo:"
+
+msgid "Use named icon:"
+msgstr "Usar el icono nombrado:"
 
 msgid "Use no icon"
 msgstr "No usar icono"

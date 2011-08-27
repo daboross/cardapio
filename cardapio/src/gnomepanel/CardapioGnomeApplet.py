@@ -394,7 +394,7 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 		method in Cardapio, acting as a layer to remove the dependence on the
 		"widget" argument.
 		"""
-		self.cardapio.open_about_dialog(verb)
+		self.cardapio.handle_about_menu_item_clicked(verb)
 
 
 	def open_options_dialog(self, widget, verb):
