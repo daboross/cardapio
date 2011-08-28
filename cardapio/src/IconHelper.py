@@ -163,6 +163,29 @@ class IconHelper:
 		return None
 
 
+	def get_icon_name_from_app_info(self, app_info, fallback_icon):
+		"""
+		Returns the icon name given an app_info dictionary
+		"""
+
+		icon_name = app_info['icon name']
+		fallback_icon = fallback_icon or 'text-x-generic'
+
+		if icon_name == 'inode/symlink':
+			icon_name = None
+
+		if icon_name is not None:
+			icon_name = self.get_icon_name_from_theme(icon_name)
+
+		elif app_info['type'] == 'xdg':
+			icon_name = self.get_icon_name_from_path(app_info['command'])
+
+		if icon_name is None:
+			icon_name = fallback_icon
+
+		return icon_name
+
+
 	def register_icon_theme_listener(self, listener):
 		"""
 		Registed a function to be called when we detect that the icon theme has

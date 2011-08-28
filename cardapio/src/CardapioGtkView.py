@@ -218,6 +218,8 @@ class CardapioGtkView(CardapioViewInterface):
 		Shows a given application section
 		"""
 		section.show()
+		# TODO: is this necessary? (below)
+		section.get_children()[0].get_children()[0].show() # show also section_contents
 
 
 	def unblock_focus_out_event(self, *dummy):
@@ -570,7 +572,9 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 		Adds a button to the session pane, and returns a handler to it
 		"""
-		return self._add_button(button_str, icon_name, pane_or_section, tooltip, self.SESSION_BUTTON)
+		session_button = self._add_button(button_str, icon_name, pane_or_section, tooltip, self.SESSION_BUTTON)
+		self.session_buttons.append(session_button)
+		return session_button
 
 
 	def add_sidepane_button(self, button_str, icon_name, pane_or_section, tooltip):
@@ -625,6 +629,7 @@ class CardapioGtkView(CardapioViewInterface):
 		Prepares the UI before building any of the actual content-related widgets
 		"""
 
+		self.session_buttons = []
 		self._read_gui_theme_info()
 
 		# the ui is already built by ui file, so we just clear it here
@@ -803,8 +808,8 @@ class CardapioGtkView(CardapioViewInterface):
 				category_button.child.child.get_children()[1].hide()
 
 			try:
-				self.session_button_locksys.child.child.get_children()[1].hide()
-				self.session_button_logout.child.child.get_children()[1].hide()
+				for session_button in self.session_buttons:
+					session_button.child.child.get_children()[1].hide()
 			except:
 				pass
 
@@ -841,8 +846,8 @@ class CardapioGtkView(CardapioViewInterface):
 				category_button.child.child.get_children()[1].show()
 
 			try:
-				self.session_button_locksys.child.child.get_children()[1].show()
-				self.session_button_logout.child.child.get_children()[1].show()
+				for session_button in self.session_buttons:
+					session_button.child.child.get_children()[1].show()
 			except:
 				pass
 

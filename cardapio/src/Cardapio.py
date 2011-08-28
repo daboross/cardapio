@@ -988,8 +988,8 @@ class Cardapio(dbus.service.Object):
 				self._view.hide_button(app['button'])
 			else:
 				self._view.show_button(app['button'])
-				self._mark_section_has_entries_and_show_category_button(app['section'])
 				self._no_results_to_show = False
+				self._mark_section_has_entries_and_show_category_button(app['section'])
 
 		if self._selected_section is None:
 			self._untoggle_and_show_all_sections()
@@ -1088,8 +1088,8 @@ class Cardapio(dbus.service.Object):
 
 		if count > 0:
 			self._view.show_section(self._view.SUBFOLDERS_SECTION)
-			self._mark_section_has_entries_and_show_category_button(self._view.SUBFOLDERS_SECTION)
 			self._no_results_to_show = False
+			self._mark_section_has_entries_and_show_category_button(self._view.SUBFOLDERS_SECTION)
 
 		else:
 			self._no_results_to_show = True
@@ -1370,7 +1370,6 @@ class Cardapio(dbus.service.Object):
 		self._view.run_in_ui_thread(self._plugin_handle_search_result_synchronized, plugin, results, original_query)
 
 
-	# TODO MVC
 	def _plugin_handle_search_result_synchronized(self, plugin, results, original_query):
 		"""
 		Handler for when a plugin returns some search results. This one is
@@ -1378,6 +1377,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		self._view.hide_section(plugin.section) # for added performance
+		self._view.remove_all_buttons_from_section(plugin.section)
 
 		plugin.__is_running = False
 		self._plugins_still_searching -= 1
@@ -1396,40 +1396,18 @@ class Cardapio(dbus.service.Object):
 
 			results = []
 
-		if original_query != self._current_query:
+		elif original_query != self._current_query:
 			results = []
-
-		self._view.remove_all_buttons_from_section(plugin.section)
 
 		for result in results:
 
-			icon_name = result['icon name']
-			fallback_icon = plugin.fallback_icon or 'text-x-generic'
-
-			if icon_name == 'inode/symlink':
-				icon_name = None
-
-			if icon_name is not None:
-				icon_name = self.icon_helper.get_icon_name_from_theme(icon_name)
-
-			elif result['type'] == 'xdg':
-				icon_name = self.icon_helper.get_icon_name_from_path(result['command'])
-
-			if icon_name is None:
-				icon_name = fallback_icon
-
+			icon_name = self.icon_helper.get_icon_name_from_app_info(result, plugin.fallback_icon)
 			button = self._add_app_button(result['name'], icon_name, plugin.section, result['type'], result['command'], result['tooltip'], None)
 			button.app_info['context menu'] = result['context menu']
-
 
 		if results:
 
 			self._no_results_to_show = False
-
-			# TODO MVC: get rid of this somehow!
-			section_contents = plugin.section.get_children()[0].get_children()[0]
-			section_contents.show()
-
 			self._mark_section_has_entries_and_show_category_button(plugin.section)
 
 			if (self._selected_section is None) or (self._selected_section == plugin.section):
@@ -1439,8 +1417,7 @@ class Cardapio(dbus.service.Object):
 			else:
 				self._consider_showing_no_results_text()
 
-		else:
-
+		else: 
 			self._mark_section_empty_and_hide_category_button(plugin.section)
 
 			if (self._selected_section is None) or (self._selected_section == plugin.section):
@@ -2015,8 +1992,8 @@ class Cardapio(dbus.service.Object):
 			app_button = self._add_app_button(app['name'], app['icon name'], section, app['type'], app['command'], app['tooltip'], self._app_list)
 
 			self._view.show_button(app_button)
-			self._mark_section_has_entries_and_show_category_button(section)
 			self._no_results_to_show = False
+			self._mark_section_has_entries_and_show_category_button(section)
 			no_results = False
 
 			if section == self._view.SIDEPANE_SECTION:
@@ -2072,12 +2049,6 @@ class Cardapio(dbus.service.Object):
 			session_button = self._view.add_session_button(button_str, item[2], item[4], tooltip)
 
 			session_button.app_info = app_button.app_info
-			item.append(session_button)
-
-		# TODO MVC
-		self._view.session_button_locksys  = items[0][5]
-		self._view.session_button_logout   = items[1][5]
-		self._view.session_button_shutdown = items[2][5]
 
 
 	def _build_applications_list(self):
@@ -2830,6 +2801,7 @@ class Cardapio(dbus.service.Object):
 		self._section_list[section]['must show'] = True
 		self._view.show_button(self._section_list[section]['category button'])
 
+	# TODO: simplify the spaghetti structure related to hiding-showing sections
 	
 	# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 	# Callbacks used in the View module	
