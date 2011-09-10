@@ -49,7 +49,7 @@ class DesktopEnvironment:
 		elif self.environment == 'xfce'        : pass
 		elif self.environment == 'lwde'        : pass
 		elif self.environment == 'gnome'       : self.init_gnome()
-		elif self.environment == 'gnome-shell' : self.init_gnome()
+		elif self.environment == 'gnome-shell' : self.init_gnome3()
 
 
 	def init_gnome(self):
@@ -67,6 +67,19 @@ class DesktopEnvironment:
 
 		except Exception, exception:
 			logging.warn('Warning: you will not be able to execute scripts in the terminal')
+
+	def init_gnome3(self):
+		"""
+		Override some of the default variables for use in Gnome3
+		"""
+
+		self.init_gnome()
+
+		# dbus-send seems to have a problem with this command, so we use gdbus instead
+		self.lock_screen  = 'gdbus call --session --dest=org.gnome.ScreenSaver --object-path=/ --method=org.gnome.ScreenSaver.Lock'
+
+		self.save_session = 'dbus-send --session --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.Logout uint32:0'
+		self.shutdown     = 'dbus-send --session --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.Shutdown'
 
 
 	def register_session_close_handler(self, handler):
