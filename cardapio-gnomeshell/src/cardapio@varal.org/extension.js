@@ -106,12 +106,16 @@ ApplicationsButton.prototype = {
 		x = this.actor.get_x() + this.container.get_x();
 		y = this.actor.get_y() + this.container.get_y();
 		this._cardapio.show_hide_near_pointRemote(x, y, false, false);
+
+		// in case the applet moved for some reason, save the new position now 
+        Mainloop.timeout_add_seconds(1.0, Lang.bind(this, this._setDefaultWindowPosition));
+		// (adding it to the Mainloop is a hack that makes sure this actually
+		// runs. Otherwise, for some reason, it fails to execute...)
     },
 };
 
 
 function main(extensionMeta) {
-
 	new ApplicationsButton();
 }
 
