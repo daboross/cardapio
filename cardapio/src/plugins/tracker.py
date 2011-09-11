@@ -68,7 +68,11 @@ class CardapioPlugin(CardapioPluginInterface):
 			bus.release_name('org.freedesktop.Tracker1')
 			return 
 
-		self.action_command = r"tracker-search-tool '%s'"
+		if (which("tracker-needle") is not None):
+			self.action_command = r"tracker-needle '%s'"
+		else:
+			self.action_command = r"tracker-search-tool '%s'"
+
 		self.action = {
 			'name'         : _('Show additional results'),
 			'tooltip'      : _('Show additional search results in the Tracker search tool'),
