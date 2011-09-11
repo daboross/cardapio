@@ -48,6 +48,8 @@ ApplicationsButton.prototype = {
 		// loaded before we run the set_default_window_positionRemote() 
 		// method. Ugly, argh!
         Mainloop.timeout_add_seconds(1.0, Lang.bind(this, this._setDefaultWindowPosition));
+        Mainloop.timeout_add_seconds(3.0, Lang.bind(this, this._setDefaultWindowPosition));
+        Mainloop.timeout_add_seconds(10.0, Lang.bind(this, this._setDefaultWindowPosition));
 
 		this._icon = new St.Icon({ 
 			icon_name: 'start-here',
