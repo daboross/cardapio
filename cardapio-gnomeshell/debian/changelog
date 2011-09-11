@@ -1,3 +1,27 @@
+cardapio-gnomeshell (0.9.191-ubuntu1-oneiric1) oneiric; urgency=low
+
+   * Bugfix release. NOW it should work!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 11 Aug 2011 23:00:00 +0100
+
+cardapio-gnomeshell (0.9.191-ubuntu1-natty1) natty; urgency=low
+
+   * Bugfix release. NOW it should work!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 11 Aug 2011 23:00:00 +0100
+
+cardapio-gnomeshell (0.9.191-ubuntu1-maverick1) maverick; urgency=low
+
+   * Bugfix release. NOW it should work!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 11 Aug 2011 23:00:00 +0100
+
+cardapio-gnomeshell (0.9.191-ubuntu1-lucid1) lucid; urgency=low
+
+   * Bugfix release. NOW it should work!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 11 Aug 2011 23:00:00 +0100
+
 cardapio-gnomeshell (0.9.189-ubuntu1-oneiric1) oneiric; urgency=low
 
    * First release!

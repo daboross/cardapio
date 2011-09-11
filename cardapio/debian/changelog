@@ -1,3 +1,51 @@
+cardapio (0.9.191-ubuntu1-oneiric1) oneiric; urgency=low
+
+   * Bug-fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 11 Sep 2011 23:01:00 +0100
+
+cardapio (0.9.191-ubuntu1-natty1) natty; urgency=low
+
+   * Bug-fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 11 Sep 2011 23:01:00 +0100
+
+cardapio (0.9.191-ubuntu1-maverick1) maverick; urgency=low
+
+   * Bug-fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 11 Sep 2011 23:01:00 +0100
+
+cardapio (0.9.191-ubuntu1-lucid1) lucid; urgency=low
+
+   * Bug-fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 11 Sep 2011 23:01:00 +0100
+
+cardapio (0.9.190-ubuntu1-oneiric1) oneiric; urgency=low
+
+   * Bug-fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 2 Sep 2011 23:01:00 +0100
+
+cardapio (0.9.190-ubuntu1-natty1) natty; urgency=low
+
+   * Bug-fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 2 Sep 2011 23:01:00 +0100
+
+cardapio (0.9.190-ubuntu1-maverick1) maverick; urgency=low
+
+   * Bug-fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 2 Sep 2011 23:01:00 +0100
+
+cardapio (0.9.190-ubuntu1-lucid1) lucid; urgency=low
+
+   * Bug-fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 2 Sep 2011 23:01:00 +0100
+
 cardapio (0.9.189-ubuntu4-oneiric1) oneiric; urgency=low
 
    * Various bug fixes and new Gnome-Shell extension!

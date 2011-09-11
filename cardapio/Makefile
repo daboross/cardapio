@@ -94,7 +94,7 @@ install: install_docky_helper
 	intltool-merge -b locale src/gnomepanel/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
 	
 	mkdir -p $(DESTDIR)/usr/share/dbus-1/services
-	sed s_PREFIX_$(PREFIX)_ res/cardapio.service > $(DESTDIR)/usr/share/dbus-1/services/cardapio.service
+	cp res/cardapio.service $(DESTDIR)/usr/share/dbus-1/services/cardapio.service
 
 buildsrc:
 	debuild -S
