@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-09-02 14:52+0200\n"
+"POT-Creation-Date: 2011-09-11 23:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -278,7 +278,7 @@ msgstr ""
 #: src/plugins/amazon.py:278 src/plugins/bing.py:151
 #: src/plugins/duckduck.py:74 src/plugins/ebay.py:245 src/plugins/ebay.py:261
 #: src/plugins/google.py:85 src/plugins/google_localized.py:89
-#: src/plugins/tracker.py:73 src/plugins/tracker_fts.py:73
+#: src/plugins/tracker.py:77 src/plugins/tracker_fts.py:77
 #: src/plugins/yahoo.py:171 src/plugins/you_tube.py:158
 #: src/plugins/zeitgeist_categorized.py:100 src/plugins/zeitgeist_simple.py:96
 #: src/plugins/zeitgeist_smart.py:108
@@ -523,7 +523,7 @@ msgstr ""
 msgid "Results found in your computer"
 msgstr ""
 
-#: src/plugins/tracker.py:74 src/plugins/tracker_fts.py:74
+#: src/plugins/tracker.py:78 src/plugins/tracker_fts.py:78
 msgid "Show additional search results in the Tracker search tool"
 msgstr ""
 
