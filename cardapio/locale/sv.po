@@ -2,18 +2,24 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-08-25 10:50-0300\n"
-"PO-Revision-Date: 2010-10-29 11:17+0000\n"
-"Last-Translator: David Bengtsson <Unknown>\n"
+"POT-Creation-Date: 2011-09-02 14:52+0200\n"
+"PO-Revision-Date: 2011-09-04 18:05+0000\n"
+"Last-Translator: mas4er <Unknown>\n"
 "Language-Team: Swedish <sv@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-09-02 12:48+0000\n"
-"X-Generator: Launchpad (build 13830)\n"
+"X-Launchpad-Export-Date: 2011-09-11 21:41+0000\n"
+"X-Generator: Launchpad (build 13900)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "\"%(file_name)s\" är en körbar textfil."
+
+msgid "<b>Appearance</b>"
+msgstr "<b>Utseende</b>"
+
+msgid "<b>Behavior</b>"
+msgstr "<b>Beteende</b>"
 
 msgid ""
 "<b>Plugin:</b> %(name)s %(version)s\n"
@@ -24,6 +30,16 @@ msgstr ""
 "<b>Upphovsman:</b> %(author)s\n"
 "<b>Beskrivning:</b> %(description)s"
 
+msgid ""
+"<big>Rebuilding...</big>\n"
+"This should take a few seconds"
+msgstr ""
+"<big>Bygger upp på nytt...</big>\n"
+"Detta bör ta några sekunder"
+
+msgid "A menu with search capabilities."
+msgstr "En meny med sökmöjligheter."
+
 msgid "Access applications, folders, system settings, etc."
 msgstr "Kom åt program, mappar, systeminställningar etc."
 
@@ -32,6 +48,12 @@ msgstr "Kom åt dokument och mappar"
 
 msgid "All"
 msgstr "Allt"
+
+msgid "All other files"
+msgstr "Övriga filer"
+
+msgid "All time"
+msgstr "Någonsin"
 
 msgid "Amazon"
 msgstr "Amazon"
@@ -69,6 +91,20 @@ msgstr "Cardapio-teamet"
 msgid "Cardapio Website"
 msgstr "Webbplatsen för Cardapio"
 
+msgid ""
+"Chrome bookmark:\n"
+"%s"
+msgstr ""
+"Chrome-favorit:\n"
+"%s"
+
+msgid ""
+"Chromium bookmark:\n"
+"%s"
+msgstr ""
+"Chromium-favorit:\n"
+"%s"
+
 msgid "Command Launcher"
 msgstr "Kommandostartare"
 
@@ -84,6 +120,14 @@ msgstr "Skapa en ny anteckning med denna titel i Tomboy"
 msgid "Create this note"
 msgstr "Skapa denna anteckning"
 
+msgid ""
+"Data has recently changed!\n"
+"This menu will be updated momentarily, so as not to interrupt your browsing."
+msgstr ""
+"Denna data har ändrats nyligen!\n"
+"Denna meny kommer att uppdateras ögonblickligen för att inte avbryta ditt "
+"bläddrande."
+
 msgid "Description:"
 msgstr "Beskrivning:"
 
@@ -96,8 +140,20 @@ msgstr "Visar en lista över mappar"
 msgid "Displays installed applications"
 msgstr "Visar installerade program"
 
+msgid "Displays the items that you marked as \"pinned\" using the context menu"
+msgstr "Visar dina gjorda val som \"markerade\" i respektive sammanhangsmeny"
+
+msgid "Do you want to run \"%(file_name)s\", or display its contents?"
+msgstr "Vill du köra \"%(file_name)s\", eller visa dess innehåll?"
+
 msgid "Drag to reorder plugins"
 msgstr "Dra för att omordna insticksmoduler"
+
+msgid "DuckDuckGo"
+msgstr "DuckDuckGo"
+
+msgid "DuckDuckGo Results"
+msgstr "Resultat av DuckDuckGo"
 
 msgid "Edit Menus"
 msgstr "Redigera menyer"
@@ -120,8 +176,24 @@ msgstr "Filsökning"
 msgid "Files that you have used recently"
 msgstr "Filer som du använt nyligen"
 
+msgid "Files you used this month"
+msgstr "Filer du öppnat under nuvarande månad"
+
+msgid "Files you used this week"
+msgstr "Filer du öppnat under nuvarande vecka"
+
+msgid "Files you used today"
+msgstr "Filer du öppnat idag"
+
 msgid "Filesystem Root"
 msgstr "Rotfilsystemet"
+
+msgid ""
+"Firefox bookmark:\n"
+"%s"
+msgstr ""
+"Firefox-favorit:\n"
+"%s"
 
 msgid "Folder Contents"
 msgstr "Mappinnehåll"
@@ -142,11 +214,23 @@ msgstr "Allmänt"
 msgid "Get help with %(distro_name)s"
 msgstr "Få hjälp med %(distro_name)s"
 
+msgid "Go To \"%s\" in Chromium"
+msgstr "Gå Till \"%s\" i Chromium"
+
+msgid "Go To \"%s\" in Firefox"
+msgstr "Gå Till \"%s\" i Firefox"
+
+msgid "Go To \"%s\" in Google Chrome"
+msgstr "Gå Till \"%s\" i Google Chrome"
+
 msgid "Google"
 msgstr "Google"
 
 msgid "Google localized results"
 msgstr "Google-lokaliserade resultat"
+
+msgid "Grab new shortcut"
+msgstr "Greppa ny genväg"
 
 msgid "Help and Support"
 msgstr "Hjälp och support"
@@ -169,10 +253,29 @@ msgstr "Objekt som inte står under någon menykategori"
 msgid "Keep search results when Cardapio is hidden"
 msgstr "Behåll sökresultat när Cardapio är dolt"
 
+msgid "Label:"
+msgstr "Beteckning:"
+
+msgid "Launch in _Background"
+msgstr "Starta i bakgrunden"
+
+msgid "Launch this item"
+msgstr "Starta detta objekt"
+
+msgid ""
+"Launch this item but do not hide Cardapio\n"
+"(same as Middle-Click or Ctrl-Click)"
+msgstr ""
+"Öppna detta föremål men behåll Cardapio synligt\n"
+"(samma som mellan-klick eller Ctrl-klick)"
+
 msgid ""
 "Lets you choose from thousands of free applications available for Ubuntu"
 msgstr ""
 "Låter dig välja från tusentals fria program som finns tillgängliga för Ubuntu"
+
+msgid "Load additional results"
+msgstr "Använd ytterligare resultat"
 
 msgid "Local Results"
 msgstr "Lokala resultat"
@@ -213,11 +316,23 @@ msgstr "Öppna Programcentralen"
 msgid "Open categories when cursor hovers them"
 msgstr "Öppna kategorier när muspekaren fokuserar på dem"
 
+msgid "Open in Chromium"
+msgstr "Öppna med Chromium"
+
+msgid "Open in Firefox"
+msgstr "Öppna med Firefox"
+
+msgid "Open in Google Chrome"
+msgstr "Öppna med Google Chrome"
+
 msgid "Open menu when cursor hovers the applet"
 msgstr "Öppna menyn när muspekaren fokuserar på panelprogrammet"
 
 msgid "Open the trash"
 msgstr "Öppna papperskorgen"
+
+msgid "Open this folder"
+msgstr "Öppna denna mapp"
 
 msgid "Open this item's parent folder in the file browser"
 msgstr "Öppna detta objekts föräldramapp i filbläddraren"
@@ -231,6 +346,9 @@ msgstr "Öppna din personliga mapp"
 msgid "Other configuration tools"
 msgstr "Andra konfigureringsverktyg"
 
+msgid "Pages bookmarked in Firefox, Chrome, or Chromium"
+msgstr "Favoritsidor i Firefox, Chrome eller Chromium"
+
 msgid "Peek _Inside Folder"
 msgstr "Kika _inuti mappen"
 
@@ -239,6 +357,9 @@ msgstr "Gör en sökning med Microsofts Bing"
 
 msgid "Perform a search using Yahoo"
 msgstr "Gör en sökning med Yahoo"
+
+msgid "Perform quick DuckDuckGo searches"
+msgstr "Gör snabba DuckDuckGo-sökningar"
 
 msgid ""
 "Perform quick Google searches <b>limited to</b> the system's default language"
@@ -267,7 +388,7 @@ msgid "Places"
 msgstr "Platser"
 
 msgid "Places menu"
-msgstr "Platser-meny"
+msgstr "Platsmenyn"
 
 msgid "Plugins"
 msgstr "Insticksmoduler"
@@ -277,6 +398,18 @@ msgstr "Skydda din dator från obehörigt användande"
 
 msgid "Recent Documents"
 msgstr "Senaste dokument"
+
+msgid "Recent documents (categorized)"
+msgstr "Senast öppnade dokument (kategoriserade)"
+
+msgid "Recent documents (simple)"
+msgstr "Senast öppnade dokument (enkelt)"
+
+msgid "Recent documents (smart)"
+msgstr "Senast öppnade dokument (smart)"
+
+msgid "Recording..."
+msgstr "Spelar in..."
 
 msgid "Reduce the size of Cardapio's main window"
 msgstr "Minska storleken på Cardapios huvudfönster"
@@ -307,6 +440,9 @@ msgstr "Resultat som hittades med Bing"
 
 msgid "Results found using Yahoo"
 msgstr "Resultat som hittades med Yahoo"
+
+msgid "Results found with DuckDuckGo"
+msgstr "Resultat funna med DuckDuckGo"
 
 msgid "Results found with Google"
 msgstr "Resultat som hittades med Google"
@@ -356,6 +492,9 @@ msgstr "Sök efter nya program i Programcentralen"
 msgid "Search for online Pidgin buddies"
 msgstr "Sök efter Pidgin-vänner på nätet"
 
+msgid "Search for pages bookmarked in Firefox, Chrome, or Chromium"
+msgstr "Sök efter favoritsidor i Firefox, Chrome eller Chromium"
+
 msgid "Search for results in Amazon"
 msgstr "Sök efter resultat på Amazon"
 
@@ -364,6 +503,23 @@ msgstr "Sök efter resultat på Wikipedia"
 
 msgid "Search for results in YouTube"
 msgstr "Sök efter resultat på YouTube"
+
+msgid ""
+"Search for your most recently used files in categorized fashion, but save "
+"space when no query is entered."
+msgstr ""
+"Sök efter dina senast öppnade filer i kategoriserad form, men spar utrymme "
+"när inga ytterligare vilkor angivits."
+
+msgid ""
+"Search for your most recently used files, divided into categories depending "
+"on <i>when</i> they were last accessed."
+msgstr ""
+"Sök efter dina senast öppnade filer, indelade i kategorier beroende på  "
+"<i>när</i> de senast öppnades."
+
+msgid "Search for your most recently used files."
+msgstr "Sök efter dina senast öppnade filer"
 
 msgid "Search local files and folders indexed with Tracker"
 msgstr "Sök efter lokala filer och mappar som indexerats med Tracker"
@@ -395,8 +551,14 @@ msgstr "Visa ytterligare anteckningar i Tomboy"
 msgid "Show additional results"
 msgstr "Visa ytterligare resultat"
 
+msgid "Show additional search results"
+msgstr "Visa ytterligare resultat av sökning"
+
 msgid "Show additional search results in Sezen"
 msgstr "Visa ytterligare sökresultat i Sezen"
+
+msgid "Show additional search results in a file browser"
+msgstr "Visa ytterligare resultat av sökning i en filhanterare"
 
 msgid "Show additional search results in the Tracker search tool"
 msgstr "Visa ytterligare sökresultat i Tracker-verktyget"
@@ -406,6 +568,13 @@ msgstr "Visa ytterligare sökresultat i din webbläsare"
 
 msgid "Show all categories"
 msgstr "Visa alla kategorier"
+
+msgid ""
+"Show contents of this folder within Cardapio\n"
+"(same as Shift-Click)"
+msgstr ""
+"Visa innehållet i denna mapp i Cardapio\n"
+"(samma som Shift-klick)"
 
 msgid "Show session buttons in bottom pane"
 msgstr "Visa sessionsknappar i nedre panelen"
@@ -441,6 +610,18 @@ msgstr "Prata med denna vän"
 msgid "This is a community-supported plugin"
 msgstr "Detta är en gemenskaps-stödd insticksmodul"
 
+msgid "This menu will be updated momentarily."
+msgstr "Denna meny kommer att uppdateras ögonblickligen"
+
+msgid "This month"
+msgstr "Nuvarande månad"
+
+msgid "This week"
+msgstr "Nuvarande vecka"
+
+msgid "Today"
+msgstr "Idag"
+
 msgid "Tomboy"
 msgstr "Tomboy"
 
@@ -456,14 +637,35 @@ msgstr "Programcentral för Ubuntu"
 msgid "Uncategorized"
 msgstr "Okategoriserade"
 
+msgid "Update now"
+msgstr "Uppdatera nu"
+
+msgid "Use default icon"
+msgstr "Använd standardikonen"
+
+msgid "Use icon from file:"
+msgstr "Använd ikon från fil:"
+
+msgid "Use named icon:"
+msgstr "Använd namngiven ikon:"
+
+msgid "Use no icon"
+msgstr "Använd ingen ikon"
+
 msgid "View"
 msgstr "Visa"
+
+msgid "View icon-naming specification on the web"
+msgstr "Visa specifikationer för ikonnamn från nätet"
 
 msgid "Virtual Machines"
 msgstr "Virtuella maskiner"
 
 msgid "VirtualBox"
 msgstr "VirtualBox"
+
+msgid "Web Bookmarks"
+msgstr "Favoritsidor på webben"
 
 msgid "Web Results"
 msgstr "Webbresultat"
@@ -521,6 +723,9 @@ msgstr "_Redigera menyer"
 
 msgid "_Install %s"
 msgstr "_Installera %s"
+
+msgid "_Launch"
+msgstr "_Starta"
 
 msgid "_Pin This Item"
 msgstr "_Nåla detta objekt"
