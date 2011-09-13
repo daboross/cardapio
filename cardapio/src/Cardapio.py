@@ -208,7 +208,7 @@ class Cardapio(dbus.service.Object):
 
 		logging.info('Exiting...')
 		self._view.quit()
-		sys.exit()
+		sys.exit(0)
 
 
 	def _setup_log_file(self, debug):
@@ -1133,7 +1133,7 @@ class Cardapio(dbus.service.Object):
 			count += 1
 
 			command = os.path.join(path, filename)
-			icon_name = self.icon_helper.get_icon_name_from_path(command)
+			icon_name = self.icon_helper.get_icon_name_for_path(command)
 			if icon_name is None: icon_name = 'folder'
 
 			basename, dummy = os.path.splitext(filename)
@@ -1966,7 +1966,7 @@ class Cardapio(dbus.service.Object):
 		folder_path = os.path.expanduser(folder_path.replace('$HOME', '~')).strip(' \n\r\t')
 		folder_path = self._unescape_url(folder_path)
 
-		icon_name = self.icon_helper.get_icon_name_from_path(folder_path)
+		icon_name = self.icon_helper.get_icon_name_for_path(folder_path)
 		if icon_name is None: icon_name = folder_icon
 		self._add_app_button(folder_name, icon_name, self._view.PLACES_SECTION, 'xdg', folder_path, folder_path, self._app_list)
 
