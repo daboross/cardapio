@@ -1575,8 +1575,8 @@ class Cardapio(dbus.service.Object):
 		self._view.setup_search_entry(not anchor_bottom, not self.settings['mini mode'])
 
 
-	@dbus.service.method(dbus_interface = Constants.BUS_NAME_STR, in_signature = 'ii', out_signature = None)
-	def set_default_window_position(self, x, y):
+	@dbus.service.method(dbus_interface = Constants.BUS_NAME_STR, in_signature = 'iii', out_signature = None)
+	def set_default_window_position(self, x, y, screen):
 		"""
 		Sets Cardapio's position when it was initialized by itself (usually not 
 		in applet mode). If not set, Cardapio defaults to appearing in the center

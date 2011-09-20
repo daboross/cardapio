@@ -37,7 +37,7 @@ const CardapioInterface = {
 		outSignature: 'b'
 	}, {
 		name: 'set_default_window_position',
-		inSignature: 'ii',
+		inSignature: 'iii',
 		outSignature: ''
 	}]
 };
@@ -105,9 +105,10 @@ CardapioApplet.prototype = {
 	},
 
 	_setDefaultWindowPosition: function() {
-		x = this.actor.get_x() + this.container.get_x();
-		y = this.actor.get_y() + this.container.get_y();
-		this._cardapio.set_default_window_positionRemote(x, y);
+		var x = this.actor.get_x() + this.container.get_x();
+		var y = this.actor.get_y() + this.container.get_y();
+		var d = 0;
+		this._cardapio.set_default_window_positionRemote(x, y, d);
 	},
 
 	_onButtonPress: function(actor, event) {
