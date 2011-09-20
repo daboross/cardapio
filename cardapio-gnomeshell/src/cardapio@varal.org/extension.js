@@ -13,14 +13,14 @@ const Lang = imports.lang;
 const DBus = imports.dbus;
 
 const CardapioAppletInterface = {
-    name: 'org.varal.Cardapio',
-    methods: [{
+	name: 'org.varal.Cardapio',
+	methods: [{
 		name: 'configure_applet_button',
 		inSignature: 'ss',
 		outSignature: ''
 	  }
    ],
-    signals: [],
+	signals: [],
 	properties: []
 };
 
@@ -52,11 +52,22 @@ CardapioApplet.prototype = {
 	__proto__: PanelMenu.Button.prototype,
 
 	_init: function() {
+		PanelMenu.Button.prototype._init.call(this, 0.0);
+		
+		this.actor = new St.Bin({
+			style_class: 'panel-button',
+			reactive: true,
+			can_focus: true,
+			x_fill: true,
+			y_fill: false,
+			track_hover: true,
+		});
+
+		this.actor._delegate = this;
+		this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));		
 
 		this._dbus_name_id = DBus.session.acquire_name('org.varal.CardapioGnomeShellApplet', 0, null, null);
 		DBus.session.exportObject('/org/varal/CardapioGnomeShellApplet', this);
-
-		PanelMenu.Button.prototype._init.call(this, 0.0);
 
 		DBus.session.start_service('org.varal.Cardapio')
 		this._cardapio = new Cardapio(DBus.session, 'org.varal.Cardapio', '/org/varal/Cardapio');
@@ -124,8 +135,8 @@ CardapioApplet.prototype = {
 		else
 			this.actor.remove_style_pseudo_class('active');
 
-		x = this.actor.get_x() + this.container.get_x();
-		y = this.actor.get_y() + this.container.get_y();
+		let x = this.actor.get_x() + this.container.get_x();
+		let y = this.actor.get_y() + this.container.get_y();
 		this._cardapio.show_hide_near_pointRemote(x, y, false, false);
 
 		// in case the applet moved for some reason, save the new position now 
@@ -175,13 +186,15 @@ function main(extensionMeta) {
 let cardapioApplet;
 
 function init(extensionMeta) {
-}
-
-function disable() {
-	cardapioApplet.destroy();
+	/* Do nothing. */
 }
 
 function enable() {
 	cardapioApplet = new CardapioApplet();
+	Main.panel._leftBox.add(cardapioApplet.actor);
+}
+
+function disable() {
+	cardapioApplet.destroy();
 }
 
