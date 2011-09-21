@@ -79,7 +79,7 @@ CardapioApplet.prototype = {
 
 		this._icon = new St.Icon({ 
 			icon_type: St.IconType.SYMBOLIC,
-			icon_size: Main.panel.button.height 
+			icon_size: Main.panel._leftBox.height 
 		});
 
 		this._label = new St.Label();
@@ -122,7 +122,6 @@ CardapioApplet.prototype = {
 		var y = this.actor.get_y() + this.container.get_y();
 		var d = 0;
 		this._cardapio.set_default_window_positionRemote(x, y, d);
-		//this._cardapio.set_default_window_positionRemote(10, 10, 0);
 	},
 
 	_onButtonPress: function(actor, event) {
@@ -142,7 +141,6 @@ CardapioApplet.prototype = {
 		var y = this.actor.get_y() + this.container.get_y();
 		// TODO: add display to this DBus method
 		this._cardapio.show_hide_near_pointRemote(x, y, false, false);
-		//this._cardapio.show_hide_near_pointRemote(0, 0, false, false);
 
 		// in case the applet moved for some reason, save the new position now 
 		Mainloop.timeout_add_seconds(1.0, Lang.bind(this, this._setDefaultWindowPosition));
