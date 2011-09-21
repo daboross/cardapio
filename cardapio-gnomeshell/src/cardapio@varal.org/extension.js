@@ -3,10 +3,8 @@
 //
 
 const St = imports.gi.St;
-const Shell = imports.gi.Shell;
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
-const Util = imports.misc.util;
 const Mainloop = imports.mainloop
 const Lang = imports.lang;
 
@@ -102,6 +100,10 @@ CardapioApplet.prototype = {
 		this.container = Main.panel._leftBox;
 		Main.panel._leftBox.insert_actor(this.actor, 1);
 
+		// add at the end of the left box
+		//this.container = Main.panel._leftBox;
+		//Main.panel._leftBox.add(this.actor);
+
 		// add to the left of the clock
 		//this.container = Main.panel._centerBox;
 		//Main.panel._centerBox.insert_actor(this.actor, 0);
@@ -120,6 +122,7 @@ CardapioApplet.prototype = {
 		var y = this.actor.get_y() + this.container.get_y();
 		var d = 0;
 		this._cardapio.set_default_window_positionRemote(x, y, d);
+		//this._cardapio.set_default_window_positionRemote(10, 10, 0);
 	},
 
 	_onButtonPress: function(actor, event) {
@@ -135,9 +138,11 @@ CardapioApplet.prototype = {
 		else
 			this.actor.remove_style_pseudo_class('active');
 
-		let x = this.actor.get_x() + this.container.get_x();
-		let y = this.actor.get_y() + this.container.get_y();
+		var x = this.actor.get_x() + this.container.get_x();
+		var y = this.actor.get_y() + this.container.get_y();
+		// TODO: add display to this DBus method
 		this._cardapio.show_hide_near_pointRemote(x, y, false, false);
+		//this._cardapio.show_hide_near_pointRemote(0, 0, false, false);
 
 		// in case the applet moved for some reason, save the new position now 
 		Mainloop.timeout_add_seconds(1.0, Lang.bind(this, this._setDefaultWindowPosition));
@@ -191,7 +196,6 @@ function init(extensionMeta) {
 
 function enable() {
 	cardapioApplet = new CardapioApplet();
-	Main.panel._leftBox.add(cardapioApplet.actor);
 }
 
 function disable() {
