@@ -47,9 +47,11 @@ function CardapioApplet() {
 }
 
 CardapioApplet.prototype = {
+
 	__proto__: PanelMenu.Button.prototype,
 
 	_init: function() {
+
 		PanelMenu.Button.prototype._init.call(this, 0.0);
 		
 		this.actor = new St.Bin({
@@ -118,9 +120,11 @@ CardapioApplet.prototype = {
 	},
 
 	_setDefaultWindowPosition: function() {
-		var x = this.actor.get_x() + this.container.get_x();
-		var y = this.actor.get_y() + this.container.get_y();
-		var d = 0;
+
+		let x = this.actor.get_x() + this.container.get_x();
+		let y = this.actor.get_y() + this.container.get_y();
+		let d = 0; // TODO: fetch the display number here
+
 		this._cardapio.set_default_window_positionRemote(x, y, d);
 	},
 
@@ -137,9 +141,11 @@ CardapioApplet.prototype = {
 		else
 			this.actor.remove_style_pseudo_class('active');
 
-		var x = this.actor.get_x() + this.container.get_x();
-		var y = this.actor.get_y() + this.container.get_y();
-		// TODO: add display to this DBus method
+		let x = this.actor.get_x() + this.container.get_x();
+		let y = this.actor.get_y() + this.container.get_y();
+		let d = 0; // TODO: fetch the display number here
+
+		// TODO: add display to the DBus method below:
 		this._cardapio.show_hide_near_pointRemote(x, y, false, false);
 
 		// in case the applet moved for some reason, save the new position now 
@@ -165,10 +171,10 @@ CardapioApplet.prototype = {
 		else {
 			this._icon.hide();
 		}
-
 	},
 
 	destroy: function() {
+
 		DBus.session.release_name_by_id(this._dbus_name_id);
 		// TODO: kill Cardapio
 	},
