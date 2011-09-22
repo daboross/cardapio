@@ -270,7 +270,6 @@
                         <property name="n_rows">6</property>
                         <property name="n_columns">2</property>
                         <property name="column_spacing">6</property>
-                        <property name="row_spacing">5</property>
                         <child>
                           <object class="GtkLabel" id="LabelAppletLabel">
                             <property name="visible">True</property>
@@ -333,7 +332,6 @@
                             <property name="receives_default">False</property>
                             <property name="use_action_appearance">False</property>
                             <property name="focus_on_click">False</property>
-                            <property name="yalign">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <property name="group">OptionIconDefault</property>
@@ -367,7 +365,6 @@
                             <property name="receives_default">False</property>
                             <property name="use_action_appearance">False</property>
                             <property name="focus_on_click">False</property>
-                            <property name="yalign">0</property>
                             <property name="active">True</property>
                             <property name="draw_indicator">True</property>
                             <property name="group">OptionIconDefault</property>
@@ -402,7 +399,7 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkLinkButton" id="linkbutton1">
+                              <object class="GtkLinkButton" id="OptionIconNameHelp">
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -457,7 +454,7 @@
                           <object class="GtkAlignment" id="alignment4">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="top_padding">15</property>
+                            <property name="top_padding">10</property>
                             <child>
                               <object class="GtkCheckButton" id="OptionOpenOnHover">
                                 <property name="label" translatable="yes">Open menu when cursor hovers the applet</property>

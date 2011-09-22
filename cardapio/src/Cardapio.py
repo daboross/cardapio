@@ -28,6 +28,7 @@ try:
 	from OptionsWindow import *
 	from DesktopEnvironment import *
 	from CardapioPluginInterface import CardapioPluginInterface
+	from CardapioSimpleDbusApplet import CardapioSimpleDbusApplet 
 	from CardapioAppletInterface import *
 	from CardapioViewInterface import *
 	import Constants
@@ -143,17 +144,16 @@ class Cardapio(dbus.service.Object):
 		self.cardapio_path     = cardapio_path
 		self._home_folder_path = os.path.abspath(os.path.expanduser('~'))
 
-		self._view           = CardapioGtkView(self)
-		self._applet         = panel_applet
-		panel_type           = panel_applet.panel_type if (panel_applet is not None) else None
-		self._options_window = OptionsWindow(self, panel_type)
-
-		self._reset_model()
-		self._reset_members()
-
 		logging.info('Setting up DBus...')
 		self._setup_dbus()
 		logging.info('...done setting up DBus!')
+
+		self._view   = CardapioGtkView(self)
+		self._applet = self._get_applet(panel_applet)
+		self._options_window = OptionsWindow(self, self._applet.panel_type)
+
+		self._reset_model()
+		self._reset_members()
 
 		logging.info('Setting up UI...')
 		self._setup_ui() # must be the first ui-related method to be called
@@ -288,13 +288,23 @@ class Cardapio(dbus.service.Object):
 		self._options_window.setup_ui()
 
 
+	def _get_applet(self, applet):
+		"""
+		Makes sure we detect applets that interact through the DBus, and also
+		provide a fallback for when there is no applet.
+		"""
+
+		if applet is None:
+			try    : applet = CardapioSimpleDbusApplet(self._bus)
+			except : applet = CardapioAppletInterface()
+
+		return applet
+
+
 	def _setup_applet(self):
 		"""
 		Prepares Cardapio's applet in any of the compatible panels.
 		"""
-
-		if self._applet is None:
-			self._applet = CardapioAppletInterface()
 
 		if self._applet.panel_type == PANEL_TYPE_GNOME2:
 			self._view.remove_about_context_menu_items()
@@ -616,7 +626,7 @@ class Cardapio(dbus.service.Object):
 		self._set_keybinding()
 
 		# set up applet
-		if self._applet.panel_type is not None:
+		if self._applet.IS_CONFIGURABLE:
 			self._applet.update_from_user_settings(self.settings)
 
 		# set up everything else
@@ -1470,7 +1480,7 @@ class Cardapio(dbus.service.Object):
 
 		window_width, window_height = self._view.get_window_size()
 
-		if self._applet.panel_type != None:
+		if self._applet.IS_CONTROLLABLE:
 
 			orientation = self._applet.get_orientation()
 			x, y = self._applet.get_position()
@@ -1692,10 +1702,10 @@ class Cardapio(dbus.service.Object):
 		shows Cardapio on the screen where the applet is drawn. Otherwise, show
 		wherever the mouse pointer is.
 		"""
-		if self._applet.panel_type is None:
-			self._view.set_screen(self._view.get_screen_with_pointer())
-		else:
+		if self._applet.IS_CONTROLLABLE:
 			self._view.set_screen(self._applet.get_screen_number())
+		else:
+			self._view.set_screen(self._view.get_screen_with_pointer())
 
 		self._view.show_main_window()
 
@@ -2571,7 +2581,7 @@ class Cardapio(dbus.service.Object):
 
 				os.environ['DESKTOP_STARTUP_ID'] = notify_id
 
-			if self._applet.panel_type is not None:
+			if self._applet.panel_type != PANEL_TYPE_NONE:
 				# allow launched apps to use Ubuntu's AppMenu
 				os.environ['UBUNTU_MENUPROXY'] = 'libappmenu.so'
 
@@ -2896,7 +2906,7 @@ class Cardapio(dbus.service.Object):
 		Handler for when the cursor leaves the Cardapio window.
 		If using 'open on hover', this hides the Cardapio window after a delay.
 		"""
-		if self._applet.panel_type is None: return
+		if self._applet.IS_CONTROLLABLE: return
 
 		# TODO - Delete this line on Feb 28th
 		#if self.settings['open on hover'] and not self._view.focus_out_blocked:
@@ -2910,7 +2920,7 @@ class Cardapio(dbus.service.Object):
 		nothing. If in launcher mode, this terminates Cardapio.
 		"""
 
-		if self._applet.panel_type is not None:
+		if self._applet.panel_type != PANEL_TYPE_NONE:
 			# keep window alive if in panel mode
 			return True
 

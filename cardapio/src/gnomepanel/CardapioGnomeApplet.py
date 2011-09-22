@@ -36,6 +36,9 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 
 	panel_type = PANEL_TYPE_GNOME2
 
+	IS_CONFIGURABLE = True
+	IS_CONTROLLABLE = True
+
 	# Added this to fix a bug where CardapioGnomeApplet was being
 	# reinstantiated (possibly by Gnome Panel) right after it was destroyed! As
 	# a hackish fix I make sure CardapioGnomeApplet is a singleton using the

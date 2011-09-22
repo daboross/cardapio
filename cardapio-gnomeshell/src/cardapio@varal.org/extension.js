@@ -11,7 +11,7 @@ const Lang = imports.lang;
 const DBus = imports.dbus;
 
 const CardapioAppletInterface = {
-	name: 'org.varal.Cardapio',
+	name: 'org.varal.CardapioSimpleDbusApplet',
 	methods: [{
 		name: 'configure_applet_button',
 		inSignature: 'ss',
@@ -66,8 +66,8 @@ CardapioApplet.prototype = {
 		this.actor._delegate = this;
 		this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));		
 
-		this._dbus_name_id = DBus.session.acquire_name('org.varal.CardapioGnomeShellApplet', 0, null, null);
-		DBus.session.exportObject('/org/varal/CardapioGnomeShellApplet', this);
+		this._dbus_name_id = DBus.session.acquire_name('org.varal.CardapioSimpleDbusApplet', 0, null, null);
+		DBus.session.exportObject('/org/varal/CardapioSimpleDbusApplet', this);
 
 		DBus.session.start_service('org.varal.Cardapio')
 		this._cardapio = new Cardapio(DBus.session, 'org.varal.Cardapio', '/org/varal/Cardapio');

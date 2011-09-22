@@ -25,7 +25,7 @@ try:
 
 	import os
 	import gtk
-	from CardapioAppletInterface import PANEL_TYPE_DOCKY, PANEL_TYPE_AWN 
+	from CardapioAppletInterface import PANEL_TYPE_NONE, PANEL_TYPE_DOCKY, PANEL_TYPE_AWN, PANEL_TYPE_SIMPLEDBUS
 
 
 except Exception, exception:
@@ -94,14 +94,21 @@ class OptionsWindow:
 		are supported by the current panel (if any)
 		"""
 
-		if self.applet_type is None \
-				or self.applet_type == PANEL_TYPE_DOCKY:
+		if self.applet_type == PANEL_TYPE_NONE or self.applet_type == PANEL_TYPE_DOCKY:
 			self.get_widget('AppletOptionPane').hide()
 
-		elif self.applet_type is PANEL_TYPE_AWN:
+		elif self.applet_type == PANEL_TYPE_AWN:
 			self.get_widget('LabelAppletLabel').hide()
 			self.get_widget('OptionAppletLabel').hide()
 			self.get_widget('OptionIconNone').hide()
+
+		elif self.applet_type == PANEL_TYPE_SIMPLEDBUS:
+			self.get_widget('OptionIconFile').hide()
+			self.get_widget('OptionIconFileChooser').hide()
+			self.get_widget('OptionIconName').hide()
+			self.get_widget('OptionIconNameEntry').hide()
+			self.get_widget('OptionIconNameHelp').hide()
+			self.get_widget('OptionOpenOnHover').hide()
 
 
 	def on_plugintreeview_hover(self, treeview, event):

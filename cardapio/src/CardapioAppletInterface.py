@@ -15,10 +15,11 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-#PANEL_TYPE_NONE  = None (Just use None instead of PANEL_TYPE_NONE)
-PANEL_TYPE_GNOME2 = 1
-PANEL_TYPE_AWN    = 2
-PANEL_TYPE_DOCKY  = None # The Docky applet is actually a "fake" applet, that just opens Cardapio at a given location.
+PANEL_TYPE_NONE       = 0
+PANEL_TYPE_GNOME2     = 1
+PANEL_TYPE_AWN        = 2
+PANEL_TYPE_DOCKY      = 3
+PANEL_TYPE_SIMPLEDBUS = 4
 
 POS_TOP    = 0
 POS_BOTTOM = 1
@@ -29,9 +30,18 @@ class CardapioAppletInterface:
 
 	panel_type = None
 
+	IS_CONFIGURABLE = False
+	# This constant verifies if the applet is configurable. This
+	# means the applet's icon and label.
+
+	IS_CONTROLLABLE = False
+	# This constant verifies if the applet is controllable. This means that the
+	# applet responds to methods like draw_toggled_state(),
+	# get_screen_number(), has_mouse_cursor(), etc.
+
 	def setup(self, cardapio):
 		"""
-		This methods is called right after Cardapio loads its main variables, but
+		This method is called right after Cardapio loads its main variables, but
 		before it actually loads plugins and builds its GUI.
 
 		IMPORTANT: Do not modify anything inside the "cardapio" variable! It is
