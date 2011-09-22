@@ -596,18 +596,18 @@ class Cardapio(dbus.service.Object):
 		self._activate_plugins_from_settings() # investigate memory usage here
 
 
-	def _set_keybinding(self):
+	def set_keybinding(self):
 		"""
 		Sets Cardapio's keybinding to the value chosen by the user
 		"""
 
-		self._unset_keybinding()
+		self.unset_keybinding()
 
 		self._keybinding = self.settings['keybinding']
 		keybinder.bind(self._keybinding, self.show_hide)
 
 
-	def _unset_keybinding(self):
+	def unset_keybinding(self):
 		"""
 		Sets Cardapio's keybinding to nothing 
 		"""
@@ -623,7 +623,7 @@ class Cardapio(dbus.service.Object):
 		"""
 
 		# set up keybinding
-		self._set_keybinding()
+		self.set_keybinding()
 
 		# set up applet
 		if self._applet.IS_CONFIGURABLE:
