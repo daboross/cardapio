@@ -84,7 +84,8 @@ CardapioApplet.prototype = {
 
 		this._label = new St.Label();
 
-		this.configure_applet_button('...', '');
+		// display "...", but using unicode bullets
+		this.configure_applet_button('\u2022 \u2022 \u2022', '');
 
 		this._box = new St.BoxLayout({style_class: 'cardapio-box'});
 		this._box.add(this._icon);

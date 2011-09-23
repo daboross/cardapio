@@ -1,3 +1,27 @@
+cardapio-gnomeshell (0.9.192-ubuntu1-oneiric1) oneiric; urgency=low
+
+   * Adding really solid support for Gnome-Shell, including newer versions
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 23 Sep 2011 23:00:00 +0100
+
+cardapio-gnomeshell (0.9.192-ubuntu1-natty1) natty; urgency=low
+
+   * Adding really solid support for Gnome-Shell, including newer versions
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 23 Sep 2011 23:00:00 +0100
+
+cardapio-gnomeshell (0.9.192-ubuntu1-maverick1) maverick; urgency=low
+
+   * Adding really solid support for Gnome-Shell, including newer versions
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 23 Sep 2011 23:00:00 +0100
+
+cardapio-gnomeshell (0.9.192-ubuntu1-lucid1) lucid; urgency=low
+
+   * Adding really solid support for Gnome-Shell, including newer versions
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 23 Sep 2011 23:00:00 +0100
+
 cardapio-gnomeshell (0.9.191-ubuntu1-oneiric1) oneiric; urgency=low
 
    * Bugfix release. NOW it should work!
