@@ -15,11 +15,11 @@ const CardapioAppletInterface = {
 	methods: [{
 		name: 'configure_applet_button',
 		inSignature: 'ss',
-		outSignature: ''
-	  }
+		outSignature: '',
+	  },
    ],
 	signals: [],
-	properties: []
+	properties: [],
 };
 
 
@@ -28,16 +28,25 @@ const CardapioInterface = {
 	methods: [{
 		name: 'show_hide_near_point',
 		inSignature: 'iibb',
-		outSignature: ''
+		outSignature: '',
 	}, {
 		name: 'is_visible',
 		inSignature: '',
-		outSignature: 'b'
+		outSignature: 'b',
 	}, {
 		name: 'set_default_window_position',
 		inSignature: 'iii',
-		outSignature: ''
-	}]
+		outSignature: '',
+	}, {
+		name: 'get_applet_configuration',
+		inSignature: '',
+		outSignature: 'ss',
+	}],
+	signals: [{
+		name: 'on_cardapio_loaded',
+		inSignature: '',	
+	}],
+	properties: [],
 };
 
 let Cardapio = DBus.makeProxyClass(CardapioInterface);
@@ -69,16 +78,6 @@ CardapioApplet.prototype = {
 		this._dbus_name_id = DBus.session.acquire_name('org.varal.CardapioSimpleDbusApplet', 0, null, null);
 		DBus.session.exportObject('/org/varal/CardapioSimpleDbusApplet', this);
 
-		DBus.session.start_service('org.varal.Cardapio')
-		this._cardapio = new Cardapio(DBus.session, 'org.varal.Cardapio', '/org/varal/Cardapio');
-
-		// Below is a hack to make sure the service started above gets 
-		// loaded before we run the set_default_window_positionRemote() 
-		// method. Ugly, argh!
-		Mainloop.timeout_add_seconds(1.0, Lang.bind(this, this._setDefaultWindowPosition));
-		Mainloop.timeout_add_seconds(3.0, Lang.bind(this, this._setDefaultWindowPosition));
-		Mainloop.timeout_add_seconds(10.0, Lang.bind(this, this._setDefaultWindowPosition));
-
 		this._icon = new St.Icon({ 
 			icon_type: St.IconType.SYMBOLIC,
 			icon_size: Main.panel._leftBox.height 
@@ -86,11 +85,11 @@ CardapioApplet.prototype = {
 
 		this._label = new St.Label();
 
+		this.configure_applet_button('Loading...', '');
+
 		this._box = new St.BoxLayout({style_class: 'cardapio-box'});
 		this._box.add(this._icon);
 		this._box.add(this._label);
-
-		this.configure_applet_button('Menu', 'start-here');
 
 		this.actor.set_child(this._box);
 
@@ -117,6 +116,36 @@ CardapioApplet.prototype = {
 		// add at the right-most position
 		//this.container = Main.panel._rightBox;
 		//Main.panel._rightBox.insert_actor(this.actor, -1);
+
+		DBus.session.start_service('org.varal.Cardapio');
+
+		this._cardapio = new Cardapio(DBus.session, 'org.varal.Cardapio', '/org/varal/Cardapio');
+
+		// in case Cardapio is already running and communicable, set up the applet
+		this._cardapioServiceLoaded();
+
+		// otherwise, only do it once Cardapio is fully loaded
+		this._cardapio.connect('on_cardapio_loaded', Lang.bind(this, 
+			function(emitter) {
+				this._cardapioServiceLoaded();
+			})
+		);
+
+		// Old code: instead of using signals, we just had a timeout
+		//Mainloop.timeout_add_seconds(1.0, Lang.bind(this, this._cardapioServiceLoaded));
+	},
+
+	_cardapioServiceLoaded: function() {
+
+		this._cardapio.get_applet_configurationRemote(Lang.bind(this, 
+			function(result, err) {
+				if (!err) {
+					this.configure_applet_button(result[0], result[1]);
+				}
+			})
+		);
+
+		this._setDefaultWindowPosition();
 	},
 
 	_setDefaultWindowPosition: function() {
@@ -148,10 +177,8 @@ CardapioApplet.prototype = {
 		// TODO: add display to the DBus method below:
 		this._cardapio.show_hide_near_pointRemote(x, y, false, false);
 
-		// in case the applet moved for some reason, save the new position now 
-		Mainloop.timeout_add_seconds(1.0, Lang.bind(this, this._setDefaultWindowPosition));
-		// (adding it to the Mainloop is a hack that makes sure this actually
-		// runs. Otherwise, for some reason, it fails to execute...)
+		// rerun this in case the applet moved on the screen
+		this._setDefaultWindowPosition();
 	},
 
 	configure_applet_button: function(label_str, icon_path) {
@@ -195,7 +222,7 @@ function main(extensionMeta) {
 let cardapioApplet;
 
 function init(extensionMeta) {
-	/* Do nothing. */
+	DBus.session.start_service('org.varal.Cardapio')
 }
 
 function enable() {

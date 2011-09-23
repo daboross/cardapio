@@ -175,6 +175,9 @@ class Cardapio(dbus.service.Object):
 
 		logging.info('==> Done initializing Cardapio!')
 
+		# send the on_cardapio_loaded signal through DBus
+		self.on_cardapio_loaded()
+
 		self._reset_search()
 
 		if   show == Constants.SHOW_NEAR_MOUSE: self.show_hide_near_mouse()
@@ -299,6 +302,31 @@ class Cardapio(dbus.service.Object):
 			except : applet = CardapioAppletInterface()
 
 		return applet
+
+
+	@dbus.service.signal(dbus_interface = Constants.BUS_NAME_STR, signature = None)
+	def on_cardapio_loaded(self):
+		"""
+		This defines a DBus signal that gets called when Cardapio is finished
+		loading for the first time.
+		"""
+
+		# nothing to do here
+		pass
+
+
+	@dbus.service.method(dbus_interface = Constants.BUS_NAME_STR, in_signature = None, out_signature = 'ss')
+	def get_applet_configuration(self):
+		"""
+		This method gets called when a DBus-connected applet gets initialized, to
+		get the user-defined applet label and icon
+		"""
+
+		self._applet = self._get_applet(None)
+		self._options_window.prepare_panel_related_options(self._applet.panel_type)
+		self._setup_applet()
+
+		return [self.settings['applet label'], self.settings['applet icon']]
 
 
 	def _setup_applet(self):

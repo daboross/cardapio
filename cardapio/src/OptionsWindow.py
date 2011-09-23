@@ -42,10 +42,10 @@ class OptionsWindow:
 	ICON_DEFAULT = 'start-here'
 	ICON_MISSING = 'image-missing'
 
-	def __init__(self, cardapio, applet_type):
+	def __init__(self, cardapio, panel_type):
 
 		self.cardapio = cardapio
-		self.applet_type = applet_type
+		self.panel_type = panel_type
 
 
 	def setup_ui(self):
@@ -75,7 +75,7 @@ class OptionsWindow:
 		self.drag_allowed_cursor = gtk.gdk.Cursor(gtk.gdk.FLEUR)
 		#self.busy_cursor = gtk.gdk.Cursor(gtk.gdk.WATCH)
 
-		self._prepare_panel_related_options()
+		self.prepare_panel_related_options()
 		self._read_gtk_theme_info()
 
 
@@ -88,21 +88,23 @@ class OptionsWindow:
 		self.scrollbar_width = scrollbar.style_get_property('slider-width')
 
 
-	def _prepare_panel_related_options(self):
+	def prepare_panel_related_options(self, panel_type = None):
 		"""
 		Show or hide widgets in the options window depending on whether they
 		are supported by the current panel (if any)
 		"""
 
-		if self.applet_type == PANEL_TYPE_NONE or self.applet_type == PANEL_TYPE_DOCKY:
+		if panel_type is not None: self.panel_type = panel_type
+
+		if self.panel_type == PANEL_TYPE_NONE or self.panel_type == PANEL_TYPE_DOCKY:
 			self.get_widget('AppletOptionPane').hide()
 
-		elif self.applet_type == PANEL_TYPE_AWN:
+		elif self.panel_type == PANEL_TYPE_AWN:
 			self.get_widget('LabelAppletLabel').hide()
 			self.get_widget('OptionAppletLabel').hide()
 			self.get_widget('OptionIconNone').hide()
 
-		elif self.applet_type == PANEL_TYPE_SIMPLEDBUS:
+		elif self.panel_type == PANEL_TYPE_SIMPLEDBUS:
 			self.get_widget('OptionIconFile').hide()
 			self.get_widget('OptionIconFileChooser').hide()
 			self.get_widget('OptionIconName').hide()
