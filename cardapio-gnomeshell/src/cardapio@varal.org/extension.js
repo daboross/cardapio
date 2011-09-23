@@ -16,8 +16,7 @@ const CardapioAppletInterface = {
 		name: 'configure_applet_button',
 		inSignature: 'ss',
 		outSignature: '',
-	  },
-   ],
+	}],
 	signals: [],
 	properties: [],
 };
@@ -85,7 +84,7 @@ CardapioApplet.prototype = {
 
 		this._label = new St.Label();
 
-		this.configure_applet_button('Loading...', '');
+		this.configure_applet_button('...', '');
 
 		this._box = new St.BoxLayout({style_class: 'cardapio-box'});
 		this._box.add(this._icon);
