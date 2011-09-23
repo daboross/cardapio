@@ -1,3 +1,31 @@
+cardapio (0.9.192-ubuntu1-oneiric1) oneiric; urgency=low
+
+   * Added pretty solid support for Gnome-Shell!!
+   * Plus many bug fixes as usual :)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 23 Sep 2011 23:01:00 +0100
+
+cardapio (0.9.192-ubuntu1-natty1) natty; urgency=low
+
+   * Added pretty solid support for Gnome-Shell!!
+   * Plus many bug fixes as usual :)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 23 Sep 2011 23:01:00 +0100
+
+cardapio (0.9.192-ubuntu1-maverick1) maverick; urgency=low
+
+   * Added pretty solid support for Gnome-Shell!!
+   * Plus many bug fixes as usual :)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 23 Sep 2011 23:01:00 +0100
+
+cardapio (0.9.192-ubuntu1-lucid1) lucid; urgency=low
+
+   * Added pretty solid support for Gnome-Shell!!
+   * Plus many bug fixes as usual :)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 23 Sep 2011 23:01:00 +0100
+
 cardapio (0.9.191-ubuntu1-oneiric1) oneiric; urgency=low
 
    * Bug-fix release

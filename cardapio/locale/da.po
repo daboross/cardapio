@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-09-02 14:52+0200\n"
-"PO-Revision-Date: 2011-07-09 22:32+0000\n"
-"Last-Translator: Simon <Unknown>\n"
+"POT-Creation-Date: 2011-09-11 23:50+0200\n"
+"PO-Revision-Date: 2011-09-19 17:38+0000\n"
+"Last-Translator: Aputsiaq Janussen <aj@isit.gl>\n"
 "Language-Team: Danish <da@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-09-11 21:41+0000\n"
-"X-Generator: Launchpad (build 13900)\n"
+"X-Launchpad-Export-Date: 2011-09-23 12:52+0000\n"
+"X-Generator: Launchpad (build 14012)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "\"%(file_name)s\" er en eksekverbar tekst fil."
@@ -263,9 +263,19 @@ msgid "Launch this item"
 msgstr "Start dette objekt"
 
 msgid ""
+"Launch this item but do not hide Cardapio\n"
+"(same as Middle-Click or Ctrl-Click)"
+msgstr ""
+"Kør dette element, men skjul ikke Cardapio\n"
+"(det samme som Midterste-Klik eller Ctrl-Klik)"
+
+msgid ""
 "Lets you choose from thousands of free applications available for Ubuntu"
 msgstr ""
 "Lader dig vælge imellem tusinder af gratis programmer tilgægelig for Ubuntu"
+
+msgid "Load additional results"
+msgstr "Indlæs flere resultater"
 
 msgid "Local Results"
 msgstr "Lokale Resultater"
@@ -320,6 +330,9 @@ msgstr "Åben menuen når musen er over Cardapio applet'en"
 
 msgid "Open the trash"
 msgstr "Åbn papirkurven"
+
+msgid "Open this folder"
+msgstr "Åbn denne mappe"
 
 msgid "Open this item's parent folder in the file browser"
 msgstr "Åben dette emnes beslægtede mappe i en filbrowser"
@@ -539,6 +552,9 @@ msgstr "Vis ydreligere noter i Tomboy"
 msgid "Show additional results"
 msgstr "Vis ydreligere resultater"
 
+msgid "Show additional search results"
+msgstr "Vis flere søgeresultater"
+
 msgid "Show additional search results in Sezen"
 msgstr "Vis ydrerligere søgeresultater i Sezen"
 
@@ -639,6 +655,9 @@ msgstr "Brug ingen ikon"
 
 msgid "View"
 msgstr "Vis"
+
+msgid "View icon-naming specification on the web"
+msgstr "Vis specifikation for navngivning af ikon på internettet"
 
 msgid "Virtual Machines"
 msgstr "Virtuelle Maskiner"

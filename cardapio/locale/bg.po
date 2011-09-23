@@ -2,15 +2,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: cardapio\n"
 "Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2011-09-02 14:52+0200\n"
-"PO-Revision-Date: 2011-07-15 06:00+0000\n"
+"POT-Creation-Date: 2011-09-11 23:50+0200\n"
+"PO-Revision-Date: 2011-09-16 07:25+0000\n"
 "Last-Translator: Svetoslav Stefanov <svetlisashkov@yahoo.com>\n"
 "Language-Team: Bulgarian <bg@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-09-11 21:41+0000\n"
-"X-Generator: Launchpad (build 13900)\n"
+"X-Launchpad-Export-Date: 2011-09-23 12:52+0000\n"
+"X-Generator: Launchpad (build 14012)\n"
 
 msgid "\"%(file_name)s\" is an executable text file."
 msgstr "\"%(file_name)s\" е изпълним текстов файл."
@@ -331,6 +331,9 @@ msgstr "Отваряне на менюто при преминаване на п
 msgid "Open the trash"
 msgstr "Отваряне на кошчето"
 
+msgid "Open this folder"
+msgstr "Отваряне на тази папка"
+
 msgid "Open this item's parent folder in the file browser"
 msgstr "Отваря родителската папка на този елемент във файловия браузър"
 
@@ -501,6 +504,13 @@ msgstr "Търсене за резултати в Уикипедия"
 
 msgid "Search for results in YouTube"
 msgstr "Търсене за резултати в YouTube"
+
+msgid ""
+"Search for your most recently used files in categorized fashion, but save "
+"space when no query is entered."
+msgstr ""
+"Търсене за последно използваните файлове по категории и спестяване на място, "
+"когато не е въведена заявка."
 
 msgid ""
 "Search for your most recently used files, divided into categories depending "
