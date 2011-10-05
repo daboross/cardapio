@@ -1,5 +1,5 @@
 {
-   "shell-version": ["3.0", "3.1.90.1", "3.1.91"], 
+   "shell-version": ["3.0", "3.1.90.1", "3.1.91", "3.2"], 
    "version": "0.9.188",
    "uuid": "cardapio@varal.org", 
    "name": "Cardapio", 

@@ -315,6 +315,15 @@ class Cardapio(dbus.service.Object):
 		pass
 
 
+	@dbus.service.method(dbus_interface = Constants.BUS_NAME_STR, in_signature = None, out_signature = None)
+	def quit(self):
+		"""
+		Allows applications to quit Cardapio through a DBus command
+		"""
+
+		self._quit()
+
+
 	@dbus.service.method(dbus_interface = Constants.BUS_NAME_STR, in_signature = None, out_signature = 'ss')
 	def get_applet_configuration(self):
 		"""

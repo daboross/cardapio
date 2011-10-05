@@ -10,8 +10,16 @@ const Lang = imports.lang;
 
 const DBus = imports.dbus;
 
+const applet_interface_name   = 'org.varal.CardapioSimpleDbusApplet';
+const applet_service_name     = 'org.varal.CardapioSimpleDbusApplet';
+const applet_object_name      = '/org/varal/CardapioSimpleDbusApplet';
+
+const cardapio_interface_name = 'org.varal.Cardapio';
+const cardapio_service_name   = 'org.varal.Cardapio';
+const cardapio_object_name    = '/org/varal/Cardapio';
+
 const CardapioAppletInterface = {
-	name: 'org.varal.CardapioSimpleDbusApplet',
+	name: applet_interface_name,
 	methods: [{
 		name: 'configure_applet_button',
 		inSignature: 'ss',
@@ -23,7 +31,7 @@ const CardapioAppletInterface = {
 
 
 const CardapioInterface = {
-	name: 'org.varal.Cardapio',
+	name: cardapio_interface_name,
 	methods: [{
 		name: 'show_hide_near_point',
 		inSignature: 'iibb',
@@ -40,6 +48,10 @@ const CardapioInterface = {
 		name: 'get_applet_configuration',
 		inSignature: '',
 		outSignature: 'ss',
+	}, {
+		name: 'quit',
+		inSignature: '',
+		outSignature: '',
 	}],
 	signals: [{
 		name: 'on_cardapio_loaded',
@@ -74,8 +86,8 @@ CardapioApplet.prototype = {
 		this.actor._delegate = this;
 		this.actor.connect('button-press-event', Lang.bind(this, this._onButtonPress));		
 
-		this._dbus_name_id = DBus.session.acquire_name('org.varal.CardapioSimpleDbusApplet', 0, null, null);
-		DBus.session.exportObject('/org/varal/CardapioSimpleDbusApplet', this);
+		this._dbus_name_id = DBus.session.acquire_name(applet_service_name, 0, null, null);
+		DBus.session.exportObject(applet_object_name, this);
 
 		this._icon = new St.Icon({ 
 			icon_type: St.IconType.SYMBOLIC,
@@ -117,9 +129,9 @@ CardapioApplet.prototype = {
 		//this.container = Main.panel._rightBox;
 		//Main.panel._rightBox.insert_actor(this.actor, -1);
 
-		DBus.session.start_service('org.varal.Cardapio');
+		DBus.session.start_service(cardapio_service_name);
 
-		this._cardapio = new Cardapio(DBus.session, 'org.varal.Cardapio', '/org/varal/Cardapio');
+		this._cardapio = new Cardapio(DBus.session, cardapio_service_name, cardapio_object_name);
 
 		// in case Cardapio is already running and communicable, set up the applet
 		this._cardapioServiceLoaded();
@@ -161,7 +173,7 @@ CardapioApplet.prototype = {
 
 		// just in case the user closed Cardapio in the 
 		// meantime using Alt-F4, we restart it here
-		DBus.session.start_service('org.varal.Cardapio')
+		DBus.session.start_service(cardapio_service_name)
 
 		visible = this._cardapio.is_visibleRemote();
 
@@ -202,8 +214,13 @@ CardapioApplet.prototype = {
 
 	destroy: function() {
 
+		this._cardapio.quitRemote();
+
+		DBus.session.unexportObject(this);
 		DBus.session.release_name_by_id(this._dbus_name_id);
-		// TODO: kill Cardapio
+		
+		this.container.remove_actor(this.actor);
+		delete this;
 	},
 };
 
@@ -222,7 +239,7 @@ function main(extensionMeta) {
 let cardapioApplet;
 
 function init(extensionMeta) {
-	DBus.session.start_service('org.varal.Cardapio')
+	DBus.session.start_service(cardapio_service_name)
 }
 
 function enable() {
