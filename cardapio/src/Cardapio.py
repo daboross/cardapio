@@ -1927,6 +1927,8 @@ class Cardapio(dbus.service.Object):
 			if line.strip(' \n\r\t'):
 
 				name, path = self._get_place_name_and_path(line)
+				name = urllib2.unquote(name)
+
 				path_type, dummy = urllib2.splittype(path)
 
 				gio_path_obj = gio.File(path)
