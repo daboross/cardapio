@@ -2943,7 +2943,8 @@ class Cardapio(dbus.service.Object):
 		Handler for when the cursor leaves the Cardapio window.
 		If using 'open on hover', this hides the Cardapio window after a delay.
 		"""
-		if self._applet.IS_CONTROLLABLE: return
+
+		if not self._applet.IS_CONTROLLABLE: return
 
 		# TODO - Delete this line on Feb 28th
 		#if self.settings['open on hover'] and not self._view.focus_out_blocked:
