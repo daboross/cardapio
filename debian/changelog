@@ -1,0 +1,1036 @@
+cardapio (0.9.193-0~eugenesan~oneiric1) oneiric; urgency=low
+
+  * Reworked depends to allow installation without additional modules,
+    provides temporary solution for Gnome3 fallback
+  * Combined all modules in single tree
+  * Reworked debsrc, now should support Launchpad recipes
+  * Changelog cleanups
+  * Added helper for Launchpad uploads (upload-series.sh)
+
+ -- Eugene San (eugenesan) <eugenesan@gmail.com>  Sun, 13 Nov 2011 13:00:18 +0200
+
+cardapio (0.9.192-ubuntu1-oneiric1) oneiric; urgency=low
+
+   * Added pretty solid support for Gnome-Shell!!
+   * Plus many bug fixes as usual :)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 23 Sep 2011 23:01:00 +0100
+
+cardapio (0.9.191-ubuntu1-oneiric1) oneiric; urgency=low
+
+   * Bug-fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 11 Sep 2011 23:01:00 +0100
+
+cardapio (0.9.190-ubuntu1-oneiric1) oneiric; urgency=low
+
+   * Bug-fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 2 Sep 2011 23:01:00 +0100
+
+cardapio (0.9.189-ubuntu4-oneiric1) oneiric; urgency=low
+
+   * Various bug fixes and new Gnome-Shell extension!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 5 Aug 2011 23:01:00 +0100
+
+cardapio (0.9.189-ubuntu3-oneiric1) oneiric; urgency=low
+
+   * Various bug fixes and new Gnome-Shell extension!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 5 Aug 2011 23:01:00 +0100
+
+cardapio (0.9.189-ubuntu1-oneiric1) oneiric; urgency=low
+
+   * Various bug fixes and new Gnome-Shell extension!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 5 Aug 2011 23:01:00 +0100
+
+cardapio (0.9.188-ubuntu1-natty1) natty; urgency=low
+
+   * Various bug fixes, including bug #811655 and bug #653102:comment #8
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 27 Jul 2011 23:01:00 +0100
+
+cardapio (0.9.188-ubuntu1-natty1) natty; urgency=low
+
+   * Various bug fixes, including bug #811655 and bug #653102:comment #8
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 27 Jul 2011 23:01:00 +0100
+
+cardapio (0.9.187-ubuntu1-natty1) natty; urgency=low
+
+   * New, updated Cardapio icon (see bug 654072)
+   * Added inline loading of additional subfolder results 
+   * Made app buttons toggle when right-clicked (fixing bug 656846)
+   * Fixed bug where pressing Enter when focused on an app button *was not* launching the focused app
+   * Fixed other bugs :)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 16 Jul 2011 23:01:00 +0100
+
+cardapio (0.9.186-ubuntu1-natty1) natty; urgency=low
+
+   * Made shift-click / shift-enter mean: peek inside folder (if applied
+     to a folder), or open parent folder (if applied to a file)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 8 Jul 2011 23:01:00 +0100
+
+cardapio (0.9.185-ubuntu1-natty1) natty; urgency=low
+
+   * Made it MUCH faster to launch Cardapio from Docky, Unity, etc.
+   * Fixed bug in Gnome-Panel code
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 5 Jul 2011 23:01:00 +0100
+
+cardapio (0.9.184-ubuntu1-natty1) natty; urgency=low
+
+   * Made it MUCH faster to launch Cardapio from Docky, Unity, etc.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 5 Jul 2011 23:01:00 +0100
+
+cardapio (0.9.183-ubuntu1-natty1) natty; urgency=low
+
+   * Cleaned up the icon preferences :)
+   * Fixed bugs
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 2 Jul 2011 23:01:00 +0100
+
+cardapio (0.9.182-ubuntu2-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.182-ubuntu1-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.181-ubuntu2-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.181-ubuntu1-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.180-ubuntu2-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.180-ubuntu1-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+cardapio (0.9.179-ubuntu1-natty1) natty; urgency=low
+
+   * Separated the Gnome-Panel code into the cardapio-gnomepanel package
+   * Fixed Zeitgeist plugin for people who do not have Tracker installed
+   * Added CLI option to open Cardapio's settings window
+   * Removed GTK's new resize grip
+   * Updated Tracker plugin to be case-insensitive even with Tracker 0.8.x
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 6 Jun 2011 23:01:00 +0100
+
+
+cardapio (0.9.178-ubuntu1-natty1) natty; urgency=low
+
+   * Bug-fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 10 May 2011 23:01:00 +0100
+
+cardapio (0.9.177-ubuntu1-natty1) natty; urgency=low
+
+   * Bug-fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 30 Apr 2011 23:01:00 +0100
+
+cardapio (0.9.176-ubuntu1-natty1) natty; urgency=low
+
+   * Bug-fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 30 Apr 2011 23:01:00 +0100
+
+cardapio (0.9.175-ubuntu1-natty1) natty; urgency=low
+
+   * Bug fixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 12 Apr 2011 23:01:00 +0100
+
+cardapio (0.9.174-ubuntu1-natty1) natty; urgency=low
+
+   * RGBA support (see new setting "allow transparency")
+   * Added new Zeitgeist plugins!
+   * Made "applications" and "places" plugins optional
+   * Fixed bugs
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 24 Mar 2011 23:01:00 +0100
+
+cardapio (0.9.173-ubuntu1-natty1) natty; urgency=low
+
+   * Bug fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 3 Mar 2011 23:01:00 +0100
+
+
+cardapio (0.9.172-ubuntu1-natty1) natty; urgency=low
+
+   * Bug fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 1 Mar 2011 23:01:00 +0100
+
+cardapio (0.9.171-ubuntu1-natty1) natty; urgency=low
+
+   * Bug fix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 1 Mar 2011 23:01:00 +0100
+
+cardapio (0.9.170-ubuntu1-natty1) natty; urgency=low
+
+   * Removed the blocking "rebuilding" message, and made it inline instead. This
+   means Cardapio is always accessible when the user summons it.
+   * Made software center plugin *not* update its list during a rebuild, because
+   the apt module for Python is full of memory leaks.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Feb 2011 23:01:00 +0100
+
+cardapio (0.9.169-ubuntu1-natty1) natty; urgency=low
+
+   * Removed the blocking "rebuilding" message, and made it inline instead. This
+   means Cardapio is always accessible when the user summons it.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Feb 2011 23:01:00 +0100
+
+cardapio (0.9.168-ubuntu1-maverick1) maverick; urgency=low
+
+   * New feature: keep results for a few seconds after Cardapio is closed
+   * Several bug fixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 11 Feb 2011 23:01:00 +0100
+
+cardapio (0.9.167-ubuntu1-maverick1) maverick; urgency=low
+
+   * Eh. Fixing error with the version numbers.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 3 Feb 2010 23:01:00 +0100
+
+cardapio (0.9.166-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fixed a couple of bugs
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 3 Feb 2010 23:01:00 +0100
+
+cardapio (0.9.165-ubuntu1-maverick1) maverick; urgency=low
+
+   * Refactored much of the code.
+   * Fixed several bugs
+   * Made subfolder search function more useful with the mouse
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 3 Feb 2010 23:01:00 +0100
+
+cardapio (0.9.164-ubuntu1-maverick1) maverick; urgency=low
+
+   * Bug fixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 18 Dec 2010 23:01:00 +0100
+
+cardapio (0.9.163-ubuntu1-maverick1) maverick; urgency=low
+
+   * Added keybinding recorder button!
+   * AWN no longer shows tooltip for Cardapio
+   * Fixed cardapio-awn package to work with awn-trunk
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 15 Dec 2010 23:01:00 +0100
+
+cardapio (0.9.162-ubuntu1-maverick1) maverick; urgency=low
+
+   * Added AWN support (see package cardapio-awn)
+   * Fixed miscellaneous bugs!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 13 Dec 2010 23:01:00 +0100
+
+cardapio (0.9.161-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fixed bottom-panel problem with Lucid (bug 680674)
+   * Replaced Firefox plugin with new Web plugin for Firefox, Chrome, Chromium
+   * Web plugin is also updates bookmarks without reloading Cardapio
+   * Made Software Center plugin skip the Software Center when using the 
+     context menu option "install appname"
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 4 Dec 2010 23:01:00 +0100
+
+cardapio (0.9.160-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fixed another memory leak
+   * Fixed bug in Firefox plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 28 Nov 2010 23:01:00 +0100
+
+cardapio (0.9.159-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fixed another memory leak
+   * Fixed bug in Firefox plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 28 Nov 2010 23:01:00 +0100
+
+cardapio (0.9.158-ubuntu2-maverick1) maverick; urgency=low
+
+   * Fixed memory leak in Firefox and Software Center plugin
+   * Several other bugfixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 24 Nov 2010 23:01:00 +0100
+
+
+cardapio (0.9.157-ubuntu1-maverick1) maverick; urgency=low
+
+   * Now with new "mini mode"!
+   * Now with Docky support!
+   * Now with faster startup times, and smaller memory usage!
+   * Several bugs fixed
+   * Renamed config file to ~/.config/Cardapio/config.json
+   * Moved log file to ~/.cache/Cardapio/cardapio.log
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 21 Nov 2010 23:01:00 -0000
+
+
+cardapio (0.9.156-ubuntu1-maverick1) maverick; urgency=low
+
+   * Hopefully fixed a bug with the Places menu, where it showed the same place
+   multiple times under certan conditions
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 28 Oct 2010 12:01:00 -0000
+
+
+cardapio (0.9.155-ubuntu1-maverick1) maverick; urgency=low
+
+   * Added a last-resort error message to help debug problems loading the applet
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 19 Oct 2010 10:21:00 -0000
+
+
+cardapio (0.9.154-ubuntu1-maverick1) maverick; urgency=low
+
+   * Added "Connect to Network"
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 15 Oct 2010 22:01:00 -0000
+
+
+cardapio (0.9.153-ubuntu1-maverick1) maverick; urgency=low
+
+   * Bugfix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 15 Sep 2010 10:01:00 -0000
+
+
+cardapio (0.9.152-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fixed a nasty memory leak!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 14 Sep 2010 21:01:00 -0000
+
+
+cardapio (0.9.151-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fix a case-sensitivity bug with Tracker plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 13 Sep 2010 21:01:00 -0000
+
+cardapio (0.9.150-ubuntu1-maverick1) maverick; urgency=low
+
+   * File search plugin now works with the default Tracker version in Maverick
+   * Fixed bugs with the subfolder search
+   * Updated translations
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 13 Sep 2010 21:01:00 -0000
+
+
+cardapio (0.9.149-ubuntu1-maverick1) maverick; urgency=low
+
+   * Pidgin plugin now displays offline buddies and buddy status
+   * Updated translations
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 30 Sep 2010 13:01:00 -0000
+
+
+cardapio (0.9.148-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fixed applet background bug
+   * Updated translations
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 30 Sep 2010 13:01:00 -0000
+
+
+cardapio (0.9.147-ubuntu1-maverick1) maverick; urgency=low
+
+   * Command launcher plugin allows you to run CLI commands from Cardapio
+   * Removable disks are now shown in Cardapio
+   * Able to mount/unmount disks from Cardapio
+   * Plus several bug fixes!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 26 Sep 2010 22:01:00 -0400
+
+cardapio (0.9.146-ubuntu1-maverick1) maverick; urgency=low
+
+   * Updating translations
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 5 Sep 2010 22:01:00 -0400
+
+
+cardapio (0.9.145-ubuntu1-maverick1) maverick; urgency=low
+
+   * More small bugfixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 4 Sep 2010 20:01:00 -0400
+
+
+cardapio (0.9.144-ubuntu1-maverick1) maverick; urgency=low
+
+   * Bugfixes, bugfixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 1 Sep 2010 14:01:00 -0400
+
+
+cardapio (0.9.143-ubuntu1-maverick1) maverick; urgency=low
+
+   * Small bugfixes, updated translations
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 25 Aug 2010 13:01:00 -0400
+
+
+cardapio (0.9.142-ubuntu1-maverick1) maverick; urgency=low
+
+   * Cardapio now plays nice with Ubuntu's new AppMenu
+   * Plus other bugfixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 22 Aug 2010 23:01:00 -0400
+
+
+cardapio (0.9.141-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fixed bugs in subfolder browser, and trying out Maverick PPA
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 23 Aug 2010 10:01:00 -0400
+
+
+cardapio (0.9.141-ubuntu1-maverick1) maverick; urgency=low
+
+   * Fixed bugs in subfolder browser, and trying out Maverick PPA
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 23 Aug 2010 10:01:00 -0400
+
+
+cardapio (0.9.141-ubuntu1) maverick; urgency=low
+
+   * Fixed bugs in subfolder browser, and trying out Maverick PPA
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 23 Aug 2010 10:01:00 -0400
+
+
+cardapio (0.9.140-ubuntu1) lucid; urgency=low
+
+   * "Ooops edition". Fixed some bugs introduced 30 minutes ago. Ooops.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 22 Aug 2010 23:01:00 -0400
+
+
+cardapio (0.9.139-ubuntu1) lucid; urgency=low
+
+   * Bugfixes, code cleanup, small changes to plugin api
+   * Also reverted back to non-threaded version
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 22 Aug 2010 23:01:00 -0400
+
+
+cardapio (0.9.138-ubuntu1) lucid; urgency=low
+
+   * New option to open categories on hover
+   * First working implementation of threaded plugins (this will probably evolve 
+   in the next few days, but it's already very usable as it is)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 19 Aug 2010 23:01:00 -0400
+
+
+cardapio (0.9.137-ubuntu1) lucid; urgency=low
+
+   * New option to open categories on hover
+   * First working implementation of threaded plugins (this will probably evolve 
+   in the next few days, but it's already very usable as it is)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 19 Aug 2010 23:01:00 -0400
+
+
+cardapio (0.9.136-ubuntu1) lucid; urgency=low
+
+   * New feature: subfolder browsing by appending a slash
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 4 Aug 2010 23:01:00 -0400
+
+
+cardapio (0.9.135-ubuntu1) lucid; urgency=low
+
+   * Bugfix release
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 2 Aug 2010 23:19:00 -0400
+
+
+cardapio (0.9.134-ubuntu1) lucid; urgency=low
+
+   * Small bugfixes, and trying to get Launchpad to compile this already!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 1 Aug 2010 23:37:00 -0400
+
+
+cardapio (0.9.133-ubuntu1) lucid; urgency=low
+
+   * A coupld of small bugfixes, and updated translations
+   * Let's see if Launchpad builds this one quickly, at least
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 1 Aug 2010 13:37:00 -0400
+
+
+cardapio (0.9.134-ubuntu1) lucid; urgency=low
+
+   * A coupld of small bugfixes, and updated translations
+   * Let's see if Launchpad builds this one quickly, at least
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 1 Aug 2010 13:37:00 -0400
+
+
+cardapio (0.9.133-ubuntu1) lucid; urgency=low
+
+   * A coupld of small bugfixes, and updated translations
+   * Let's see if Launchpad builds this one quickly, at least
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 1 Aug 2010 13:37:00 -0400
+
+
+cardapio (0.9.133-ubuntu1) lucid; urgency=low
+
+   * A coupld of small bugfixes, and updated translations
+   * Let's see if Launchpad builds this one quickly, at least
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 1 Aug 2010 13:37:00 -0400
+
+
+cardapio (0.9.132-ubuntu1) lucid; urgency=low
+
+   * Now with support for the System Menu! HOORAY!
+   * Plus some bugfixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 31 Jul 2010 19:55:00 -0400
+
+
+cardapio (0.9.131-ubuntu1) lucid; urgency=low
+
+   * Fixed some small issues with the new plugins, and changed the code
+     to save the config file when the Gnome session closes.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 30 Jul 2010 21:51:00 -0400
+
+
+cardapio (0.9.130-ubuntu1) lucid; urgency=low
+
+  * Updated some pluging-handling code for less jumpy behavior
+  * Added "Searching..." and "Plugin timed out" inline messages
+  * And, last but not least, added FOUR (!) plugins by Pawel:
+    - Bing Search
+    - Yahoo Search
+    - Wikipedia Search
+    - Youtube Search
+    These are currently in beta but *very* stable 
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 29 Jul 2010 23:58:00 -0400
+
+
+cardapio (0.9.129-ubuntu1) lucid; urgency=low
+
+  * wrapped all plugin calls with exception handlers, so there are less
+    chances for a plugin to crash Cardapio
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 21 Jul 2010 13:25:00 -0400
+
+
+cardapio (0.9.128-ubuntu1) lucid; urgency=low
+
+  * updated the plugin display, and included the new version of the virtual box
+    plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 14 Jul 2010 23:04:00 -0400
+
+
+cardapio (0.9.127-ubuntu1) lucid; urgency=low
+
+  * trying to fix the ppa
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 14 Jul 2010 23:04:00 -0400
+
+
+cardapio (0.9.126-ubuntu1) lucid; urgency=low
+
+  * bug fixes and a minor improvement in loading speed
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 14 Jul 2010 23:04:00 -0400
+
+
+cardapio (0.9.125-ubuntu1-lucid1) lucid; urgency=low
+
+  * Speedups and bugfixes
+  * Plus some minor features added to the software center plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 11 Jul 2010 23:34:00 -0400
+
+
+cardapio (0.9.124-ubuntu1-lucid1) lucid; urgency=low
+
+  * Fixed minor themeing bug, and updated translations
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 5 Jul 2010 23:50:00 -0400
+
+
+cardapio (0.9.123-ubuntu1-lucid1) lucid; urgency=low
+
+  * Added software center plugin, and fixed minor bugs
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 3 Jul 2010 22:40:00 -0400
+
+
+cardapio (0.9.122-ubuntu1-lucid1) lucid; urgency=low
+
+  * added zeitgeist plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 2 Jul 2010 15:10:00 -0400
+
+
+cardapio (0.9.121-ubuntu1-lucid1) lucid; urgency=low
+
+  * added virtual box plugin and fixed a few bugs
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 1 Jul 2010 23:00:00 -0400
+
+
+cardapio (0.9.121-ubuntu1-maverick1) maverick; urgency=low
+
+  * added virtual box plugin and fixed a few bugs
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 1 Jul 2010 23:00:00 -0400
+
+
+cardapio (0.9.121-ubuntu1-karmic1) karmic; urgency=low
+
+  * added virtual box plugin and fixed a few bugs
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 1 Jul 2010 23:00:00 -0400
+
+
+cardapio (0.9.120-ubuntu1-maverick1) maverick; urgency=low
+
+  * various bug fixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 30 Jun 2010 23:30:00 -0400
+
+
+cardapio (0.9.120-ubuntu1-lucid1) lucid; urgency=low
+
+  * various bug fixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 30 Jun 2010 23:30:00 -0400
+
+
+cardapio (0.9.120-ubuntu1-karmic1) karmic; urgency=low
+
+  * various bug fixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 30 Jun 2010 23:30:00 -0400
+
+
+cardapio (0.9.119-ubuntu1) lucid; urgency=low
+
+  * bug fixes, plus option to keep last search result and localized google plugin
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 29 Jun 2010 22:50:00 -0400
+
+cardapio (0.9.118-ubuntu1) lucid; urgency=low
+
+  * docky-related bug fixes, and better handling of executable files
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 28 Jun 2010 23:10:00 -0400
+
+cardapio (0.9.117-ubuntu1) lucid; urgency=low
+
+  * small bug fixes and new translations
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 27 Jun 2010 23:07:00 -0400
+
+cardapio (0.9.116-ubuntu1) lucid; urgency=low
+
+  * fixed a few bugs and added 'show-near-mouse' option for Docky
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 26 Jun 2010 23:45:00 -0400
+
+cardapio (0.9.115-ubuntu2) lucid; urgency=low
+
+  * updated the version in the cardapio about window :)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 26 Jun 2010 23:05:00 -0400
+
+cardapio (0.9.115-ubuntu1) lucid; urgency=low
+
+  * bug fixes for the loading dot problem, added features :)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 25 Jun 2010 17:52:00 -0400
+
+cardapio (0.9.114-ubuntu1) lucid; urgency=low
+
+  * fixed loading error
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 24 Jun 2010 23:40:00 -0400
+
+cardapio (0.9.113-ubuntu2) lucid; urgency=low
+
+  * better migration support
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 23 Jun 2010 23:40:00 -0400
+
+cardapio (0.9.113-ubuntu1) lucid; urgency=low
+
+  * bug fixes and reorderable plugins/menus
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 23 Jun 2010 23:40:00 -0400
+
+cardapio (0.9.112-ubuntu1) lucid; urgency=low
+
+  * bug fixes and better 'launch in background' 
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 22 Jun 2010 22:01:00 -0400
+
+cardapio (0.9.111-ubuntu1) lucid; urgency=low
+
+  * now with better gtkrc support, and with middle-click / ctrl-click to launch
+  in background
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Jun 2010 23:42:00 -0400
+
+cardapio (0.9.110-ubuntu5) lucid; urgency=low
+
+  * fixed the version string
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Jun 2010 12:05:00 -0400
+
+cardapio (0.9.110-ubuntu4) lucid; urgency=low
+
+  * trying to fix the ppa
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Jun 2010 12:05:00 -0400
+
+cardapio (0.9.110-ubuntu3) lucid; urgency=low
+
+  * trying to fix the ppa
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 21 Jun 2010 12:05:00 -0400
+
+cardapio (0.9.110-ubuntu2) lucid; urgency=low
+
+  * trying to fix the ppa
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 20 Jun 2010 22:20:00 -0400
+
+cardapio (0.9.110-ubuntu1) lucid; urgency=low
+
+  * fixed some critical bugs
+  * changed the build system
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 20 Jun 2010 22:20:00 -0400
+
+cardapio (0.9.109-ubuntu1) lucid; urgency=low
+
+  * fixed the icons in "places"
+  * fixed bug 596270
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 18 Jun 2010 23:00:00 -0400
+
+cardapio (0.9.108-ubuntu1) lucid; urgency=low
+
+  * bugfixes
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 18 Jun 2010 23:00:00 -0400
+
+cardapio (0.9.107-ubuntu1) lucid; urgency=low
+
+  * bugfix for window positioning
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 17 Jun 2010 23:52:00 -0400
+
+cardapio (0.9.106-ubuntu1) lucid; urgency=low
+
+  * changed the plugin api (now at version 1.2) to support callback actions
+  * added callback to tracker and google plugins, to open window with more
+  results
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 16 Jun 2010 23:20:00 -0400
+
+cardapio (0.9.105-ubuntu1) lucid; urgency=low
+
+  * updating user translations.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 15 Jun 2010 23:00:00 -0400
+
+cardapio (0.9.104-ubuntu1) lucid; urgency=low
+
+  * fixed the focus/scrolling bug, along with a small regression regarding
+    the sidepane menu not showing.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 14 Jun 2010 23:55:00 -0400
+
+cardapio (0.9.103-ubuntu2) lucid; urgency=low
+
+  * simple bugfix
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 14 Jun 2010 17:45:00 -0400
+
+cardapio (0.9.103-ubuntu1) lucid; urgency=low
+
+  * assorted bugfixes, mainly to do with the sidepane and window sizing
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 14 Jun 2010 17:45:00 -0400
+
+cardapio (0.9.102-ubuntu1) lucid; urgency=low
+
+  * fixed issue where 'open on hover' and 'show session buttons' were
+  conflicting when showing the options dialog
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 22:00:00 -0400
+
+cardapio (0.9.101-ubuntu1) lucid; urgency=low
+
+  * renamed system pane to side pane
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 22:00:00 -0400
+
+cardapio (0.9.100-ubuntu1) lucid; urgency=low
+
+  * Added an option to customize the left-side pane, cleaned up the
+  configuration dialog, fixed bugs, and so on...
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 21:21:00 -0400
+
+cardapio (0.9.99-ubuntu1) lucid; urgency=low
+
+  * Fixes a regression with the session buttons
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 12:43:00 -0400
+
+cardapio (0.9.98-ubuntu3) lucid; urgency=low
+
+  * Other small fixes...
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 12:43:00 -0400
+
+cardapio (0.9.98-ubuntu2) lucid; urgency=low
+
+  * Fixes the default window size
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 12:43:00 -0400
+
+cardapio (0.9.98-ubuntu1) lucid; urgency=low
+
+  * Fixes a critical bug introduced with the last few versions
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 12:43:00 -0400
+
+cardapio (0.9.97-ubuntu2) lucid; urgency=low
+
+  * Removing a file that got into the package for no reason :(
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 01:25:00 -0400
+
+cardapio (0.9.97-ubuntu1) lucid; urgency=low
+
+  * Fixed a critical bug that made it not launch!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 01:25:00 -0400
+
+cardapio (0.9.96-ubuntu1) lucid; urgency=low
+
+  * Bug fixes :)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 13 Jun 2010 01:25:00 -0400
+
+cardapio (0.9.95-ubuntu1) lucid; urgency=low
+
+  * Added pinning/unpinning GUI
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 12 Jun 2010 23:38:00 -0400
+
+cardapio (0.9.94-ubuntu1) lucid; urgency=low
+
+  * Fixed resizing bug
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 12 Jun 2010 18:18:00 -0400
+
+cardapio (0.9.93-ubuntu1) lucid; urgency=low
+
+  * Fixed panel sizing and orientation bugs
+  * Made the configuration window update the settings in real time
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sat, 12 Jun 2010 14:46:00 -0400
+
+cardapio (0.9.92-ubuntu1) lucid; urgency=low
+
+  * Fixed three bugs: #592571, #592618, #592630 
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 11 Jun 2010 13:27:00 -0400
+
+cardapio (0.9.91-ubuntu1) lucid; urgency=low
+
+  * Added resize cursors to the margins
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 10 Jun 2010 23:01:00 -0400
+
+cardapio (0.9.90-ubuntu1) lucid; urgency=low
+
+  * Made icon changeable
+  * Made icon change size with panel
+  * Made applet change orientation with panel
+  * Added borders for resizing Cardapio
+  * Made the Tracker search be case insensitive
+  * And several other changes
+  * OMG we are fast approaching version 1.0!
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 10 Jun 2010 23:01:00 -0400
+
+cardapio (0.9.80-ubuntu1) lucid; urgency=low
+
+  * Added configuration window
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 9 Jun 2010 23:11:00 -0400
+
+cardapio (0.9.71-ubuntu1) lucid; urgency=low
+
+  * Small change to fix a drawing bug in the applet
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 9 Jun 2010 15:45:00 -0400
+
+cardapio (0.9.70-ubuntu1) lucid; urgency=low
+
+  * Fixed most applet-related bugs
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 9 Jun 2010 15:37:00 -0400
+
+cardapio (0.9.61-ubuntu1) lucid; urgency=low
+
+  * Fixed a couple of smaller bugs and added latest translations
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 8 Jun 2010 17:46:00 -0400
+
+cardapio (0.9.60-ubuntu2) lucid; urgency=low
+
+  * Now with plugin support
+  * Included plugins are: Tracker and Google Search
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 7 Jun 2010 19:16:00 -0400
+
+cardapio (0.9.50-ubuntu2) lucid; urgency=low
+
+  * Fixing setup.py to make the package build
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 7 Jun 2010 13:07:00 -0400
+
+cardapio (0.9.50-ubuntu1) lucid; urgency=low
+
+  * Added the ability to do translations
+  * Added the first translation: pt_BR
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 6 Jun 2010 22:00:00 -0400
+
+cardapio (0.9.42-ubuntu1) lucid; urgency=low
+
+  * Fixed problems with unicode filenames (i.e. displaying, launching, and searching with tracker)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Fri, 4 Jun 2010 19:13:00 -0400
+
+cardapio (0.9.41-ubuntu2) lucid; urgency=low
+
+  * Adding a missing dependency to the package
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Thu, 3 Jun 2010 14:00:00 -0400
+
+cardapio (0.9.41-ubuntu1) lucid; urgency=low
+
+  * A few updates, but mostly trying to satisfy dependencies (still!)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 2 May 2010 15:15:00 -0400
+
+cardapio (0.9.4-ubuntu2) lucid; urgency=low
+
+  * Trying to satisfy dependencies...
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Mon, 17 May 2010 13:51:00 -0400
+
+cardapio (0.9.4-ubuntu1) lucid; urgency=low
+
+  * Made tracker search more useful. Yes, this warrants another release :)
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 16 May 2010 13:17:41 -0400
+
+cardapio (0.9.3-ubuntu1) lucid; urgency=low
+
+  * Added the "Rebuilding..." window, and a few other cosmetic changes.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Sun, 16 May 2010 13:17:41 -0400
+
+cardapio (0.9.2-ubuntu1) lucid; urgency=low
+
+  * Getting close to version 1.0 . Fixed most of the nasty focus problems.
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 12 May 2010 22:52:33 -0400
+
+cardapio (0.9-ubuntu3) lucid; urgency=low
+
+  * Argh! Still trying to fix the PPA's build system...
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 12 May 2010 19:40:04 -0400
+
+cardapio (0.9-ubuntu2) lucid; urgency=low
+
+  * Trying to fix the PPA's build system...
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 12 May 2010 19:28:00 -0400
+
+cardapio (0.9-ubuntu1) lucid; urgency=low
+
+  * Initial (preview) release 
+
+ -- Thiago Teixeira <tvst@hotmail.com>  Wed, 12 May 2010 17:47:03 -0400

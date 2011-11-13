@@ -1,0 +1,14 @@
+usr/bin/cardapio
+usr/lib/cardapio/ui
+usr/lib/cardapio/plugins
+usr/lib/cardapio/cardapio
+usr/lib/cardapio/C*.py*
+usr/lib/cardapio/D*.py*
+usr/lib/cardapio/I*.py*
+usr/lib/cardapio/O*.py*
+usr/lib/cardapio/S*.py*
+usr/lib/cardapio/m*.py*
+usr/share/applications/cardapio.desktop
+usr/share/pixmaps/cardapio*.png
+usr/share/pixmaps/cardapio*.svg
+usr/share/locale
