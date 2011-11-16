@@ -103,6 +103,7 @@ install-panel: install-alone
 		do test -f $$f/LC_MESSAGES/cardapio.mo && msgunfmt -o $$f.po $$f/LC_MESSAGES/cardapio.mo || true; \
 	done
 	intltool-merge -b locale src/gnomepanel/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
+	rm locale/*.po
 
 
 install-docky: install-alone
