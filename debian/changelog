@@ -1,4 +1,10 @@
-cardapio (0.9.193-0~eugenesan~oneiric2) oneiric; urgency=low
+cardapio (0.9.194-ubuntu1-oneiric1) oneiric; urgency=low
+
+  * Fixed regression where Cardapio no longer hi after mouse out (when 
+    open on hover was active)
+  * Other bug fixes related to the code merge
+
+cardapio (0.9.193-ubuntu1-oneiric1) oneiric; urgency=low
 
   * Reworked depends to allow installation without additional modules,
     provides temporary solution for Gnome3 fallback
@@ -8,7 +14,7 @@ cardapio (0.9.193-0~eugenesan~oneiric2) oneiric; urgency=low
   * Added helper for Launchpad uploads (upload-series.sh)
   * Allow cardapio to be displayed in Applications menu
 
- -- Eugene San (eugenesan) <eugenesan@gmail.com>  Sun, 13 Nov 2011 13:00:18 +0200
+ -- Thiago Teixeira <tvst@hotmail.com>  Tue, 15 Nov 2011 23:00:00 -0800
 
 cardapio (0.9.192-ubuntu1-oneiric1) oneiric; urgency=low
 
