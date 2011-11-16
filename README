@@ -1,0 +1,47 @@
+Usage
+=====
+
+To use as a Gnome2 panel applet, simply add it as usual: Right-click the panel,
+select "Add to panel", then choose "Cardapio".
+
+
+To use in Gnome3 FallBack mode, drag and drop cardapio icon from Applications menu onto Gnome Panel.
+(Currently this is the only way to use it in Gnome3 FallBack mode, but this will change soon)
+
+
+To use as a launcher, run cardapio with the argument 'hidden'. That is:
+$ cardapio hidden 
+
+
+To use in Docky, open Docky's settings window, click on the Helpers tab, select
+Cardapio and click on the right-most button that appears on its
+row (the button has no label, but its tooltip is "enable this helper").
+That's it! From now on, when you click the "anchor" icon you will cause Cardapio to pop up.
+
+
+To use in AWN, open Avant Window Navigator's settings window, choose applets,
+and drag Cardapio from "Available Applets" to "Active Applets".
+That's it!
+
+
+Once cardapio is running, you can access it using Super+Space. To change this
+key binding and to access many more options, simply change the file at
+~/.config/Cardapio/config.ini which is created automatically when Cardapio
+*exits*.
+
+
+Have fun!
+
+
+Note
+====
+
+For power-users: If you would like to make a shortcut somewhere that will show a hidden instance
+of Cardapio, just point it to "cardapio show".
+
+Although Cardapio is in a VERY stable state right now, this version has been
+marked as 0.9.x, which means there are still some bugs and missing features.
+
+These are marked in the source file cardapio.py with the "TODO" headings. Some
+are marked as blocking the release of version 1.0. If you would like to
+contribute, please consider starting with those! 

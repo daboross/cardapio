@@ -28,5 +28,3 @@ for dist in dists:
 
 		for individualarchive in archive.getPublishedBinaries(status='Published', distro_arch_series=desired_dist_and_arch):
 			print ' * % -20s % -30s % 6s' % (individualarchive.binary_package_name, individualarchive.binary_package_version, str(individualarchive.getDownloadCount()))
-
-

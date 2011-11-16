@@ -1,0 +1,10 @@
+{
+   "shell-version": ["3.0", "3.1.90.1", "3.1.91", "3.2"], 
+   "version": "0.9.193",
+   "uuid": "cardapio@varal.org", 
+   "name": "Cardapio", 
+   "description": "A menu with search capabilities.",
+   "original-authors": "Thiago Teixeira, Cardapio team",
+   "url": "https://launchpad.net/cardapio",
+   "localdir": "locale"
+}
