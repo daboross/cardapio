@@ -15,7 +15,8 @@ http://www.gnu.org/licenses/gpl-3.0-standalone.html	</property>
     <property name="authors">∙ Thiago Teixeira
 ∙ Jan-Christoph Borchardt
 ∙ Clifton Mulkey
-∙ Pawel Bara</property>
+∙ Pawel Bara
+∙ Eugene San</property>
     <property name="translator_credits" translatable="yes">See https://translations.launchpad.net/cardapio</property>
     <property name="logo_icon_name">cardapio-dark256</property>
     <signal name="close" handler="on_dialog_close" swapped="no"/>
