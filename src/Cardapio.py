@@ -40,7 +40,6 @@ try:
 	import gio
 	import glib
 	import json
-	import gmenu
 
 	import urllib2
 	import gettext
@@ -61,6 +60,18 @@ try:
 except Exception, exception:
 	fatal_error('Fatal error loading Cardapio', exception)
 	sys.exit(1)
+
+# if the computer has the gmenu module, use that (wrapped in the GMenuHelper module)
+try:
+	import GMenuHelper as MenuHelper
+
+# otherwise use xdg (wrapped in the XDGMenuHelper module)
+except Exception, exception:
+	try:
+		import XDGMenuHelper as MenuHelper
+	except Exception, exception:
+		fatal_error('Fatal error loading Cardapio', exception)
+		sys.exit(1)
 
 if gtk.ver < (2, 14, 0):
 	fatal_error('Fatal error loading Cardapio', 'Error! Gtk version must be at least 2.14. You have version %s' % gtk.ver)
@@ -243,16 +254,16 @@ class Cardapio(dbus.service.Object):
 		Loads the XDG application menus into memory
 		"""
 
-		self._sys_tree = gmenu.lookup_tree('gnomecc.menu')
-		self._have_control_center = (self._sys_tree.root is not None)
+		self._sys_tree = MenuHelper.MenuHelper('gnomecc.menu')
+		self._have_control_center = self._sys_tree.is_valid()
 
 		if not self._have_control_center:
-			self._sys_tree = gmenu.lookup_tree('settings.menu')
+			self._sys_tree = MenuHelper.MenuHelper('settings.menu')
 			logging.warn('Could not find Control Center menu file. Deactivating Control Center button.')
 
-		self._app_tree = gmenu.lookup_tree('applications.menu')
-		self._app_tree.add_monitor(self._on_menu_data_changed)
-		self._sys_tree.add_monitor(self._on_menu_data_changed)
+		self._app_tree = MenuHelper.MenuHelper('applications.menu')
+		self._app_tree.set_on_change_handler(self._on_menu_data_changed)
+		self._sys_tree.set_on_change_handler(self._on_menu_data_changed)
 
 
 	def _setup_dbus(self):
@@ -1820,16 +1831,16 @@ class Cardapio(dbus.service.Object):
 
 		# TODO: add session buttons here
 
-		for node in self._sys_tree.root.contents:
-			if isinstance(node, gmenu.Directory):
-				self.add_section(node.name, node.icon, node.get_comment(), node = node, system_menu = True)
+		for entry in self._sys_tree:
+			if entry.is_menu():
+				self.add_section(entry.get_name(), entry.get_icon(), entry.get_comment(), node = entry, system_menu = True)
 
 		self._view.hide_pane(self._view.SYSTEM_CATEGORY_PANE)
 
 		section, dummy = self.add_section(_('Uncategorized'), 'applications-other', tooltip = _('Other configuration tools'), hidden_when_no_query = False, system_menu = True)
-		self._add_tree_to_app_list(self._sys_tree.root, section, self._sys_list, recursive = False)
+		self._add_tree_to_app_list(self._sys_tree, section, self._sys_list, recursive = False)
 
-		self._add_tree_to_app_list(self._sys_tree.root, self._view.SYSTEM_SECTION, self._app_list)
+		self._add_tree_to_app_list(self._sys_tree, self._view.SYSTEM_SECTION, self._app_list)
 
 
 	def _fill_uncategorized_list(self):
@@ -1837,7 +1848,7 @@ class Cardapio(dbus.service.Object):
 		Populate the Uncategorized section
 		"""
 
-		self._add_tree_to_app_list(self._app_tree.root, self._view.UNCATEGORIZED_SECTION, self._app_list, recursive = False)
+		self._add_tree_to_app_list(self._app_tree, self._view.UNCATEGORIZED_SECTION, self._app_list, recursive = False)
 
 
 	def _fill_places_list(self):
@@ -2107,9 +2118,9 @@ class Cardapio(dbus.service.Object):
 
 		self._load_application_menus()
 
-		for node in self._app_tree.root.contents:
-			if isinstance(node, gmenu.Directory):
-				self.add_section(node.name, node.icon, node.get_comment(), node = node, hidden_when_no_query = False)
+		for entry in self._app_tree:
+			if entry.is_menu():
+				self.add_section(entry.get_name(), entry.get_icon(), entry.get_comment(), node = entry, hidden_when_no_query = False)
 
 
 	# TODO MVC
@@ -2314,15 +2325,15 @@ class Cardapio(dbus.service.Object):
 		parent widget
 		"""
 
-		for node in tree.contents:
+		for entry in tree:
 
-			if isinstance(node, gmenu.Entry):
+			if entry.is_entry():
 
-				self._add_app_button(node.name, node.icon, section, 'app', node.desktop_file_path, node.get_comment(), app_list)
+				self._add_app_button(entry.get_name(), entry.get_icon(), section, 'app', entry.get_path(), entry.get_comment(), app_list)
 
-			elif isinstance(node, gmenu.Directory) and recursive:
+			elif entry.is_menu() and recursive:
 
-				self._add_tree_to_app_list(node, section, app_list)
+				self._add_tree_to_app_list(entry, section, app_list)
 
 
 	def _go_to_parent_folder(self):
