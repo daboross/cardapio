@@ -47,6 +47,7 @@ class DesktopEnvironment:
 
 		if   self.environment == 'kde'         : pass
 		elif self.environment == 'xfce'        : pass
+		elif self.environment == 'lxde'        : self.init_lxde()
 		elif self.environment == 'lwde'        : pass
 		elif self.environment == 'gnome'       : self.init_gnome()
 		elif self.environment == 'gnome-shell' : self.init_gnome3()
@@ -80,6 +81,19 @@ class DesktopEnvironment:
 
 		self.save_session = 'dbus-send --session --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.Logout uint32:0'
 		self.shutdown     = 'dbus-send --session --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.Shutdown'
+
+
+    def init_lxde(self):
+		"""
+		Override some of the default variables for use in LXDE
+		"""
+        self.lock_screen = ('dbus-send --system '
+				'--dest=org.freedesktop.DisplayManager '
+				'--type=method_call '
+				'/org/freedesktop/DisplayManager/Seat0 '
+				'org.freedesktop.DisplayManager.Seat.SwitchToGreeter')
+		self.save_session = 'pkill -SIGTERM lxsession'
+		self.shutdown = 'lxde-logout'
 
 
 	def register_session_close_handler(self, handler):
