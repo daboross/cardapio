@@ -83,11 +83,11 @@ class DesktopEnvironment:
 		self.shutdown     = 'dbus-send --session --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.Shutdown'
 
 
-    def init_lxde(self):
+	def init_lxde(self):
 		"""
 		Override some of the default variables for use in LXDE
 		"""
-        self.lock_screen = ('dbus-send --system '
+		self.lock_screen = ('dbus-send --system '
 				'--dest=org.freedesktop.DisplayManager '
 				'--type=method_call '
 				'/org/freedesktop/DisplayManager/Seat0 '
