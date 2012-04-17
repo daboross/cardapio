@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd locale
+cd ../locale
 tar -zxvf ../src/launchpad-export.tar.gz
 rm -rf templates
 

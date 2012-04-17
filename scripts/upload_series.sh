@@ -12,8 +12,8 @@ help() {
 Usage: ${0} [-y] [-o] [-p <ppa:user/repo>] [-d <dist1 distx>] <debsrc>
 	-y : Do not approve each upload in series
 	-o : Create source package including .orig tarball
-	-f : Force upload even if source package marged as already uploaded
-	-d : Specify distribution serires, might be multiple in single quotes
+	-f : Force upload even if source package marked as already uploaded
+	-d : Specify distribution series, might be multiple in single quotes
 	-p : Specify target PPA / repository
 Example: ${0} -y -o -p "${repo}" -d "lucid oneiric" .
 EOB
