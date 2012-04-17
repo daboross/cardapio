@@ -354,7 +354,8 @@ class Cardapio(dbus.service.Object):
 		Prepares Cardapio's applet in any of the compatible panels.
 		"""
 
-		if self._applet.panel_type == PANEL_TYPE_GNOME2:
+		if (self._applet.panel_type == PANEL_TYPE_GNOME2 or 
+		    self._applet.panel_type == PANEL_TYPE_MATE):
 			self._view.remove_about_context_menu_items()
 
 		if self.settings['show titlebar']:

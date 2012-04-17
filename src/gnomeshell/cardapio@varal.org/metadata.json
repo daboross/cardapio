@@ -1,6 +1,6 @@
 {
-   "shell-version": ["3.0", "3.1.90.1", "3.1.91", "3.2"], 
-   "version": "0.9.193",
+   "shell-version": ["3.0", "3.2", "3.4"], 
+   "version": "0.9.194",
    "uuid": "cardapio@varal.org", 
    "name": "Cardapio", 
    "description": "A menu with search capabilities.",

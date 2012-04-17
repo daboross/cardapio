@@ -1,5 +1,5 @@
 //
-//  Copyright (c) 2011   Cardapio team
+//  Copyright (c) 2011-2012 Cardapio team
 //
 
 const St = imports.gi.St;
@@ -110,12 +110,12 @@ CardapioApplet.prototype = {
 		//Main.panel._leftBox.insert_actor(this.actor, 0);
 
 		// add immediately after hotspot
-		this.container = Main.panel._leftBox;
-		Main.panel._leftBox.insert_actor(this.actor, 1);
+		//this.container = Main.panel._leftBox;
+		//Main.panel._leftBox.insert_actor(this.actor, 1);
 
 		// add at the end of the left box
-		//this.container = Main.panel._leftBox;
-		//Main.panel._leftBox.add(this.actor);
+		this.container = Main.panel._leftBox;
+		Main.panel._leftBox.add(this.actor);
 
 		// add to the left of the clock
 		//this.container = Main.panel._centerBox;

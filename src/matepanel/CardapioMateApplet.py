@@ -21,36 +21,36 @@ import sys
 try:
 	import gtk
 	import glib
-	import gnomeapplet
+	import mateapplet
 	from CardapioAppletInterface import *
 
 except Exception, exception:
-	fatal_error("Fatal error loading Cardapio's applet for the Gnome Panel", exception)
+	fatal_error("Fatal error loading Cardapio's applet for the Mate Panel", exception)
 	sys.exit(1)
 
 
-class CardapioGnomeApplet(CardapioAppletInterface):
+class CardapioMateApplet(CardapioAppletInterface):
 
 	PANEL_SIZE_CHANGE_IGNORE_INTERVAL = 200 # milliseconds
 	SETUP_PANEL_BUTTON_DELAY          = 100 # milliseconds (must be smaller than PANEL_SIZE_CHANGE_IGNORE_INTERVAL)
 
-	panel_type = PANEL_TYPE_GNOME2
+	panel_type = PANEL_TYPE_MATE
 
 	IS_CONFIGURABLE = True
 	IS_CONTROLLABLE = True
 
-	# Added this to fix a bug where CardapioGnomeApplet was being
-	# reinstantiated (possibly by Gnome Panel) right after it was destroyed! As
-	# a hackish fix I make sure CardapioGnomeApplet is a singleton using the
+	# Added this to fix a bug where CardapioMateApplet was being
+	# reinstantiated (possibly by Mate Panel) right after it was destroyed! As
+	# a hackish fix I make sure CardapioMateApplet is a singleton using the
 	# variable below. Eek.
 	_singleton_instance = None
 
 	def __init__(self, applet):
 
-		if CardapioGnomeApplet._singleton_instance is not None:
-			return CardapioGnomeApplet._singleton_instance
+		if CardapioMateApplet._singleton_instance is not None:
+			return CardapioMateApplet._singleton_instance
 
-		CardapioGnomeApplet._singleton_instance = self
+		CardapioMateApplet._singleton_instance = self
 
 		self.applet = applet
 		self.button = gtk.ImageMenuItem()
@@ -70,14 +70,14 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 				<menuitem name="Item 2" verb="Edit" label="%s" pixtype="stock" pixname="gtk-edit"/>
 				<separator />
 				<menuitem name="Item 3" verb="AboutCardapio" label="%s" pixtype="stock" pixname="gtk-about"/>
-				<menuitem name="Item 4" verb="AboutGnome" label="%s" pixtype="none"/>
+				<menuitem name="Item 4" verb="AboutMate" label="%s" pixtype="none"/>
 				<menuitem name="Item 5" verb="AboutDistro" label="%s" pixtype="none"/>
 			</popup>
 			''' % (
 				_('_Properties'),
 				_('_Edit Menus'),
 				_('_About Cardapio'),
-				_('_About Gnome'),
+				_('_About Mate'),
 				_('_About %(distro_name)s') % {'distro_name' : cardapio.distro_name}
 			)
 
@@ -85,7 +85,7 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 			('Properties', self.open_options_dialog),
 			('Edit', self.launch_edit_app),
 			('AboutCardapio', self.open_about_dialog),
-			('AboutGnome', self.open_about_dialog),
+			('AboutMate', self.open_about_dialog),
 			('AboutDistro', self.open_about_dialog)
 		]
 
@@ -120,7 +120,7 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 			}
 
 			widget "*CardapioAppletMenu" style:highest "cardapio-applet-menu-style"
-			widget "*PanelApplet" style:highest "cardapio-applet-style"
+			widget "*MatePanelApplet" style:highest "cardapio-applet-style"
 			''')
 
 		self.applet.add(menubar)
@@ -130,7 +130,7 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 		self.applet.connect('change-background', self._on_panel_change_background)
 		self.applet.connect('destroy', self._on_panel_destroy)
 
-		self.applet.set_applet_flags(gnomeapplet.EXPAND_MINOR)
+		self.applet.set_applet_flags(mateapplet.EXPAND_MINOR)
 		self.applet.show_all()
 
 		return True
@@ -164,9 +164,9 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 	def get_orientation(self):
 
 		orientation = self.applet.get_orient()
-		if orientation == gnomeapplet.ORIENT_UP  : return POS_BOTTOM # bottom and top are flipped for some reason
-		if orientation == gnomeapplet.ORIENT_DOWN: return POS_TOP    # bottom and top are flipped for some reason
-		if orientation == gnomeapplet.ORIENT_LEFT: return POS_RIGHT  # left and right are flipped for some reason
+		if orientation == mateapplet.ORIENT_UP  : return POS_BOTTOM # bottom and top are flipped for some reason
+		if orientation == mateapplet.ORIENT_DOWN: return POS_TOP    # bottom and top are flipped for some reason
+		if orientation == mateapplet.ORIENT_LEFT: return POS_RIGHT  # left and right are flipped for some reason
 		return POS_LEFT # left and right are flipped for some reason
 
 
@@ -183,17 +183,17 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 
 		orientation = self.applet.get_orient()
 
-		if orientation == gnomeapplet.ORIENT_UP or orientation == gnomeapplet.ORIENT_DOWN:
+		if orientation == mateapplet.ORIENT_UP or orientation == mateapplet.ORIENT_DOWN:
 			self.button.parent.set_child_pack_direction(gtk.PACK_DIRECTION_LTR)
 			self.button.child.set_angle(0)
 			self.button.child.set_alignment(0, 0.5)
 
-		elif orientation == gnomeapplet.ORIENT_RIGHT:
+		elif orientation == mateapplet.ORIENT_RIGHT:
 			self.button.parent.set_child_pack_direction(gtk.PACK_DIRECTION_BTT)
 			self.button.child.set_angle(90)
 			self.button.child.set_alignment(0.5, 0)
 
-		elif orientation == gnomeapplet.ORIENT_LEFT:
+		elif orientation == mateapplet.ORIENT_LEFT:
 			self.button.parent.set_child_pack_direction(gtk.PACK_DIRECTION_TTB)
 			self.button.child.set_angle(270)
 			self.button.child.set_alignment(0.5, 0)
@@ -210,15 +210,15 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 		clean_style = gtk.RcStyle()
 		self.button.parent.modify_style(clean_style)
 
-		if bg_type == gnomeapplet.COLOR_BACKGROUND:
+		if bg_type == mateapplet.COLOR_BACKGROUND:
 			self.button.parent.modify_bg(gtk.STATE_NORMAL, color)
 
-		elif bg_type == gnomeapplet.PIXMAP_BACKGROUND:
+		elif bg_type == mateapplet.PIXMAP_BACKGROUND:
 			style = self.button.parent.get_style()
 			style.bg_pixmap[gtk.STATE_NORMAL] = pixmap
 			self.button.parent.set_style(style)
 
-		#elif bg_type == gnomeapplet.NO_BACKGROUND: pass
+		#elif bg_type == mateapplet.NO_BACKGROUND: pass
 
 
 	def _on_panel_size_change_done(self):
@@ -236,8 +236,8 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 		"""
 
 		self.applet.handler_block_by_func(self._on_panel_size_changed)
-		glib.timeout_add(CardapioGnomeApplet.SETUP_PANEL_BUTTON_DELAY, self._load_settings)
-		glib.timeout_add(CardapioGnomeApplet.PANEL_SIZE_CHANGE_IGNORE_INTERVAL, self._on_panel_size_change_done) # added this to avoid an infinite loop
+		glib.timeout_add(CardapioMateApplet.SETUP_PANEL_BUTTON_DELAY, self._load_settings)
+		glib.timeout_add(CardapioMateApplet.PANEL_SIZE_CHANGE_IGNORE_INTERVAL, self._on_panel_size_change_done) # added this to avoid an infinite loop
 
 
 	def _on_panel_button_pressed(self, widget, event):
@@ -313,7 +313,7 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 			self.button.set_image(None)
 
 		clean_imagemenuitem = gtk.ImageMenuItem()
-		is_horizontal = (self.applet.get_orient() in (gnomeapplet.ORIENT_UP, gnomeapplet.ORIENT_DOWN))
+		is_horizontal = (self.applet.get_orient() in (mateapplet.ORIENT_UP, mateapplet.ORIENT_DOWN))
 
 		if self.applet_label and self.applet_icon:
 			toggle_spacing = clean_imagemenuitem.style_get_property('toggle-spacing')
@@ -373,7 +373,7 @@ class CardapioGnomeApplet(CardapioAppletInterface):
 
 		orientation = self.applet.get_orient()
 
-		if orientation in (gnomeapplet.ORIENT_DOWN, gnomeapplet.ORIENT_UP):
+		if orientation in (mateapplet.ORIENT_DOWN, mateapplet.ORIENT_UP):
 			panel_size = panel_height
 
 		else:

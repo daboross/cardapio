@@ -8,7 +8,7 @@ Homepage: https://launchpad.net/cardapio
 
 Package: cardapio
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-gtk2 (>= 2.17), python-gmenu, python-keybinder, xdg-user-dirs, xdg-user-dirs-gtk
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-gtk2 (>= 2.17), python-glade2, python-gmenu, python-keybinder, xdg-user-dirs, xdg-user-dirs-gtk
 Recommends: tracker (>= 0.9.0)
 Suggests: cardapio-gnomepanel | cardapio-gnomeshell | cardapio-awn | cardapio-docky, python-tk
 Description: An alternative Gnome menu, launcher, and much more!
@@ -59,8 +59,22 @@ Description: Cardapio applet for Gnome Panel
  well-thought-out interface, supports tracker searching, and much more. 
  Give it a try today! 
  .
- This is a dummy package that installs the dependencies required to 
+ This is a package that also installs the dependencies required to 
  allow Cardapio to run in the Gnome panel.
+
+Package: cardapio-matepanel
+Architecture: any
+Depends: cardapio, mate-panel, mate-applets
+Description: Cardapio applet for Mate Panel
+ Cardapio is a launcher that can work in two modes: as a panel applet 
+ (in which case it is an alternative to Mate's application menu 
+ applet) or as a launcher (in which case it is a lightweight 
+ alternative to Mate Do). Either way, it features a beautiful, 
+ well-thought-out interface, supports tracker searching, and much more. 
+ Give it a try today! 
+ .
+ This is a package that also installs the dependencies required to 
+ allow Cardapio to run in the Mate panel.
 
 Package: cardapio-gnomeshell
 Architecture: any
