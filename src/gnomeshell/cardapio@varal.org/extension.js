@@ -107,27 +107,27 @@ CardapioApplet.prototype = {
 
 		// add at the leftmost position
 		//this.container = Main.panel._leftBox;
-		//Main.panel._leftBox.insert_actor(this.actor, 0);
+		//Main.panel._leftBox.insert_child_at_index(this.actor, 0);
 
 		// add immediately after hotspot
-		//this.container = Main.panel._leftBox;
-		//Main.panel._leftBox.insert_actor(this.actor, 1);
+		this.container = Main.panel._leftBox;
+		Main.panel._leftBox.insert_child_at_index(this.actor, 1);
 
 		// add at the end of the left box
-		this.container = Main.panel._leftBox;
-		Main.panel._leftBox.add(this.actor);
+		//this.container = Main.panel._leftBox;
+		//Main.panel._leftBox.add(this.actor);
 
 		// add to the left of the clock
 		//this.container = Main.panel._centerBox;
-		//Main.panel._centerBox.insert_actor(this.actor, 0);
+		//Main.panel._centerBox.insert_child_at_index(this.actor, 0);
 
 		// add to the right of the clock
 		//this.container = Main.panel._centerBox;
-		//Main.panel._centerBox.insert_actor(this.actor, -1);
+		//Main.panel._centerBox.insert_child_at_index(this.actor, -1);
 
 		// add at the right-most position
 		//this.container = Main.panel._rightBox;
-		//Main.panel._rightBox.insert_actor(this.actor, -1);
+		//Main.panel._rightBox.insert_child_at_index(this.actor, -1);
 
 		DBus.session.start_service(cardapio_service_name);
 
