@@ -10,7 +10,13 @@ endif
 
 all:
 	@echo "make install - Install on local system"
+	@echo "make install-alone - Install just Cardapio."
+	@echo "make install-panel - Install Gnome Panel applet."
+	@echo "make install-awn - Install AWN applet."
+	@echo "make install-shell - Install Gnome Shell applet."
+	@echo "make install-mate - Install Mate Panel applet."
 	@echo "make uninstall - Remove from local system"
+	@echo "make uninstall-* - Remove * from local system"
 	@echo "make buildsrc - Generate a deb source package"
 	@echo "make clean - Get rid of scratch and byte files"
 
@@ -20,7 +26,7 @@ buildsrc:
 clean:
 	find . -name '*.pyc' -delete
 
-install: install-alone install-panel install-docky install-awn install-shell install-mate-panel
+install: install-alone install-panel install-docky install-awn install-shell install-mate
 
 install-alone:
 	python -m compileall src/
@@ -107,7 +113,7 @@ install-panel: install-alone
 	intltool-merge -b locale src/gnomepanel/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
 	rm locale/*.po
 
-install-mate-panel: install-alone
+install-mate: install-alone
 	python -m compileall src/matepanel/
 	cp -f src/matepanel/cardapio-mate-panel-applet $(PREFIX)/lib/cardapio/
 
@@ -152,7 +158,7 @@ install-shell: install-alone
 	mkdir -p $(PREFIX)/share/gnome-shell/extensions
 	cp -rf src/gnomeshell/cardapio@varal.org $(PREFIX)/share/gnome-shell/extensions/
 
-uninstall: uninstall-alone uninstall-panel uninstall-docky uninstall-awn uninstall-shell uninstall-mate-panel
+uninstall: uninstall-alone uninstall-panel uninstall-docky uninstall-awn uninstall-shell uninstall-mate
 
 uninstall-alone: uninstall-panel uninstall-docky uninstall-awn uninstall-shell
 	rm -rf $(PREFIX)/lib/cardapio
