@@ -52,6 +52,10 @@ class MenuHelper:
 			for entry in entries:
 				yield self._wrap_entry(entry)
 			raise StopIteration
+
+		if self._node is None:
+			raise StopIteration
+
 		# will possibly have an issue where sometimes we can't have the .root here :-/
 		return the_iter(self._node.contents)
 
