@@ -1,3 +1,9 @@
+cardapio (0.9.194-5) precise; urgency=low
+
+  * Attempting to fix Bug 995538
+
+ -- Thiago Teixeira <thiagot@gmail.com>  Sun, 13 May 2012 19:50:00 -0800
+
 cardapio (0.9.194-4) precise; urgency=low
 
   * Fix Mate applet install (Mate applet still broken)
