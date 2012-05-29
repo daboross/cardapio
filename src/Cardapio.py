@@ -985,14 +985,13 @@ class Cardapio(dbus.service.Object):
 			# MUST run these lines BEFORE disappering with all sections
 			first_app_info = self._view.get_nth_visible_app(1)
 
-			# TODO MVC: (about the line above ^) there should be no need for
+			# About the line above, there should be no need for
 			# asking the view what is the first visible app (with
 			# get_nth_visible_app). Instead, the model should know the top
 			# app already! Except this is not exactly that straight-forward,
 			# since it depends on the plugin ordering chosen by the user. And to
 			# further complicate matters, some plugins respond after a
-			# local/remote delay. So I have to think about the best way to solve
-			# this issue...
+			# local/remote delay. So this seemed like the simplest solution.
 
 			selected_app_info = self._view.get_selected_app()
 			self._view.show_navigation_buttons()
@@ -1253,7 +1252,7 @@ class Cardapio(dbus.service.Object):
 
 		if not keyword_exists: return True
 
-		plugin = self._keyword_to_plugin_mapping[keyword][0] # TODO TODO
+		plugin = self._keyword_to_plugin_mapping[keyword][0]
 
 		self._cancel_all_plugins()
 		self._cancel_all_plugin_timers()
@@ -1795,9 +1794,6 @@ class Cardapio(dbus.service.Object):
 		panel applet
 		"""
 
-		# TODO - Delete this line on Feb 28th
-		#if self._view.focus_out_blocked: return
-
 		mouse_x, mouse_y = self._view.get_cursor_coordinates()
 
 		window_width, window_height = self._view.get_window_size()
@@ -2124,7 +2120,7 @@ class Cardapio(dbus.service.Object):
 				self.add_section(entry.get_name(), entry.get_icon(), entry.get_comment(), node = entry, hidden_when_no_query = False)
 
 
-	# TODO MVC
+	# TODO MVC - appears to be done...
 	# This method is called from the View API
 	def add_section(self, title_str, icon_name = None, tooltip = '', hidden_when_no_query = False, node = None, system_menu = False):
 		"""
@@ -2366,15 +2362,13 @@ class Cardapio(dbus.service.Object):
 			self._view.hide_context_menu_option(self._view.UNPIN_MENUITEM)
 			self._view.hide_context_menu_option(self._view.ADD_SIDE_PANE_MENUITEM)
 			self._view.hide_context_menu_option(self._view.REMOVE_SIDE_PANE_MENUITEM)
-			# TODO MVC
-			self._view.app_menu_separator.hide() # this should happen automatically in setup_plugin_context_menu
+			self._view.hide_context_menu_option(self._view.SEPARATOR_MENUITEM)
 			self.setup_plugin_context_menu(app_info)
 			return
 
 		already_pinned = False
 		already_on_side_pane = False
-		# TODO MVC
-		self._view.app_menu_separator.show()
+		self._view.show_context_menu_option(self._view.SEPARATOR_MENUITEM)
 
 		for command in [app['command'] for app in self.settings['pinned items']]:
 			if command == app_info['command']:
@@ -2438,7 +2432,7 @@ class Cardapio(dbus.service.Object):
 		return 0
 
 
-	# TODO MVC
+	# TODO MVC - appears to be done...
 	def setup_plugin_context_menu(self, app_info):
 		"""
 		Sets up context menu items as requested by individual plugins
@@ -2960,8 +2954,6 @@ class Cardapio(dbus.service.Object):
 
 		if not self._applet.IS_CONTROLLABLE: return
 
-		# TODO - Delete this line on Feb 28th
-		#if self.settings['open on hover'] and not self._view.focus_out_blocked:
 		if self.settings['open on hover']:
 			glib.timeout_add(self.settings['autohide delay'], self._hide_if_mouse_away)
 
@@ -3048,8 +3040,14 @@ class Cardapio(dbus.service.Object):
 			return
 
 		app_info = self._view.get_nth_visible_app(1)
-		# TODO MVC: there should be no need for get_first_visible_app. Instead,
-		# the model should know the top app already!
+
+		# About the line above, there should be no need for
+		# asking the view what is the first visible app (with
+		# get_nth_visible_app). Instead, the model should know the top
+		# app already! Except this is not exactly that straight-forward,
+		# since it depends on the plugin ordering chosen by the user. And to
+		# further complicate matters, some plugins respond after a
+		# local/remote delay. So this seemed like the simplest solution.
 
 		if app_info is not None:
 			self.handle_app_clicked(app_info, 1, ctrl_is_pressed, shift_is_pressed)
@@ -3264,6 +3262,8 @@ class Cardapio(dbus.service.Object):
 
 
 # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
+# Create some new built-ins for use in the plugins
+
 import __builtin__
 __builtin__._ = _
 __builtin__.CardapioPluginInterface = CardapioPluginInterface
