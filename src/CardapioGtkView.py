@@ -173,27 +173,6 @@ class CardapioGtkView(CardapioViewInterface):
 			pass
 
 
-	def _get_current_window_manager(self):
-		"""
-		Returns the name of the current window manager as a string. If
-		unrecognized, returns None.
-		"""
-
-		# We don't need to know all WMs, just a few problematic ones.
-		wms = ['gnome-shell', 'compiz', 'metacity']
-
-		for wm in wms:
-
-			process = subprocess.Popen(
-					['pgrep', wm],
-					stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
-			stdout, dummy = process.communicate()
-			if stdout: return wm
-
-		return None
-
-
 	def quit(self):
 		"""
 		Do the last cleaning up you need to do --- this is the last thing that
@@ -1239,6 +1218,27 @@ class CardapioGtkView(CardapioViewInterface):
 
 	# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
 	# Private methods
+
+	def _get_current_window_manager(self):
+		"""
+		Returns the name of the current window manager as a string. If
+		unrecognized, returns None.
+		"""
+
+		# We don't need to know all WMs, just a few problematic ones.
+		wms = ['gnome-shell', 'compiz', 'metacity']
+
+		for wm in wms:
+
+			process = subprocess.Popen(
+					['pgrep', wm],
+					stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+			stdout, dummy = process.communicate()
+			if stdout: return wm
+
+		return None
+
 
 	def _read_gui_theme_info(self):
 		"""
