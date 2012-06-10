@@ -1,14 +1,30 @@
-//
-//  Copyright (c) 2011-2012 Cardapio team
-//
+/*
+  Cardapio is an alternative menu applet, launcher, and much more!
+
+  Copyright (C) 2010 Cardapio Team (tvst@hotmail.com)
+
+  This program is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 const St = imports.gi.St;
 const Main = imports.ui.main;
 const PanelMenu = imports.ui.panelMenu;
 const Mainloop = imports.mainloop
 const Lang = imports.lang;
-
 const DBus = imports.dbus;
+
+// set up dbus interface
 
 const applet_interface_name   = 'org.varal.CardapioSimpleDbusApplet';
 const applet_service_name     = 'org.varal.CardapioSimpleDbusApplet';
@@ -28,7 +44,6 @@ const CardapioAppletInterface = {
 	signals: [],
 	properties: [],
 };
-
 
 const CardapioInterface = {
 	name: cardapio_interface_name,
@@ -61,6 +76,8 @@ const CardapioInterface = {
 };
 
 let Cardapio = DBus.makeProxyClass(CardapioInterface);
+
+// applet code
 
 function CardapioApplet() {
 	this._init.apply(this, arguments);
@@ -96,7 +113,7 @@ CardapioApplet.prototype = {
 
 		this._label = new St.Label();
 
-		// display "...", but using unicode bullets
+		// while loading, display "...", but using unicode bullets
 		this.configure_applet_button('\u2022 \u2022 \u2022', '');
 
 		this._box = new St.BoxLayout({style_class: 'cardapio-box'});

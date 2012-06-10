@@ -120,3 +120,11 @@ class CardapioAppletInterface:
 		pass
 
 
+class CardapioStandAlone(CardapioAppletInterface):
+
+	panel_type = PANEL_TYPE_NONE
+
+	IS_CONFIGURABLE = False
+	IS_CONTROLLABLE = False
+
+

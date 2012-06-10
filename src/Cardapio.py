@@ -310,7 +310,7 @@ class Cardapio(dbus.service.Object):
 
 		if applet is None:
 			try    : applet = CardapioSimpleDbusApplet(self._bus)
-			except : applet = CardapioAppletInterface()
+			except : applet = CardapioStandAlone()
 
 		return applet
 
@@ -793,8 +793,6 @@ class Cardapio(dbus.service.Object):
 		Rebuild the UI after a timer (this is called when the menu data changes,
 		for example)
 		"""
-
-		# (this method is verified leak-free when no plugins are loaded)
 
 		# TODO: make rebuild smarter: only rebuild whatever is absolutely necessary
 
@@ -1522,7 +1520,7 @@ class Cardapio(dbus.service.Object):
 		  screen
 
 		- Otherwise, position the window near the applet (just below it if the
-		  panel is top opriented, just to the left of it if the panel is right
+		  panel is top oriented, just to the left of it if the panel is right
 		  oriented, and so on)
 		"""
 
