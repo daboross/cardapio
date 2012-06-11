@@ -255,17 +255,16 @@ class Cardapio(dbus.service.Object):
 		Loads the XDG application menus into memory
 		"""
 
-		self._sys_tree = MenuHelper('gnomeccs.menu')
+		self._sys_tree = MenuHelper('gnomecc.menu')
 		self._have_control_center = self._sys_tree.is_valid()
 
 		if not self._have_control_center:
 			self._sys_tree = MenuHelper('settings.menu')
+			logging.warn('Could not find gnomecc.menu. Trying settings.menu.')
 
 			if not self._sys_tree.is_valid():
 				self._sys_tree = MenuHelperInterface()
 				logging.warn('Could not find settings.menu. Deactivating Control Center button.')
-			else:
-				logging.warn('Could not find gnomecc.menu. Using settings.menu.')
 
 
 		self._app_tree = MenuHelper('applications.menu')
