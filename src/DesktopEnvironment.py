@@ -34,6 +34,19 @@ class DesktopEnvironment:
 		except Exception, exception:
 			self.environment = None 
 
+		# We don't need to know all window managers, just a few problematic ones.
+		wms = ['gnome-shell', 'cinnamon']
+
+		for wm in wms:
+
+			process = subprocess.Popen(
+					['pgrep', wm],
+					stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+			stdout, dummy = process.communicate()
+			if stdout:
+				self.environment = wm
+
 		# initialize everything to Gnome defaults, then change them to other DEs as needed
 		self.about_de            = 'gnome-about'
 		self.about_distro        = 'yelp "ghelp:about-%s"' % cardapio.distro_name.lower() # NOTE: i'm assuming this is the pattern for all distros...
@@ -52,6 +65,7 @@ class DesktopEnvironment:
 		elif self.environment == 'mate'        : self.init_mate()
 		elif self.environment == 'gnome'       : self.init_gnome()
 		elif self.environment == 'gnome-shell' : self.init_gnome3()
+		elif self.environment == 'cinnamon'    : self.init_gnome3()
 
 
 	def init_gnome(self):
