@@ -19,8 +19,9 @@
 
 import gmenu
 import os
+from MenuHelperInterface import *
 
-class MenuHelper:
+class GMenuHelper(MenuHelperInterface):
 	"""
 	This class only exists to provide a common API around the XDG Menu module
 	and the Gnome GMenu module.
@@ -42,7 +43,7 @@ class MenuHelper:
 
 	def _wrap_entry(self, entry):
 
-		menuHelper = MenuHelper()
+		menuHelper = GMenuHelper()
 		menuHelper._root = self._root
 		menuHelper._node = entry 
 		return menuHelper

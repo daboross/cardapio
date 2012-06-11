@@ -31,6 +31,7 @@ try:
 	from CardapioSimpleDbusApplet import CardapioSimpleDbusApplet 
 	from CardapioAppletInterface import *
 	from CardapioViewInterface import *
+	from MenuHelperInterface import *
 	import Constants
 
 	import gc
@@ -63,12 +64,12 @@ except Exception, exception:
 
 # if the computer has the gmenu module, use that (wrapped in the GMenuHelper module)
 try:
-	import GMenuHelper as MenuHelper
+	from GMenuHelper import GMenuHelper as MenuHelper
 
 # otherwise use xdg (wrapped in the XDGMenuHelper module)
 except Exception, exception:
 	try:
-		import XDGMenuHelper as MenuHelper
+		from XDGMenuHelper import XDGMenuHelper as MenuHelper
 	except Exception, exception:
 		fatal_error('Fatal error loading Cardapio', exception)
 		sys.exit(1)
@@ -254,14 +255,20 @@ class Cardapio(dbus.service.Object):
 		Loads the XDG application menus into memory
 		"""
 
-		self._sys_tree = MenuHelper.MenuHelper('gnomecc.menu')
+		self._sys_tree = MenuHelper('gnomeccs.menu')
 		self._have_control_center = self._sys_tree.is_valid()
 
 		if not self._have_control_center:
-			self._sys_tree = MenuHelper.MenuHelper('settings.menu')
-			logging.warn('Could not find Control Center menu file. Deactivating Control Center button.')
+			self._sys_tree = MenuHelper('settings.menu')
 
-		self._app_tree = MenuHelper.MenuHelper('applications.menu')
+			if not self._sys_tree.is_valid():
+				self._sys_tree = MenuHelperInterface()
+				logging.warn('Could not find settings.menu. Deactivating Control Center button.')
+			else:
+				logging.warn('Could not find gnomecc.menu. Using settings.menu.')
+
+
+		self._app_tree = MenuHelper('applications.menu')
 		self._app_tree.set_on_change_handler(self._on_menu_data_changed)
 		self._sys_tree.set_on_change_handler(self._on_menu_data_changed)
 

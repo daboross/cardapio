@@ -1273,13 +1273,10 @@ class CardapioGtkView(CardapioViewInterface):
 
 		window.present_with_time(int(time()))
 
-		# HACK: for Compiz, this must take place twice!!
 		if self._wm == 'compiz':
 			window.present_with_time(int(time()))
 
-		# HACK: for Metacity, this is required!!
-		# (but this messes things up with Mutter)
-		if self._wm == 'metacity':
+		else:
 			window.window.focus()
 
 		# TODO: must handle Cinnamon here, since we are getting focus
