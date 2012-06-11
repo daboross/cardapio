@@ -61,6 +61,8 @@ install-alone:
 	cp -f src/OptionsWindow.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/misc.py $(PREFIX)/lib/cardapio/
 	cp -f src/misc.pyc $(PREFIX)/lib/cardapio/
+	cp -f src/MenuHelperInterface.py $(PREFIX)/lib/cardapio/
+	cp -f src/MenuHelperInterface.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/GMenuHelper.py $(PREFIX)/lib/cardapio/
 	cp -f src/GMenuHelper.pyc $(PREFIX)/lib/cardapio/
 	cp -f src/XDGMenuHelper.py $(PREFIX)/lib/cardapio/
