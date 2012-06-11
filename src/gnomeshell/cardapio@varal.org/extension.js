@@ -122,6 +122,8 @@ CardapioApplet.prototype = {
 
 		this.actor.set_child(this._box);
 
+		// TODO: make this a setting
+
 		// add at the leftmost position
 		//this.container = Main.panel._leftBox;
 		//Main.panel._leftBox.insert_child_at_index(this.actor, 0);
@@ -145,6 +147,8 @@ CardapioApplet.prototype = {
 		// add at the right-most position
 		//this.container = Main.panel._rightBox;
 		//Main.panel._rightBox.insert_child_at_index(this.actor, -1);
+
+		// TODO: create a setting for setting up a hotspot
 
 		DBus.session.start_service(cardapio_service_name);
 
