@@ -15,6 +15,7 @@ all:
 	@echo "make install-awn - Install AWN applet."
 	@echo "make install-shell - Install Gnome Shell applet."
 	@echo "make install-mate - Install Mate Panel applet."
+	@echo "make install-cinnamon - Install Cinnamon applet."
 	@echo "make uninstall - Remove from local system"
 	@echo "make uninstall-* - Remove * from local system"
 	@echo "make buildsrc - Generate a deb source package"
@@ -26,7 +27,7 @@ buildsrc:
 clean:
 	find . -name '*.pyc' -delete
 
-install: install-alone install-panel install-docky install-awn install-shell install-mate
+install: install-alone install-panel install-docky install-awn install-shell install-mate install-cinnamon
 
 install-alone:
 	python -m compileall src/
@@ -158,9 +159,13 @@ install-shell: install-alone
 	mkdir -p $(PREFIX)/share/gnome-shell/extensions
 	cp -rf src/gnomeshell/cardapio@varal.org $(PREFIX)/share/gnome-shell/extensions/
 
-uninstall: uninstall-alone uninstall-panel uninstall-docky uninstall-awn uninstall-shell uninstall-mate
+install-cinnamon: install-alone
+	mkdir -p $(PREFIX)/share/cinnamon/applets
+	cp -rf src/cinnamon/cardapio@varal.org $(PREFIX)/share/cinnamon/applets/
 
-uninstall-alone: uninstall-panel uninstall-docky uninstall-awn uninstall-shell
+uninstall: uninstall-alone uninstall-panel uninstall-docky uninstall-awn uninstall-cinnamon uninstall-mate
+
+uninstall-alone: uninstall-panel uninstall-docky uninstall-awn uninstall-cinnamon
 	rm -rf $(PREFIX)/lib/cardapio
 	rm -f $(PREFIX)/bin/cardapio
 	rm -f $(PREFIX)/share/pixmaps/cardapio*
@@ -193,8 +198,8 @@ uninstall-awn:
 	rm -f $(PREFIX)/lib/cardapio/CardapioAwnApplet.*
 	rm -f $(DESTDIR)/usr/share/avant-window-navigator/applets/cardapio.desktop
 
-uninstall-shell:
-	rm -rf $(PREFIX)/share/gnome-shell/extensions/cardapio@varal.org
+uninstall-cinnamon:
+	rm -rf $(PREFIX)/share/cinnamon/applets/cardapio@varal.org
 
 # I hear these "old" entries are useful in Gentoo, so I'm leaving them here:
 

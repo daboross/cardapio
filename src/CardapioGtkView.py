@@ -1226,7 +1226,7 @@ class CardapioGtkView(CardapioViewInterface):
 		"""
 
 		# We don't need to know all WMs, just a few problematic ones.
-		wms = ['gnome-shell', 'compiz', 'metacity']
+		wms = ['gnome-shell', 'compiz', 'metacity', 'cinnamon']
 
 		for wm in wms:
 
@@ -1281,6 +1281,9 @@ class CardapioGtkView(CardapioViewInterface):
 		# (but this messes things up with Mutter)
 		if self._wm == 'metacity':
 			window.window.focus()
+
+		# TODO: must handle Cinnamon here, since we are getting focus
+		# problems in the WM :(
 
 
 	def _toggle_app_button(self, widget, state):
