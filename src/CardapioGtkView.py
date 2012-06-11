@@ -1307,7 +1307,7 @@ class CardapioGtkView(CardapioViewInterface):
 		return False
 
 
-	def _is_cursor_inside_window(self, window):
+	def is_cursor_inside_window(self, window):
 		"""
 		Returns True if the mouse cursor is inside the given window. False
 		otherwise.
@@ -1543,7 +1543,7 @@ class CardapioGtkView(CardapioViewInterface):
 
 		# TODO: consider case where cursor is inside the APPLET too!
 
-		if not self._is_cursor_inside_window(self.main_window):
+		if not self.is_cursor_inside_window(self.main_window):
 			# since we grab keyboard/pointer focus, we want to make sure Cardapio hides
 			# when the user clicks outside its window
 			self.hide_main_window()

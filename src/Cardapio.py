@@ -1798,15 +1798,16 @@ class Cardapio(dbus.service.Object):
 		panel applet
 		"""
 
-		mouse_x, mouse_y = self._view.get_cursor_coordinates()
+		#mouse_x, mouse_y = self._view.get_cursor_coordinates()
 
-		window_width, window_height = self._view.get_window_size()
-		window_x, window_y = self._view.get_window_position()
+		#window_width, window_height = self._view.get_window_size()
+		#window_x, window_y = self._view.get_window_position()
 
-		cursor_in_window_x = (window_x <= mouse_x <= window_x + window_width)
-		cursor_in_window_y = (window_y <= mouse_y <= window_y + window_height)
-		if cursor_in_window_x and cursor_in_window_y: return
+		#cursor_in_window_x = (window_x <= mouse_x <= window_x + window_width)
+		#cursor_in_window_y = (window_y <= mouse_y <= window_y + window_height)
+		#if cursor_in_window_x and cursor_in_window_y: return
 
+		if self._view.is_cursor_inside_window(): return
 		if self._applet.has_mouse_cursor(mouse_x, mouse_y): return
 
 		self._hide()
@@ -2679,7 +2680,8 @@ class Cardapio(dbus.service.Object):
 			logging.error(exception)
 			return False
 
-		if hide: self._hide()
+		if hide:
+			self._hide()
 
 		return True
 
@@ -2927,6 +2929,11 @@ class Cardapio(dbus.service.Object):
 		"""
 		Make Cardapio disappear when it loses focus
 		"""
+
+		# Fixes a bug where the main window sometimes loses focus right after
+		# it is shown -- and for no apparent reason!
+		if time() - self._last_visibility_toggle < Cardapio.MIN_VISIBILITY_TOGGLE_INTERVAL:
+			return
 
 		self._save_dimensions()
 
