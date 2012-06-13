@@ -8,9 +8,9 @@ Homepage: https://launchpad.net/cardapio
 
 Package: cardapio
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, python-gtk2 (>= 2.17), python-glade2, python-gmenu, python-keybinder, xdg-user-dirs, xdg-user-dirs-gtk
+Depends: ${shlibs:Depends}, ${misc:Depends}, python-gtk2 (>= 2.17), python-tk, python-glade2, python-gmenu, python-keybinder, xdg-user-dirs, xdg-user-dirs-gtk
 Recommends: tracker (>= 0.9.0)
-Suggests: cardapio-gnomepanel | cardapio-gnomeshell | cardapio-awn | cardapio-docky, python-tk
+Suggests: cardapio-gnomepanel | cardapio-gnomeshell | cardapio-awn | cardapio-docky
 Description: An alternative Gnome menu, launcher, and much more!
  Cardapio is a launcher that can work in two modes: as a panel applet 
  (in which case it is an alternative to Gnome's application menu 

@@ -186,7 +186,7 @@ uninstall-panel:
 	rm -f $(PREFIX)/bin/cardapio-gnome-panel-applet
 	rm -f $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
 
-uninstall-mate-panel:
+uninstall-mate:
 	rm -f $(PREFIX)/lib/cardapio/cardapio-mate-panel-applet
 	rm -rf $(PREFIX)/bin/cardapio-mate-panel-applet
 	rm -f $(DESTDIR)/usr/lib/matecomponent/servers/cardapio.server

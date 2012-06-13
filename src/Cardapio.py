@@ -124,7 +124,7 @@ class Cardapio(dbus.service.Object):
 
 	LOG_FILE_MAX_SIZE                 = 1000000 # bytes
 
-	version = '0.9.194'
+	version = '0.9.200'
 
 	REMOTE_PROTOCOLS = ['ftp', 'sftp', 'smb']
 
