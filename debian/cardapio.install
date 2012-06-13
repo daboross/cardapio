@@ -11,6 +11,7 @@ usr/lib/cardapio/CardapioViewInterface.py*
 usr/lib/cardapio/Constants.py*
 usr/lib/cardapio/Desktop*.py*
 usr/lib/cardapio/GMenu*.py*
+usr/lib/cardapio/MenuHelperInterface.py*
 usr/lib/cardapio/Icon*.py*
 usr/lib/cardapio/Options*.py*
 usr/lib/cardapio/Settings*.py*
