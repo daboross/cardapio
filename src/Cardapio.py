@@ -341,6 +341,14 @@ class Cardapio(dbus.service.Object):
 		self._quit()
 
 
+	@dbus.service.method(dbus_interface = Constants.BUS_NAME_STR, in_signature = None, out_signature = 'b')
+	def is_visible(self):
+		"""
+		Let's calling applications know whether Cardapio is visible at any moment in time
+		"""
+		return self._visible
+
+
 	@dbus.service.method(dbus_interface = Constants.BUS_NAME_STR, in_signature = None, out_signature = 'ss')
 	def get_applet_configuration(self):
 		"""
