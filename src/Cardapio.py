@@ -348,6 +348,13 @@ class Cardapio(dbus.service.Object):
 		"""
 		return self._visible
 
+	@dbus.service.signal(dbus_interface = Constants.BUS_NAME_STR, signature = None)
+	def on_menu_visibility_changed(self):
+		"""
+		A signal that can be emitted over DBUS to determine exactly when a window is hidden/shown
+		"""
+		# nothing to do here
+		pass
 
 	@dbus.service.method(dbus_interface = Constants.BUS_NAME_STR, in_signature = None, out_signature = 'ss')
 	def get_applet_configuration(self):
@@ -1720,6 +1727,8 @@ class Cardapio(dbus.service.Object):
 			if x < 0: x = None
 			if y < 0: y = None
 			self._show(x, y, force_anchor_right, force_anchor_bottom)
+		# emit the signal
+		self.on_menu_visibility_changed()
 
 		return True
 	
@@ -1781,6 +1790,8 @@ class Cardapio(dbus.service.Object):
 		#self._applet.disable_autohide(False)
 
 		self._visible = False
+		# emit the signal
+		self.on_menu_visibility_changed()
 		self._last_visibility_toggle = time()
 
 		self._view.hide_main_window()
