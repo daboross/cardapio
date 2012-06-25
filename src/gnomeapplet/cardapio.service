@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=org.gnome.panel.applet.CardapioGnomeAppletFactory
+Exec=/usr/lib/gnome-applets/cardapio-gnome-applet

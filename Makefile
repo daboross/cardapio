@@ -12,6 +12,8 @@ all:
 	@echo "make install - Install on local system"
 	@echo "make install-alone - Install just Cardapio."
 	@echo "make install-panel - Install Gnome Panel applet."
+	@echo "make install-applet - Install Gnome 3 Panel applet."
+	@echo "make install-docky - Install AWN applet."
 	@echo "make install-awn - Install AWN applet."
 	@echo "make install-shell - Install Gnome Shell applet."
 	@echo "make install-mate - Install Mate Panel applet."
@@ -27,7 +29,7 @@ buildsrc:
 clean:
 	find . -name '*.pyc' -delete
 
-install: install-alone install-panel install-docky install-awn install-shell install-mate install-cinnamon
+install: install-alone install-panel install-applet install-docky install-awn install-shell install-mate install-cinnamon
 
 install-alone:
 	python -m compileall src/
@@ -93,12 +95,9 @@ install-alone:
 	mkdir -p $(PREFIX)/share/applications
 	cp -f res/cardapio.desktop $(PREFIX)/share/applications/
 
-	mkdir -p $(DESTDIR)/usr/share/dbus-1/services
-	cp res/cardapio.service $(DESTDIR)/usr/share/dbus-1/services/cardapio.service
-
 install-panel: install-alone
 	python -m compileall src/gnomepanel/
-	cp -f src/gnomepanel/cardapio-gnome-panel-applet $(PREFIX)/lib/cardapio/
+	cp -f src/gnomepanel/cardapio-gnome-panel $(PREFIX)/lib/cardapio/
 
 	mkdir -p $(PREFIX)/lib/cardapio/gnomepanel
 	cp -f src/gnomepanel/CardapioGnomeApplet* $(PREFIX)/lib/cardapio/gnomepanel/
@@ -106,15 +105,39 @@ install-panel: install-alone
 	cp -f src/gnomepanel/__init__* $(PREFIX)/lib/cardapio/gnomepanel/
 
 	mkdir -p $(PREFIX)/bin
-	ln -sf ../lib/cardapio/cardapio-gnome-panel-applet $(PREFIX)/bin/cardapio-gnome-panel-applet
+	ln -sf ../lib/cardapio/cardapio-gnome-panel $(PREFIX)/bin/cardapio-gnome-panel
 
-	mkdir -p $(DESTDIR)/usr/lib/bonobo/servers
-	#cp -f src/gnomepanel/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/
+	mkdir -p $(PREFIX)/share/dbus-1/services
+	cp -f src/gnomepanel/cardapio.service $(PREFIX)/share/dbus-1/services/org.gnome.panel.applet.cardapio-gnome-panel.service
+
+	mkdir -p $(PREFIX)/lib/bonobo/servers
+	#cp -f src/gnomepanel/cardapio-gnome-panel.server $(PREFIX)/lib/bonobo/servers/
 	for f in locale/*; \
 		do test -f $$f/LC_MESSAGES/cardapio.mo && msgunfmt -o $$f.po $$f/LC_MESSAGES/cardapio.mo || true; \
 	done
-	intltool-merge -b locale src/gnomepanel/cardapio.server $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
+	intltool-merge -b locale src/gnomepanel/cardapio.server $(PREFIX)/lib/bonobo/servers/cardapio.server
 	rm locale/*.po
+
+install-applet: install-alone
+	python -m compileall src/gnomeapplet/
+	cp -f src/gnomeapplet/cardapio-gnome-applet $(PREFIX)/lib/cardapio/
+
+	mkdir -p $(PREFIX)/lib/cardapio/gnomeapplet
+	cp -f src/gnomeapplet/CardapioGnomeApplet* $(PREFIX)/lib/cardapio/gnomeapplet/
+	cp -f src/gnomeapplet/cardapio-gnome-applet $(PREFIX)/lib/cardapio/
+	cp -f src/gnomeapplet/__init__* $(PREFIX)/lib/cardapio/gnomeapplet/
+
+	mkdir -p $(PREFIX)/bin
+	ln -sf ../lib/cardapio/cardapio-gnome-applet $(PREFIX)/bin/cardapio-gnome-applet
+
+	mkdir -p $(PREFIX)/lib/gnome-applets
+	ln -sf ../cardapio/cardapio-gnome-applet $(PREFIX)/lib/gnome-applets/cardapio-gnome-applet
+
+	mkdir -p $(PREFIX)/share/dbus-1/services
+	cp -f src/gnomeapplet/cardapio.service $(PREFIX)/share/dbus-1/services/org.gnome.panel.applet.CardapioGnomeApplet.service
+
+	mkdir -p $(PREFIX)/share/gnome-panel/4.0/applets
+	cp -f src/gnomeapplet/cardapio.panel-applet $(PREFIX)/share/gnome-panel/4.0/applets/org.gnome.applets.CardapioGnomeApplet.panel-applet
 
 install-mate: install-alone
 	python -m compileall src/matepanel/
@@ -128,12 +151,12 @@ install-mate: install-alone
 	mkdir -p $(PREFIX)/bin
 	ln -sf ../lib/cardapio/cardapio-mate-panel-applet $(PREFIX)/bin/cardapio-mate-panel-applet
 
-	mkdir -p $(DESTDIR)/usr/lib/matecomponent/servers
-	#cp -f src/matepanel/cardapio.server $(DESTDIR)/usr/lib/matecomponent/servers/
+	mkdir -p $(PREFIX)/lib/matecomponent/servers
+	#cp -f src/matepanel/cardapio.server $(PREFIX)/lib/matecomponent/servers/
 	for f in locale/*; \
 		do test -f $$f/LC_MESSAGES/cardapio.mo && msgunfmt -o $$f.po $$f/LC_MESSAGES/cardapio.mo || true; \
 	done
-	intltool-merge -b locale src/matepanel/cardapio.server $(DESTDIR)/usr/lib/matecomponent/servers/cardapio.server
+	intltool-merge -b locale src/matepanel/cardapio.server $(PREFIX)/lib/matecomponent/servers/cardapio.server
 	rm locale/*.po
 
 install-docky: install-alone
@@ -154,8 +177,8 @@ install-awn: install-alone
 	cp -f src/awn/CardapioAwnWrapper.py $(PREFIX)/lib/cardapio/
 	cp -f src/awn/CardapioAwnApplet.py $(PREFIX)/lib/cardapio/
 
-	mkdir -p $(DESTDIR)/usr/share/avant-window-navigator/applets
-	cp -f src/awn/cardapio.desktop $(DESTDIR)/usr/share/avant-window-navigator/applets
+	mkdir -p $(PREFIX)/share/avant-window-navigator/applets
+	cp -f src/awn/cardapio.desktop $(PREFIX)/share/avant-window-navigator/applets
 
 install-shell: install-alone
 	mkdir -p $(PREFIX)/share/gnome-shell/extensions
@@ -182,14 +205,17 @@ uninstall-alone: uninstall-panel uninstall-docky uninstall-awn uninstall-cinnamo
 	rm -f $(PREFIX)/lib/cardapio/plugins/firefox_bookmarks.pyc
 
 uninstall-panel:
+	rm -rf $(PREFIX)/lib/cardapio/gnomepanel
 	rm -f $(PREFIX)/lib/cardapio/cardapio-gnome-panel-applet
 	rm -f $(PREFIX)/bin/cardapio-gnome-panel-applet
 	rm -f $(DESTDIR)/usr/lib/bonobo/servers/cardapio.server
 
-uninstall-mate:
-	rm -f $(PREFIX)/lib/cardapio/cardapio-mate-panel-applet
-	rm -rf $(PREFIX)/bin/cardapio-mate-panel-applet
-	rm -f $(DESTDIR)/usr/lib/matecomponent/servers/cardapio.server
+uninstall-applet:
+	rm -rf $(PREFIX)/lib/cardapio/gnomeapplet
+	rm -f $(PREFIX)/lib/cardapio/cardapio-gnome-applet
+	rm -f $(PREFIX)/lib/gnome-applets/cardapio-gnome-applet
+	rm -f $(PREFIX)/share/dbus-1/services/org.gnome.panel.applet.cardapio.service
+	rm -f $(PREFIX)/share/gnome-panel/4.0/applets/org.gnome.applets.cardapio.panel-applet
 
 uninstall-docky:
 	rm -f $(PREFIX)/share/dockmanager/metadata/cardapio_helper.py.info
@@ -198,7 +224,12 @@ uninstall-docky:
 uninstall-awn:
 	rm -f $(PREFIX)/lib/cardapio/CardapioAwnWrapper.*
 	rm -f $(PREFIX)/lib/cardapio/CardapioAwnApplet.*
-	rm -f $(DESTDIR)/usr/share/avant-window-navigator/applets/cardapio.desktop
+	rm -f $(PREFIX)/share/avant-window-navigator/applets/cardapio.desktop
+
+uninstall-mate:
+	rm -f $(PREFIX)/lib/cardapio/cardapio-mate-panel-applet
+	rm -rf $(PREFIX)/bin/cardapio-mate-panel-applet
+	rm -f $(DESTDIR)/usr/lib/matecomponent/servers/cardapio.server
 
 uninstall-cinnamon:
 	rm -rf $(PREFIX)/share/cinnamon/applets/cardapio@varal.org

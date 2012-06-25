@@ -1,4 +1,4 @@
-usr/bin/cardapio-gnome-panel-applet
-usr/lib/bonobo/servers/cardapio.server
-usr/lib/cardapio/cardapio-gnome-panel-applet
+usr/bin/cardapio-gnome-panel
+usr/lib/cardapio/cardapio-gnome-panel
 usr/lib/cardapio/gnomepanel
+usr/lib/bonobo/servers/cardapio.server

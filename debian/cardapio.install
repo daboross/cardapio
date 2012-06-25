@@ -21,5 +21,3 @@ usr/share/applications/cardapio.desktop
 usr/share/pixmaps/cardapio*.png
 usr/share/pixmaps/cardapio*.svg
 usr/share/locale
-usr/share/dbus-1/services/cardapio.service
-

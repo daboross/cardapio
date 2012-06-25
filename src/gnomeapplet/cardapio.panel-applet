@@ -1,0 +1,10 @@
+[Applet Factory]
+Id=CardapioGnomeAppletFactory
+Location=usr/lib/cardapio/gnomeapplet/cardapio-gnome-applet
+Name=Cardapio Gnome Applet Factory
+
+[CardapioGnomeApplet]
+Name=Cardapio
+Description=Cardapio for Gnome 3
+Icon=gnome-main-menu
+BonoboId=OAFIID:CardapioGnomeAppletFactory
