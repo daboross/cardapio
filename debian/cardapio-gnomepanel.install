@@ -1,4 +1,9 @@
 usr/bin/cardapio-gnome-panel
-usr/lib/cardapio/cardapio-gnome-panel
+usr/bin/cardapio-gnome3-panel
 usr/lib/cardapio/gnomepanel
+usr/lib/cardapio/cardapio-gnome-panel
+usr/lib/cardapio/cardapio-gnome3-panel
+usr/lib/gnome-applets/cardapio-gnome-panel
 usr/lib/bonobo/servers/cardapio.server
+usr/share/dbus-1/services/org.gnome.panel.applet.CardapioGnomeApplet.service
+usr/share/gnome-panel/4.0/applets/org.gnome.applets.CardapioGnomeApplet.panel-applet

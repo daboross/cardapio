@@ -12,7 +12,6 @@ all:
 	@echo "make install - Install on local system"
 	@echo "make install-alone - Install just Cardapio."
 	@echo "make install-panel - Install Gnome Panel applet."
-	@echo "make install-applet - Install Gnome 3 Panel applet."
 	@echo "make install-docky - Install AWN applet."
 	@echo "make install-awn - Install AWN applet."
 	@echo "make install-shell - Install Gnome Shell applet."
@@ -29,7 +28,7 @@ buildsrc:
 clean:
 	find . -name '*.pyc' -delete
 
-install: install-alone install-panel install-applet install-docky install-awn install-shell install-mate install-cinnamon
+install: install-alone install-panel install-docky install-awn install-shell install-mate install-cinnamon
 
 install-alone:
 	python -m compileall src/
@@ -95,20 +94,32 @@ install-alone:
 	mkdir -p $(PREFIX)/share/applications
 	cp -f res/cardapio.desktop $(PREFIX)/share/applications/
 
+	mkdir -p $(PREFIX)/share/dbus-1/services
+	cp -f res/cardapio.service $(PREFIX)/share/dbus-1/services/cardapio.service
+
 install-panel: install-alone
 	python -m compileall src/gnomepanel/
 	cp -f src/gnomepanel/cardapio-gnome-panel $(PREFIX)/lib/cardapio/
+	cp -f src/gnomepanel/cardapio-gnome3-panel $(PREFIX)/lib/cardapio/
 
 	mkdir -p $(PREFIX)/lib/cardapio/gnomepanel
 	cp -f src/gnomepanel/CardapioGnomeApplet* $(PREFIX)/lib/cardapio/gnomepanel/
 	cp -f src/gnomepanel/CardapioGnomeAppletFactory* $(PREFIX)/lib/cardapio/gnomepanel/
+	cp -f src/gnomepanel/CardapioGnome3Applet* $(PREFIX)/lib/cardapio/gnomepanel/
 	cp -f src/gnomepanel/__init__* $(PREFIX)/lib/cardapio/gnomepanel/
 
 	mkdir -p $(PREFIX)/bin
 	ln -sf ../lib/cardapio/cardapio-gnome-panel $(PREFIX)/bin/cardapio-gnome-panel
+	ln -sf ../lib/cardapio/cardapio-gnome3-panel $(PREFIX)/bin/cardapio-gnome3-panel
+
+	mkdir -p $(PREFIX)/lib/gnome-applets
+	ln -sf ../cardapio/cardapio-gnome3-panel $(PREFIX)/lib/gnome-applets/cardapio-gnome-panel
 
 	mkdir -p $(PREFIX)/share/dbus-1/services
-	cp -f src/gnomepanel/cardapio.service $(PREFIX)/share/dbus-1/services/org.gnome.panel.applet.cardapio-gnome-panel.service
+	cp -f src/gnomepanel/cardapio.service $(PREFIX)/share/dbus-1/services/org.gnome.panel.applet.CardapioGnomeApplet.service
+
+	mkdir -p $(PREFIX)/share/gnome-panel/4.0/applets
+	cp -f src/gnomepanel/cardapio.panel-applet $(PREFIX)/share/gnome-panel/4.0/applets/org.gnome.applets.CardapioGnomeApplet.panel-applet
 
 	mkdir -p $(PREFIX)/lib/bonobo/servers
 	#cp -f src/gnomepanel/cardapio-gnome-panel.server $(PREFIX)/lib/bonobo/servers/
@@ -117,27 +128,6 @@ install-panel: install-alone
 	done
 	intltool-merge -b locale src/gnomepanel/cardapio.server $(PREFIX)/lib/bonobo/servers/cardapio.server
 	rm locale/*.po
-
-install-applet: install-alone
-	python -m compileall src/gnomeapplet/
-	cp -f src/gnomeapplet/cardapio-gnome-applet $(PREFIX)/lib/cardapio/
-
-	mkdir -p $(PREFIX)/lib/cardapio/gnomeapplet
-	cp -f src/gnomeapplet/CardapioGnomeApplet* $(PREFIX)/lib/cardapio/gnomeapplet/
-	cp -f src/gnomeapplet/cardapio-gnome-applet $(PREFIX)/lib/cardapio/
-	cp -f src/gnomeapplet/__init__* $(PREFIX)/lib/cardapio/gnomeapplet/
-
-	mkdir -p $(PREFIX)/bin
-	ln -sf ../lib/cardapio/cardapio-gnome-applet $(PREFIX)/bin/cardapio-gnome-applet
-
-	mkdir -p $(PREFIX)/lib/gnome-applets
-	ln -sf ../cardapio/cardapio-gnome-applet $(PREFIX)/lib/gnome-applets/cardapio-gnome-applet
-
-	mkdir -p $(PREFIX)/share/dbus-1/services
-	cp -f src/gnomeapplet/cardapio.service $(PREFIX)/share/dbus-1/services/org.gnome.panel.applet.CardapioGnomeApplet.service
-
-	mkdir -p $(PREFIX)/share/gnome-panel/4.0/applets
-	cp -f src/gnomeapplet/cardapio.panel-applet $(PREFIX)/share/gnome-panel/4.0/applets/org.gnome.applets.CardapioGnomeApplet.panel-applet
 
 install-mate: install-alone
 	python -m compileall src/matepanel/

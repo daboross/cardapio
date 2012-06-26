@@ -196,5 +196,3 @@ if len(sys.argv) == 2:
 
 else:
 	cardapio_show(centered = True)
-
-

@@ -22,7 +22,7 @@ from gi.repository import Gtk
 from gi.repository import PanelApplet
 import gi
 
-from gnomeapplet.CardapioGnomeApplet import CardapioGnomeAppletFactory
+from gnomepanel.CardapioGnome3Applet import CardapioGnomeAppletFactory
 
 # testing for execution
 if __name__ == '__main__':

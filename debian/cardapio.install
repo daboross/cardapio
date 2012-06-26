@@ -17,6 +17,7 @@ usr/lib/cardapio/Options*.py*
 usr/lib/cardapio/Settings*.py*
 usr/lib/cardapio/XDG*.py*
 usr/lib/cardapio/misc.py*
+usr/share/dbus-1/services/cardapio.service
 usr/share/applications/cardapio.desktop
 usr/share/pixmaps/cardapio*.png
 usr/share/pixmaps/cardapio*.svg

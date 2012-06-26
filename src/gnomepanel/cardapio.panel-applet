@@ -1,6 +1,6 @@
 [Applet Factory]
 Id=CardapioGnomeAppletFactory
-Location=usr/lib/cardapio/gnomeapplet/cardapio-gnome-applet
+Location=/usr/lib/gnome-applets/cardapio-gnome-panel
 Name=Cardapio Gnome Applet Factory
 
 [CardapioGnomeApplet]

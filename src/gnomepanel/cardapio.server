@@ -1,6 +1,6 @@
 <oaf_info>
 <oaf_server iid="OAFIID:GNOME_Cardapio_Factory"
-            type="exe" location="cardapio-gnome-panel-applet">
+            type="exe" location="cardapio-gnome-panel">
 
         <oaf_attribute name="repo_ids" type="stringv">
                 <item value="IDL:Bonobo/GenericFactory:1.0"/>

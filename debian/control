@@ -7,9 +7,9 @@ Standards-Version: 3.8.3
 Homepage: https://launchpad.net/cardapio
 
 Package: cardapio
-Architecture: any
+Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, python-gtk2 (>= 2.17), python-tk, python-glade2, python-gmenu, python-keybinder, xdg-user-dirs, xdg-user-dirs-gtk
-Recommends: tracker (>= 0.9.0)
+Recommends: tracker
 Suggests: cardapio-gnomepanel | cardapio-gnomeshell | cardapio-awn | cardapio-docky
 Description: An alternative Gnome menu, launcher, and much more!
  Cardapio is a launcher that can work in two modes: as a panel applet
@@ -20,7 +20,7 @@ Description: An alternative Gnome menu, launcher, and much more!
  Give it a try today!
 
 Package: cardapio-awn
-Architecture: any
+Architecture: all
 Depends: cardapio, avant-window-navigator (>= 0.4.0) | avant-window-navigator-trunk (>= 0.4.0)
 Description: Cardapio applet for Avant Window Navigator
  Cardapio is a launcher that can work in two modes: as a panel applet
@@ -34,7 +34,7 @@ Description: Cardapio applet for Avant Window Navigator
  the Cardapio menu.
 
 Package: cardapio-docky
-Architecture: any
+Architecture: all
 Depends: cardapio, docky, python-dockmanager | python-docky
 Description: Cardapio helper for Docky
  Cardapio is a launcher that can work in two modes: as a panel applet
@@ -49,9 +49,8 @@ Description: Cardapio helper for Docky
  gconf, but this package aims to  automate the process.
 
 Package: cardapio-gnomepanel
-Architecture: any
-Depends: cardapio, gnome-panel, python-gnomeapplet
-Conflicts: cardapio-gnomeapplet
+Architecture: all
+Depends: cardapio, gnome-panel, python-gnomeapplet | gir1.2-panelapplet-4.0, python-gtk2 | gir1.2-gtk-3.0, gnome-icon-theme
 Description: Cardapio applet for Gnome Panel
  Cardapio is a launcher that can work in two modes: as a panel applet
  (in which case it is an alternative to Gnome's application menu
@@ -63,23 +62,8 @@ Description: Cardapio applet for Gnome Panel
  This is a package that also installs the dependencies required to
  allow Cardapio to run in the Gnome panel.
 
-Package: cardapio-gnomeapplet
-Architecture: any
-Depends: cardapio, gnome-panel, gir1.2-gtk-3.0, gir1.2-panelapplet-4.0, gnome-icon-theme
-Conflicts: cardapio-gnomepanel
-Description: Cardapio applet for Gnome 3 Panel
- Cardapio is a launcher that can work in two modes: as a panel applet
- (in which case it is an alternative to Gnome's application menu
- applet) or as a launcher (in which case it is a lightweight
- alternative to Gnome Do). Either way, it features a beautiful,
- well-thought-out interface, supports tracker searching, and much more.
- Give it a try today!
- .
- This is a package that also installs the dependencies required to
- allow Cardapio to run in the Gnome 3 panel.
-
 Package: cardapio-matepanel
-Architecture: any
+Architecture: all
 Depends: cardapio, mate-panel, mate-applets
 Description: Cardapio applet for Mate Panel
  Cardapio is a launcher that can work in two modes: as a panel applet
@@ -93,7 +77,7 @@ Description: Cardapio applet for Mate Panel
  allow Cardapio to run in the Mate panel.
 
 Package: cardapio-gnomeshell
-Architecture: any
+Architecture: all
 Depends: cardapio, gnome-shell
 Description: Cardapio extension for Gnome Shell
  Cardapio is a launcher that can work in two modes: as a panel applet
@@ -107,7 +91,7 @@ Description: Cardapio extension for Gnome Shell
  Cardapio to your Gnome Shell top panel.
 
 Package: cardapio-cinnamon
-Architecture: any
+Architecture: all
 Depends: cardapio, cinnamon
 Description: Cardapio extension for Cinnamon
  Cardapio is a launcher that can work in two modes: as a panel applet

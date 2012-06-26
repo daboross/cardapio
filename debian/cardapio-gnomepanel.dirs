@@ -1,3 +1,6 @@
 usr/bin
 usr/lib/bonobo/servers
 usr/lib/cardapio/gnomepanel
+usr/lib/gnome-applets
+usr/share/dbus-1/services
+usr/share/gnome-panel/4.0/applets

@@ -2,7 +2,7 @@
 #
 #  Cardapio is an alternative menu applet, launcher, and much more!
 #  Copyright (C) 2010 Cardapio Team (tvst@hotmail.com)
-# 
+#
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
 #  the Free Software Foundation, either version 3 of the License, or
@@ -27,5 +27,3 @@ os.environ['UBUNTU_MENUPROXY'] = ''
 
 gnomeapplet.bonobo_factory('OAFIID:GNOME_Cardapio_Factory',
 		gnomeapplet.Applet.__gtype__, 'Cardapio', '0', CardapioGnomeAppletFactory)
-
-

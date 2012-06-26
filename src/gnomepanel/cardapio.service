@@ -1,4 +1,3 @@
 [D-BUS Service]
-Name=org.varal.Cardapio
-Exec=/usr/bin/cardapio hidden
-
+Name=org.gnome.panel.applet.CardapioGnomeAppletFactory
+Exec=/usr/lib/gnome-applets/cardapio-gnome-panel
