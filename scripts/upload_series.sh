@@ -2,7 +2,7 @@
 
 # Version v1.2
 
-dists="lucid maverick natty oneiric"
+dists="lucid maverick natty oneiric precise quantal"
 srcs="$(cd .; pwd)"
 noask="no"
 repo="ppa:cardapio-team/unstable"
