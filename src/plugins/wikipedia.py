@@ -24,144 +24,144 @@
 # asynchronous web requests and the lifecycle of plugin so I'm leaving this
 # unimplemented and waiting for somebody brave enough ;)
 class CardapioPlugin(CardapioPluginInterface):
-	"""
-	Wikipedia plugin based on it's "unofficial" API. Documentation can
-	be found at: http://en.wikipedia.org/w/api.php.
+    """
+    Wikipedia plugin based on it's "unofficial" API. Documentation can
+    be found at: http://en.wikipedia.org/w/api.php.
 
-	All web requests are done in asynchronous and cancellable manner.
-	"""
+    All web requests are done in asynchronous and cancellable manner.
+    """
 
-	# Cardapio's variables
-	author = 'Pawel Bara'
-	name = _('Wikipedia')
-	description = _('Search for results in Wikipedia')
-	version = '0.95'
+    # Cardapio's variables
+    author = 'Pawel Bara'
+    name = _('Wikipedia')
+    description = _('Search for results in Wikipedia')
+    version = '0.95'
 
-	url = ''
-	help_text = ''
+    url = ''
+    help_text = ''
 
-	plugin_api_version = 1.40
+    plugin_api_version = 1.40
 
-	search_delay_type = 'remote'
+    search_delay_type = 'remote'
 
-	default_keyword = 'wikipedia'
+    default_keyword = 'wikipedia'
 
-	category_name = _('Wikipedia Results')
-	category_tooltip = _('Results found in Wikipedia')
+    category_name = _('Wikipedia Results')
+    category_tooltip = _('Results found in Wikipedia')
 
-	category_icon = 'system-search'
-	icon          = 'system-search'
-	fallback_icon = ''
+    category_icon = 'system-search'
+    icon = 'system-search'
+    fallback_icon = ''
 
-	hide_from_sidebar = True
+    hide_from_sidebar = True
 
-	def __init__(self, cardapio_proxy, category):
+    def __init__(self, cardapio_proxy, category):
 
-		self.cardapio = cardapio_proxy
+        self.cardapio = cardapio_proxy
 
-		try:
-			import json
-			import gio
-			import urllib
-			from glib import GError
+        try:
+            import json
+            import gio
+            import urllib
+            from glib import GError
 
-		except Exception, exception:
-			self.cardapio.write_to_log(self, 'Could not import certain modules', is_error = True)
-			self.cardapio.write_to_log(self, exception, is_error = True)
-			self.loaded = False
-			return
-		
-		self.json   = json
-		self.gio    = gio
-		self.urllib = urllib
-		self.GError = GError
+        except Exception, exception:
+            self.cardapio.write_to_log(self, 'Could not import certain modules', is_error=True)
+            self.cardapio.write_to_log(self, exception, is_error=True)
+            self.loaded = False
+            return
 
-		self.cancellable = self.gio.Cancellable()
+        self.json = json
+        self.gio = gio
+        self.urllib = urllib
+        self.GError = GError
 
-		# Wikipedia's unofficial API arguments (search truncated to
-		# maximum four results, formatted as json)
-		self.api_base_args = {
-			'action': 'opensearch',
-			'format': 'json'
-		}
+        self.cancellable = self.gio.Cancellable()
 
-		# Wikipedia's base URLs (search and show details variations)
-		self.api_base_url = 'http://en.wikipedia.org/w/api.php?{0}'
-		self.web_base_url = 'http://en.wikipedia.org/wiki/{0}'
+        # Wikipedia's unofficial API arguments (search truncated to
+        # maximum four results, formatted as json)
+        self.api_base_args = {
+        'action': 'opensearch',
+        'format': 'json'
+        }
 
-		self.loaded = True
+        # Wikipedia's base URLs (search and show details variations)
+        self.api_base_url = 'http://en.wikipedia.org/w/api.php?{0}'
+        self.web_base_url = 'http://en.wikipedia.org/wiki/{0}'
 
-	def search(self, text, result_limit):
-		if len(text) == 0:
-			return
+        self.loaded = True
 
-		self.cardapio.write_to_log(self, 'searching for {0} in Wikipedia'.format(text), is_debug = True)
+    def search(self, text, result_limit):
+        if len(text) == 0:
+            return
 
-		self.cancellable.reset()
+        self.cardapio.write_to_log(self, 'searching for {0} in Wikipedia'.format(text), is_debug=True)
 
-		# prepare final API URL
-		current_args = self.api_base_args.copy()
-		current_args['limit'] = result_limit
-		current_args['search'] = text
+        self.cancellable.reset()
 
-		final_url = self.api_base_url.format(self.urllib.urlencode(current_args))
+        # prepare final API URL
+        current_args = self.api_base_args.copy()
+        current_args['limit'] = result_limit
+        current_args['search'] = text
 
-		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
+        final_url = self.api_base_url.format(self.urllib.urlencode(current_args))
 
-		# asynchronous and cancellable IO call
-		self.current_stream = self.gio.File(final_url)
-		self.current_stream.load_contents_async(self.show_search_results,
-			cancellable = self.cancellable,
-			user_data = text)
+        self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug=True)
 
-	def show_search_results(self, gdaemonfile, result, text):
-		"""
-		Callback to asynchronous IO (Wikipedia's API call).
-		"""
+        # asynchronous and cancellable IO call
+        self.current_stream = self.gio.File(final_url)
+        self.current_stream.load_contents_async(self.show_search_results,
+                                                cancellable=self.cancellable,
+                                                user_data=text)
 
-		# watch out for connection problems
-		try:
-			json_body = self.current_stream.load_contents_finish(result)[0]
+    def show_search_results(self, gdaemonfile, result, text):
+        """
+        Callback to asynchronous IO (Wikipedia's API call).
+        """
 
-			# watch out for empty input
-			if len(json_body) == 0:
-				return
+        # watch out for connection problems
+        try:
+            json_body = self.current_stream.load_contents_finish(result)[0]
 
-			response = self.json.loads(json_body)
-		except (ValueError, self.GError) as ex:
-			self.cardapio.handle_search_error(self, 'error while obtaining data: {0}'.format(str(ex)))
-			return
+            # watch out for empty input
+            if len(json_body) == 0:
+                return
 
-		# decode the result
-		try:
-			items = []
+            response = self.json.loads(json_body)
+        except (ValueError, self.GError) as ex:
+            self.cardapio.handle_search_error(self, 'error while obtaining data: {0}'.format(str(ex)))
+            return
 
-			# response[1] because the response looks like: [text, [result_list]]
-			# append results (if any)
-			for item in response[1]:
-				# TODO: wikipedia sometimes returns item names encoded in unicode (try
-				# searching for 'aaaaaaaaaaaaa' for example); we use those names as part
-				# of a URL so we need to encode the special characters; unfortunately,
-				# Python's 2.* urllib.quote throws an exception when it's given unicode
-				# argument - what now?
-				item_url = self.web_base_url.format(self.urllib.quote(str(item)))
-				items.append({
-					'name'         : item,
-					'tooltip'      : item_url,
-					'icon name'    : 'text-html',
-					'type'         : 'xdg',
-					'command'      : item_url,
-					'context menu' : None
-				})
+        # decode the result
+        try:
+            items = []
 
-			# pass the results to Cardapio
-			self.cardapio.handle_search_result(self, items, text)
+            # response[1] because the response looks like: [text, [result_list]]
+            # append results (if any)
+            for item in response[1]:
+                # TODO: wikipedia sometimes returns item names encoded in unicode (try
+                # searching for 'aaaaaaaaaaaaa' for example); we use those names as part
+                # of a URL so we need to encode the special characters; unfortunately,
+                # Python's 2.* urllib.quote throws an exception when it's given unicode
+                # argument - what now?
+                item_url = self.web_base_url.format(self.urllib.quote(str(item)))
+                items.append({
+                'name': item,
+                'tooltip': item_url,
+                'icon name': 'text-html',
+                'type': 'xdg',
+                'command': item_url,
+                'context menu': None
+                })
 
-		except KeyError:
-			self.cardapio.handle_search_error(self, "Incorrect Wikipedia's JSON structure")
+            # pass the results to Cardapio
+            self.cardapio.handle_search_result(self, items, text)
 
-	def cancel(self):
-		self.cardapio.write_to_log(self, 'cancelling a recent Wikipedia search (if any)', is_debug = True)
+        except KeyError:
+            self.cardapio.handle_search_error(self, "Incorrect Wikipedia's JSON structure")
 
-		if not self.cancellable.is_cancelled():
-			self.cancellable.cancel()
+    def cancel(self):
+        self.cardapio.write_to_log(self, 'cancelling a recent Wikipedia search (if any)', is_debug=True)
+
+        if not self.cancellable.is_cancelled():
+            self.cancellable.cancel()

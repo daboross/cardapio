@@ -19,35 +19,35 @@
 
 
 class MenuHelperInterface(object):
-	"""
-	Common API for XDG and Gnome menus.
-	"""
+    """
+    Common API for XDG and Gnome menus.
+    """
 
-	def is_valid(self):
-		return False
+    def is_valid(self):
+        return False
 
-	def __iter__(self):	
-		return iter([])
+    def __iter__(self):
+        return iter([])
 
-	def is_menu(self):
-		return False
+    def is_menu(self):
+        return False
 
-	def is_entry(self):
-		return False
+    def is_entry(self):
+        return False
 
-	def get_name(self):
-		return None
+    def get_name(self):
+        return None
 
-	def get_icon(self):
-		return None
+    def get_icon(self):
+        return None
 
-	def get_comment(self):
-		return None
+    def get_comment(self):
+        return None
 
-	def get_path(self):
-		return None
+    def get_path(self):
+        return None
 
-	def set_on_change_handler(self, handler):
-		pass
+    def set_on_change_handler(self, handler):
+        pass
 
 

@@ -17,10 +17,10 @@
 
 from Cardapio import Cardapio
 from CardapioMateApplet import CardapioMateApplet
-import Constants 
+import Constants
+
 
 def CardapioMateAppletFactory(applet, iid):
-
-	mate_panel_applet = CardapioMateApplet(applet)
-	cardapio = Cardapio(show = Constants.DONT_SHOW, panel_applet = mate_panel_applet)
+    mate_panel_applet = CardapioMateApplet(applet)
+    cardapio = Cardapio(show=Constants.DONT_SHOW, panel_applet=mate_panel_applet)
 

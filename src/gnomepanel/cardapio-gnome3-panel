@@ -17,17 +17,14 @@
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-import sys
-from gi.repository import Gtk
 from gi.repository import PanelApplet
-import gi
 
 from gnomepanel.CardapioGnome3Applet import CardapioGnomeAppletFactory
 
 # testing for execution
 if __name__ == '__main__':
-	print('Starting factory')
-	PanelApplet.Applet.factory_main("CardapioGnomeAppletFactory",
-				PanelApplet.Applet.__gtype__,
-				CardapioGnomeAppletFactory,
-				None)
+    print('Starting factory')
+    PanelApplet.Applet.factory_main("CardapioGnomeAppletFactory",
+                                    PanelApplet.Applet.__gtype__,
+                                    CardapioGnomeAppletFactory,
+                                    None)

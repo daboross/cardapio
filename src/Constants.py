@@ -25,26 +25,26 @@
 APP = 'cardapio'
 
 BUS_NAME_STR = 'org.varal.Cardapio'
-BUS_OBJ_STR  = '/org/varal/Cardapio'
+BUS_OBJ_STR = '/org/varal/Cardapio'
 
-DONT_SHOW       = 0
-SHOW_CENTERED   = 1
+DONT_SHOW = 0
+SHOW_CENTERED = 1
 SHOW_NEAR_MOUSE = 2
 
 CORE_PLUGINS = [
-		'applications',
-		'command_launcher',
-		'google',
-		'google_localized',
-		'pinned',
-		'places',
-		'software_center',
-		'tracker',
-		'tracker_fts',
-		'zeitgeist_smart',
-		'zeitgeist_categorized',
-		'zeitgeist_simple',
-		]
+    'applications',
+    'command_launcher',
+    'google',
+    'google_localized',
+    'pinned',
+    'places',
+    'software_center',
+    'tracker',
+    'tracker_fts',
+    'zeitgeist_smart',
+    'zeitgeist_categorized',
+    'zeitgeist_simple',
+]
 
 REQUIRED_PLUGINS = ['pinned']
 BUILTIN_PLUGINS = ['applications', 'places', 'pinned']

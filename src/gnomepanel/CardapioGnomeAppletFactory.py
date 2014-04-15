@@ -17,8 +17,9 @@
 
 from Cardapio import Cardapio
 from CardapioGnomeApplet import CardapioGnomeApplet
-import Constants 
+import Constants
+
 
 def CardapioGnomeAppletFactory(applet, iid):
-	panel_applet = CardapioGnomeApplet(applet)
-	cardapio = Cardapio(show = Constants.DONT_SHOW, panel_applet = panel_applet)
+    panel_applet = CardapioGnomeApplet(applet)
+    cardapio = Cardapio(show=Constants.DONT_SHOW, panel_applet=panel_applet)

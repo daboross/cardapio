@@ -16,266 +16,265 @@
 #
 
 class CardapioPlugin(CardapioPluginInterface):
-	"""
-	eBay search plugin based on it's Finding API documented at:
-	http://developer.ebay.com/products/finding/
+    """
+    eBay search plugin based on it's Finding API documented at:
+    http://developer.ebay.com/products/finding/
 
-	Please note, that this API limits the number of calls to 5000 per IP
-	and day.
+    Please note, that this API limits the number of calls to 5000 per IP
+    and day.
 
-	All calls are localized, meaning that they are using eBay version local
-	to the user. The specific version being used is derived from the user's
-	computer locale.
+    All calls are localized, meaning that they are using eBay version local
+    to the user. The specific version being used is derived from the user's
+    computer locale.
 
-	For a list of locale supported by eBay check:
-	http://developer.ebay.com/DevZone/finding/Concepts/SiteIDToGlobalID.html
-	The listing there means that the plugin is localized for more than 20
-	countries. :) Nevertheless, we must have a fallback strategy and we use
-	the US version in this role.
+    For a list of locale supported by eBay check:
+    http://developer.ebay.com/DevZone/finding/Concepts/SiteIDToGlobalID.html
+    The listing there means that the plugin is localized for more than 20
+    countries. :) Nevertheless, we must have a fallback strategy and we use
+    the US version in this role.
 
-	All of the plugin's web requests are asynchronous and cancellable.
-	"""
+    All of the plugin's web requests are asynchronous and cancellable.
+    """
 
-	# Cardapio's variables
-	author = 'Pawel Bara'
-	name = _('eBay')
-	description = _('Search for items on eBay')
-	version = '0.93'
+    # Cardapio's variables
+    author = 'Pawel Bara'
+    name = _('eBay')
+    description = _('Search for items on eBay')
+    version = '0.93'
 
-	url = ''
-	help_text = ''
+    url = ''
+    help_text = ''
 
-	plugin_api_version = 1.40
+    plugin_api_version = 1.40
 
-	search_delay_type = 'remote'
+    search_delay_type = 'remote'
 
-	default_keyword = 'ebay'
+    default_keyword = 'ebay'
 
-	category_name = _('eBay Results')
-	category_tooltip = _('Items found on eBay')
+    category_name = _('eBay Results')
+    category_tooltip = _('Items found on eBay')
 
-	category_icon = 'system-search'
-	icon          = 'system-search'
-	fallback_icon = ''
+    category_icon = 'system-search'
+    icon = 'system-search'
+    fallback_icon = ''
 
-	hide_from_sidebar = True
+    hide_from_sidebar = True
 
-	def __init__(self, cardapio_proxy, category):
+    def __init__(self, cardapio_proxy, category):
 
-		self.cardapio = cardapio_proxy
+        self.cardapio = cardapio_proxy
 
-		try:
-			import json
-			import gio
-			import urllib
+        try:
+            import json
+            import gio
+            import urllib
 
-			from glib import GError
-			from locale import getdefaultlocale
+            from glib import GError
+            from locale import getdefaultlocale
 
-		except Exception, exception:
-			self.cardapio.write_to_log(self, 'Could not import certain modules', is_error = True)
-			self.cardapio.write_to_log(self, exception, is_error = True)
-			self.loaded = False
-			return
+        except Exception, exception:
+            self.cardapio.write_to_log(self, 'Could not import certain modules', is_error=True)
+            self.cardapio.write_to_log(self, exception, is_error=True)
+            self.loaded = False
+            return
 
-		self.json             = json
-		self.gio              = gio
-		self.urllib           = urllib
-		self.GError           = GError
-		self.getdefaultlocale = getdefaultlocale
-		
-		self.cancellable = self.gio.Cancellable()
+        self.json = json
+        self.gio = gio
+        self.urllib = urllib
+        self.GError = GError
+        self.getdefaultlocale = getdefaultlocale
 
-		# eBay's API arguments (my API key, 'find' operation, JSON response format,
-		# and locale information)
-		self.api_base_args = {
-			'SECURITY-APPNAME'     : 'Cardapio-9704-40b3-8e17-cfad62dd6c45',
-			'OPERATION-NAME'       : 'findItemsByKeywords',
-			'RESPONSE-DATA-FORMAT' : 'JSON',
-			'GLOBAL-ID'            : self.get_global_id()
-		}
+        self.cancellable = self.gio.Cancellable()
 
-		# eBay's base URLs (search and a fallback search more variations)
-		self.api_base_url = 'http://svcs.ebay.com/services/search/FindingService/v1?{0}'
-		self.web_base_url = 'http://shop.ebay.com/?{0}'
+        # eBay's API arguments (my API key, 'find' operation, JSON response format,
+        # and locale information)
+        self.api_base_args = {
+        'SECURITY-APPNAME': 'Cardapio-9704-40b3-8e17-cfad62dd6c45',
+        'OPERATION-NAME': 'findItemsByKeywords',
+        'RESPONSE-DATA-FORMAT': 'JSON',
+        'GLOBAL-ID': self.get_global_id()
+        }
 
-		self.loaded = True
+        # eBay's base URLs (search and a fallback search more variations)
+        self.api_base_url = 'http://svcs.ebay.com/services/search/FindingService/v1?{0}'
+        self.web_base_url = 'http://shop.ebay.com/?{0}'
 
-	def get_global_id(self):
-		"""
-		Tries to get a locale specific GLOBAL-ID argument for eBay's API.
-		For more information check those two websites:
-		http://developer.ebay.com/DevZone/finding/Concepts/SiteIDToGlobalID.html
-		http://developer.ebay.com/DevZone/finding/CallRef/Enums/GlobalIdList.html
+        self.loaded = True
 
-		We use 'EBAY-US' as a fallback strategy.
-		"""
+    def get_global_id(self):
+        """
+        Tries to get a locale specific GLOBAL-ID argument for eBay's API.
+        For more information check those two websites:
+        http://developer.ebay.com/DevZone/finding/Concepts/SiteIDToGlobalID.html
+        http://developer.ebay.com/DevZone/finding/CallRef/Enums/GlobalIdList.html
 
-		default = 'EBAY-US'
+        We use 'EBAY-US' as a fallback strategy.
+        """
 
-		# get and parse the language code
-		lang_code = self.getdefaultlocale()[0]
+        default = 'EBAY-US'
 
-		if lang_code is None:
-			return default
+        # get and parse the language code
+        lang_code = self.getdefaultlocale()[0]
 
-		lang = lang_code[:2].lower()
-		dialect = lang_code[3:].lower()
+        if lang_code is None:
+            return default
 
-		# try to find a mapping...
-		result = None
-		if lang == 'en':
-			if dialect == 'gb':
-				result = 'EBAY-GB'
-			elif dialect == 'ca':
-				result = 'EBAY-ENCA'
-			elif dialect == 'ie':
-				result = 'EBAY-IE'
-			elif dialect == 'in':
-				result = 'EBAY-IN'
-			elif dialect == 'my':
-				result = 'EBAY-MY'
-			elif dialect == 'ph':
-				result = 'EBAY-PH'
-			elif dialect == 'sg':
-				result = 'EBAY-SG'
-			elif dialect == 'au':
-				result = 'EBAY-AU'
-		elif lang == 'fr':
-			if dialect == 'be':
-				result = 'EBAY-FRBE'
-			elif dialect == 'ca':
-				result = 'EBAY-FRCA'
-			else:
-				result = 'EBAY-FR'
-		elif lang == 'de':
-			if dialect == 'at':
-				result = 'EBAY-AT'
-			elif dialect == 'ch':
-				result = 'EBAY-CH'
-			else:
-				result = 'EBAY-DE'
-		elif lang == 'it':
-			result = 'EBAY-IT'
-		elif lang == 'pl':
-			result = 'EBAY-PL'
-		elif lang == 'es':
-			result = 'EBAY-ES'
-		elif lang == 'nl':
-			if dialect == 'be':
-				result = 'EBAY-NLBE'
-			else:
-				result = 'EBAY-NL'
-		elif lang == 'zh':
-			result = 'EBAY-HK'
-		elif lang == 'sv':
-			result = 'EBAY-SE'
+        lang = lang_code[:2].lower()
+        dialect = lang_code[3:].lower()
 
-		return default if result is None else result
+        # try to find a mapping...
+        result = None
+        if lang == 'en':
+            if dialect == 'gb':
+                result = 'EBAY-GB'
+            elif dialect == 'ca':
+                result = 'EBAY-ENCA'
+            elif dialect == 'ie':
+                result = 'EBAY-IE'
+            elif dialect == 'in':
+                result = 'EBAY-IN'
+            elif dialect == 'my':
+                result = 'EBAY-MY'
+            elif dialect == 'ph':
+                result = 'EBAY-PH'
+            elif dialect == 'sg':
+                result = 'EBAY-SG'
+            elif dialect == 'au':
+                result = 'EBAY-AU'
+        elif lang == 'fr':
+            if dialect == 'be':
+                result = 'EBAY-FRBE'
+            elif dialect == 'ca':
+                result = 'EBAY-FRCA'
+            else:
+                result = 'EBAY-FR'
+        elif lang == 'de':
+            if dialect == 'at':
+                result = 'EBAY-AT'
+            elif dialect == 'ch':
+                result = 'EBAY-CH'
+            else:
+                result = 'EBAY-DE'
+        elif lang == 'it':
+            result = 'EBAY-IT'
+        elif lang == 'pl':
+            result = 'EBAY-PL'
+        elif lang == 'es':
+            result = 'EBAY-ES'
+        elif lang == 'nl':
+            if dialect == 'be':
+                result = 'EBAY-NLBE'
+            else:
+                result = 'EBAY-NL'
+        elif lang == 'zh':
+            result = 'EBAY-HK'
+        elif lang == 'sv':
+            result = 'EBAY-SE'
 
-	def search(self, text, result_limit):
-		if len(text) == 0:
-			return
+        return default if result is None else result
 
-		self.cardapio.write_to_log(self, 'searching for {0} on eBay'.format(text), is_debug = True)
+    def search(self, text, result_limit):
+        if len(text) == 0:
+            return
 
-		self.cancellable.reset()
+        self.cardapio.write_to_log(self, 'searching for {0} on eBay'.format(text), is_debug=True)
 
-		# prepare final API URL (items per page and search keyword)
-		current_args = self.api_base_args.copy()
-		current_args['paginationInput.entriesPerPage'] = result_limit
-		current_args['keywords'] = text
+        self.cancellable.reset()
 
-		final_url = self.api_base_url.format(self.urllib.urlencode(current_args))
+        # prepare final API URL (items per page and search keyword)
+        current_args = self.api_base_args.copy()
+        current_args['paginationInput.entriesPerPage'] = result_limit
+        current_args['keywords'] = text
 
-		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
+        final_url = self.api_base_url.format(self.urllib.urlencode(current_args))
 
-		# asynchronous and cancellable IO call
-		self.current_stream = self.gio.File(final_url)
-		self.current_stream.load_contents_async(self.show_search_results,
-			cancellable = self.cancellable,
-			user_data = text)
+        self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug=True)
 
-	def show_search_results(self, gdaemonfile, result, text):
-		"""
-		Callback to asynchronous IO (eBay's API call).
-		"""
+        # asynchronous and cancellable IO call
+        self.current_stream = self.gio.File(final_url)
+        self.current_stream.load_contents_async(self.show_search_results,
+                                                cancellable=self.cancellable,
+                                                user_data=text)
 
-		# watch out for connection problems
-		try:
-			json_body = self.current_stream.load_contents_finish(result)[0]
+    def show_search_results(self, gdaemonfile, result, text):
+        """
+        Callback to asynchronous IO (eBay's API call).
+        """
 
-			# watch out for empty input
-			if len(json_body) == 0:
-				return
+        # watch out for connection problems
+        try:
+            json_body = self.current_stream.load_contents_finish(result)[0]
 
-			response = self.json.loads(json_body)
-		except (ValueError, self.GError) as ex:
-			self.cardapio.handle_search_error(self, 'error while obtaining data: {0}'.format(str(ex)))
-			return
+            # watch out for empty input
+            if len(json_body) == 0:
+                return
 
-		# decode the result
-		try:
-			items = []
+            response = self.json.loads(json_body)
+        except (ValueError, self.GError) as ex:
+            self.cardapio.handle_search_error(self, 'error while obtaining data: {0}'.format(str(ex)))
+            return
 
-			response_body = response['findItemsByKeywordsResponse'][0]
+        # decode the result
+        try:
+            items = []
 
-			# if we made a successful call...
-			if response_body['ack'][0] == 'Success':
-				search_result = response_body['searchResult'][0]
+            response_body = response['findItemsByKeywordsResponse'][0]
 
-				# and we have any results...
-				if int(search_result['@count']) > 0:
+            # if we made a successful call...
+            if response_body['ack'][0] == 'Success':
+                search_result = response_body['searchResult'][0]
 
-					# remember them all
-					for ebay_item in search_result['item']:
-						ebay_item_url = ebay_item['viewItemURL'][0]
+                # and we have any results...
+                if int(search_result['@count']) > 0:
 
-						items.append({
-							'name'         : ebay_item['title'][0],
-							'tooltip'      : ebay_item_url,
-							'icon name'    : 'text-html',
-							'type'         : 'xdg',
-							'command'      : ebay_item_url,
-							'context menu' : None
-							})
+                    # remember them all
+                    for ebay_item in search_result['item']:
+                        ebay_item_url = ebay_item['viewItemURL'][0]
 
-				# on a succesful call, add the 'Search more...' item (URL from the response)
-				items.append({
-					'name'	       : _('Show additional results'),
-					'tooltip'      : _('Show additional search results in your web browser'),
-					'icon name'    : 'system-search',
-					'type'         : 'xdg',
-					'command'      : response_body['itemSearchURL'][0],
-					'context menu' : None
-				})
+                        items.append({
+                        'name': ebay_item['title'][0],
+                        'tooltip': ebay_item_url,
+                        'icon name': 'text-html',
+                        'type': 'xdg',
+                        'command': ebay_item_url,
+                        'context menu': None
+                        })
 
-			# if the API call failed, add the generic 'search more' item
-			if len(items) == 0:
-				search_more_args = {
-					'_nkw'   : text,
-					'_sacat' : 'See-All-Categories'
-				}
+                # on a succesful call, add the 'Search more...' item (URL from the response)
+                items.append({
+                'name': _('Show additional results'),
+                'tooltip': _('Show additional search results in your web browser'),
+                'icon name': 'system-search',
+                'type': 'xdg',
+                'command': response_body['itemSearchURL'][0],
+                'context menu': None
+                })
 
-				items.append({
-					'name'	       : _('Show additional results'),
-					'tooltip'      : _('Show additional search results in your web browser'),
-					'icon name'    : 'system-search',
-					'type'         : 'xdg',
-					# TODO: cardapio later unquotes this and then quotes it again;
-					# it's screwing my quotation
-					'command'      : self.web_base_url.format(self.urllib.urlencode(search_more_args)),
-					'context menu' : None
-				})
+            # if the API call failed, add the generic 'search more' item
+            if len(items) == 0:
+                search_more_args = {
+                '_nkw': text,
+                '_sacat': 'See-All-Categories'
+                }
 
-			# pass the results to Cardapio
-			self.cardapio.handle_search_result(self, items, text)
+                items.append({
+                'name': _('Show additional results'),
+                'tooltip': _('Show additional search results in your web browser'),
+                'icon name': 'system-search',
+                'type': 'xdg',  # TODO: cardapio later unquotes this and then quotes it again;
+                # it's screwing my quotation
+                'command': self.web_base_url.format(self.urllib.urlencode(search_more_args)),
+                'context menu': None
+                })
 
-		except KeyError:
-			self.cardapio.handle_search_error(self, "Incorrect eBay's JSON structure")
+            # pass the results to Cardapio
+            self.cardapio.handle_search_result(self, items, text)
 
-	def cancel(self):
-		self.cardapio.write_to_log(self, 'cancelling a recent eBay search (if any)', is_debug = True)
+        except KeyError:
+            self.cardapio.handle_search_error(self, "Incorrect eBay's JSON structure")
 
-		if not self.cancellable.is_cancelled():
-			self.cancellable.cancel()
+    def cancel(self):
+        self.cardapio.write_to_log(self, 'cancelling a recent eBay search (if any)', is_debug=True)
+
+        if not self.cancellable.is_cancelled():
+            self.cancellable.cancel()

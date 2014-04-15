@@ -18,67 +18,68 @@
 #
 
 import gmenu
-import os
+
 from MenuHelperInterface import *
 
+
 class GMenuHelper(MenuHelperInterface):
-	"""
-	This class only exists to provide a common API around the XDG Menu module
-	and the Gnome GMenu module.
+    """
+    This class only exists to provide a common API around the XDG Menu module
+    and the Gnome GMenu module.
 
-	In this case, the implementation is for the Gmenu version, which adds
-	support for monitoring the menu for changes.
-	"""
+    In this case, the implementation is for the Gmenu version, which adds
+    support for monitoring the menu for changes.
+    """
 
-	def __init__(self, filename = None):
-		if filename: 
-			self._root = gmenu.lookup_tree(filename)
-			self._node = self._root.root
-		else: 
-			self._root = None
-			self._node = None
+    def __init__(self, filename=None):
+        if filename:
+            self._root = gmenu.lookup_tree(filename)
+            self._node = self._root.root
+        else:
+            self._root = None
+            self._node = None
 
-	def is_valid(self):
-		return (self._node is not None)
+    def is_valid(self):
+        return (self._node is not None)
 
-	def _wrap_entry(self, entry):
+    def _wrap_entry(self, entry):
 
-		menuHelper = GMenuHelper()
-		menuHelper._root = self._root
-		menuHelper._node = entry 
-		return menuHelper
+        menuHelper = GMenuHelper()
+        menuHelper._root = self._root
+        menuHelper._node = entry
+        return menuHelper
 
-	def __iter__(self):	
-		def the_iter(entries):
-			for entry in entries:
-				yield self._wrap_entry(entry)
-			raise StopIteration
+    def __iter__(self):
+        def the_iter(entries):
+            for entry in entries:
+                yield self._wrap_entry(entry)
+            raise StopIteration
 
-		if self._node is None:
-			raise StopIteration
+        if self._node is None:
+            raise StopIteration
 
-		# will possibly have an issue where sometimes we can't have the .root here :-/
-		return the_iter(self._node.contents)
+        # will possibly have an issue where sometimes we can't have the .root here :-/
+        return the_iter(self._node.contents)
 
-	def is_menu(self):
-		return isinstance(self._node, gmenu.Directory)
+    def is_menu(self):
+        return isinstance(self._node, gmenu.Directory)
 
-	def is_entry(self):
-		return isinstance(self._node, gmenu.Entry)
+    def is_entry(self):
+        return isinstance(self._node, gmenu.Entry)
 
-	def get_name(self):
-		return self._node.name
+    def get_name(self):
+        return self._node.name
 
-	def get_icon(self):
-		return self._node.icon
+    def get_icon(self):
+        return self._node.icon
 
-	def get_comment(self):
-		return self._node.get_comment()
+    def get_comment(self):
+        return self._node.get_comment()
 
-	def get_path(self):
-		return self._node.desktop_file_path
+    def get_path(self):
+        return self._node.desktop_file_path
 
-	def set_on_change_handler(self, handler):
-		self._root.add_monitor(handler)
+    def set_on_change_handler(self, handler):
+        self._root.add_monitor(handler)
 
 

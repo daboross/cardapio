@@ -16,156 +16,154 @@
 #
 
 class CardapioPlugin(CardapioPluginInterface):
-	"""
-	Plugin based on Microsoft's Bing API. Basics of the API are described in
-	this document:
-	http://www.bing.com/developers/s/API%20Basics.pdf
+    """
+    Plugin based on Microsoft's Bing API. Basics of the API are described in
+    this document:
+    http://www.bing.com/developers/s/API%20Basics.pdf
 
-	All web requests are done in asynchronous and cancellable manner.
-	"""
+    All web requests are done in asynchronous and cancellable manner.
+    """
 
-	# Cardapio's variables
-	author = 'Pawel Bara'
-	name = _('Bing')
-	description = _("Perform a search using Microsoft's Bing")
-	version = '0.95'
+    # Cardapio's variables
+    author = 'Pawel Bara'
+    name = _('Bing')
+    description = _("Perform a search using Microsoft's Bing")
+    version = '0.95'
 
-	url = ''
-	help_text = ''
+    url = ''
+    help_text = ''
 
-	plugin_api_version = 1.40
+    plugin_api_version = 1.40
 
-	search_delay_type = 'remote'
+    search_delay_type = 'remote'
 
-	default_keyword = 'bing'
+    default_keyword = 'bing'
 
-	category_name = _('Bing Results')
-	category_tooltip = _('Results found using Bing')
+    category_name = _('Bing Results')
+    category_tooltip = _('Results found using Bing')
 
-	category_icon = 'system-search'
-	icon          = 'system-search'
-	fallback_icon = ''
+    category_icon = 'system-search'
+    icon = 'system-search'
+    fallback_icon = ''
 
-	hide_from_sidebar = True
+    hide_from_sidebar = True
 
-	def __init__(self, cardapio_proxy, category):
+    def __init__(self, cardapio_proxy, category):
 
-		self.cardapio = cardapio_proxy
+        self.cardapio = cardapio_proxy
 
-		try:
-			import json
-			import gio
-			import urllib
-			from glib import GError
+        try:
+            import json
+            import gio
+            import urllib
+            from glib import GError
 
-		except Exception, exception:
-			self.cardapio.write_to_log(self, 'Could not import certain modules', is_error = True)
-			self.cardapio.write_to_log(self, exception, is_error = True)
-			self.loaded = False
-			return
+        except Exception, exception:
+            self.cardapio.write_to_log(self, 'Could not import certain modules', is_error=True)
+            self.cardapio.write_to_log(self, exception, is_error=True)
+            self.loaded = False
+            return
 
-		self.json   = json
-		self.gio    = gio
-		self.urllib = urllib
-		self.GError = GError
-		
-		self.cancellable = self.gio.Cancellable()
+        self.json = json
+        self.gio = gio
+        self.urllib = urllib
+        self.GError = GError
 
-		# Bing's API arguments (my AppID and a request for a web search)
-		self.api_base_args = {
-			'Appid'    : '237CBC82BB8C3F7F5F19F6A77B0D38A59E8F8C2C',
-			'sources'  : 'web'
-		}
+        self.cancellable = self.gio.Cancellable()
 
-		# Bing's base URLs (search and search more variations)
-		self.api_base_url = 'http://api.search.live.net/json.aspx?{0}'
-		self.web_base_url = 'http://www.bing.com/search?{0}'
+        # Bing's API arguments (my AppID and a request for a web search)
+        self.api_base_args = {
+        'Appid': '237CBC82BB8C3F7F5F19F6A77B0D38A59E8F8C2C',
+        'sources': 'web'
+        }
 
-		self.loaded = True
+        # Bing's base URLs (search and search more variations)
+        self.api_base_url = 'http://api.search.live.net/json.aspx?{0}'
+        self.web_base_url = 'http://www.bing.com/search?{0}'
 
-	def search(self, text, result_limit):
+        self.loaded = True
 
-		if len(text) == 0:
-			return
+    def search(self, text, result_limit):
 
-		self.cardapio.write_to_log(self, 'searching for {0} using Bing'.format(text), is_debug = True)
+        if len(text) == 0:
+            return
 
-		self.cancellable.reset()
+        self.cardapio.write_to_log(self, 'searching for {0} using Bing'.format(text), is_debug=True)
 
-		# prepare final API URL
-		current_args = self.api_base_args.copy()
-		current_args['web.count'] = result_limit
+        self.cancellable.reset()
 
-		current_args['query'] = text
-		final_url = self.api_base_url.format(self.urllib.urlencode(current_args))
+        # prepare final API URL
+        current_args = self.api_base_args.copy()
+        current_args['web.count'] = result_limit
 
-		self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug = True)
+        current_args['query'] = text
+        final_url = self.api_base_url.format(self.urllib.urlencode(current_args))
 
-		# asynchronous and cancellable IO call
-		self.current_stream = self.gio.File(final_url)
-		self.current_stream.load_contents_async(self.show_search_results,
-			cancellable = self.cancellable,
-			user_data = text)
+        self.cardapio.write_to_log(self, 'final API URL: {0}'.format(final_url), is_debug=True)
 
-	def show_search_results(self, gdaemonfile, result, text):
-		"""
-		Callback to asynchronous IO (Bing's API call).
-		"""
+        # asynchronous and cancellable IO call
+        self.current_stream = self.gio.File(final_url)
+        self.current_stream.load_contents_async(self.show_search_results,
+                                                cancellable=self.cancellable,
+                                                user_data=text)
 
-		# watch out for connection problems
-		try:
-			json_body = self.current_stream.load_contents_finish(result)[0]
+    def show_search_results(self, gdaemonfile, result, text):
+        """
+        Callback to asynchronous IO (Bing's API call).
+        """
 
-			# watch out for empty input
-			if len(json_body) == 0:
-				return
+        # watch out for connection problems
+        try:
+            json_body = self.current_stream.load_contents_finish(result)[0]
 
-			response = self.json.loads(json_body)
-		except (ValueError, self.GError) as ex:
-			self.cardapio.handle_search_error(self, 'error while obtaining data: {0}'.format(str(ex)))
-			return
+            # watch out for empty input
+            if len(json_body) == 0:
+                return
 
-		# decode the result
-		try:
-			items = []
+            response = self.json.loads(json_body)
+        except (ValueError, self.GError) as ex:
+            self.cardapio.handle_search_error(self, 'error while obtaining data: {0}'.format(str(ex)))
+            return
 
-			response_body = response['SearchResponse']['Web']
+        # decode the result
+        try:
+            items = []
 
-			# if we have any results...
-			if response_body['Total'] != 0:
-				# remember them all
-				for item in response_body['Results']:
-					items.append({
-						'name'         : item['Title'],
-						'tooltip'      : item['Url'],
-						'icon name'    : 'text-html',
-						'type'         : 'xdg',
-						'command'      : item['Url'],
-						'context menu' : None
-					})
+            response_body = response['SearchResponse']['Web']
 
-			# always add 'Search more...' item
-			search_more_args = { 'q' : text }
+            # if we have any results...
+            if response_body['Total'] != 0:
+                # remember them all
+                for item in response_body['Results']:
+                    items.append({
+                    'name': item['Title'],
+                    'tooltip': item['Url'],
+                    'icon name': 'text-html',
+                    'type': 'xdg',
+                    'command': item['Url'],
+                    'context menu': None
+                    })
 
-			items.append({
-				'name'         : _('Show additional results'),
-				'tooltip'      : _('Show additional search results in your web browser'),
-				'icon name'    : 'system-search',
-				'type'         : 'xdg',
-				# TODO: cardapio later unquotes this and then quotes it again;
-				# it's screwing my quotation
-				'command'      : self.web_base_url.format(self.urllib.urlencode(search_more_args)),
-				'context menu' : None
-			})
+            # always add 'Search more...' item
+            search_more_args = {'q': text}
 
-			# pass the results to Cardapio
-			self.cardapio.handle_search_result(self, items, text)
+            items.append({
+            'name': _('Show additional results'),
+            'tooltip': _('Show additional search results in your web browser'),
+            'icon name': 'system-search',
+            'type': 'xdg',  # TODO: cardapio later unquotes this and then quotes it again;  # it's screwing my quotation
+            'command': self.web_base_url.format(self.urllib.urlencode(search_more_args)),
+            'context menu': None
+            })
 
-		except KeyError:
-			self.cardapio.handle_search_error(self, "Incorrect Bing's JSON structure")
+            # pass the results to Cardapio
+            self.cardapio.handle_search_result(self, items, text)
 
-	def cancel(self):
-		self.cardapio.write_to_log(self, 'cancelling a recent Bing search (if any)', is_debug = True)
+        except KeyError:
+            self.cardapio.handle_search_error(self, "Incorrect Bing's JSON structure")
 
-		if not self.cancellable.is_cancelled():
-			self.cancellable.cancel()
+    def cancel(self):
+        self.cardapio.write_to_log(self, 'cancelling a recent Bing search (if any)', is_debug=True)
+
+        if not self.cancellable.is_cancelled():
+            self.cancellable.cancel()

@@ -18,134 +18,137 @@
 #
 
 try:
- 	from dockmanager.dockmanager import DockManagerSink
+    from dockmanager.dockmanager import DockManagerSink
 
-	from sys import exit
-	from signal import signal, SIGTERM
+    from sys import exit
+    from signal import signal, SIGTERM
 
-	import os
-	import gconf
-	import atexit
-	import gobject
-	import subprocess
+    import os
+    import gconf
+    import atexit
+    import gobject
+    import subprocess
 
 except ImportError, e:
-	print(e)
-	exit(255)
+    print(e)
+    exit(255)
 
 
 # note - this is duplicated in misc.py
 def which(filename):
-	"""
-	Searches the folders in the OS's PATH variable, looking for a file called
-	"filename". If found, returns the full path. Otherwise, returns None.
-	"""
+    """
+    Searches the folders in the OS's PATH variable, looking for a file called
+    "filename". If found, returns the full path. Otherwise, returns None.
+    """
 
-	for path in os.environ["PATH"].split(os.pathsep):
-		if os.access(os.path.join(path, filename), os.X_OK):
-			return "%s/%s" % (path, filename)
-	return None
+    for path in os.environ["PATH"].split(os.pathsep):
+        if os.access(os.path.join(path, filename), os.X_OK):
+            return "%s/%s" % (path, filename)
+    return None
 
 
 docky_item_gconf_root = '/apps/docky-2/Docky/Items/DockyItem'
 
 
 def install_cardapio_launcher():
-	"""
-	Sets Docky up so that Cardapio is launched whenever the dock icon is clicked.
-	"""
+    """
+    Sets Docky up so that Cardapio is launched whenever the dock icon is clicked.
+    """
 
-	gconf_client = gconf.client_get_default()
+    gconf_client = gconf.client_get_default()
 
-	cardapio_cmd = which('cardapio')
+    cardapio_cmd = which('cardapio')
 
-	if cardapio_cmd == None: 
-		print "Error! Cardapio not found!"
-		exit(254)
+    if cardapio_cmd == None:
+        print "Error! Cardapio not found!"
+        exit(254)
 
-	new_command = cardapio_cmd + ' docky-open'
-	new_label   = ''
+    new_command = cardapio_cmd + ' docky-open'
+    new_label = ''
 
-	current_command = gconf_client.get_string(docky_item_gconf_root + '/DockyItemCommand')
-	#current_label   = gconf_client.get_string(docky_item_gconf_root + '/HoverText')
+    current_command = gconf_client.get_string(docky_item_gconf_root + '/DockyItemCommand')
+    #current_label   = gconf_client.get_string(docky_item_gconf_root + '/HoverText')
 
-	if current_command != new_command:
-		if current_command is not None and current_command != '':
-			if 'cardapio' not in current_command:
-				gconf_client.set_string(docky_item_gconf_root + '/OldDockyItemCommand', current_command)
+    if current_command != new_command:
+        if current_command is not None and current_command != '':
+            if 'cardapio' not in current_command:
+                gconf_client.set_string(docky_item_gconf_root + '/OldDockyItemCommand', current_command)
 
-		try    : gconf_client.set_string(docky_item_gconf_root + '/DockyItemCommand', new_command)
-		except : pass
+        try:
+            gconf_client.set_string(docky_item_gconf_root + '/DockyItemCommand', new_command)
+        except:
+            pass
 
-	#if current_label != '':
-	#	if current_label is not None:
-	#		gconf_client.set_string(docky_item_gconf_root + '/OldHoverText', current_label)
+    #if current_label != '':
+    #	if current_label is not None:
+    #		gconf_client.set_string(docky_item_gconf_root + '/OldHoverText', current_label)
 
-	#	try    : gconf_client.set_string(docky_item_gconf_root + '/HoverText', '')
-	#	except : pass
+    #	try    : gconf_client.set_string(docky_item_gconf_root + '/HoverText', '')
+    #	except : pass
 
 
 def remove_cardapio_launcher():
-	"""
-	Resets Docky to its initial state, before Cardapio ever loaded.
-	"""
+    """
+    Resets Docky to its initial state, before Cardapio ever loaded.
+    """
 
-	gconf_client = gconf.client_get_default()
+    gconf_client = gconf.client_get_default()
 
-	current_command = gconf_client.get_string(docky_item_gconf_root + '/DockyItemCommand')
-	#current_label   = gconf_client.get_string(docky_item_gconf_root + '/HoverText')
+    current_command = gconf_client.get_string(docky_item_gconf_root + '/DockyItemCommand')
+    #current_label   = gconf_client.get_string(docky_item_gconf_root + '/HoverText')
 
-	if current_command == which('cardapio') + ' docky-open':
+    if current_command == which('cardapio') + ' docky-open':
 
-		old_command = gconf_client.get_string(docky_item_gconf_root + '/OldDockyItemCommand')
+        old_command = gconf_client.get_string(docky_item_gconf_root + '/OldDockyItemCommand')
 
-		if old_command is not None and old_command != '':
-			gconf_client.set_string(docky_item_gconf_root + '/DockyItemCommand', old_command)
-		else:
-			gconf_client.set_string(docky_item_gconf_root + '/DockyItemCommand', '')
+        if old_command is not None and old_command != '':
+            gconf_client.set_string(docky_item_gconf_root + '/DockyItemCommand', old_command)
+        else:
+            gconf_client.set_string(docky_item_gconf_root + '/DockyItemCommand', '')
 
-		try    : gconf_client.unset(docky_item_gconf_root + '/OldDockyItemCommand')
-		except : pass
+        try:
+            gconf_client.unset(docky_item_gconf_root + '/OldDockyItemCommand')
+        except:
+            pass
 
-	#if current_label == '':
+    #if current_label == '':
 
-	#	old_label = gconf_client.get_string(docky_item_gconf_root + '/OldHoverText')
+    #	old_label = gconf_client.get_string(docky_item_gconf_root + '/OldHoverText')
 
-	#	if old_label is not None and old_label != '':
-	#		gconf_client.set_string(docky_item_gconf_root + '/HoverText', old_label)
-	#	else:
-	#		gconf_client.set_string(docky_item_gconf_root + '/HoverText', '')
+    #	if old_label is not None and old_label != '':
+    #		gconf_client.set_string(docky_item_gconf_root + '/HoverText', old_label)
+    #	else:
+    #		gconf_client.set_string(docky_item_gconf_root + '/HoverText', '')
 
-	#	try    : gconf_client.unset(docky_item_gconf_root + '/OldHoverText')
-	#	except : pass
-
+    #	try    : gconf_client.unset(docky_item_gconf_root + '/OldHoverText')
+    #	except : pass
 
 
 class CardapioSink(DockManagerSink):
-	"""
-	This is not attaching any helpers - just waiting for the signal
-	to close.
-	"""
+    """
+    This is not attaching any helpers - just waiting for the signal
+    to close.
+    """
 
-	def item_path_found(self, pathtoitem, item): pass
+    def item_path_found(self, pathtoitem, item): pass
 
 
 cardapio_sink = CardapioSink()
 
 
 def cleanup():
-	remove_cardapio_launcher()
-	cardapio_sink.dispose()
+    remove_cardapio_launcher()
+    cardapio_sink.dispose()
 
 
 if __name__ == "__main__":
-	install_cardapio_launcher()
-	subprocess.Popen('cardapio hidden', shell = True)
+    install_cardapio_launcher()
+    subprocess.Popen('cardapio hidden', shell=True)
 
-	mainloop = gobject.MainLoop(is_running = True)
+    mainloop = gobject.MainLoop(is_running=True)
 
-	atexit.register (cleanup)
-	signal(SIGTERM, lambda signum, stack_frame: exit(253))
+    atexit.register(cleanup)
+    signal(SIGTERM, lambda signum, stack_frame: exit(253))
 
-	mainloop.run()
+    mainloop.run()
 

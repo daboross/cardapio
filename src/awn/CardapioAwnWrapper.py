@@ -20,22 +20,23 @@ from awn.extras import awnlib, __version__
 from CardapioAwnApplet import CardapioAwnApplet
 from Cardapio import Cardapio
 
+
 class CardapioAwnWrapper:
-	def __init__(self, applet):
-		cardapio_awn_applet = CardapioAwnApplet(applet)
-		cardapio = Cardapio(panel_applet = cardapio_awn_applet)
+    def __init__(self, applet):
+        cardapio_awn_applet = CardapioAwnApplet(applet)
+        cardapio = Cardapio(panel_applet=cardapio_awn_applet)
 
 
 if __name__ == '__main__':
-	awnlib.init_start(CardapioAwnWrapper, {
-		'name'           : "Cardapio's applet",
-		'short'          : 'cardapio',
-		'version'        : __version__,
-		'description'    : 'Replace your menu with Cardapio',
-		'theme'          : CardapioAwnApplet.ICON,
-		'author'         : 'Cardapio Team',
-		'copyright-year' : '2010',
-		'authors'        : [ 'Pawel Bara, Thiago Teixeira' ],
-	}, 
-	['no-tooltip'])
+    awnlib.init_start(CardapioAwnWrapper, {
+    'name': "Cardapio's applet",
+    'short': 'cardapio',
+    'version': __version__,
+    'description': 'Replace your menu with Cardapio',
+    'theme': CardapioAwnApplet.ICON,
+    'author': 'Cardapio Team',
+    'copyright-year': '2010',
+    'authors': ['Pawel Bara, Thiago Teixeira'],
+    },
+                      ['no-tooltip'])
 
