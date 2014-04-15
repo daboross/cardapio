@@ -50,50 +50,6 @@ def start_cardapio(show):
     gtk.gdk.threads_leave()
 
 
-def cardapio_run_in_window():
-    import os
-    import gnomeapplet
-    import gtk
-    from gnomepanel.CardapioGnomeAppletFactory import CardapioGnomeAppletFactory
-
-    # make sure Cardapio shows even if using Ubuntu's AppMenu
-    os.environ['UBUNTU_MENUPROXY'] = ''
-
-    # open new Cardapio instance
-    main_window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-    main_window.set_title('Cardapio')
-    main_window.connect('destroy', gtk.main_quit)
-    app = gnomeapplet.Applet()
-    CardapioGnomeAppletFactory(app, None)
-    app.reparent(main_window)
-    main_window.show_all()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
-
-
-def cardapio_run_in_mate_window():
-    import os
-    import mateapplet
-    import gtk
-    from matepanel.CardapioMateAppletFactory import CardapioMateAppletFactory
-
-    # make sure Cardapio shows even if using Ubuntu's AppMenu
-    os.environ['UBUNTU_MENUPROXY'] = ''
-
-    # open new Cardapio instance
-    main_window = gtk.Window(gtk.WINDOW_TOPLEVEL)
-    main_window.set_title('Cardapio')
-    main_window.connect('destroy', gtk.main_quit)
-    app = mateapplet.Applet()
-    CardapioMateAppletFactory(app, None)
-    app.reparent(main_window)
-    main_window.show_all()
-    gtk.gdk.threads_enter()
-    gtk.main()
-    gtk.gdk.threads_leave()
-
-
 def cardapio_run_standalone_but_hidden():
     # if there's no other instance, start hidden Cardapio
     if bus_request_name == dbus.bus.REQUEST_NAME_REPLY_PRIMARY_OWNER:
@@ -161,13 +117,7 @@ def cardapio_show_near_docky():
 
 if len(sys.argv) == 2:
 
-    if sys.argv[1] == 'run-in-window':
-        cardapio_run_in_window()
-
-    if sys.argv[1] == 'run-in-mate-window':
-        cardapio_run_in_mate_window()
-
-    elif sys.argv[1] == 'hidden':
+    if sys.argv[1] == 'hidden':
         cardapio_run_standalone_but_hidden()
 
     elif sys.argv[1] == 'show':
@@ -183,16 +133,14 @@ if len(sys.argv) == 2:
         cardapio_open_options_dialog()
 
     elif sys.argv[1] == '--help':
-        print('Usage: cardapio [option]')
-        print('Options:')
-        print('  show                - Show Cardapio centered. This is the default behavior.')
-        print('  show-near-mouse     - Show Cardapio close to the mouse pointer.')
-        print('  hidden              - Load Cardapio but do not show it yet.')
-        print('  options             - Show Cardapio\'s preferences window')
-        print('  run-in-window       - Used for debugging the Gnome Panel applet.')
-        print('  run-in-mate-window  - Used for debugging the Mate Panel applet.')
-        print(
-            'If Cardapio is already loaded, both "show" and "show-near-mouse" simply show the existing instance. That is, they do not load a new Cardapio instance.')
+        print("Usage: cardapio [option]")
+        print("Options:")
+        print("  show                - Show Cardapio centered. This is the default behavior.")
+        print("  show-near-mouse     - Show Cardapio close to the mouse pointer.")
+        print("  hidden              - Load Cardapio but do not show it yet.")
+        print("  options             - Show Cardapio's preferences window")
+        print("If Cardapio is already loaded, both 'show' and 'show-near-mouse' simply show the existing instance."
+              "That is, they do not load a new Cardapio instance.")
 
 else:
     cardapio_show(centered=True)
