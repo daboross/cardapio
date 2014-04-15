@@ -100,12 +100,12 @@ class CardapioPlugin(CardapioPluginInterface):
 
         # basic API's arguments (search in all categories)
         self.api_base_args = {
-        'Service': 'AWSECommerceService',
-        'Version': '2009-11-01',
-        'Operation': 'ItemSearch',
-        'SearchIndex': 'All',
-        'ResponseGroup': 'Small',
-        'AWSAccessKeyId': self.aws_access_key
+            'Service': 'AWSECommerceService',
+            'Version': '2009-11-01',
+            'Operation': 'ItemSearch',
+            'SearchIndex': 'All',
+            'ResponseGroup': 'Small',
+            'AWSAccessKeyId': self.aws_access_key
         }
 
         # try to get a locale specific URL for Amazon
@@ -126,11 +126,11 @@ class CardapioPlugin(CardapioPluginInterface):
         """
 
         locale_dict = {
-        'ca': 'ecs.amazonaws.ca',
-        'de': 'ecs.amazonaws.de',
-        'fr': 'ecs.amazonaws.fr',
-        'jp': 'ecs.amazonaws.jp',
-        'uk': 'ecs.amazonaws.co.uk'
+            'ca': 'ecs.amazonaws.ca',
+            'de': 'ecs.amazonaws.de',
+            'fr': 'ecs.amazonaws.fr',
+            'jp': 'ecs.amazonaws.jp',
+            'uk': 'ecs.amazonaws.co.uk'
         }
 
         default = 'ecs.amazonaws.com'
@@ -264,24 +264,25 @@ class CardapioPlugin(CardapioPluginInterface):
                     url = item.find('DetailPageURL').text
 
                     items.append({
-                    'name': i_attributes.find('Title').text + ' [' + i_attributes.find('ProductGroup').text + ']',
-                    'tooltip': url,
-                    'icon name': 'text-html',
-                    'type': 'xdg',
-                    'command': url,
-                    'context menu': None
+                        'name': i_attributes.find('Title').text + ' [' + i_attributes.find('ProductGroup').text + ']',
+                        'tooltip': url,
+                        'icon name': 'text-html',
+                        'type': 'xdg',
+                        'command': url,
+                        'context menu': None
                     })
 
             # always add 'Search more...' item
             search_more_args = {'field-keywords': text}
 
             items.append({
-            'name': _('Show additional results'),
-            'tooltip': _('Show additional search results in your web browser'),
-            'icon name': 'system-search',
-            'type': 'xdg',  # TODO: cardapio later unquotes this and then quotes it again;  # it's screwing my quotation
-            'command': self.web_base_url.format(self.urllib.urlencode(search_more_args)),
-            'context menu': None
+                'name': _('Show additional results'),
+                'tooltip': _('Show additional search results in your web browser'),
+                'icon name': 'system-search',
+                'type': 'xdg',
+                # TODO: cardapio later unquotes this and then quotes it again;  # it's screwing my quotation
+                'command': self.web_base_url.format(self.urllib.urlencode(search_more_args)),
+                'context menu': None
             })
 
             # pass the results to Cardapio

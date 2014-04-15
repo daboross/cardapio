@@ -36,7 +36,6 @@ class CardapioPlugin(CardapioPluginInterface):
     category_tooltip = _('Results found with Google')
     hide_from_sidebar = True
 
-
     def __init__(self, cardapio_proxy, category):
 
         self.c = cardapio_proxy
@@ -81,16 +80,15 @@ class CardapioPlugin(CardapioPluginInterface):
 
         self.action_command = "xdg-open 'http://www.google.com/search?q=%%s&hl=%s'" % google_interface_language_format
         self.action = {
-        'name': _('Show additional results'),
-        'tooltip': _('Show additional search results in your web browser'),
-        'icon name': 'system-search',
-        'type': 'callback',
-        'command': self.more_results_action,
-        'context menu': None,
+            'name': _('Show additional results'),
+            'tooltip': _('Show additional search results in your web browser'),
+            'icon name': 'system-search',
+            'type': 'callback',
+            'command': self.more_results_action,
+            'context menu': None,
         }
 
         self.loaded = True
-
 
     def search(self, text, result_limit):
 
@@ -116,12 +114,10 @@ class CardapioPlugin(CardapioPluginInterface):
         self.search_controller.reset()
         self.stream.load_contents_async(self.handle_search_result, cancellable=self.search_controller)
 
-
     def cancel(self):
 
         if not self.search_controller.is_cancelled():
             self.search_controller.cancel()
-
 
     def handle_search_result(self, gdaemonfile=None, response=None):
 
@@ -144,12 +140,12 @@ class CardapioPlugin(CardapioPluginInterface):
 
         for raw_result in raw_results['responseData']['results']:
             item = {
-            'name': raw_result['titleNoFormatting'],
-            'tooltip': raw_result['url'],
-            'icon name': 'text-html',
-            'type': 'xdg',
-            'command': raw_result['url'],
-            'context menu': None,
+                'name': raw_result['titleNoFormatting'],
+                'tooltip': raw_result['url'],
+                'icon name': 'text-html',
+                'type': 'xdg',
+                'command': raw_result['url'],
+                'context menu': None,
             }
             parsed_results.append(item)
 
@@ -157,7 +153,6 @@ class CardapioPlugin(CardapioPluginInterface):
             parsed_results.append(self.action)
 
         self.c.handle_search_result(self, parsed_results, self.current_query)
-
 
     def more_results_action(self, text):
 

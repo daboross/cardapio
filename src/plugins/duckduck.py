@@ -39,7 +39,6 @@ class CardapioPlugin(CardapioPluginInterface):
     category_tooltip = _('Results found with DuckDuckGo')
     hide_from_sidebar = True
 
-
     def __init__(self, cardapio_proxy, category):
 
         self.c = cardapio_proxy
@@ -70,16 +69,15 @@ class CardapioPlugin(CardapioPluginInterface):
 
         self.action_command = "xdg-open 'http://duckduckgo.com/?q=%s'"
         self.action = {
-        'name': _('Show additional results'),
-        'tooltip': _('Show additional search results in your web browser'),
-        'icon name': 'system-search',
-        'type': 'callback',
-        'command': self.more_results_action,
-        'context menu': None,
+            'name': _('Show additional results'),
+            'tooltip': _('Show additional search results in your web browser'),
+            'icon name': 'system-search',
+            'type': 'callback',
+            'command': self.more_results_action,
+            'context menu': None,
         }
 
         self.loaded = True
-
 
     def search(self, text, result_limit):
 
@@ -104,12 +102,10 @@ class CardapioPlugin(CardapioPluginInterface):
         self.search_controller.reset()
         self.stream.load_contents_async(self.handle_search_result, cancellable=self.search_controller)
 
-
     def cancel(self):
 
         if not self.search_controller.is_cancelled():
             self.search_controller.cancel()
-
 
     def handle_search_result(self, gdaemonfile=None, response=None):
         # This function parses the results from the query
@@ -140,12 +136,12 @@ class CardapioPlugin(CardapioPluginInterface):
         try:
             if raw_results['Abstract']:
                 item = {
-                'name': raw_results['Heading'],
-                'tooltip': '(%s) %s' % (raw_results['AbstractSource'], raw_results['AbstractText']),
-                'icon name': 'text-html',
-                'type': 'xdg',
-                'command': raw_results['AbstractURL'],
-                'context menu': None,
+                    'name': raw_results['Heading'],
+                    'tooltip': '(%s) %s' % (raw_results['AbstractSource'], raw_results['AbstractText']),
+                    'icon name': 'text-html',
+                    'type': 'xdg',
+                    'command': raw_results['AbstractURL'],
+                    'context menu': None,
                 }
                 parsed_results.append(item)
                 result_count += 1
@@ -156,12 +152,12 @@ class CardapioPlugin(CardapioPluginInterface):
         try:
             if raw_results['Definition']:
                 item = {
-                'name': '%s (Definition)' % raw_results['Heading'],
-                'tooltip': '(%s) %s' % (raw_results['DefinitionSource'], raw_results['Definition']),
-                'icon name': 'text-html',
-                'type': 'xdg',
-                'command': raw_results['DefinitionURL'],
-                'context menu': None,
+                    'name': '%s (Definition)' % raw_results['Heading'],
+                    'tooltip': '(%s) %s' % (raw_results['DefinitionSource'], raw_results['Definition']),
+                    'icon name': 'text-html',
+                    'type': 'xdg',
+                    'command': raw_results['DefinitionURL'],
+                    'context menu': None,
                 }
                 parsed_results.append(item)
                 result_count += 1
@@ -180,24 +176,24 @@ class CardapioPlugin(CardapioPluginInterface):
                             if result_count >= self.result_limit: break
 
                             item = {
-                            'name': result['Text'],
-                            'tooltip': result['FirstURL'],
-                            'icon name': 'text-html',
-                            'type': 'xdg',
-                            'command': result['FirstURL'],
-                            'context menu': None,
+                                'name': result['Text'],
+                                'tooltip': result['FirstURL'],
+                                'icon name': 'text-html',
+                                'type': 'xdg',
+                                'command': result['FirstURL'],
+                                'context menu': None,
                             }
                             parsed_results.append(item)
                             result_count += 1
                     except KeyError:
                         #otherwise the RelatedTopic is a single entry
                         item = {
-                        'name': raw_result['Text'],
-                        'tooltip': raw_result['FirstURL'],
-                        'icon name': 'text-html',
-                        'type': 'xdg',
-                        'command': raw_result['FirstURL'],
-                        'context menu': None,
+                            'name': raw_result['Text'],
+                            'tooltip': raw_result['FirstURL'],
+                            'icon name': 'text-html',
+                            'type': 'xdg',
+                            'command': raw_result['FirstURL'],
+                            'context menu': None,
                         }
                         parsed_results.append(item)
                         result_count += 1
@@ -211,12 +207,12 @@ class CardapioPlugin(CardapioPluginInterface):
                     if result_count >= self.result_limit: break
 
                     item = {
-                    'name': raw_result['Text'],
-                    'tooltip': raw_result['FirstURL'],
-                    'icon name': 'text-html',
-                    'type': 'xdg',
-                    'command': raw_result['FirstURL'],
-                    'context menu': None,
+                        'name': raw_result['Text'],
+                        'tooltip': raw_result['FirstURL'],
+                        'icon name': 'text-html',
+                        'type': 'xdg',
+                        'command': raw_result['FirstURL'],
+                        'context menu': None,
                     }
                     parsed_results.append(item)
                     result_count += 1
@@ -228,7 +224,6 @@ class CardapioPlugin(CardapioPluginInterface):
             parsed_results.append(self.action)
 
         self.c.handle_search_result(self, parsed_results, self.current_query)
-
 
     def more_results_action(self, text):
 

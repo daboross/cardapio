@@ -89,10 +89,10 @@ class CardapioPlugin(CardapioPluginInterface):
         # eBay's API arguments (my API key, 'find' operation, JSON response format,
         # and locale information)
         self.api_base_args = {
-        'SECURITY-APPNAME': 'Cardapio-9704-40b3-8e17-cfad62dd6c45',
-        'OPERATION-NAME': 'findItemsByKeywords',
-        'RESPONSE-DATA-FORMAT': 'JSON',
-        'GLOBAL-ID': self.get_global_id()
+            'SECURITY-APPNAME': 'Cardapio-9704-40b3-8e17-cfad62dd6c45',
+            'OPERATION-NAME': 'findItemsByKeywords',
+            'RESPONSE-DATA-FORMAT': 'JSON',
+            'GLOBAL-ID': self.get_global_id()
         }
 
         # eBay's base URLs (search and a fallback search more variations)
@@ -232,39 +232,39 @@ class CardapioPlugin(CardapioPluginInterface):
                         ebay_item_url = ebay_item['viewItemURL'][0]
 
                         items.append({
-                        'name': ebay_item['title'][0],
-                        'tooltip': ebay_item_url,
-                        'icon name': 'text-html',
-                        'type': 'xdg',
-                        'command': ebay_item_url,
-                        'context menu': None
+                            'name': ebay_item['title'][0],
+                            'tooltip': ebay_item_url,
+                            'icon name': 'text-html',
+                            'type': 'xdg',
+                            'command': ebay_item_url,
+                            'context menu': None
                         })
 
                 # on a succesful call, add the 'Search more...' item (URL from the response)
                 items.append({
-                'name': _('Show additional results'),
-                'tooltip': _('Show additional search results in your web browser'),
-                'icon name': 'system-search',
-                'type': 'xdg',
-                'command': response_body['itemSearchURL'][0],
-                'context menu': None
+                    'name': _('Show additional results'),
+                    'tooltip': _('Show additional search results in your web browser'),
+                    'icon name': 'system-search',
+                    'type': 'xdg',
+                    'command': response_body['itemSearchURL'][0],
+                    'context menu': None
                 })
 
             # if the API call failed, add the generic 'search more' item
             if len(items) == 0:
                 search_more_args = {
-                '_nkw': text,
-                '_sacat': 'See-All-Categories'
+                    '_nkw': text,
+                    '_sacat': 'See-All-Categories'
                 }
 
                 items.append({
-                'name': _('Show additional results'),
-                'tooltip': _('Show additional search results in your web browser'),
-                'icon name': 'system-search',
-                'type': 'xdg',  # TODO: cardapio later unquotes this and then quotes it again;
-                # it's screwing my quotation
-                'command': self.web_base_url.format(self.urllib.urlencode(search_more_args)),
-                'context menu': None
+                    'name': _('Show additional results'),
+                    'tooltip': _('Show additional search results in your web browser'),
+                    'icon name': 'system-search',
+                    'type': 'xdg',  # TODO: cardapio later unquotes this and then quotes it again;
+                    # it's screwing my quotation
+                    'command': self.web_base_url.format(self.urllib.urlencode(search_more_args)),
+                    'context menu': None
                 })
 
             # pass the results to Cardapio

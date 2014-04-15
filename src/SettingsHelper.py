@@ -55,20 +55,20 @@ class SettingsHelper:
         if path is not None:
             default_side_pane_items.append(
                 {
-                'name': _('Ubuntu Software Center'),
-                'icon name': 'softwarecenter',
-                'tooltip': _('Lets you choose from thousands of free applications available for Ubuntu'),
-                'type': 'raw',
-                'command': 'software-center',
+                    'name': _('Ubuntu Software Center'),
+                    'icon name': 'softwarecenter',
+                    'tooltip': _('Lets you choose from thousands of free applications available for Ubuntu'),
+                    'type': 'raw',
+                    'command': 'software-center',
                 })
 
         default_side_pane_items.append(
             {
-            'name': _('Help and Support'),
-            'icon name': 'help-contents',
-            'tooltip': _('Get help with %(distro_name)s') % {'distro_name': Cardapio.Cardapio.distro_name},
-            'type': 'raw',
-            'command': 'gnome-help',
+                'name': _('Help and Support'),
+                'icon name': 'help-contents',
+                'tooltip': _('Get help with %(distro_name)s') % {'distro_name': Cardapio.Cardapio.distro_name},
+                'type': 'raw',
+                'command': 'gnome-help',
             })
 
         self.read_config_option(s, 'window size', None)  # format: [px, px]
@@ -140,7 +140,6 @@ class SettingsHelper:
         # this saves the loaded config file (useful on the first run)
         self.save()
 
-
     def assert_config_file_exists(self):
         """
         If this doesn't throw any exceptions, after the invocation the caller
@@ -176,7 +175,6 @@ class SettingsHelper:
 
         return config_file_path
 
-
     def get_config_file(self, mode):
         """
         Returns a file handler to Cardapio's config file. The caller is
@@ -184,7 +182,6 @@ class SettingsHelper:
         """
 
         return open(self.assert_config_file_exists(), mode)
-
 
     def save(self):
         """
@@ -195,7 +192,6 @@ class SettingsHelper:
             logging.info('Saving config file...')
             json.dump(self.settings, config_file, sort_keys=True, indent=4)
             logging.info('...done saving config file!')
-
 
     def read_config_option(self, user_settings, key, val, override_empty_str=False, force_update_from_version=None):
         """
@@ -230,14 +226,12 @@ class SettingsHelper:
             if settings_version <= force_update_from_version:
                 self.settings[key] = val
 
-
     def __getitem__(self, name):
         """
         Returns the value of the setting named 'name'.
         """
 
         return self.settings[name];
-
 
     def __setitem__(self, name, value):
         """

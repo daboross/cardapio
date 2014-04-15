@@ -50,7 +50,6 @@ class IconHelper:
         self._listener = return_true
         self.icon_theme.connect('changed', self._on_icon_theme_changed)
 
-
     def get_icon_pixbuf(self, icon_name_or_path, icon_size, fallback_icon='application-x-executable'):
         """
         Returns a GTK Image from a given icon name and size. The icon name can be
@@ -97,7 +96,6 @@ class IconHelper:
         # otherwise, return fallback icon
         return self.icon_theme.load_icon(fallback_icon, icon_size, gtk.ICON_LOOKUP_FORCE_SIZE)
 
-
     def get_icon_name_from_theme(self, icon_name):
         """
         Find out if this icon exists in the theme (such as 'gtk-open'), or if
@@ -118,7 +116,6 @@ class IconHelper:
             return cleaned_icon_name
 
         return None
-
 
     def get_icon_name_for_path(self, path):
         """
@@ -152,7 +149,6 @@ class IconHelper:
 
         return None
 
-
     def get_icon_name_from_gio_icon(self, gio_icon, icon_size=None):
         """
         Gets the icon name from a GIO icon object
@@ -175,7 +171,6 @@ class IconHelper:
             pass
 
         return None
-
 
     def get_icon_name_from_app_info(self, app_info, fallback_icon):
         """
@@ -202,14 +197,12 @@ class IconHelper:
 
         return icon_name
 
-
     def register_icon_theme_listener(self, listener):
         """
         Registed a function to be called when we detect that the icon theme has
         changed
         """
         self._listener = listener
-
 
     def _get_icon_name_from_icon_path(self, filepath):
 
@@ -221,7 +214,6 @@ class IconHelper:
         if dot_pos >= 0: icon_name = icon_name[:dot_pos]
 
         return icon_name
-
 
     def _on_icon_theme_changed(self, icon_theme):
         """

@@ -29,10 +29,8 @@ class CardapioSimpleDbusApplet(CardapioAppletInterface):
     IS_CONFIGURABLE = True
     IS_CONTROLLABLE = False
 
-
     def __init__(self, bus):
         self._applet = bus.get_object('org.varal.CardapioSimpleDbusApplet', '/org/varal/CardapioSimpleDbusApplet')
-
 
     def update_from_user_settings(self, settings):
         label = settings['applet label']

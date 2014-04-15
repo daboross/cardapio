@@ -52,7 +52,6 @@ class CardapioAppletInterface:
         """
         pass
 
-
     def update_from_user_settings(self, settings):
         """
         This method updates the applet according to the settings in
@@ -61,13 +60,11 @@ class CardapioAppletInterface:
         """
         pass
 
-
     def get_size(self):
         """
         Returns the width and height of the applet
         """
         return 0, 0
-
 
     def get_position(self):
         """
@@ -76,14 +73,12 @@ class CardapioAppletInterface:
         """
         return 0, 0
 
-
     def get_orientation(self):
         """
         Returns the edge of the screen at which the panel is placed, using one
         of POS_TOP, POS_BOTTOM, ORIENT_LEFT, ORIENT_RIGHT.
         """
         return POS_TOP
-
 
     def draw_toggled_state(self, state):
         """
@@ -93,13 +88,11 @@ class CardapioAppletInterface:
         """
         pass
 
-
     def get_screen_number(self):
         """
         Returns the number of the screen where the applet is placed
         """
         pass
-
 
     def has_mouse_cursor(self, mouse_x, mouse_y):
         """
@@ -108,8 +101,7 @@ class CardapioAppletInterface:
         """
         x, y = self.get_position()
         w, h = self.get_size()
-        return ((x <= mouse_x <= x + w) and (y <= mouse_y <= y + h))
-
+        return (x <= mouse_x <= x + w) and (y <= mouse_y <= y + h)
 
     def disable_autohide(self, state):
         """

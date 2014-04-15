@@ -86,7 +86,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
         self.loaded = True
 
-
     def search(self, text, result_limit):
 
         self.current_query = text
@@ -107,7 +106,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
         self.c.handle_search_result(self, results, self.current_query)
 
-
     def load_vm_items(self):
         self.vm_items = []
         vms = self.vboxmgr.getArray(self.vboxmgr.vbox, 'machines')
@@ -115,16 +113,15 @@ class CardapioPlugin(CardapioPluginInterface):
 
         for vm in vms:
             item = {
-            'name': vm.name,
-            'tooltip': tooltip % {'name': vm.name, 'os': vm.OSTypeId},
-            'icon name': 'VBox',
-            'type': 'raw',
-            'command': 'VBoxManage startvm \"%s\"' % vm.name,
-            'context menu': None,
+                'name': vm.name,
+                'tooltip': tooltip % {'name': vm.name, 'os': vm.OSTypeId},
+                'icon name': 'VBox',
+                'type': 'raw',
+                'command': 'VBoxManage startvm \"%s\"' % vm.name,
+                'context menu': None,
             }
 
             self.vm_items.append(item)
-
 
     def on_vms_changed(self, monitor, file, other_file, event):
 

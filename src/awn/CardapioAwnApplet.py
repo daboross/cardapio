@@ -25,8 +25,6 @@ except Exception, exception:
     fatal_error("Fatal error loading Cardapio's applet for Avant Window Navigator", exception)
     sys.exit(1)
 
-from awn.extras import awnlib, __version__
-
 
 class CardapioAwnApplet(CardapioAppletInterface):
     panel_type = PANEL_TYPE_AWN
@@ -47,7 +45,6 @@ class CardapioAwnApplet(CardapioAppletInterface):
 
         self.applet.tooltip.set('Cardapio')
 
-
     def setup(self, cardapio):
 
         self.cardapio = cardapio
@@ -67,7 +64,6 @@ class CardapioAwnApplet(CardapioAppletInterface):
         self.menu.insert(self.about, 2)
         self.menu.insert(gtk.SeparatorMenuItem(), 3)
         self.menu.show_all()
-
 
     def update_from_user_settings(self, settings):
 
@@ -100,7 +96,6 @@ class CardapioAwnApplet(CardapioAppletInterface):
         except:
             pass
 
-
     def get_size(self):
 
         icon_size = self.applet.get_size()
@@ -115,7 +110,6 @@ class CardapioAwnApplet(CardapioAppletInterface):
             return offset_icon_size, icon_size
         else:
             return offset_icon_size, icon_size
-
 
     def get_position(self):
 
@@ -141,7 +135,6 @@ class CardapioAwnApplet(CardapioAppletInterface):
 
         return x, y
 
-
     def get_orientation(self):
 
         pos_type = self.applet.get_pos_type()
@@ -152,14 +145,11 @@ class CardapioAwnApplet(CardapioAppletInterface):
         else:
             return POS_RIGHT
 
-
     def has_mouse_cursor(self, mouse_x, mouse_y):
         return False
 
-
     def draw_toggled_state(self, state):
         pass
-
 
     def disable_autohide(self, state):
 
@@ -170,37 +160,29 @@ class CardapioAwnApplet(CardapioAppletInterface):
             self.applet.uninhibit_autohide(self.autohide_cookie)
             self.autohide_cookie = None
 
-
     def _on_applet_clicked(self, widget, ignore_main_button):
 
         if not ignore_main_button:
             self.cardapio.show_hide()
 
-
     def _on_applet_cursor_enter(self, widget, event):
         self.cardapio.show_hide()
         return True
 
-
     def _on_applet_cursor_leave(self, widget, event):
         self.cardapio.handle_mainwindow_cursor_leave()
-
 
     def _open_options_dialog(self, widget):
         self.cardapio.open_options_dialog()
 
-
     def _launch_edit_app(self, widget):
         self.cardapio.launch_edit_app()
-
 
     def _open_about_dialog(self, widget):
         self.cardapio.handle_about_menu_item_clicked(widget)
 
-
     def _on_applet_destroy(self, *args):
         self.cardapio.save_and_quit()
-
 
     def get_screen_number(self):
         """

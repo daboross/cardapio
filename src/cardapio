@@ -22,7 +22,6 @@ import sys
 
 from misc import fatal_error
 
-
 try:
     import Constants
     import dbus
@@ -110,7 +109,6 @@ def cardapio_show_near_docky():
 
         except Exception, exception:
             fatal_error('Unknown error with Cardapio in Docky!', exception)
-
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 

@@ -36,7 +36,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
     hide_from_sidebar = True
 
-
     def __init__(self, cardapio_proxy, category):
         '''
         This method is called when the plugin is enabled.
@@ -66,7 +65,6 @@ class CardapioPlugin(CardapioPluginInterface):
         # search for browsers installed and do initial load of bookmark lists
         self.init_browser_lists()
 
-
     def __del__(self):
 
         # handle objects that somehow seem to leak memory
@@ -88,7 +86,6 @@ class CardapioPlugin(CardapioPluginInterface):
                 self.chrome_monitor.disconnect(self.chrome_monitor_handler)
 
         self.chrome_list = None  # for some reason this has to be cleared to prevent a memory leak (wtf)
-
 
     def init_browser_lists(self):
         ## Look for firefox and setup bookmark list and file monitor if found
@@ -150,7 +147,6 @@ class CardapioPlugin(CardapioPluginInterface):
                 self.c.write_to_log(self, e, is_error=True)
                 self.chrome_list = []
 
-
     def search(self, text, result_limit):
         #First we get results from every browser's plugin list
         #then we sort alphabetically
@@ -172,13 +168,11 @@ class CardapioPlugin(CardapioPluginInterface):
 
         self.c.handle_search_result(self, results[:result_limit], self.current_query)
 
-
     def search_bm_list(self, text, bm_list, results):
         for item in bm_list:
             if item['name'] is None: item['name'] = item['command']
             if item['name'].lower().find(text) != -1:
                 results.append(item)
-
 
     def load_firefox_bm(self, *dummy):
 
@@ -227,19 +221,19 @@ class CardapioPlugin(CardapioPluginInterface):
         try:
             for bookmark in sql_conn.execute(sql_query):
                 self.ff_list.append({
-                'name': bookmark[0],
-                'tooltip': _('Firefox bookmark:\n%s') % bookmark[1],
-                'icon name': 'html',
-                'type': 'xdg',
-                'command': bookmark[1],
-                'context menu': [
-                    {
-                    'name': _('Open in Firefox'),
-                    'tooltip': _('Go To \"%s\" in Firefox') % bookmark[0],
-                    'icon name': 'firefox',
-                    'type': 'raw',
-                    'command': 'firefox \"%s\"' % bookmark[1]
-                    }]
+                    'name': bookmark[0],
+                    'tooltip': _('Firefox bookmark:\n%s') % bookmark[1],
+                    'icon name': 'html',
+                    'type': 'xdg',
+                    'command': bookmark[1],
+                    'context menu': [
+                        {
+                            'name': _('Open in Firefox'),
+                            'tooltip': _('Go To \"%s\" in Firefox') % bookmark[0],
+                            'icon name': 'firefox',
+                            'type': 'raw',
+                            'command': 'firefox \"%s\"' % bookmark[1]
+                        }]
                 })
 
         except Exception, exception:
@@ -247,7 +241,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
         sql_conn.close()
         self.os.remove(db_copy_path)
-
 
     def load_chromium_bm(self):
 
@@ -275,21 +268,20 @@ class CardapioPlugin(CardapioPluginInterface):
             name = line[0].split("\"")[3]
             url = line[1].split("\"")[3]
             self.chromium_list.append({
-            'name': name,
-            'tooltip': _('Chromium bookmark:\n%s') % url,
-            'icon name': 'html',
-            'type': 'xdg',
-            'command': url,
-            'context menu': [
-                {
-                'name': _('Open in Chromium'),
-                'tooltip': _('Go To \"%s\" in Chromium') % name,
-                'icon name': 'chromium',
-                'type': 'raw',
-                'command': 'chromium-browser \"%s\"' % line[1].split("\"")[3]
-                }]
+                'name': name,
+                'tooltip': _('Chromium bookmark:\n%s') % url,
+                'icon name': 'html',
+                'type': 'xdg',
+                'command': url,
+                'context menu': [
+                    {
+                        'name': _('Open in Chromium'),
+                        'tooltip': _('Go To \"%s\" in Chromium') % name,
+                        'icon name': 'chromium',
+                        'type': 'raw',
+                        'command': 'chromium-browser \"%s\"' % line[1].split("\"")[3]
+                    }]
             })
-
 
     #of course its very similar to the chromium function, but there are enough
     #variables and strings that need to be different so I didn't try to
@@ -320,21 +312,20 @@ class CardapioPlugin(CardapioPluginInterface):
             name = line[0].split("\"")[3]
             url = line[1].split("\"")[3]
             self.chrome_list.append({
-            'name': name,
-            'tooltip': _('Chrome bookmark:\n%s') % url,
-            'icon name': 'html',
-            'type': 'xdg',
-            'command': url,
-            'context menu': [
-                {
-                'name': _('Open in Google Chrome'),
-                'tooltip': _('Go To \"%s\" in Google Chrome') % name,
-                'icon name': 'google-chrome',
-                'type': 'raw',
-                'command': 'google-chrome \"%s\"' % line[1].split("\"")[3]
-                }]
+                'name': name,
+                'tooltip': _('Chrome bookmark:\n%s') % url,
+                'icon name': 'html',
+                'type': 'xdg',
+                'command': url,
+                'context menu': [
+                    {
+                        'name': _('Open in Google Chrome'),
+                        'tooltip': _('Go To \"%s\" in Google Chrome') % name,
+                        'icon name': 'google-chrome',
+                        'type': 'raw',
+                        'command': 'google-chrome \"%s\"' % line[1].split("\"")[3]
+                    }]
             })
-
 
     def on_ff_bookmark_change(self, monitor, _file, other_file, event):
         try:
@@ -344,7 +335,6 @@ class CardapioPlugin(CardapioPluginInterface):
             self.c.write_to_log(self, e, is_error=True)
             self.ff_list = []
 
-
     def on_chromium_bookmark_change(self, monitor, _file, other_file, event):
         try:
             self.load_chromium_bm()
@@ -352,7 +342,6 @@ class CardapioPlugin(CardapioPluginInterface):
             self.c.write_to_log(self, "Error reloading chromium bookmarks", is_error=True)
             self.c.write_to_log(self, e, is_error=True)
             self.chromium_list = []
-
 
     def on_chrome_bookmark_change(self, monitor, _file, other_file, event):
         try:

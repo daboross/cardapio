@@ -73,8 +73,8 @@ class CardapioPlugin(CardapioPluginInterface):
 
         # Bing's API arguments (my AppID and a request for a web search)
         self.api_base_args = {
-        'Appid': '237CBC82BB8C3F7F5F19F6A77B0D38A59E8F8C2C',
-        'sources': 'web'
+            'Appid': '237CBC82BB8C3F7F5F19F6A77B0D38A59E8F8C2C',
+            'sources': 'web'
         }
 
         # Bing's base URLs (search and search more variations)
@@ -136,24 +136,25 @@ class CardapioPlugin(CardapioPluginInterface):
                 # remember them all
                 for item in response_body['Results']:
                     items.append({
-                    'name': item['Title'],
-                    'tooltip': item['Url'],
-                    'icon name': 'text-html',
-                    'type': 'xdg',
-                    'command': item['Url'],
-                    'context menu': None
+                        'name': item['Title'],
+                        'tooltip': item['Url'],
+                        'icon name': 'text-html',
+                        'type': 'xdg',
+                        'command': item['Url'],
+                        'context menu': None
                     })
 
             # always add 'Search more...' item
             search_more_args = {'q': text}
 
             items.append({
-            'name': _('Show additional results'),
-            'tooltip': _('Show additional search results in your web browser'),
-            'icon name': 'system-search',
-            'type': 'xdg',  # TODO: cardapio later unquotes this and then quotes it again;  # it's screwing my quotation
-            'command': self.web_base_url.format(self.urllib.urlencode(search_more_args)),
-            'context menu': None
+                'name': _('Show additional results'),
+                'tooltip': _('Show additional search results in your web browser'),
+                'icon name': 'system-search',
+                'type': 'xdg',
+                # TODO: cardapio later unquotes this and then quotes it again;  # it's screwing my quotation
+                'command': self.web_base_url.format(self.urllib.urlencode(search_more_args)),
+                'context menu': None
             })
 
             # pass the results to Cardapio

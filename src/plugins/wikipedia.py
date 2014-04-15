@@ -81,8 +81,8 @@ class CardapioPlugin(CardapioPluginInterface):
         # Wikipedia's unofficial API arguments (search truncated to
         # maximum four results, formatted as json)
         self.api_base_args = {
-        'action': 'opensearch',
-        'format': 'json'
+            'action': 'opensearch',
+            'format': 'json'
         }
 
         # Wikipedia's base URLs (search and show details variations)
@@ -146,12 +146,12 @@ class CardapioPlugin(CardapioPluginInterface):
                 # argument - what now?
                 item_url = self.web_base_url.format(self.urllib.quote(str(item)))
                 items.append({
-                'name': item,
-                'tooltip': item_url,
-                'icon name': 'text-html',
-                'type': 'xdg',
-                'command': item_url,
-                'context menu': None
+                    'name': item,
+                    'tooltip': item_url,
+                    'icon name': 'text-html',
+                    'type': 'xdg',
+                    'command': item_url,
+                    'context menu': None
                 })
 
             # pass the results to Cardapio

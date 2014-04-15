@@ -36,7 +36,6 @@ class CardapioPlugin(CardapioPluginInterface):
     category_tooltip = _('Results found inside the files in your computer')
     hide_from_sidebar = True
 
-
     def __init__(self, cardapio_proxy, category):
 
         self.c = cardapio_proxy
@@ -73,16 +72,15 @@ class CardapioPlugin(CardapioPluginInterface):
             self.action_command = r"tracker-search-tool '%s'"
 
         self.action = {
-        'name': _('Show additional results'),
-        'tooltip': _('Show additional search results in the Tracker search tool'),
-        'icon name': 'system-search',
-        'type': 'callback',
-        'command': self.more_results_action,
-        'context menu': None,
+            'name': _('Show additional results'),
+            'tooltip': _('Show additional search results in the Tracker search tool'),
+            'icon name': 'system-search',
+            'type': 'callback',
+            'command': self.more_results_action,
+            'context menu': None,
         }
 
         self.loaded = True
-
 
     def search(self, text, result_limit):
 
@@ -114,7 +112,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
         self.c.handle_search_error(self, error)
 
-
     def prepare_and_handle_search_result(self, results):
 
         formatted_results = []
@@ -125,12 +122,12 @@ class CardapioPlugin(CardapioPluginInterface):
             icon_name = result[1]
 
             formatted_result = {
-            'name': child_name,
-            'icon name': icon_name,
-            'tooltip': result[0],
-            'command': canonical_path,
-            'type': 'xdg',
-            'context menu': None,
+                'name': child_name,
+                'icon name': icon_name,
+                'tooltip': result[0],
+                'command': canonical_path,
+                'type': 'xdg',
+                'context menu': None,
             }
 
             formatted_results.append(formatted_result)
@@ -139,7 +136,6 @@ class CardapioPlugin(CardapioPluginInterface):
             formatted_results.append(self.action)
 
         self.c.handle_search_result(self, formatted_results, self.current_query)
-
 
     def more_results_action(self, text):
 

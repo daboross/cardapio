@@ -131,23 +131,23 @@ class CardapioPlugin(CardapioPluginInterface):
         # title' link
         if len(items) == 0:
             items.append({
-            'name': _('Create this note'),
-            'tooltip': _('Create a new note with this title in Tomboy'),
-            'icon name': 'tomboy',
-            'type': 'callback',
-            'command': self.tomboy_create_note,
-            'context menu': None
+                'name': _('Create this note'),
+                'tooltip': _('Create a new note with this title in Tomboy'),
+                'icon name': 'tomboy',
+                'type': 'callback',
+                'command': self.tomboy_create_note,
+                'context menu': None
             })
 
         # show the 'search more' option if required
         if has_more_results:
             items.append({
-            'name': _('Show additional notes'),
-            'tooltip': _('Show additional notes in Tomboy'),
-            'icon name': 'tomboy',
-            'type': 'callback',
-            'command': self.tomboy_find_more,
-            'context menu': None
+                'name': _('Show additional notes'),
+                'tooltip': _('Show additional notes in Tomboy'),
+                'icon name': 'tomboy',
+                'type': 'callback',
+                'command': self.tomboy_find_more,
+                'context menu': None
             })
 
         self.cardapio.handle_search_result(self, items, text)
@@ -222,12 +222,12 @@ class DBusSearchNotesCallback:
 
             # add 'open this note' item
             items.append({
-            'name': self.tomboy.GetNoteTitle(note),
-            'tooltip': _('Open this note'),
-            'icon name': 'tomboy',
-            'type': 'xdg',
-            'command': note,
-            'context menu': None
+                'name': self.tomboy.GetNoteTitle(note),
+                'tooltip': _('Open this note'),
+                'icon name': 'tomboy',
+                'type': 'xdg',
+                'command': note,
+                'context menu': None
             })
 
         # pass all of the gathered items and the current search

@@ -91,11 +91,11 @@ class CardapioPlugin(CardapioPluginInterface):
         # Yahoo's API arguments (my AppID and a request for a search with
         # maximum four results in raw json format and given language)
         self.api_base_args = {
-        'appid': 'TuNKmOzV34GRC9mrBNZMgr.vY1xPMLMH9U3PsOYkg8WvYnFawnB5gKd4GsrUbqluzg--',
-        'format': 'json',
-        'style': 'raw',
-        'lang': language,
-        'region': region
+            'appid': 'TuNKmOzV34GRC9mrBNZMgr.vY1xPMLMH9U3PsOYkg8WvYnFawnB5gKd4GsrUbqluzg--',
+            'format': 'json',
+            'style': 'raw',
+            'lang': language,
+            'region': region
         }
 
         # Yahoo's base URLs (search and search more variations)
@@ -155,24 +155,25 @@ class CardapioPlugin(CardapioPluginInterface):
                 # remember them all
                 for item in response_body['resultset_web']:
                     items.append({
-                    'name': item['title'],
-                    'tooltip': item['url'],
-                    'icon name': 'text-html',
-                    'type': 'xdg',
-                    'command': item['url'],
-                    'context menu': None
+                        'name': item['title'],
+                        'tooltip': item['url'],
+                        'icon name': 'text-html',
+                        'type': 'xdg',
+                        'command': item['url'],
+                        'context menu': None
                     })
 
             # always add 'Search more...' item
             search_more_args = {'p': text}
 
             items.append({
-            'name': _('Show additional results'),
-            'tooltip': _('Show additional search results in your web browser'),
-            'icon name': 'system-search',
-            'type': 'xdg',  # TODO: cardapio later unquotes this and then quotes it again;  # it's screwing my quotation
-            'command': self.web_base_url.format(self.urllib.urlencode(search_more_args)),
-            'context menu': None
+                'name': _('Show additional results'),
+                'tooltip': _('Show additional search results in your web browser'),
+                'icon name': 'system-search',
+                'type': 'xdg',
+                # TODO: cardapio later unquotes this and then quotes it again;  # it's screwing my quotation
+                'command': self.web_base_url.format(self.urllib.urlencode(search_more_args)),
+                'context menu': None
             })
 
             # pass the results to Cardapio

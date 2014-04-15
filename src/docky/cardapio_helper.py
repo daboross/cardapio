@@ -79,12 +79,12 @@ def install_cardapio_launcher():
         except:
             pass
 
-    #if current_label != '':
-    #	if current_label is not None:
-    #		gconf_client.set_string(docky_item_gconf_root + '/OldHoverText', current_label)
+            #if current_label != '':
+            #	if current_label is not None:
+            #		gconf_client.set_string(docky_item_gconf_root + '/OldHoverText', current_label)
 
-    #	try    : gconf_client.set_string(docky_item_gconf_root + '/HoverText', '')
-    #	except : pass
+            #	try    : gconf_client.set_string(docky_item_gconf_root + '/HoverText', '')
+            #	except : pass
 
 
 def remove_cardapio_launcher():
@@ -111,17 +111,17 @@ def remove_cardapio_launcher():
         except:
             pass
 
-    #if current_label == '':
+            #if current_label == '':
 
-    #	old_label = gconf_client.get_string(docky_item_gconf_root + '/OldHoverText')
+            #	old_label = gconf_client.get_string(docky_item_gconf_root + '/OldHoverText')
 
-    #	if old_label is not None and old_label != '':
-    #		gconf_client.set_string(docky_item_gconf_root + '/HoverText', old_label)
-    #	else:
-    #		gconf_client.set_string(docky_item_gconf_root + '/HoverText', '')
+            #	if old_label is not None and old_label != '':
+            #		gconf_client.set_string(docky_item_gconf_root + '/HoverText', old_label)
+            #	else:
+            #		gconf_client.set_string(docky_item_gconf_root + '/HoverText', '')
 
-    #	try    : gconf_client.unset(docky_item_gconf_root + '/OldHoverText')
-    #	except : pass
+            #	try    : gconf_client.unset(docky_item_gconf_root + '/OldHoverText')
+            #	except : pass
 
 
 class CardapioSink(DockManagerSink):

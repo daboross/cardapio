@@ -39,7 +39,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
     hide_from_sidebar = True
 
-
     def __init__(self, cardapio_proxy, category):
         '''
         This method is called when the plugin is enabled.
@@ -69,7 +68,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
         self.loaded = True  # set to true if everything goes well
 
-
     def search(self, text, result_limit):
 
         self.current_query = text
@@ -98,26 +96,27 @@ class CardapioPlugin(CardapioPluginInterface):
 
                 cmdargs = cmd + args
                 item = {
-                'name': cmdargs,
-                'tooltip': 'Run \'%s\'' % cmdargs,
-                'icon name': cmd,
-                'type': 'raw-no-notification',
-                'command': cmdargs,
-                'context menu': [
-                    {
-                    'name': self.in_a_terminal % cmdargs,
-                    'tooltip': self.in_a_terminal_tooltip % cmdargs,
-                    'icon name': 'utilities-terminal',
-                    'type': 'raw-in-terminal',  #'command'   : 'gnome-terminal -x bash -c \"%s ; bash\"' % cmdargs
-                    'command': cmdargs
-                    },
-                    {
-                    'name': self.as_root % cmdargs,
-                    'tooltip': self.as_root_tooltip % cmdargs,
+                    'name': cmdargs,
+                    'tooltip': 'Run \'%s\'' % cmdargs,
                     'icon name': cmd,
-                    'type': 'raw',
-                    'command': 'gksudo \"%s\"' % cmdargs
-                    }]
+                    'type': 'raw-no-notification',
+                    'command': cmdargs,
+                    'context menu': [
+                        {
+                            'name': self.in_a_terminal % cmdargs,
+                            'tooltip': self.in_a_terminal_tooltip % cmdargs,
+                            'icon name': 'utilities-terminal',
+                            'type': 'raw-in-terminal',
+                            #'command'   : 'gnome-terminal -x bash -c \"%s ; bash\"' % cmdargs
+                            'command': cmdargs
+                        },
+                        {
+                            'name': self.as_root % cmdargs,
+                            'tooltip': self.as_root_tooltip % cmdargs,
+                            'icon name': cmd,
+                            'type': 'raw',
+                            'command': 'gksudo \"%s\"' % cmdargs
+                        }]
                 }
                 results.append(item)
                 num_results += 1

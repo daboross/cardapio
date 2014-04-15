@@ -17,10 +17,8 @@
 
 # these imports are outside of the "try" block because it defines
 # the function fatal_error(), which is used in the "except"
-import sys
 
 from misc import *
-
 
 try:
     import Constants
@@ -48,7 +46,6 @@ class OptionsWindow:
 
         self.cardapio = cardapio
         self.panel_type = panel_type
-
 
     def setup_ui(self):
         """
@@ -80,7 +77,6 @@ class OptionsWindow:
         self.prepare_panel_related_options()
         self._read_gtk_theme_info()
 
-
     def _read_gtk_theme_info(self):
         """
         Reads some info from the GTK theme to better adapt to it
@@ -88,7 +84,6 @@ class OptionsWindow:
 
         scrollbar = gtk.VScrollbar()
         self.scrollbar_width = scrollbar.style_get_property('slider-width')
-
 
     def prepare_panel_related_options(self, panel_type=None):
         """
@@ -114,7 +109,6 @@ class OptionsWindow:
             self.get_widget('OptionIconNameHelp').hide()
             self.get_widget('OptionOpenOnHover').hide()
 
-
     def on_plugintreeview_hover(self, treeview, event):
         """
         Change the cursor to show that plugins are draggable.
@@ -132,7 +126,6 @@ class OptionsWindow:
             treeview.window.set_cursor(None)
         else:
             treeview.window.set_cursor(self.drag_allowed_cursor)
-
 
     def show(self):
         """
@@ -172,7 +165,6 @@ class OptionsWindow:
 
         self.is_change_handler_blocked = False
 
-
     def hide(self, *dummy):
         """
         Hides the Options Dialog
@@ -182,7 +174,6 @@ class OptionsWindow:
         self.cardapio.save()
 
         return True
-
 
     def _plugin_iterator(self):
         """
@@ -213,7 +204,6 @@ class OptionsWindow:
 
             yield (basename, plugin_class, is_active, is_core, is_required)
 
-
     def _set_widget_from_option(self, widget_str, option_str):
         """
         Set the value of the widget named 'widget_str' to 'option_str'
@@ -229,7 +219,6 @@ class OptionsWindow:
 
         else:
             logging.error('Widget %s (%s) was not written' % (widget_str, type(widget)))
-
 
     def on_grab_new_shortcut_toggled(self, button):
         """
@@ -248,7 +237,6 @@ class OptionsWindow:
             self.dialog.disconnect(self.key_grab_handler)
             self.get_widget('OptionGrabKeybinding').set_label(_('Grab new shortcut'))
             self.on_options_changed()
-
 
     def on_new_keybinding_press(self, widget, event):
         """
@@ -303,18 +291,17 @@ class OptionsWindow:
             self.get_widget('OptionKeybinding').set_text(shortcut_string)
 
             if main_key not in (
-            gtk.keysyms.Shift_L, gtk.keysyms.Shift_R, gtk.keysyms.Shift_Lock,
-            gtk.keysyms.Control_L, gtk.keysyms.Control_R,
-            gtk.keysyms.Super_L, gtk.keysyms.Super_R,
-            gtk.keysyms.Hyper_L, gtk.keysyms.Hyper_R,
-            gtk.keysyms.Meta_L, gtk.keysyms.Meta_R,
-            gtk.keysyms.Alt_L, gtk.keysyms.Alt_R, gtk.keysyms.Mode_switch,  # TODO: what else?
-            #gtk.keysyms.ISO_Level3_Shift, gtk.keysyms.ISO_Group_Shift,
+                    gtk.keysyms.Shift_L, gtk.keysyms.Shift_R, gtk.keysyms.Shift_Lock,
+                    gtk.keysyms.Control_L, gtk.keysyms.Control_R,
+                    gtk.keysyms.Super_L, gtk.keysyms.Super_R,
+                    gtk.keysyms.Hyper_L, gtk.keysyms.Hyper_R,
+                    gtk.keysyms.Meta_L, gtk.keysyms.Meta_R,
+                    gtk.keysyms.Alt_L, gtk.keysyms.Alt_R, gtk.keysyms.Mode_switch,  # TODO: what else?
+                    #gtk.keysyms.ISO_Level3_Shift, gtk.keysyms.ISO_Group_Shift,
             ):
                 self.get_widget('OptionGrabKeybinding').set_active(False)
 
         return True
-
 
     def on_options_changed(self, *dummy):
         """
@@ -351,7 +338,6 @@ class OptionsWindow:
 
         self.cardapio.apply_settings()
 
-
     def _set_icon_widgets(self):
         """
         Sets the value of icon-related widgets in the options window according
@@ -379,7 +365,6 @@ class OptionsWindow:
             self.icon_button_name.set_active(True)
             self.icon_button_name_entry.set_text(icon_string)
 
-
     def update_plugin_description(self, *dummy):
         """
         Writes information about the currently-selected plugin on the GUI
@@ -398,10 +383,10 @@ class OptionsWindow:
 
         description = _(
             '<b>Plugin:</b> %(name)s %(version)s\n<b>Author:</b> %(author)s\n<b>Description:</b> %(description)s') % {
-                      'name': plugin_class.name,
-                      'version': plugin_class.version,
-                      'author': plugin_class.author,
-                      'description': plugin_class.description,
+                          'name': plugin_class.name,
+                          'version': plugin_class.version,
+                          'author': plugin_class.author,
+                          'description': plugin_class.description,
                       }
         if not is_core: description += '\n<small>(' + _('This is a community-supported plugin') + ')</small>'
 
@@ -414,11 +399,10 @@ class OptionsWindow:
         if width > 1:
             label.set_size_request(width - self.scrollbar_width - 20, -1)
 
-        # HACK: The -20 is a hack because some themes add extra padding that I
-        # need to account for. Since I don't know where that padding is comming
-        # from, I just enter a value (20px) that is larger than I assume any
-        # theme would ever use.
-
+            # HACK: The -20 is a hack because some themes add extra padding that I
+            # need to account for. Since I don't know where that padding is comming
+            # from, I just enter a value (20px) that is larger than I assume any
+            # theme would ever use.
 
     def apply_plugins_from_option_window(self, *dummy):
         """
@@ -437,7 +421,6 @@ class OptionsWindow:
 
         self.cardapio.apply_plugin_settings()
 
-
     def on_plugin_state_toggled(self, cell, path):
         """
         Believe it or not, GTK requires you to manually tell the checkbuttons
@@ -452,7 +435,6 @@ class OptionsWindow:
 
         self.plugin_tree_model.set_value(iter_, 3, not cell.get_active())
         self.apply_plugins_from_option_window()
-
 
     def on_mini_mode_button_toggled(self, widget):
         """

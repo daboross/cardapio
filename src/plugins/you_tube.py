@@ -71,7 +71,7 @@ class CardapioPlugin(CardapioPluginInterface):
 
         # YouTube's API arguments (format and maximum result count)
         self.api_base_args = {
-        'alt': 'json'
+            'alt': 'json'
         }
 
         # YouTube's base URLs (search and search more variations)
@@ -145,22 +145,23 @@ class CardapioPlugin(CardapioPluginInterface):
                         continue
 
                     items.append({
-                    'name': item['title']['$t'],
-                    'tooltip': href,
-                    'icon name': 'text-html',
-                    'type': 'xdg',
-                    'command': href,
-                    'context menu': None
+                        'name': item['title']['$t'],
+                        'tooltip': href,
+                        'icon name': 'text-html',
+                        'type': 'xdg',
+                        'command': href,
+                        'context menu': None
                     })
 
             # always add 'Search more...' item
             items.append({
-            'name': _('Show additional results'),
-            'tooltip': _('Show additional search results in your web browser'),
-            'icon name': 'system-search',
-            'type': 'xdg',  # TODO: cardapio later unquotes this and then quotes it again;  # it's screwing my quotation
-            'command': self.web_base_url.format(self.urllib.urlencode({'search_query': text})),
-            'context menu': None
+                'name': _('Show additional results'),
+                'tooltip': _('Show additional search results in your web browser'),
+                'icon name': 'system-search',
+                'type': 'xdg',
+                # TODO: cardapio later unquotes this and then quotes it again;  # it's screwing my quotation
+                'command': self.web_base_url.format(self.urllib.urlencode({'search_query': text})),
+                'context menu': None
             })
 
             # pass the results to Cardapio

@@ -17,9 +17,6 @@
 
 # these imports are outside of the "try" block because it defines
 # the function fatal_error(), which is used in the "except"
-import sys
-
-from misc import *
 
 
 try:
@@ -69,7 +66,6 @@ class CardapioGtkView(CardapioViewInterface):
         self._screen = self._display.get_default_screen()
         self._root_window = gtk.gdk.get_default_root_window()
         self._wm = self._get_current_window_manager()
-
 
     # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     # Methods required by the View API
@@ -124,7 +120,8 @@ class CardapioGtkView(CardapioViewInterface):
         for widget in builder.get_objects():
 
             # skip the about dialog or the app name will be overwritten!
-            if widget == self.about_dialog: continue
+            if widget == self.about_dialog:
+                continue
 
             if 'set_name' in dir(widget):
                 widget.set_name(gtk.Buildable.get_name(widget))
@@ -174,14 +171,12 @@ class CardapioGtkView(CardapioViewInterface):
         except:
             pass
 
-
     def quit(self):
         """
         Do the last cleaning up you need to do --- this is the last thing that
         happens before Cardapio closes.
         """
         gtk.main_quit()
-
 
     def set_sidebar_button_toggled(self, button, state):
         """
@@ -191,7 +186,6 @@ class CardapioGtkView(CardapioViewInterface):
         if button.get_active() != state:
             self._auto_toggled_sidebar_button = True
             button.set_active(state)
-
 
     def set_all_sections_sidebar_button_toggled(self, state, is_system_mode):
         """
@@ -204,7 +198,6 @@ class CardapioGtkView(CardapioViewInterface):
         else:
             self.set_sidebar_button_toggled(self.all_sections_sidebar_button, state)
 
-
     def set_all_sections_sidebar_button_sensitive(self, state, is_system_mode):
         """
         Makes the "All" button unclickable
@@ -215,7 +208,6 @@ class CardapioGtkView(CardapioViewInterface):
         else:
             self.all_sections_sidebar_button.set_sensitive(state)
 
-
     def show_section(self, section):
         """
         Shows a given application section
@@ -223,7 +215,6 @@ class CardapioGtkView(CardapioViewInterface):
         section.show()
         # TODO: is this necessary? (below)
         section.get_children()[0].get_children()[0].show()  # show also section_contents
-
 
     def unblock_focus_out_event(self, *dummy):
         """
@@ -234,7 +225,6 @@ class CardapioGtkView(CardapioViewInterface):
             self.main_window.handler_unblock_by_func(self.on_mainwindow_focus_out)
             self.main_window.handler_unblock_by_func(self.on_mainwindow_cursor_leave)
             self._focus_out_blocked = False
-
 
     def fill_plugin_context_menu(self, _clicked_app_button_info_context_menu):
         """
@@ -262,7 +252,6 @@ class CardapioGtkView(CardapioViewInterface):
             menu_item.show_all()
             self.app_context_menu.append(menu_item)
 
-
     def clear_plugin_context_menu(self):
         """
         Remove all plugin-dependent actions from the context menu
@@ -271,7 +260,6 @@ class CardapioGtkView(CardapioViewInterface):
         for menu_item in self.app_context_menu:
             if menu_item.name is not None and menu_item.name.startswith('PluginAction'):
                 self.app_context_menu.remove(menu_item)
-
 
     def show_context_menu_option(self, menu_item):
         """
@@ -282,7 +270,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         menu_item.show()
 
-
     def hide_context_menu_option(self, menu_item):
         """
         Hides the context menu option specified by "menu_item". The "menu_item"
@@ -292,7 +279,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         menu_item.hide()
 
-
     def popup_app_context_menu(self, app_info):
         """
         Show context menu for app buttons
@@ -300,7 +286,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         time = gtk.get_current_event().time
         self.app_context_menu.popup(None, None, None, 3, time)
-
 
     def set_view_mode_button_toggled(self, state):
         """
@@ -311,7 +296,6 @@ class CardapioGtkView(CardapioViewInterface):
         if self.view_mode_button.get_active() != state:
             self._auto_toggled_view_mode_button = True
             self.view_mode_button.set_active(state)
-
 
     def show_view_mode_button(self):
         """
@@ -326,7 +310,6 @@ class CardapioGtkView(CardapioViewInterface):
         self.get_widget('SideappViewport').hide()
         self.get_widget('SideappViewport').show()
 
-
     def hide_view_mode_button(self):
         """
         Hides the "view mode" button, which switches between "app view" and
@@ -334,7 +317,6 @@ class CardapioGtkView(CardapioViewInterface):
         """
 
         self.view_mode_button.hide()
-
 
     def set_main_splitter_position(self, position):
         """
@@ -344,7 +326,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         self.main_splitter.set_position(position)
 
-
     def get_main_splitter_position(self):
         """
         Get the position of the "splitter" which separates the sidepane from the
@@ -353,7 +334,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         return self.main_splitter.get_position()
 
-
     def get_window_size(self):
         """
         Get the width and height of the Cardapio window
@@ -361,13 +341,11 @@ class CardapioGtkView(CardapioViewInterface):
 
         return list(self.main_window.get_size())
 
-
     def get_window_position(self):
         """
         Get the x,y coordinates of the top-left corner of the Cardapio window
         """
         return self.main_window.get_position()
-
 
     def apply_settings(self):
         """
@@ -405,7 +383,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         self.toggle_mini_mode_ui(update_window_size=False)
 
-
     def get_cursor_coordinates(self):
         """
         Returns the x,y coordinates of the mouse cursor with respect
@@ -413,7 +390,6 @@ class CardapioGtkView(CardapioViewInterface):
         """
         mouse_x, mouse_y, dummy = gtk.gdk.get_default_root_window().get_pointer()
         return mouse_x, mouse_y
-
 
     def get_monitor_dimensions(self, x, y):
         """
@@ -425,7 +401,6 @@ class CardapioGtkView(CardapioViewInterface):
         monitor = self._screen.get_monitor_at_point(x, y)
         monitor_dimensions = self._screen.get_monitor_geometry(monitor)
         return monitor_dimensions
-
 
     def get_screen_dimensions(self):
         """
@@ -451,13 +426,11 @@ class CardapioGtkView(CardapioViewInterface):
 
         return (screen_x, screen_y, screen_width, screen_height)
 
-
     def is_window_visible(self):
         """
         Returns True if the main window is visible
         """
         return self.main_window.get_visible()
-
 
     def is_search_entry_empty(self):
         """
@@ -465,7 +438,6 @@ class CardapioGtkView(CardapioViewInterface):
         """
 
         return (len(self.search_entry.get_text().strip()) == 0)
-
 
     def focus_first_visible_app(self):
         """
@@ -476,7 +448,6 @@ class CardapioGtkView(CardapioViewInterface):
         if first_app_widget is not None:
             self.main_window.set_focus(first_app_widget)
 
-
     def get_nth_visible_app(self, n):
         """
         Returns the app_info for the nth app in the right pane, if any.
@@ -484,7 +455,6 @@ class CardapioGtkView(CardapioViewInterface):
         widget = self._get_nth_visible_app_widget(n)
         if widget is None: return None
         return widget.app_info
-
 
     def get_selected_app(self):
         """
@@ -499,14 +469,12 @@ class CardapioGtkView(CardapioViewInterface):
 
         return None
 
-
     def place_text_cursor_at_end(self):
         """
         Places the text cursor at the end of the search entry's text
         """
 
         self.search_entry.set_position(-1)
-
 
     def hide_no_results_text(self):
         """
@@ -515,14 +483,12 @@ class CardapioGtkView(CardapioViewInterface):
 
         self.no_results_section.hide()
 
-
     def scroll_to_top(self):
         """
         Scroll to the top of the app pane
         """
 
         self.scroll_adjustment.set_value(0)
-
 
     def show_no_results_text(self, text=None):
         """
@@ -533,7 +499,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         self.no_results_label.set_text(text)
         self.no_results_section.show()
-
 
     def show_navigation_buttons(self):
         """
@@ -547,7 +512,6 @@ class CardapioGtkView(CardapioViewInterface):
         # somewhere before processing a subfolder, so we're doing it here.
         self._previously_focused_widget = None
 
-
     def hide_navigation_buttons(self):
         """
         Shows the row of navigation buttons on top of the main app pane.
@@ -555,13 +519,11 @@ class CardapioGtkView(CardapioViewInterface):
         self.navigation_buttons_pane.hide()
         self.mainpane_separator.hide()
 
-
     def add_app_button(self, button_str, icon_name, pane_or_section, tooltip):
         """
         Adds a button to the app pane, and returns a handler to it
         """
         return self._add_button(button_str, icon_name, pane_or_section, tooltip, self.APP_BUTTON)
-
 
     def add_category_button(self, button_str, icon_name, pane_or_section, section, tooltip):
         """
@@ -572,7 +534,6 @@ class CardapioGtkView(CardapioViewInterface):
         sidebar_button.connect('clicked', self.on_sidebar_button_clicked, section)
         return sidebar_button
 
-
     def add_session_button(self, button_str, icon_name, pane_or_section, tooltip):
         """
         Adds a button to the session pane, and returns a handler to it
@@ -581,20 +542,17 @@ class CardapioGtkView(CardapioViewInterface):
         self.session_buttons.append(session_button)
         return session_button
 
-
     def add_sidepane_button(self, button_str, icon_name, pane_or_section, tooltip):
         """
         Adds a button to the sidepane, and returns a handler to it
         """
         return self._add_button(button_str, icon_name, pane_or_section, tooltip, self.SIDEPANE_BUTTON)
 
-
     def hide_button(self, button):
         """
         Hides a button
         """
         button.hide()
-
 
     def setup_button_drag_and_drop(self, button, is_desktop_file):
         """
@@ -629,7 +587,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         return button.parent.parent.parent
 
-
     def pre_build_ui(self):
         """
         Prepares the UI before building any of the actual content-related widgets
@@ -643,7 +600,6 @@ class CardapioGtkView(CardapioViewInterface):
         self._remove_all_children(self.RIGHT_SESSION_PANE)
         self._remove_all_children(self.LEFT_SESSION_PANE)
 
-
     def post_build_ui(self):
         """
         Performs operations after building the actual content-related widgets
@@ -653,7 +609,6 @@ class CardapioGtkView(CardapioViewInterface):
         # window, so that it doesn't flash a grey rectangle on the first time
         # cardapio is shown
         pass
-
 
     def build_all_sections_sidebar_buttons(self, title, tooltip):
         """
@@ -674,7 +629,6 @@ class CardapioGtkView(CardapioViewInterface):
         self.set_sidebar_button_toggled(button, True)
         self.all_system_sections_sidebar_button.set_sensitive(False)
 
-
     def build_no_results_section(self):
         """
         Creates the section that will be used to display the "No results to show" text
@@ -684,7 +638,6 @@ class CardapioGtkView(CardapioViewInterface):
         self.no_results_section = section
         self.no_results_label = label
         self.hide_no_results_text()
-
 
     def build_subfolders_section(self, title, tooltip):
         """
@@ -696,7 +649,6 @@ class CardapioGtkView(CardapioViewInterface):
         self.SUBFOLDERS_SECTION = section
         self.subfolders_label = label
 
-
     def build_uncategorized_section(self, title, tooltip):
         """
         Creates the Uncategorized section to the app pane
@@ -706,7 +658,6 @@ class CardapioGtkView(CardapioViewInterface):
                                                     hidden_when_no_query=True)
         self.UNCATEGORIZED_SECTION = section
 
-
     def build_session_section(self, title, tooltip):
         """
         Creates the Session section to the app pane
@@ -714,7 +665,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         section, dummy = self._cardapio.add_section(title, 'session-properties', hidden_when_no_query=True)
         self.SESSION_SECTION = section
-
 
     def build_system_section(self, title, tooltip):
         """
@@ -724,7 +674,6 @@ class CardapioGtkView(CardapioViewInterface):
         section, dummy = self._cardapio.add_section(title, 'applications-system', hidden_when_no_query=True)
         self.SYSTEM_SECTION = section
 
-
     def build_places_section(self, title, tooltip):
         """
         Creates the Places section to the app pane
@@ -732,7 +681,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         section, dummy = self._cardapio.add_section(title, 'folder', tooltip=tooltip, hidden_when_no_query=False)
         self.PLACES_SECTION = section
-
 
     def build_pinneditems_section(self, title, tooltip):
         """
@@ -743,7 +691,6 @@ class CardapioGtkView(CardapioViewInterface):
                                                     hidden_when_no_query=False)
         self.FAVORITES_SECTION = section
 
-
     def build_sidepane_section(self, title, tooltip):
         """
         Creates the Side Pane section to the app pane
@@ -753,7 +700,6 @@ class CardapioGtkView(CardapioViewInterface):
                                                     hidden_when_no_query=True)
         self.SIDEPANE_SECTION = section
 
-
     def remove_about_context_menu_items(self):
         """
         Removes "About Gnome" and "About %distro" from Cardapio's context menu
@@ -761,7 +707,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         self.get_widget('AboutGnomeMenuItem').set_visible(False)
         self.get_widget('AboutDistroMenuItem').set_visible(False)
-
 
     def show_window_frame(self):
         """
@@ -771,7 +716,6 @@ class CardapioGtkView(CardapioViewInterface):
         self.main_window.set_deletable(False)  # remove "close" button from window frame (doesn't work with Compiz!)
         self.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_NONE)
 
-
     def hide_window_frame(self):
         """
         Hides the window frame around Cardapio
@@ -779,7 +723,6 @@ class CardapioGtkView(CardapioViewInterface):
         self.main_window.set_decorated(False)
         self.main_window.set_deletable(True)
         self.get_widget('MainWindowBorder').set_shadow_type(gtk.SHADOW_IN)
-
 
     def remove_all_buttons_from_section(self, section):
         """
@@ -790,9 +733,8 @@ class CardapioGtkView(CardapioViewInterface):
         if container is None: return
         for child in container.get_children():
             container.remove(child)
-        # TODO: for speed, remove/readd container from its parent instead of
-        # removing each child!
-
+            # TODO: for speed, remove/readd container from its parent instead of
+            # removing each child!
 
     def remove_all_buttons_from_category_panes(self):
         """
@@ -802,7 +744,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         for child in self.CATEGORY_PANE.get_children(): self.CATEGORY_PANE.remove(child)
         for child in self.SYSTEM_CATEGORY_PANE.get_children(): self.SYSTEM_CATEGORY_PANE.remove(child)
-
 
     def toggle_mini_mode_ui(self, update_window_size=True):
         """
@@ -876,7 +817,6 @@ class CardapioGtkView(CardapioViewInterface):
             if update_window_size:
                 self._cardapio.settings['window size'][0] += self.get_main_splitter_position()
 
-
     def setup_search_entry(self, place_at_top, place_at_left):
         """
         Hides 3 of the 4 search entries and returns the visible entry.
@@ -908,14 +848,12 @@ class CardapioGtkView(CardapioViewInterface):
         self.search_entry.set_text(text)
         self.search_entry.handler_unblock_by_func(self.on_search_entry_changed)
 
-
     def focus_search_entry(self):
         """
         Focuses the search entry
         """
 
         self.main_window.set_focus(self.search_entry)
-
 
     def show_section_status_text(self, section, text):
         """
@@ -934,7 +872,6 @@ class CardapioGtkView(CardapioViewInterface):
         section_contents.pack_start(label, expand=False, fill=False)
         section_contents.show()
 
-
     def run_in_ui_thread(self, function, *args, **kwargs):
         """
         Runs a function making sure that no other thread can write to the UI.
@@ -942,7 +879,6 @@ class CardapioGtkView(CardapioViewInterface):
         gtk.gdk.threads_enter()
         function(*args, **kwargs)
         gtk.gdk.threads_leave()
-
 
     def add_application_section(self, section_title):
         """
@@ -975,13 +911,11 @@ class CardapioGtkView(CardapioViewInterface):
 
         return section, label
 
-
     def show_pane(self, pane):
         """
         Show the pane given by one of the *_PANE constants
         """
         pane.show()
-
 
     def hide_pane(self, pane):
         """
@@ -989,13 +923,11 @@ class CardapioGtkView(CardapioViewInterface):
         """
         pane.hide()
 
-
     def show_button(self, button):
         """
         Show the given button
         """
         button.show()
-
 
     def hide_button(self, button):
         """
@@ -1003,13 +935,11 @@ class CardapioGtkView(CardapioViewInterface):
         """
         button.hide()
 
-
     def resize_main_window(self, width, height):
         """
         Resizes the main Cardapio window
         """
         self.main_window.resize(width, height)
-
 
     def move_main_window(self, x, y, anchor_right, anchor_bottom):
         """
@@ -1035,13 +965,11 @@ class CardapioGtkView(CardapioViewInterface):
         else:
             self.main_window.move(x, y)
 
-
     def set_subfolder_section_title(self, title):
         """
         Sets the title of the subfolder section
         """
         self.subfolders_label.set_text(title)
-
 
     def show_rebuild_required_bar(self):
         """
@@ -1050,13 +978,11 @@ class CardapioGtkView(CardapioViewInterface):
         """
         self.get_widget('ReloadMessageBar').show()
 
-
     def hide_rebuild_required_bar(self):
         """
         Hide the "rebuild required" bar.
         """
         self.get_widget('ReloadMessageBar').hide()
-
 
     def set_screen(self, screen_number):
         """
@@ -1064,7 +990,6 @@ class CardapioGtkView(CardapioViewInterface):
         """
         self._screen = self._display.get_screen(screen_number)
         self._root_window = self._screen.get_root_window()
-
 
     def get_screen_with_pointer(self):
         """
@@ -1074,13 +999,11 @@ class CardapioGtkView(CardapioViewInterface):
         screen, dummy, dummy, dummy = self._display.get_pointer()
         return screen.get_number()
 
-
     def place_text_cursor_at_end(self):
         """
         Places the text cursor at the end of the text entry
         """
         self.search_entry.set_position(-1)
-
 
     def hide_section(self, section):
         """
@@ -1088,13 +1011,11 @@ class CardapioGtkView(CardapioViewInterface):
         """
         section.hide()
 
-
     def hide_sections(self, sections):
         """
         Hides the application sections listed in the array "sections"
         """
         for section in sections: section.hide()
-
 
     def clear_search_entry(self):
         """
@@ -1102,13 +1023,11 @@ class CardapioGtkView(CardapioViewInterface):
         """
         self.search_entry.set_text('')
 
-
     def set_search_entry_text(self, text):
         """
         Removes all text from the search entry.
         """
         self.search_entry.set_text(text)
-
 
     def get_search_entry_text(self):
         """
@@ -1118,7 +1037,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         text = self.search_entry.get_text()
         return unicode(text, 'utf-8')
-
 
     def show_message_window(self):
         """
@@ -1142,7 +1060,6 @@ class CardapioGtkView(CardapioViewInterface):
         while gtk.events_pending():
             gtk.main_iteration()
 
-
     def hide_message_window(self):
         """
         Hide the "Rebuilding..." message window
@@ -1154,7 +1071,6 @@ class CardapioGtkView(CardapioViewInterface):
         gtk.gdk.flush()
         while gtk.events_pending():
             gtk.main_iteration()
-
 
     def show_main_window(self):
         """
@@ -1187,14 +1103,12 @@ class CardapioGtkView(CardapioViewInterface):
 
         self.main_window.hide()
 
-
     def open_about_dialog(self):
         """
         Shows the "About" dialog
         """
 
         self.about_dialog.show()
-
 
     def show_executable_file_dialog(self, primary_text, secondary_text, hide_terminal_option):
         """
@@ -1217,7 +1131,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         return response
 
-
     def block_focus_out_event(self):
         """
         Blocks the focus-out event
@@ -1227,7 +1140,6 @@ class CardapioGtkView(CardapioViewInterface):
             self.main_window.handler_block_by_func(self.on_mainwindow_focus_out)
             self.main_window.handler_block_by_func(self.on_mainwindow_cursor_leave)
             self._focus_out_blocked = True
-
 
     # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     # Private methods
@@ -1251,7 +1163,6 @@ class CardapioGtkView(CardapioViewInterface):
             if stdout: return wm
 
         return None
-
 
     def _read_gui_theme_info(self):
         """
@@ -1292,9 +1203,8 @@ class CardapioGtkView(CardapioViewInterface):
         else:
             window.window.focus()
 
-        # TODO: must handle Cinnamon here, since we are getting focus
-        # problems in the WM :(
-
+            # TODO: must handle Cinnamon here, since we are getting focus
+            # problems in the WM :(
 
     def _toggle_app_button(self, widget, state):
         """
@@ -1303,7 +1213,6 @@ class CardapioGtkView(CardapioViewInterface):
         widget.handler_block_by_func(self.on_app_button_clicked)
         widget.set_active(state)
         widget.handler_unblock_by_func(self.on_app_button_clicked)
-
 
     def _handle_if_key_combo(self, event):
         """
@@ -1319,7 +1228,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         return False
 
-
     def is_cursor_inside_window(self, window):
         """
         Returns True if the mouse cursor is inside the given window. False
@@ -1332,7 +1240,6 @@ class CardapioGtkView(CardapioViewInterface):
         w, h = list(window.get_size())
 
         return (x0 <= mouse_x <= x0 + w and y0 <= mouse_y <= y0 + h)
-
 
     def _get_nth_visible_app_widget(self, n=1):
         """
@@ -1353,7 +1260,6 @@ class CardapioGtkView(CardapioViewInterface):
                 if n == 0: return child
 
         return None
-
 
     def _add_button(self, button_str, icon_name, pane_or_section, tooltip, button_type):
         # TODO MVC: break this into add_app_button, add_sidebar_button, etc., so
@@ -1420,7 +1326,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         return button
 
-
     def _get_button_container_from_section(self, section):
         """
         Returns a SectionContents widget given a SectionSlab. (SectionContents
@@ -1435,7 +1340,6 @@ class CardapioGtkView(CardapioViewInterface):
         except:
             return None
 
-
     def _remove_all_children(self, container):
         """
         Removes all children from a GTK container
@@ -1443,20 +1347,17 @@ class CardapioGtkView(CardapioViewInterface):
 
         for child in container: container.remove(child)
 
-
     def _get_ctrl_key_state(self):
         """
         Returns True if the CTRL key is pressed, and False otherwise.
         """
         return (gtk.get_current_event().state & gtk.gdk.CONTROL_MASK == gtk.gdk.CONTROL_MASK)
 
-
     def _get_shift_key_state(self):
         """
         Returns True if the SHIFT key is pressed, and False otherwise.
         """
         return (gtk.get_current_event().state & gtk.gdk.SHIFT_MASK == gtk.gdk.SHIFT_MASK)
-
 
     def _move_main_window_with_gravity_hack(self, x, y):
         """
@@ -1486,7 +1387,6 @@ class CardapioGtkView(CardapioViewInterface):
         self.main_window.set_gravity(gtk.gdk.GRAVITY_NORTH_WEST)
         self.main_window.move(x, y)
 
-
     def _get_icon_pixbuf_from_app_info(self, app_info):
         """
         Get the icon pixbuf for an app given its app_info dict
@@ -1494,7 +1394,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         return self._cardapio.icon_helper.get_icon_pixbuf(app_info['icon name'],
                                                           self._cardapio.icon_helper.icon_size_app)
-
 
     # . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     # Callbacks
@@ -1508,14 +1407,12 @@ class CardapioGtkView(CardapioViewInterface):
             self._read_gui_theme_info()
             self._cardapio.handle_view_settings_changed()
 
-
     def on_mainwindow_destroy(self, *dummy):
         """
         Handler for when the Cardapio window is destroyed
         """
 
         self._cardapio.handle_window_destroyed()
-
 
     def on_all_sections_sidebar_button_clicked(self, widget):
         """
@@ -1528,7 +1425,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         self._cardapio.handle_section_all_clicked()
 
-
     def on_sidebar_button_clicked(self, widget, section):
         """
         Handler for when the user chooses a category in the sidebar
@@ -1540,14 +1436,12 @@ class CardapioGtkView(CardapioViewInterface):
 
         return not self._cardapio.handle_section_clicked(section)
 
-
     def on_sidebar_button_hovered(self, widget):
         """
         Handler for when the user hovers over a category in the sidebar
         """
 
         widget.set_active(True)
-
 
     def on_mainwindow_button_pressed(self, widget, event):
         """
@@ -1567,7 +1461,6 @@ class CardapioGtkView(CardapioViewInterface):
             self.block_focus_out_event()
             self.context_menu.popup(None, None, None, event.button, event.time)
 
-
     def on_search_entry_button_pressed(self, widget, event):
         """
         Handler for when the users clicks on the search entry. We use this to
@@ -1578,10 +1471,8 @@ class CardapioGtkView(CardapioViewInterface):
             self.block_focus_out_event()
             glib.timeout_add(self.FOCUS_BLOCK_INTERVAL, self.unblock_focus_out_event)
 
-
     def on_about_cardapio_clicked(self, dummy):
         self.open_about_dialog()
-
 
     def on_context_menu_selection_done(self, widget):
         """
@@ -1590,7 +1481,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         widget = self._clicked_app_button
         self._toggle_app_button(widget, False)
-
 
     def on_app_button_clicked(self, widget):
         """
@@ -1604,7 +1494,6 @@ class CardapioGtkView(CardapioViewInterface):
         self._cardapio.handle_app_clicked(widget.app_info, 1, ctrl_is_pressed, shift_is_pressed)
 
         self._toggle_app_button(widget, False)
-
 
     def on_app_button_button_pressed(self, widget, event):
         """
@@ -1626,7 +1515,6 @@ class CardapioGtkView(CardapioViewInterface):
         self._clicked_app_button = widget
         self._cardapio.handle_app_clicked(widget.app_info, event.button, False, False)
 
-
     def on_view_mode_toggled(self, widget):
         """
         Handler for when the "system menu" button is toggled
@@ -1638,7 +1526,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         self._cardapio.handle_view_mode_toggled(widget.get_active())
 
-
     def on_dialog_close(self, dialog, response=None):
         """
         Handler for when a dialog's X button is clicked. This is used for the
@@ -1647,7 +1534,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         dialog.hide()
         return True
-
 
     def on_mainwindow_after_key_pressed(self, widget, event):
         """
@@ -1676,7 +1562,6 @@ class CardapioGtkView(CardapioViewInterface):
         else:
             self._previously_focused_widget = None
 
-
     def on_mainwindow_key_pressed(self, widget, event):
         """
         This is a trick to make sure the user isn't already typing at the
@@ -1687,26 +1572,21 @@ class CardapioGtkView(CardapioViewInterface):
         if self.main_window.get_focus() != self.search_entry:
             self._previously_focused_widget = self.main_window.get_focus()
 
-
     def on_mainwindow_focus_out(self, widget, event):
 
         self._cardapio.handle_mainwindow_focus_out()
-
 
     def on_mainwindow_cursor_leave(self, widget, event):
 
         self._cardapio.handle_mainwindow_cursor_leave()
 
-
     def on_mainwindow_delete_event(self, widget, event):
 
         self._cardapio.handle_user_closing_mainwindow()
 
-
     def on_search_entry_icon_pressed(self, widget, iconpos, event):
 
         self._cardapio.handle_search_entry_icon_pressed()
-
 
     def on_search_entry_activate(self, widget):
 
@@ -1724,14 +1604,12 @@ class CardapioGtkView(CardapioViewInterface):
 
         self._cardapio.handle_about_menu_item_clicked('AboutGnome')
 
-
     def on_about_distro_clicked(self, widget):
         """
         Opens the "About %distro%" dialog
         """
 
         self._cardapio.handle_about_menu_item_clicked('AboutDistro')
-
 
     def on_options_menu_item_clicked(self, *dummy):
         """
@@ -1740,7 +1618,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         self._cardapio.open_options_dialog()
 
-
     def on_edit_menu_item_clicked(self, *dummy):
         """
         Open the menu editor app
@@ -1748,11 +1625,9 @@ class CardapioGtkView(CardapioViewInterface):
 
         self._cardapio.handle_editor_menu_item_clicked()
 
-
     def on_search_entry_changed(self, *dummy):
 
         self._cardapio.handle_search_entry_changed()
-
 
     def on_search_entry_key_pressed(self, widget, event):
         """
@@ -1779,7 +1654,6 @@ class CardapioGtkView(CardapioViewInterface):
             return False
         return True
 
-
     def on_main_splitter_clicked(self, widget, event):
         """
         Make sure user can't move the splitter when in mini mode
@@ -1793,51 +1667,41 @@ class CardapioGtkView(CardapioViewInterface):
                 # block any other type of clicking when in mini mode
                 return True
 
-
     def on_pin_this_app_clicked(self, widget):
 
         self._cardapio.handle_pin_this_app_clicked(self._clicked_app_button.app_info)
-
 
     def on_unpin_this_app_clicked(self, widget):
 
         self._cardapio.handle_unpin_this_app_clicked(self._clicked_app_button.app_info)
 
-
     def on_add_to_side_pane_clicked(self, widget):
 
         self._cardapio.handle_add_to_side_pane_clicked(self._clicked_app_button.app_info)
-
 
     def on_remove_from_side_pane_clicked(self, widget):
 
         self._cardapio.handle_remove_from_side_pane_clicked(self._clicked_app_button.app_info)
 
-
     def on_open_parent_folder_pressed(self, widget):
 
         self._cardapio.handle_open_parent_folder_pressed(self._clicked_app_button.app_info)
-
 
     def on_launch_in_background_pressed(self, widget):
 
         self._cardapio.handle_launch_in_background_pressed(self._clicked_app_button.app_info)
 
-
     def on_peek_inside_pressed(self, widget):
 
         self._cardapio.handle_peek_inside_pressed(self._clicked_app_button.app_info)
-
 
     def on_eject_pressed(self, widget):
 
         self._cardapio.handle_eject_pressed(self._clicked_app_button.app_info)
 
-
     def on_open_app_pressed(self, widget):
 
         self._cardapio.handle_launch_app_pressed(self._clicked_app_button.app_info)
-
 
     def on_app_button_focused(self, widget, event):
         """
@@ -1854,7 +1718,6 @@ class CardapioGtkView(CardapioViewInterface):
         elif alloc.y + alloc.height > scroller_position + page_size:
             self.scroll_adjustment.set_value(alloc.y + alloc.height - page_size)
 
-
     def on_app_button_drag_begin(self, button, drag_context):
         """
         In a drag-and-drop operation, setup the icon that will be displayed near the
@@ -1863,7 +1726,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         icon_pixbuf = self._get_icon_pixbuf_from_app_info(button.app_info)
         button.drag_source_set_icon_pixbuf(icon_pixbuf)
-
 
     def on_app_button_data_get(self, button, drag_context, selection_data, info, time):
         """
@@ -1874,13 +1736,11 @@ class CardapioGtkView(CardapioViewInterface):
         app_uri = self._cardapio.get_app_uri_for_drag_and_drop(button.app_info)
         selection_data.set_uris([app_uri])
 
-
     def on_back_button_clicked(self, widget):
         """
         Handler for when the "back" button is clicked.
         """
         self._cardapio.handle_back_button_clicked()
-
 
     def on_resize_started(self, widget, event):
         """
@@ -1934,7 +1794,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         self.main_window.window.begin_resize_drag(edge, event.button, x, y, event.time)
 
-
     def on_resize_ended(self, *dummy):
         """
         This function is called when the user releases the mouse after resizing the
@@ -1943,7 +1802,6 @@ class CardapioGtkView(CardapioViewInterface):
 
         self._cardapio.handle_resize_done()
         self.unblock_focus_out_event()
-
 
     def on_reload_button_clicked(self, widget):
         self._cardapio.handle_reload_clicked()

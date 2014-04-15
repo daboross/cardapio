@@ -76,7 +76,6 @@ class CardapioPluginInterface(object):
         """
         pass
 
-
     def __del__(self):
         """
         NOT REQUIRED
@@ -85,7 +84,6 @@ class CardapioPluginInterface(object):
         (Typically once per session, unless the user is turning plugins on/off)
         """
         pass
-
 
     def search(self, text, result_limit):
         """
@@ -140,7 +138,6 @@ class CardapioPluginInterface(object):
         """
         pass
 
-
     def cancel(self):
         """
         NOT REQUIRED
@@ -149,7 +146,6 @@ class CardapioPluginInterface(object):
         done in a separate thread (which it should, as much as possible)
         """
         pass
-
 
     def on_reload_permission_granted(self):
         """

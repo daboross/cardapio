@@ -107,12 +107,12 @@ class CardapioPlugin(CardapioPluginInterface):
 
         self.action_command = r"sezen '%s'"  # NOTE: Seif said he would add this capability into Sezen
         self.action = {
-        'name': _('Show additional results'),
-        'tooltip': _('Show additional search results in Sezen'),
-        'icon name': 'system-search',
-        'type': 'callback',
-        'command': self.more_results_action,
-        'context menu': None,
+            'name': _('Show additional results'),
+            'tooltip': _('Show additional search results in Sezen'),
+            'icon name': 'system-search',
+            'type': 'callback',
+            'command': self.more_results_action,
+            'context menu': None,
         }
 
         self.event_template = self.datamodel.Event()
@@ -138,7 +138,6 @@ class CardapioPlugin(CardapioPluginInterface):
             self.time_range = self.datamodel.TimeRange(0, now - 30 * DAY)
 
         self.loaded = True
-
 
     def search(self, text, result_limit):
 
@@ -168,7 +167,6 @@ class CardapioPlugin(CardapioPluginInterface):
             #storage_state = self.datamodel.StorageState.Available, # not yet implemented in Zeitgeist!
             result_type=self.result_type
         )
-
 
     def handle_search_result(self, events):
 
@@ -212,12 +210,12 @@ class CardapioPlugin(CardapioPluginInterface):
                 urls_seen.add(canonical_path)
 
                 item = {
-                'name': subject.text,
-                'icon name': subject.mimetype,
-                'tooltip': canonical_path,
-                'command': canonical_path,
-                'type': 'xdg',
-                'context menu': None,
+                    'name': subject.text,
+                    'icon name': subject.mimetype,
+                    'tooltip': canonical_path,
+                    'command': canonical_path,
+                    'type': 'xdg',
+                    'context menu': None,
                 }
 
                 parsed_results.append(item)
@@ -228,7 +226,6 @@ class CardapioPlugin(CardapioPluginInterface):
             parsed_results.append(self.action)
 
         self.c.handle_search_result(self, parsed_results, self.current_query)
-
 
     def more_results_action(self, text):
 

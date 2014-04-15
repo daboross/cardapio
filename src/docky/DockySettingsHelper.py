@@ -34,12 +34,10 @@ class DockySettingsHelper:
 
     gconf_client = gconf.client_get_default()
 
-
     def __init__(self):
         # sets the names of user's active docks
         self.active_docks = self.gconf_client.get_list(self.docky_dcontroller_gconf_root + 'ActiveDocks',
                                                        gconf.VALUE_STRING)
-
 
     def get_main_dock(self):
         """
@@ -57,14 +55,12 @@ class DockySettingsHelper:
 
         return main_docks[0]
 
-
     def get_icon_size(self, dock):
         """
         Returns the IconSize property for chosen dock.
         """
 
         return self.gconf_client.get_int(self.docky_iface_gconf_root + dock + '/IconSize')
-
 
     def get_zoom_percentage(self, dock):
         """
@@ -78,14 +74,12 @@ class DockySettingsHelper:
         else:
             return 1
 
-
     def get_position(self, dock):
         """
         Returns the Position property for chosen dock.
         """
 
         return self.gconf_client.get_string(self.docky_iface_gconf_root + dock + '/Position')
-
 
     def is_in_panel_mode(self, dock):
         """
@@ -94,14 +88,12 @@ class DockySettingsHelper:
 
         return self.gconf_client.get_bool(self.docky_iface_gconf_root + dock + '/PanelMode')
 
-
     def is_showing_hover(self):
         """
         Returns a flag saying whether Docky's icon has a hover.
         """
 
         return self.gconf_client.get_string(self.docky_gconf_root + '/Items/DockyItem/HoverText') != ''
-
 
     def get_horizontal_offset(self, dock):
         """
@@ -111,7 +103,6 @@ class DockySettingsHelper:
         """
 
         return 5 if self.is_in_panel_mode(dock) else 15
-
 
     def get_vertical_offset(self, dock, position):
         """
@@ -125,7 +116,6 @@ class DockySettingsHelper:
         offset = 5 if self.is_in_panel_mode(dock) else 15
 
         return offset
-
 
     def get_best_position(self, dock_num):
         """

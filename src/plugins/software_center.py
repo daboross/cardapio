@@ -41,7 +41,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
     hide_from_sidebar = True
 
-
     def __init__(self, cardapio_proxy, category):
         '''
         This method is called when the plugin is enabled.
@@ -117,23 +116,23 @@ class CardapioPlugin(CardapioPluginInterface):
                 self.apps_filter.set_only_packages_without_applications(True)
 
             self.action = {
-            'name': _('Open Software Center'),
-            'tooltip': _('Search for more software in the Software Center'),
-            'icon name': 'system-search',  # using this icon because otherwise it looks strange...
-            'type': 'callback',
-            'command': self.open_softwarecenter_search,
-            'context menu': None,
+                'name': _('Open Software Center'),
+                'tooltip': _('Search for more software in the Software Center'),
+                'icon name': 'system-search',  # using this icon because otherwise it looks strange...
+                'type': 'callback',
+                'command': self.open_softwarecenter_search,
+                'context menu': None,
             }
         else:
             self.c.write_to_log(self, 'Detected Ubuntu older than 10.10')
             self.apps_filter.set_only_packages_without_applications(True)
             self.action = {
-            'name': _('Open Software Center'),
-            'tooltip': _('Search for more software in the Software Center'),
-            'icon name': 'system-search',  # using this icon because otherwise it looks strange...
-            'type': 'raw',
-            'command': 'software-center',
-            'context menu': None,
+                'name': _('Open Software Center'),
+                'tooltip': _('Search for more software in the Software Center'),
+                'icon name': 'system-search',  # using this icon because otherwise it looks strange...
+                'type': 'raw',
+                'command': 'software-center',
+                'context menu': None,
             }
 
         self.context_menu_action_name = _('_Install %s')
@@ -155,7 +154,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
         self.loaded = True  # set to true if everything goes well
 
-
     def __del__(self):
 
         # handle objects that somehow seem to leak memory
@@ -167,7 +165,6 @@ class CardapioPlugin(CardapioPluginInterface):
         self.action = None  # for some reason this has to be cleared to prevent a memory leak (wtf)
         self.db = None
         self.cache = None
-
 
     def search(self, text, result_limit):
 
@@ -211,20 +208,20 @@ class CardapioPlugin(CardapioPluginInterface):
                     tooltip += '\n' + self.summary_str + ' ' + summary
 
                 item = {
-                'name': name,
-                'tooltip': tooltip,
-                'icon name': icon_name,
-                'type': 'raw',
-                'command': "software-center '%s'" % pkgname,
-                'context menu': [
-                    {
-                    'name': self.context_menu_action_name % name,
-                    'tooltip': self.context_menu_action_tooltip,
-                    'icon name': 'gtk-save',
+                    'name': name,
+                    'tooltip': tooltip,
+                    'icon name': icon_name,
                     'type': 'raw',
-                    'command': 'apturl-gtk apt:%s' % pkgname,
-                    },
-                ]
+                    'command': "software-center '%s'" % pkgname,
+                    'context menu': [
+                        {
+                            'name': self.context_menu_action_name % name,
+                            'tooltip': self.context_menu_action_tooltip,
+                            'icon name': 'gtk-save',
+                            'type': 'raw',
+                            'command': 'apturl-gtk apt:%s' % pkgname,
+                        },
+                    ]
                 }
 
                 results.append(item)
@@ -234,7 +231,6 @@ class CardapioPlugin(CardapioPluginInterface):
             results.append(self.action)
 
         self.c.handle_search_result(self, results, self.current_query)
-
 
     def on_reload_permission_granted(self):
 
@@ -247,7 +243,6 @@ class CardapioPlugin(CardapioPluginInterface):
 
         if event == self.gio.FILE_MONITOR_EVENT_CHANGES_DONE_HINT:
             self.c.ask_for_reload_permission(self)
-
 
     def open_softwarecenter_search(self, text):
         try:

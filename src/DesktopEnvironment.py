@@ -75,7 +75,6 @@ class DesktopEnvironment:
         elif self.environment == 'cinnamon':
             self.init_gnome3()
 
-
     def init_gnome(self):
         """
         Override some of the default variables for use in Gnome
@@ -129,7 +128,6 @@ class DesktopEnvironment:
         self.save_session = 'dbus-send --session --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.Logout uint32:0'
         self.shutdown = 'dbus-send --session --dest=org.gnome.SessionManager /org/gnome/SessionManager org.gnome.SessionManager.Shutdown'
 
-
     def init_lxde(self):
         """
         Override some of the default variables for use in LXDE
@@ -142,7 +140,6 @@ class DesktopEnvironment:
         self.save_session = 'pkill -SIGTERM lxsession'
         self.shutdown = 'lxde-logout'
 
-
     def register_session_close_handler(self, handler):
         """
         Register the callback that saves all settings when the user's session is closed
@@ -152,7 +149,6 @@ class DesktopEnvironment:
             self.register_gnome_session_close_handler(handler)
         elif self.environment == 'mate':
             self.register_gnome_session_close_handler(handler)
-
 
     def register_gnome_session_close_handler(self, handler):
         """

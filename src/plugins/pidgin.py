@@ -169,12 +169,12 @@ class CardapioPlugin(CardapioPluginInterface):
 
             # add 'talk to this buddy' item
             items.append({
-            'name': buddy[2] + ' ({0})'.format(buddy[1]),
-            'tooltip': _('Talk to this buddy'),
-            'icon name': buddy[3],
-            'type': 'callback',
-            'command': conversation_callback.start_conversation,
-            'context menu': None
+                'name': buddy[2] + ' ({0})'.format(buddy[1]),
+                'tooltip': _('Talk to this buddy'),
+                'icon name': buddy[3],
+                'type': 'callback',
+                'command': conversation_callback.start_conversation,
+                'context menu': None
             })
 
         self.cardapio.handle_search_result(self, items, text)
