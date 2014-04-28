@@ -19,7 +19,7 @@
 # the function fatal_error(), which is used in the "except"
 
 from misc import *
-
+from Cardapio import _
 try:
     import Constants
 

@@ -139,6 +139,7 @@ class Cardapio(dbus.service.Object):
         """
         Creates an instance of Cardapio.
         """
+        dbus.service.Object.__init__(self)
 
         self._create_xdg_folders()  # must happen before logging is setup
         self._setup_log_file(debug)
@@ -1231,7 +1232,8 @@ class Cardapio(dbus.service.Object):
         """
 
         keywordtext = self._parse_keyword_query(text)
-        if not keywordtext: return True
+        if not keywordtext:
+            return True
 
         keyword, text = keywordtext
         keyword_exists = False
@@ -1243,7 +1245,8 @@ class Cardapio(dbus.service.Object):
                 keyword = plugin_keyword
                 break
 
-        if not keyword_exists: return True
+        if not keyword_exists:
+            return True
 
         plugin = self._keyword_to_plugin_mapping[keyword][0]
 
@@ -3183,7 +3186,8 @@ class Cardapio(dbus.service.Object):
         elif command_type == 'xdg':
 
             path_type, dummy = urllib2.splittype(command)
-            if path_type is None: command = 'file://' + command
+            if path_type is None:
+                command = 'file://' + command
 
         # TODO: figure out how to handle drag-and-drop for 'computer://' and
         # 'trash://' (it seems that nautilus has the same problems...)
@@ -3198,19 +3202,3 @@ class Cardapio(dbus.service.Object):
         Collapses the sidebar into a row of small buttons (i.e. minimode)
         """
         self._view.toggle_mini_mode_ui()
-
-# . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
-# Create some new built-ins for use in the plugins
-
-import __builtin__
-
-__builtin__._ = _
-__builtin__.CardapioPluginInterface = CardapioPluginInterface
-__builtin__.dbus = dbus
-__builtin__.logging = logging
-__builtin__.subprocess = subprocess
-__builtin__.get_output = get_output
-__builtin__.fatal_error = fatal_error
-__builtin__.which = which
-
-

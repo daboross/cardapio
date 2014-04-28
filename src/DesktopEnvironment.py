@@ -16,8 +16,11 @@
 #  You should have received a copy of the GNU General Public License
 #  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+import logging
 
 import os
+import subprocess
+from src.docky.cardapio_helper import which
 
 
 class DesktopEnvironment:
@@ -66,12 +69,8 @@ class DesktopEnvironment:
             self.init_lxde()
         elif self.environment == 'lwde':
             pass
-        elif self.environment == 'mate':
-            self.init_mate()
         elif self.environment == 'gnome':
             self.init_gnome()
-        elif self.environment == 'gnome-shell':
-            self.init_gnome3()
         elif self.environment == 'cinnamon':
             self.init_gnome3()
 
@@ -86,29 +85,6 @@ class DesktopEnvironment:
 
         try:
             from gnome import execute_terminal_shell
-
-            self.execute_in_terminal = execute_terminal_shell
-
-        except Exception, exception:
-            logging.warn('Warning: you will not be able to execute scripts in the terminal')
-
-    def init_mate(self):
-        """
-        Override some of the default variables for use in Mate
-        """
-
-        # When libexo is installed (use in some xfce apps) it breaks xdg-open
-        # for some reason. So we here substitute it with gnome-open.
-        self.file_open = "mate-open '%s'"
-        self.menu_editor = 'mozo'
-        self.connect_to_server = which('caja-connect-server')
-        self.lock_screen = 'mate-screensaver-command --lock'
-        self.save_session = 'mate-session-save --logout-dialog'
-        self.shutdown = 'mate-session-save --shutdown-dialog'
-        self.about_de = 'mate-about'
-
-        try:
-            from mate import execute_terminal_shell
 
             self.execute_in_terminal = execute_terminal_shell
 
@@ -159,9 +135,6 @@ class DesktopEnvironment:
             if self.environment == 'gnome':
                 from gnome import program_init as gnome_program_init
                 from gnome.ui import master_client as gnome_ui_master_client
-            elif self.environment == 'mate':
-                from mate import program_init as gnome_program_init
-                from mate.ui import master_client as gnome_ui_master_client
 
         except Exception, exception:
             logging.warn('Warning: Cardapio will not be able to tell when the Gnome session is closed')

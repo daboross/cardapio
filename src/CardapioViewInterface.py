@@ -16,6 +16,9 @@
 #
 
 class CardapioViewInterface:
+    def __init__(self):
+        pass
+
     # all these constants can be overridden, so long as they
     # maintain their uniqueness (within their own groups)
 

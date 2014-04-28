@@ -40,14 +40,14 @@ class GMenuHelper(MenuHelperInterface):
             self._node = None
 
     def is_valid(self):
-        return (self._node is not None)
+        return self._node is not None
 
     def _wrap_entry(self, entry):
 
-        menuHelper = GMenuHelper()
-        menuHelper._root = self._root
-        menuHelper._node = entry
-        return menuHelper
+        menu_helper = GMenuHelper()
+        menu_helper._root = self._root
+        menu_helper._node = entry
+        return menu_helper
 
     def __iter__(self):
         def the_iter(entries):

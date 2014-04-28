@@ -16,6 +16,7 @@
 #
 
 from misc import *
+from Cardapio import _
 
 try:
     import Cardapio
@@ -47,7 +48,7 @@ class SettingsHelper:
         with self.get_config_file('r') as config_file:
             # if the file is empty, we assume it's the first run and
             # we'll fill it while saving the settings for the first time
-            if (os.path.getsize(config_file.name) > 0):
+            if os.path.getsize(config_file.name) > 0:
                 s = json.load(config_file)
 
         default_side_pane_items = []
@@ -80,7 +81,7 @@ class SettingsHelper:
         self.read_config_option(s, 'open on hover', False)  # bool
         self.read_config_option(s, 'open categories on hover', False)  # bool
         self.read_config_option(s, 'min search string length', 3)  # int, number of characters
-        #self.read_config_option(s, 'menu rebuild delay'         , 3                        , force_update_from_version = [0,9,96]) # seconds
+        #self.read_config_option(s, 'menu rebuild delay', 3, force_update_from_version = [0,9,96]) # seconds
         self.read_config_option(s, 'search results limit', 5)  # int, number of results
         self.read_config_option(s, 'long search results limit', 15)  # int, number of results
         self.read_config_option(s, 'local search update delay', 100, force_update_from_version=[0, 9, 96])  # msec
@@ -88,16 +89,15 @@ class SettingsHelper:
         self.read_config_option(s, 'local search timeout', 3000)  # msec
         self.read_config_option(s, 'remote search timeout', 5000)  # msec
         self.read_config_option(s, 'autohide delay', 250)  # msec
-        self.read_config_option(s, 'keybinding',
-                                '<Super>space')  # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
+        self.read_config_option(s, 'keybinding', '<Super>space')
+        # the user should use gtk.accelerator_parse('<Super>space') to see if the string is correct!
         self.read_config_option(s, 'applet label', _('Menu'))  # string
-        self.read_config_option(s, 'applet icon', 'start-here',
-                                override_empty_str=False)  # string (either a path to the icon, or an icon name)
+        self.read_config_option(s, 'applet icon', 'start-here', override_empty_str=False)
+        # string (either a path to the icon, or an icon name)
         self.read_config_option(s, 'pinned items', [])
         self.read_config_option(s, 'side pane items', default_side_pane_items)
-        self.read_config_option(s, 'active plugins',
-                                ['pinned', 'places', 'applications', 'zeitgeist_simple', 'google', 'command_launcher',
-                                 'software_center'])
+        self.read_config_option(s, 'active plugins', ['pinned', 'places', 'applications', 'zeitgeist_simple', 'google',
+                                                      'command_launcher', 'software_center'])
         self.read_config_option(s, 'plugin settings', {})
         self.read_config_option(s, 'show titlebar', False)  # bool
         self.read_config_option(s, 'allow transparency', False)  # bool
@@ -231,20 +231,19 @@ class SettingsHelper:
         Returns the value of the setting named 'name'.
         """
 
-        return self.settings[name];
+        return self.settings[name]
 
     def __setitem__(self, name, value):
         """
         Sets the value of the setting named 'name' to 'value'.
         """
 
-        self.settings[name] = value;
+        self.settings[name] = value
 
 
 class FatalSettingsError(Exception):
     """
     Indicates unrecoverable SettingsHelper error.
     """
-
     pass
 
